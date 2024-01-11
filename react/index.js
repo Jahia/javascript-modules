@@ -1,9 +1,9 @@
-export * from './jAddCacheDependency';
-export * from './jBuildNavMenu';
-export * from './jUrl';
-export * from './JAddContentButtons';
-export * from './JAddResources';
-export * from './JArea';
-export * from './JRender';
+export {default as jAddCacheDependency} from './jAddCacheDependency';
+export {default as jBuildNavMenu} from './jBuildNavMenu';
+export {default as jUrl} from './jUrl';
+export {default as JAddContentButtons} from './JAddContentButtons';
+export {default as JAddResources} from './JAddResources';
+export {default as JArea} from './JArea';
+export {default as JRender} from './JRender';
 export * from './register';
 export * from './ServerContext';
