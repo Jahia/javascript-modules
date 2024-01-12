@@ -1,5 +1,5 @@
 import getNodeFromPathOrId from '../utils/getNodeFromPathOrId';
-import {render, registry} from '@jahia/server-helpers';
+import {server} from '@jahia/js-server-engine-private';
 
 const absoluteUrlRegExp = /^(?:[a-z+]+:)?\/\//i;
 
@@ -25,16 +25,16 @@ function appendParameters(url, parameters) {
  * Initialize the registry with default url builders
  */
 export const initUrlBuilder = () => {
-    registry.add('urlBuilder', 'nt:file', {
+    server.registry.add('urlBuilder', 'nt:file', {
         priority: 1,
         buildURL: ({jcrNode, mode, currentResource}) => {
             let workspace = mode ?
                 ((mode === 'edit' || mode === 'preview') ? 'default' : 'live') :
                 currentResource.getWorkspace();
-            return '/files/' + workspace + render.escapePath(jcrNode.getCanonicalPath());
+            return '/files/' + workspace + server.render.escapePath(jcrNode.getCanonicalPath());
         }
     });
-    registry.add('urlBuilder', '*', {
+    server.registry.add('urlBuilder', '*', {
         priority: 0,
         buildURL: ({jcrNode, mode, language, extension, renderContext, currentResource}) => {
             let workspace;
@@ -60,7 +60,7 @@ export const initUrlBuilder = () => {
             }
 
             return servletPath + '/' + workspace + '/' + (language ? language : currentResource.getLocale().toString()) +
-                render.escapePath(jcrNode.getPath()) + (extension ? extension : '.html');
+                server.render.escapePath(jcrNode.getPath()) + (extension ? extension : '.html');
         }
     });
 };
@@ -84,7 +84,7 @@ export const buildUrl = (props, renderContext, currentResource) => {
         }
 
         if (jcrNode) {
-            const urlBuilders = registry.find({type: 'urlBuilder'}, 'priority');
+            const urlBuilders = server.registry.find({type: 'urlBuilder'}, 'priority');
             for (const urlBuilder of urlBuilders) {
                 if (urlBuilder.key === '*' || jcrNode.isNodeType(urlBuilder.key)) {
                     url = urlBuilder.buildURL({

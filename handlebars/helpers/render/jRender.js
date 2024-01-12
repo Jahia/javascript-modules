@@ -1,5 +1,5 @@
 import {SafeString} from 'handlebars';
-import {render} from '@jahia/server-helpers';
+import {server} from '@jahia/js-server-engine-private';
 import setResult from '../../setResult';
 
 const allowedRenderAttributes = ['content', 'node', 'path', 'editable', 'advanceRenderingConfig', 'templateType', 'view', 'parameters'];
@@ -21,6 +21,6 @@ export default function (options) {
         return '';
     }
 
-    const output = new SafeString(render.render(attrs, options.data.root.renderContext, options.data.root.currentResource));
+    const output = new SafeString(server.render.render(attrs, options.data.root.renderContext, options.data.root.currentResource));
     return setResult(output, this, options);
 }

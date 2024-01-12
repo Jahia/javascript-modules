@@ -1,7 +1,7 @@
-import {registry} from '@jahia/server-helpers';
+import {server} from '@jahia/js-server-engine-private';
 
 export const registerJahiaComponents = jahiaComponents => {
-    const reactView = registry.get('view', 'react');
+    const reactView = server.registry.get('view', 'react');
     Object.keys(jahiaComponents).forEach(k => {
         let options;
         const props = jahiaComponents[k].jahiaComponent;
@@ -22,6 +22,6 @@ export const registerJahiaComponents = jahiaComponents => {
         // Replace default values if set in view
         const processOptions = {...options, ...props};
         // Register view
-        registry.add('view', id, reactView, processOptions);
+        server.registry.add('view', id, reactView, processOptions);
     });
 };

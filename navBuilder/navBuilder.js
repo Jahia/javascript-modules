@@ -1,9 +1,9 @@
-import {gql as gqlServer, render} from '@jahia/server-helpers';
+import {server} from '@jahia/js-server-engine-private';
 import {gql} from '@apollo/client';
 import {print} from 'graphql';
 
 const getPageAncestors = (workspace, path) => {
-    const result = gqlServer.executeQuerySync({
+    const result = server.gql.executeQuerySync({
         query: print(gql`
             query ($workspace: Workspace!, $path: String!){
                 jcr(workspace: $workspace) {
@@ -26,7 +26,7 @@ const getPageAncestors = (workspace, path) => {
 };
 
 const getMenuItemsChildren = (workspace, path) => {
-    const result = gqlServer.executeQuerySync({
+    const result = server.gql.executeQuerySync({
         query: print(gql`
             query childrenOfType($workspace: Workspace!, $path: String!){
                 jcr(workspace: $workspace) {
@@ -113,7 +113,7 @@ const buildMenu = (node, navMenuLevel, config) => {
                 const hasChildren = navMenuLevel < config.maxDepth && getMenuItemsChildren(config.workspace, menuItem.getPath()).length > 0;
                 if (config.startLevelValue < navMenuLevel) {
                     config.currentResource.getDependencies().add(menuItem.getCanonicalPath());
-                    menuEntry.render = render.render({
+                    menuEntry.render = server.render.render({
                         path: menuItem.getPath(),
                         view: config.menuEntryView || 'menuElement'
                     }, config.renderContext, config.currentResource);

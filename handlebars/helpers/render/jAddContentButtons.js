@@ -1,7 +1,7 @@
 import {SafeString} from 'handlebars';
-import {render} from '@jahia/server-helpers';
+import {server} from '@jahia/js-server-engine-private';
 
 export default function (options) {
     const {nodeTypes, childName, editCheck} = options.hash;
-    return new SafeString(render.createContentButtons(childName || '*', nodeTypes, Boolean(editCheck), options.data.root.renderContext, options.data.root.currentResource));
+    return new SafeString(server.render.createContentButtons(childName || '*', nodeTypes, Boolean(editCheck), options.data.root.renderContext, options.data.root.currentResource));
 }

@@ -1,13 +1,13 @@
 import setResult from '../../setResult';
-import {render} from '@jahia/server-helpers';
+import {server} from '@jahia/js-server-engine-private';
 import getNodeFromPathOrId from '../../../utils/getNodeFromPathOrId';
 
 export default function (options) {
     const node = getNodeFromPathOrId(options.hash, options.data.root.currentResource.getNode().getSession());
     if (node) {
-        const displayableNode = render.findDisplayableNode(node, options.data.root.renderContext, null);
+        const displayableNode = server.render.findDisplayableNode(node, options.data.root.renderContext, null);
         if (displayableNode) {
-            return setResult(render.transformToJsNode(displayableNode, false, false, false), this, options);
+            return setResult(server.render.transformToJsNode(displayableNode, false, false, false), this, options);
         }
     }
 }

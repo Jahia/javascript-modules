@@ -1,9 +1,9 @@
-import {gql} from '@jahia/server-helpers';
+import {server} from '@jahia/js-server-engine-private';
 
 export default function (options) {
     const query = options.fn(this);
     const {varName, ...rest} = options.hash;
-    let {data} = gql.executeQuerySync({
+    let {data} = server.gql.executeQuerySync({
         query,
         ...rest
     });

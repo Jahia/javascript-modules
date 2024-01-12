@@ -1,6 +1,6 @@
-import {render} from '@jahia/server-helpers';
+import {server} from '@jahia/js-server-engine-private';
 
 export default function (options) {
-    render.addCacheDependencyTag(options.hash, options.data.root.renderContext);
+    server.render.addCacheDependencyTag(options.hash, options.data.root.renderContext);
     return '';
 }

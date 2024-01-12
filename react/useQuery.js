@@ -1,7 +1,7 @@
 import {useServerContext} from './ServerContext';
 import {server} from '@jahia/js-server-engine-private';
 
-export default ({...props}) => {
+export default ({query, variables, operationName}) => {
     const {renderContext} = useServerContext();
-    server.render.addCacheDependencyTag(props, renderContext);
+    return server.gql.executeQuerySync({query, variables, operationName, renderContext});
 };

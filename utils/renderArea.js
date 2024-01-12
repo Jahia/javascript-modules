@@ -1,4 +1,4 @@
-import {render} from '@jahia/server-helpers';
+import {server} from '@jahia/js-server-engine-private';
 
 const allowedAreaProperties = ['areaView', 'allowedTypes', 'numberOfItems', 'subNodesView'];
 
@@ -25,5 +25,5 @@ export default function renderArea(props, renderContext) {
         return '';
     }
 
-    return render.renderComponent(attrs, renderContext);
+    return server.render.renderComponent(attrs, renderContext);
 }

@@ -1,7 +1,7 @@
 import {SafeString} from 'handlebars';
-import {render} from '@jahia/server-helpers';
+import {server} from '@jahia/js-server-engine-private';
 
 export default function (options) {
-    return new SafeString(render.addResourcesTag(options.hash, options.data.root.renderContext));
+    return new SafeString(server.render.addResourcesTag(options.hash, options.data.root.renderContext));
 }
 

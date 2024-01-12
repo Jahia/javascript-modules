@@ -1,8 +1,8 @@
 import setResult from '../../setResult';
-import {render} from '@jahia/server-helpers';
+import {server} from '@jahia/js-server-engine-private';
 
 export default function (options) {
-    return setResult(render.transformToJsNode(options.data.root.renderContext.getMainResource().getNode(),
+    return setResult(server.render.transformToJsNode(options.data.root.renderContext.getMainResource().getNode(),
         false,
         false,
         false), this, options);

@@ -1,4 +1,4 @@
-import {osgi} from '@jahia/server-helpers';
+import {server} from '@jahia/js-server-engine-private';
 
 export default function (path, varName, options) {
     if (varName && path && path.endsWith('.json')) {
@@ -15,7 +15,7 @@ export default function (path, varName, options) {
             resourcePath = templateViewFolder + '/' + path;
         }
 
-        this[varName] = JSON.parse(osgi.loadResource(currentView.bundle, resourcePath, false));
+        this[varName] = JSON.parse(server.osgi.loadResource(currentView.bundle, resourcePath, false));
     }
 
     return '';
