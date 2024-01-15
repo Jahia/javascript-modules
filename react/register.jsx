@@ -6,12 +6,13 @@ export const registerJahiaComponents = jahiaComponents => {
         let options;
         const props = jahiaComponents[k].jahiaComponent;
 
-        if (!props || !props.id || !props.target) {
+        if (!props || !props.id || !props.nodeType || !props.componentType) {
+            console.warn('Missing mandatory property id, nodeType and/or componentType, skipping component registration');
             return;
         }
 
         options = {
-            templateName: 'default',
+            name: 'default',
             templateType: 'html'
         };
 
