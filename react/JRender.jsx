@@ -3,7 +3,7 @@ import {server} from '@jahia/js-server-engine-private';
 import {useServerContext} from './ServerContext';
 import PropTypes from 'prop-types';
 
-const JRender = ({content, node, path, editable, advanceRenderingConfig, templateType, view, parameters}) => {
+const JRender = ({content, node, path, editable = true, advanceRenderingConfig, templateType, view, parameters}) => {
     const {renderContext, currentResource} = useServerContext();
     return (
         /* eslint-disable-next-line no-warning-comments */
