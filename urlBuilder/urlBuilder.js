@@ -67,8 +67,7 @@ export const initUrlBuilder = () => {
 
 /**
  * Provide URL generation for contents/files
- *
- * @param {Object} props props used to build the URL 
+ * @param {Object} props props used to build the URL
  * @param {string} props.value the value to use to build the URL
  * @param {string} props.path the path of the resource to build the URL for
  * @param {Object} props.parameters the parameters to append to the URL

@@ -45,7 +45,7 @@ JAddResources.propTypes = {
     targetTag: PropTypes.string,
     rel: PropTypes.string,
     media: PropTypes.string,
-    condition: PropTypes.string,
+    condition: PropTypes.string
 };
 
 export default JAddResources;
