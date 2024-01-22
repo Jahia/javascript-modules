@@ -5,12 +5,12 @@ import renderArea from '../utils/renderArea';
 
 /**
  * Generates an area in editors may insert content objects.
- * @param {Object} properties The React properties for the component.
- * @param {string} properties.name The name of the area.
- * @param {string} properties.areaView The view to use for the area.
- * @param {string[]} properties.allowedTypes The allowed types for the area.
- * @param {number} properties.numberOfItems The number of items to display in the area.
- * @param {string} properties.subNodesView The view to use for the subnodes.
+ * @param {Object} props The React properties for the component.
+ * @param {string} props.name The name of the area.
+ * @param {string} props.areaView The view to use for the area.
+ * @param {string[]} props.allowedTypes The allowed types for the area.
+ * @param {number} props.numberOfItems The number of items to display in the area.
+ * @param {string} props.subNodesView The view to use for the subnodes.
  * @returns {JSX.Element} The area component
  */
 const JArea = ({...props}) => {
