@@ -67,11 +67,16 @@ export const initUrlBuilder = () => {
 
 /**
  * Provide URL generation for contents/files
- *
- * @param props props used to build the URL (path, value, mode, language, extension, parameters)
- * @param renderContext the current renderContext
- * @param currentResource the current resource
- * @returns {*} the final URL
+ * @param {Object} props props used to build the URL
+ * @param {string} props.value the value to use to build the URL
+ * @param {string} props.path the path of the resource to build the URL for
+ * @param {Object} props.parameters the parameters to append to the URL
+ * @param {string} props.mode the mode to use to build the URL
+ * @param {string} props.language the language to use to build the URL
+ * @param {string} props.extension the extension to use to build the URL
+ * @param {Object} renderContext the current renderContext
+ * @param {Object} currentResource the current resource
+ * @returns {string} the final URL
  */
 export const buildUrl = (props, renderContext, currentResource) => {
     let url;
