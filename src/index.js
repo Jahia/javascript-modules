@@ -3,4 +3,3 @@ export * from './navBuilder';
 export * from './react';
 export * from './urlBuilder';
 export * from './utils';
-export * as server from './server';

@@ -1,15 +1,14 @@
 import React from 'react';
 import {server} from '@jahia/js-server-engine-private';
 import {useServerContext} from './ServerContext';
-import PropTypes from 'prop-types';
 
 /**
  * Generates add content buttons for a content object
  * @param {Object} properties The React properties for the component.
- * @param {string} properties.nodeTypes The node types to add.
- * @param {string} properties.childName The child name.
- * @param {boolean} properties.editCheck If true, the edit check will be performed.
- * @returns {JSX.Element} The add content buttons.
+ * @param {string} [properties.nodeTypes] The node types to add.
+ * @param {string} [properties.childName='*'] The child name.
+ * @param {boolean} [properties.editCheck=false] If true, the edit check will be performed.
+ * @returns The add content buttons.
  */
 const JAddContentButtons = ({nodeTypes, childName = '*', editCheck = false}) => {
     const {renderContext, currentResource} = useServerContext();
@@ -25,13 +24,6 @@ const JAddContentButtons = ({nodeTypes, childName = '*', editCheck = false}) => 
                 currentResource)
         }}/>
     );
-};
-
-JAddContentButtons.propTypes = {
-    nodeTypes: PropTypes.string,
-    childName: PropTypes.string,
-    /* eslint-disable-next-line react/boolean-prop-naming */
-    editCheck: PropTypes.bool
 };
 
 export default JAddContentButtons;
