@@ -13,10 +13,8 @@ import {useServerContext} from './ServerContext';
 const JAddContentButtons = ({nodeTypes, childName = '*', editCheck = false}) => {
     const {renderContext, currentResource} = useServerContext();
     return (
-        /* eslint-disable-next-line no-warning-comments */
-        // Todo we should find a way to strip this unwanted div here, check: https://stackoverflow.com/a/65033466
         /* eslint-disable-next-line react/no-danger */
-        <div dangerouslySetInnerHTML={{
+        <unwanteddiv dangerouslySetInnerHTML={{
             __html: server.render.createContentButtons(childName,
                 nodeTypes,
                 editCheck,
