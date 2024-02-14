@@ -1,7 +1,7 @@
 import {SafeString} from 'handlebars';
 import setResult from '../../setResult';
-import renderArea from '../../../utils/renderArea';
+import {server} from '@jahia/js-server-engine-private';
 
 export default function (options) {
-    return setResult(new SafeString(renderArea(options.hash, options.data.root.renderContext)), this, options);
+    return setResult(new SafeString(server.render.renderArea(options.hash, options.data.root.renderContext)), this, options);
 }
