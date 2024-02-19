@@ -4,6 +4,7 @@ export {default as jUrl} from './jUrl';
 export {default as JAddContentButtons} from './JAddContentButtons';
 export {default as JAddResources} from './JAddResources';
 export {default as JArea} from './JArea';
+export {default as JAbsoluteArea} from './JAbsoluteArea';
 export {default as JRender} from './JRender';
 export {default as useQuery} from './useQuery';
 export * from './register';
