@@ -11,17 +11,29 @@ import {server} from '@jahia/js-server-engine-private';
  * @param {number} [props.numberOfItems] The number of items to display in the area.
  * @param {string} [props.subNodesView] The view to use for the subnodes.
  * @param {string} [props.path] Relative (to the current node) or absolute path to the node to include
- * @param {string} [props.editable] Enables or disables edition of this content in edit mode. Mainly used for absolute or references.
+ * @param {boolean} [props.editable] Enables or disables edition of this content in edit mode. Mainly used for absolute or references.
  * @param {boolean} [props.areaAsSubNode] Allows area to be stored as a subnode
  * @param {string} [props.areaType] Content type to be used to create the area (by default jnt:contentList)
+ * @param {Object} [props.parameters] the parameters to pass to the area
  * @returns The Area component
  */
-const JArea = ({...props}) => {
+const JArea = ({name, areaView, allowedTypes, numberOfItems, subNodesView, path, editable = true, areaAsSubNode, areaType = 'jnt:contentList', parameters}) => {
     const {renderContext} = useServerContext();
     return (
         /* eslint-disable-next-line react/no-danger */
         <unwanteddiv dangerouslySetInnerHTML={{
-            __html: server.render.renderArea(props, renderContext)
+            __html: server.render.renderArea({
+                name,
+                areaView,
+                allowedTypes,
+                numberOfItems,
+                subNodesView,
+                path,
+                editable,
+                areaAsSubNode,
+                areaType,
+                parameters
+            }, renderContext)
         }}/>
     );
 };
