@@ -15,14 +15,26 @@ import {server} from '@jahia/js-server-engine-private';
  * @param {number} [props.level] Ancestor level for absolute area - 0 is Home page, 1 first sub-pages, ...
  * @param {string} [props.areaType] Content type to be used to create the area (by default jnt:contentList)
  * @param {boolean} [props.limitedAbsoluteAreaEdit] Is the absolute area editable everywhere or only on the page containing its node.
+ * @param {Object} [props.parameters] the parameters to pass to the absolute area
  * @returns The AbsoluteArea component
  */
-const JAbsoluteArea = ({...props}) => {
+const JAbsoluteArea = ({name, areaView, allowedTypes, numberOfItems, path, editable, level, areaType, limitedAbsoluteAreaEdit, parameters}) => {
     const {renderContext} = useServerContext();
     return (
         /* eslint-disable-next-line react/no-danger */
         <unwanteddiv dangerouslySetInnerHTML={{
-            __html: server.render.renderAbsoluteArea(props, renderContext)
+            __html: server.render.renderAbsoluteArea({
+                name,
+                areaView,
+                allowedTypes,
+                numberOfItems,
+                path,
+                editable,
+                level,
+                areaType,
+                limitedAbsoluteAreaEdit,
+                parameters
+            }, renderContext)
         }}/>
     );
 };
