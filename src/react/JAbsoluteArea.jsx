@@ -18,7 +18,7 @@ import {server} from '@jahia/js-server-engine-private';
  * @param {Object} [props.parameters] the parameters to pass to the absolute area
  * @returns The AbsoluteArea component
  */
-const JAbsoluteArea = ({name, areaView, allowedTypes, numberOfItems, path, editable = true, level, areaType = 'jnt:contentList', limitedAbsoluteAreaEdit, parameters}) => {
+const JAbsoluteArea = ({name, areaView, allowedTypes, numberOfItems, subNodesView, path, editable = true, level, areaType = 'jnt:contentList', limitedAbsoluteAreaEdit, parameters}) => {
     const {renderContext} = useServerContext();
     return (
         /* eslint-disable-next-line react/no-danger */
@@ -28,6 +28,7 @@ const JAbsoluteArea = ({name, areaView, allowedTypes, numberOfItems, path, edita
                 areaView,
                 allowedTypes,
                 numberOfItems,
+                subNodesView,
                 path,
                 editable,
                 level,
