@@ -11,14 +11,14 @@ import {server} from '@jahia/js-server-engine-private';
  * @param {number} [props.numberOfItems] The number of items to display in the area.
  * @param {string} [props.subNodesView] The view to use for the subnodes.
  * @param {string} [props.path] Relative (to the current node) or absolute path to the node to include
- * @param {string} [props.editable] Enables or disables edition of this content in edit mode. Mainly used for absolute or references.
+ * @param {boolean} [props.editable] Enables or disables edition of this content in edit mode. Mainly used for absolute or references.
  * @param {number} [props.level] Ancestor level for absolute area - 0 is Home page, 1 first sub-pages, ...
  * @param {string} [props.areaType] Content type to be used to create the area (by default jnt:contentList)
  * @param {boolean} [props.limitedAbsoluteAreaEdit] Is the absolute area editable everywhere or only on the page containing its node.
  * @param {Object} [props.parameters] the parameters to pass to the absolute area
  * @returns The AbsoluteArea component
  */
-const JAbsoluteArea = ({name, areaView, allowedTypes, numberOfItems, path, editable, level, areaType, limitedAbsoluteAreaEdit, parameters}) => {
+const JAbsoluteArea = ({name, areaView, allowedTypes, numberOfItems, path, editable = true, level, areaType = 'jnt:contentList', limitedAbsoluteAreaEdit, parameters}) => {
     const {renderContext} = useServerContext();
     return (
         /* eslint-disable-next-line react/no-danger */
