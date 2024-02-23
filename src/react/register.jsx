@@ -6,21 +6,19 @@ import {server} from '@jahia/js-server-engine-private';
  * TODO We will probably want to revisit this function once we handle global component registration in ticket https://jira.jahia.org/browse/BACKLOG-22400
  */
 export const registerJahiaComponents = jahiaComponents => {
+    // First we check if the global variable bundle is available. If it is not, it means we are using the function outside of the
+    // initialization of the bundle, which is an error !
+    if (!bundle) {
+        console.error('registerJahiaComponents: bundle is not available, make sure you are using this function inside the initialization of the bundle');
+        return;
+    }
+
+    const bundleSymbolicName = bundle.getSymbolicName();
+
     const reactView = server.registry.get('view', 'react');
     Object.keys(jahiaComponents).forEach(k => {
         let options;
         const props = jahiaComponents[k].jahiaComponent;
-
-        // First we check if the global variable bundle is available. If it is not, it means we are using the function outside of the
-        // initialization of the bundle, which is an error !
-        // eslint-disable-next-line no-undef
-        const currentBundle = bundle;
-        if (!currentBundle) {
-            console.error('registerJahiaComponents: bundle is not available, make sure you are using this function inside the initialization of the bundle');
-            return;
-        }
-
-        const bundleSymbolicName = currentBundle.getSymbolicName();
 
         if (!props || !props.nodeType || !props.componentType) {
             console.warn(`registerJahiaComponents(bundle=${bundleSymbolicName}: Missing mandatory property nodeType and/or componentType, skipping component name=${props.name} nodeType=${props.nodeType} id=${props.id} registration`);
