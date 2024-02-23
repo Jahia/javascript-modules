@@ -6,5 +6,8 @@
   "rules": {
     "react/boolean-prop-naming": [1, { "rule": "^(is|has)[A-Z]([A-Za-z0-9]?)+" }],
     "react/prop-types": "off" // propTypes for now are not used, to be removed the day we implement them
-  }
+  },
+  "globals": {
+    "bundle": true
+  }  
 }
