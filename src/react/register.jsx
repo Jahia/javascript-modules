@@ -3,6 +3,7 @@ import {server} from '@jahia/js-server-engine-private';
 /**
  * Registers Jahia components into the global registry as views
  * @param {Object} jahiaComponents an object containing the jahia components to register
+ * TODO We will probably want to revisit this function once we handle global component registration in ticket https://jira.jahia.org/browse/BACKLOG-22400
  */
 export const registerJahiaComponents = jahiaComponents => {
     const reactView = server.registry.get('view', 'react');
