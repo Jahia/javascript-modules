@@ -6,6 +6,7 @@ import {server} from '@jahia/js-server-engine-private';
  * @param {Object} props the properties
  * @param {Object} [props.node] the node (JCRNodeWrapper) for which to add a dependency to
  * @param {Object} [props.path] the path for which to add a dependency to
+ * @param {Object} [props.flushOnPathMatchingRegexp] the Regexp matching path that should flush this component
  */
 export default ({...props}) => {
     const {renderContext} = useServerContext();
