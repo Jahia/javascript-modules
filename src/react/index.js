@@ -6,6 +6,8 @@ export {default as JAddResources} from './JAddResources';
 export {default as JArea} from './JArea';
 export {default as JAbsoluteArea} from './JAbsoluteArea';
 export {default as JRender} from './JRender';
+export {default as HydrateInBrowser} from './HydrateInBrowser';
+export {default as RenderInBrowser} from './RenderInBrowser';
 export {default as useQuery} from './useQuery';
 export * from './register';
 export * from './ServerContext';

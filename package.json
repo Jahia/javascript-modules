@@ -1,6 +1,6 @@
 {
   "name": "@jahia/js-server-engine",
-  "version": "1.2.9",
+  "version": "1.2.10",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "repository": "git@github.com:Jahia/jahia-js-server-engine.git",
