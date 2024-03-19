@@ -1,6 +1,6 @@
 import React from 'react';
 import {server} from '@jahia/js-server-engine-private';
-import {useServerContext} from './ServerContext';
+import {useServerContext} from './useServerContext';
 
 /**
  * Render a content node
@@ -15,7 +15,7 @@ import {useServerContext} from './ServerContext';
  * @param {Object} [props.parameters] the parameters to pass to the view
  * @returns the rendered output of the view for the specified content
  */
-const JRender = ({content, node, path, editable = true, advanceRenderingConfig, templateType, view, parameters}) => {
+export function Render({content, node, path, editable = true, advanceRenderingConfig, templateType, view, parameters}) {
     const {renderContext, currentResource} = useServerContext();
     return (
         /* eslint-disable-next-line react/no-danger */
@@ -32,6 +32,4 @@ const JRender = ({content, node, path, editable = true, advanceRenderingConfig, 
             }, renderContext, currentResource)
         }}/>
     );
-};
-
-export default JRender;
+}

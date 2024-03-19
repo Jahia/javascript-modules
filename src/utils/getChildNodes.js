@@ -6,7 +6,7 @@
  * @param {function} [filter] - A function to filter the nodes to be returned.
  * @returns {JCRNodeWrapper[]} An array of child nodes.
  */
-export default (node, limit, offset = 0, filter = undefined) => {
+export function getChildNodes(node, limit, offset = 0, filter = undefined) {
     let result = [];
 
     if (!node || !limit) {
@@ -37,4 +37,4 @@ export default (node, limit, offset = 0, filter = undefined) => {
     }
 
     return result;
-};
+}

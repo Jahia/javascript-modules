@@ -5,7 +5,7 @@ import {server} from '@jahia/js-server-engine-private';
  * @param {Object} jahiaComponents an object containing the jahia components to register
  * TODO We will probably want to revisit this function once we handle global component registration in ticket https://jira.jahia.org/browse/BACKLOG-22400
  */
-export const registerJahiaComponents = jahiaComponents => {
+export function registerJahiaComponents(jahiaComponents) {
     // First we check if the global variable bundle is available. If it is not, it means we are using the function outside of the
     // initialization of the bundle, which is an error !
     if (!bundle) {
@@ -45,4 +45,4 @@ export const registerJahiaComponents = jahiaComponents => {
         // Register view
         server.registry.add('view', id, reactView, processOptions);
     });
-};
+}

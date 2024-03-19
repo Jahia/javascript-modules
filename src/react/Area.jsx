@@ -1,9 +1,9 @@
 import React from 'react';
-import {useServerContext} from './ServerContext';
+import {useServerContext} from './useServerContext';
 import {server} from '@jahia/js-server-engine-private';
 
 /**
- * Generates an absolute area in which editors may insert content objects.
+ * Generates an area in which editors may insert content objects.
  * @param {Object} props The React properties for the component.
  * @param {string} [props.name] The name of the area.
  * @param {string} [props.areaView] The view to use for the area.
@@ -12,18 +12,17 @@ import {server} from '@jahia/js-server-engine-private';
  * @param {string} [props.subNodesView] The view to use for the subnodes.
  * @param {string} [props.path] Relative (to the current node) or absolute path to the node to include
  * @param {boolean} [props.editable] Enables or disables edition of this content in edit mode. Mainly used for absolute or references.
- * @param {number} [props.level] Ancestor level for absolute area - 0 is Home page, 1 first sub-pages, ...
+ * @param {boolean} [props.areaAsSubNode] Allows area to be stored as a subnode
  * @param {string} [props.areaType] Content type to be used to create the area (by default jnt:contentList)
- * @param {boolean} [props.limitedAbsoluteAreaEdit] Is the absolute area editable everywhere or only on the page containing its node.
- * @param {Object} [props.parameters] the parameters to pass to the absolute area
- * @returns The AbsoluteArea component
+ * @param {Object} [props.parameters] the parameters to pass to the area
+ * @returns The Area component
  */
-const JAbsoluteArea = ({name, areaView, allowedTypes, numberOfItems, subNodesView, path, editable = true, level, areaType = 'jnt:contentList', limitedAbsoluteAreaEdit, parameters}) => {
+export function Area({name, areaView, allowedTypes, numberOfItems, subNodesView, path, editable = true, areaAsSubNode, areaType = 'jnt:contentList', parameters}) {
     const {renderContext} = useServerContext();
     return (
         /* eslint-disable-next-line react/no-danger */
         <unwanteddiv dangerouslySetInnerHTML={{
-            __html: server.render.renderAbsoluteArea({
+            __html: server.render.renderArea({
                 name,
                 areaView,
                 allowedTypes,
@@ -31,13 +30,10 @@ const JAbsoluteArea = ({name, areaView, allowedTypes, numberOfItems, subNodesVie
                 subNodesView,
                 path,
                 editable,
-                level,
+                areaAsSubNode,
                 areaType,
-                limitedAbsoluteAreaEdit,
                 parameters
             }, renderContext)
         }}/>
     );
-};
-
-export default JAbsoluteArea;
+}

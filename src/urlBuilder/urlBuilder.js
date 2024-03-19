@@ -24,7 +24,7 @@ function appendParameters(url, parameters) {
 /**
  * Initialize the registry with default url builders
  */
-export const initUrlBuilder = () => {
+export function initUrlBuilder() {
     server.registry.add('urlBuilder', 'nt:file', {
         priority: 1,
         buildURL: ({jcrNode, mode, currentResource}) => {
@@ -63,7 +63,7 @@ export const initUrlBuilder = () => {
                 server.render.escapePath(jcrNode.getPath()) + (extension ? extension : '.html');
         }
     });
-};
+}
 
 /**
  * Provide URL generation for contents/files
@@ -78,7 +78,7 @@ export const initUrlBuilder = () => {
  * @param {Object} currentResource the current resource
  * @returns {string} the final URL
  */
-export const buildUrl = (props, renderContext, currentResource) => {
+export function buildUrl(props, renderContext, currentResource) {
     let url;
     if (props.path) {
         let jcrNode;
@@ -122,4 +122,4 @@ export const buildUrl = (props, renderContext, currentResource) => {
     }
 
     console.warn('Unable to build url for: ' + JSON.stringify(props));
-};
+}

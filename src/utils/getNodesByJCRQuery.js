@@ -6,7 +6,7 @@
  * @param {number} [offset=0] the offset to start from
  * @returns {Object} an object containing the property values
  */
-export default (session, query, limit, offset = 0) => {
+export function getNodesByJCRQuery(session, query, limit, offset = 0) {
     let result = [];
 
     if (!session || !query || !limit) {
@@ -29,4 +29,4 @@ export default (session, query, limit, offset = 0) => {
     }
 
     return result;
-};
+}

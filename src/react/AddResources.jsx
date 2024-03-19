@@ -1,5 +1,5 @@
 import React from 'react';
-import {useServerContext} from './ServerContext';
+import {useServerContext} from './useServerContext';
 import {server} from '@jahia/js-server-engine-private';
 
 /**
@@ -18,7 +18,7 @@ import {server} from '@jahia/js-server-engine-private';
  * @param {string} [props.condition] - A condition that must be met for the resource to be loaded. This could be used for conditional comments in IE, for example.
  * @returns A React element that renders a script or link tag.
  */
-const JAddResources = ({...props}) => {
+export function AddResources({...props}) {
     const {renderContext} = useServerContext();
     return (
         /* eslint-disable-next-line react/no-danger */
@@ -26,6 +26,4 @@ const JAddResources = ({...props}) => {
             __html: server.render.addResourcesTag(props, renderContext)
         }}/>
     );
-};
-
-export default JAddResources;
+}
