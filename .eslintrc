@@ -1,13 +1,31 @@
 {
-  "extends": "@jahia",
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "@jahia",
+    "plugin:@typescript-eslint/recommended"
+  ],
   "plugins": [
+    "@typescript-eslint",
     "json"
   ],
   "rules": {
-    "react/boolean-prop-naming": [1, { "rule": "^(is|has)[A-Z]([A-Za-z0-9]?)+" }],
-    "react/prop-types": "off" // propTypes for now are not used, to be removed the day we implement them
+    "react/boolean-prop-naming": [
+      1,
+      {
+        "rule": "^(is|has)[A-Z]([A-Za-z0-9]?)+"
+      }
+    ],
+    "react/prop-types": "off",
+    // propTypes for now are not used, to be removed the day we implement them
+    "react/function-component-definition": [
+      2,
+      {
+        "namedComponents": "function-declaration",
+        "unnamedComponents": "function-expression"
+      }
+    ]
   },
   "globals": {
     "bundle": true
-  }  
+  }
 }

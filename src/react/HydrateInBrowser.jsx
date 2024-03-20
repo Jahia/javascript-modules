@@ -1,6 +1,6 @@
 import React from 'react';
-import {useServerContext} from './ServerContext';
-import JAddResources from './JAddResources';
+import {useServerContext} from './useServerContext';
+import {AddResources} from './AddResources';
 import {buildUrl} from '../urlBuilder';
 
 /**
@@ -10,7 +10,7 @@ import {buildUrl} from '../urlBuilder';
  * @param {Object} child The React component.
  * @param {Object} [props] The React component props, this props will be serialized/deserialized to be usable server and client side. The serialization and deserialization is done using JSON.stringify server side and JSON.parse in the browser. Please make sure that the props are serializable.
  */
-const HydrateInBrowser = ({child: Child, props}) => {
+export function HydrateInBrowser({child: Child, props}) {
     const {bundleKey, currentResource, renderContext} = useServerContext();
 
     const remote = buildUrl({value: '/modules/' + bundleKey + '/javascript/client/remote.js'}, renderContext, currentResource);
@@ -21,10 +21,13 @@ const HydrateInBrowser = ({child: Child, props}) => {
                 <Child {...props}/>
             </div>
             {/* The paths are absolute here to avoid jAddResources to look for .js in other modules */}
-            <JAddResources insert type="javascript" targetTag="body" resources={remote}/>
-            <JAddResources type="javascript" targetTag="body" resources={appShell}/>
+            <AddResources insert
+                          type="javascript"
+                          targetTag="body"
+                          resources={remote}/>
+            <AddResources type="javascript"
+                          targetTag="body"
+                          resources={appShell}/>
         </>
     );
-};
-
-export default HydrateInBrowser;
+}

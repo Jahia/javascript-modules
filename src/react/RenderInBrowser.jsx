@@ -1,6 +1,6 @@
 import React from 'react';
-import {useServerContext} from './ServerContext';
-import JAddResources from './JAddResources';
+import {useServerContext} from './useServerContext';
+import JAddResources from './AddResources';
 import {buildUrl} from '../urlBuilder';
 
 /**
@@ -10,7 +10,7 @@ import {buildUrl} from '../urlBuilder';
  * @param {Object} child The React component.
  * @param {Object} [props] The React component props, this props will be serialized/deserialized to be usable server and client side. The serialization and deserialization is done using JSON.stringify server side and JSON.parse in the browser. Please make sure that the props are serializable.
  * */
-const RenderInBrowser = ({child: Child, props}) => {
+export function RenderInBrowser({child: Child, props}) {
     const {bundleKey, currentResource, renderContext} = useServerContext();
 
     const remote = buildUrl({value: '/modules/' + bundleKey + '/javascript/client/remote.js'}, renderContext, currentResource);
@@ -23,6 +23,4 @@ const RenderInBrowser = ({child: Child, props}) => {
             <JAddResources type="javascript" targetTag="body" resources={appShell}/>
         </>
     );
-};
-
-export default RenderInBrowser;
+}

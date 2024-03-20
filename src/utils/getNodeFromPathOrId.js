@@ -6,7 +6,7 @@
  * @param {JCRSessionWrapper} session - The JCR session.
  * @returns {JCRNodeWrapper} The node.
  */
-export default (props, session) => {
+export function getNodeFromPathOrId(props, session) {
     if (props.identifier) {
         return session.getNodeByIdentifier(props.identifier);
     }
@@ -16,4 +16,4 @@ export default (props, session) => {
     }
 
     return null;
-};
+}

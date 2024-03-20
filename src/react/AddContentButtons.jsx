@@ -1,6 +1,6 @@
 import React from 'react';
 import {server} from '@jahia/js-server-engine-private';
-import {useServerContext} from './ServerContext';
+import {useServerContext} from './useServerContext';
 
 /**
  * Generates add content buttons for a content object
@@ -10,7 +10,7 @@ import {useServerContext} from './ServerContext';
  * @param {boolean} [properties.editCheck=false] If true, the edit check will be performed.
  * @returns The add content buttons.
  */
-const JAddContentButtons = ({nodeTypes, childName = '*', editCheck = false}) => {
+export function AddContentButtons({nodeTypes, childName = '*', editCheck = false}) {
     const {renderContext, currentResource} = useServerContext();
     return (
         /* eslint-disable-next-line react/no-danger */
@@ -22,6 +22,4 @@ const JAddContentButtons = ({nodeTypes, childName = '*', editCheck = false}) => 
                 currentResource)
         }}/>
     );
-};
-
-export default JAddContentButtons;
+}

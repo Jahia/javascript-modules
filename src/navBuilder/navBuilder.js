@@ -136,6 +136,15 @@ const buildMenu = (node, navMenuLevel, config) => {
     return result;
 };
 
+/**
+ * Build a navigation menu
+ * @param {number} maxDepth the maximum depth of the menu
+ * @param {string} base the base path of the menu
+ * @param {string} menuEntryView the view to use for each menu entry
+ * @param {number} startLevel the level at which to start the menu
+ * @param {RenderContext} renderContext the render context
+ * @param {Resource} currentResource the current resource
+ */
 /* eslint-disable-next-line max-params */
 export function buildNavMenu(maxDepth, base, menuEntryView, startLevelValue, renderContext, currentResource) {
     const workspace = renderContext.isLiveMode() ? 'LIVE' : 'EDIT';

@@ -64,7 +64,7 @@ const extractPropValue = (session, value, type) => {
  * @param {Array} props the name of the properties to extract
  * @returns {Object} an object containing the property values
  */
-export default (node, props) => {
+export function getNodeProps(node, props) {
     let result = {};
     if (node && props && props.length > 0) {
         for (const prop of props) {
@@ -75,4 +75,4 @@ export default (node, props) => {
     }
 
     return result;
-};
+}

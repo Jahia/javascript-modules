@@ -1,4 +1,4 @@
-import {useServerContext} from './ServerContext';
+import {useServerContext} from './useServerContext';
 import {server} from '@jahia/js-server-engine-private';
 
 /**
@@ -9,7 +9,7 @@ import {server} from '@jahia/js-server-engine-private';
  * @param {string} props.operationName the operation name to use for the query
  * @returns {Object} the result of the query
  */
-export default ({query, variables, operationName}) => {
+export const useQuery = ({query, variables, operationName}) => {
     const {renderContext} = useServerContext();
     return server.gql.executeQuerySync({query, variables, operationName, renderContext});
 };
