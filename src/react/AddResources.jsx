@@ -9,7 +9,8 @@ import {server} from '@jahia/js-server-engine-private';
  * @param {boolean} [props.async] - If true, the resource will be loaded asynchronously. For scripts, this means the script will be executed as soon as it's available, without blocking the rest of the page.
  * @param {boolean} [props.defer] - If true, the resource will be deferred, i.e., loaded after the document has been parsed. For scripts, this means the script will not be executed until after the page has loaded.
  * @param {string} props.type - The type of the resource. This could be 'javascript' for .js files, 'css' for .css files, etc.
- * @param {string} props.resources - The path to the resource file, relative to the module.
+ * @param {string} [props.resources] - The path to the resource file, relative to the module.
+ * @param {string} [props.inlineResource] - Inline HTML that markup will be considered as resource.
  * @param {string} [props.title] - The title of the resource. This is typically not used for scripts or stylesheets, but may be used for other types of resources.
  * @param {string} [props.key] - A unique key for the resource. This could be used to prevent duplicate resources from being added to the document.
  * @param {string} [props.targetTag] - The HTML tag where the resource should be added. This could be 'head' for resources that should be added to the <head> tag, 'body' for resources that should be added to the <body> tag, etc.

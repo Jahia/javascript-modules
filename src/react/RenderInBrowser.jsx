@@ -1,7 +1,5 @@
 import React from 'react';
-import {useServerContext} from './useServerContext';
-import {AddResources} from './AddResources';
-import {buildUrl} from '../urlBuilder';
+import InBrowser from './internal/InBrowser';
 
 /**
  * Will render the given React component in the browser.
@@ -11,16 +9,7 @@ import {buildUrl} from '../urlBuilder';
  * @param {Object} [props] The React component props, this props will be serialized/deserialized to be usable server and client side. The serialization and deserialization is done using JSON.stringify server side and JSON.parse in the browser. Please make sure that the props are serializable.
  * */
 export function RenderInBrowser({child: Child, props}) {
-    const {bundleKey, currentResource, renderContext} = useServerContext();
-
-    const remote = buildUrl({value: '/modules/' + bundleKey + '/javascript/client/remote.js'}, renderContext, currentResource);
-    const appShell = buildUrl({value: '/modules/npm-modules-engine/javascript/apps/reactAppShell.js'}, renderContext, currentResource);
     return (
-        <>
-            <div data-reactrender={encodeURIComponent(JSON.stringify({name: Child.name, bundle: bundleKey, props: props}))}/>
-            {/* The paths are absolute here to avoid jAddResources to look for .js in other modules */}
-            <AddResources insert type="javascript" targetTag="body" resources={remote}/>
-            <AddResources type="javascript" targetTag="body" resources={appShell}/>
-        </>
+        <InBrowser child={Child} props={props} dataKey="data-reactrender"/>
     );
 }
