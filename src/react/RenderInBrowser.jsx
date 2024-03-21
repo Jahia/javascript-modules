@@ -1,6 +1,6 @@
 import React from 'react';
 import {useServerContext} from './useServerContext';
-import JAddResources from './AddResources';
+import {AddResources} from './AddResources';
 import {buildUrl} from '../urlBuilder';
 
 /**
@@ -19,8 +19,8 @@ export function RenderInBrowser({child: Child, props}) {
         <>
             <div data-reactrender={encodeURIComponent(JSON.stringify({name: Child.name, bundle: bundleKey, props: props}))}/>
             {/* The paths are absolute here to avoid jAddResources to look for .js in other modules */}
-            <JAddResources insert type="javascript" targetTag="body" resources={remote}/>
-            <JAddResources type="javascript" targetTag="body" resources={appShell}/>
+            <AddResources insert type="javascript" targetTag="body" resources={remote}/>
+            <AddResources type="javascript" targetTag="body" resources={appShell}/>
         </>
     );
 }
