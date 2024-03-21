@@ -23,7 +23,7 @@ export function AddResources({...props}) {
     return (
         /* eslint-disable-next-line react/no-danger */
         <unwanteddiv dangerouslySetInnerHTML={{
-            __html: server.render.addResourcesTag(props, renderContext)
+            __html: server.render.addResources(props, renderContext)
         }}/>
     );
 }
