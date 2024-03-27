@@ -1,4 +1,4 @@
-import {server} from '@jahia/js-server-engine-private';
+import {server} from '@jahia/js-server-core-private';
 import {gql} from '@apollo/client';
 import {print} from 'graphql';
 

@@ -1,5 +1,5 @@
 import setResult from '../../setResult';
-import {server} from '@jahia/js-server-engine-private';
+import {server} from '@jahia/js-server-core-private';
 import {getNodeFromPathOrId} from '../../../utils/getNodeFromPathOrId';
 
 export default function (options) {

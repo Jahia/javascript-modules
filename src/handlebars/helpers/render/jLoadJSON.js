@@ -1,4 +1,4 @@
-import {server} from '@jahia/js-server-engine-private';
+import {server} from '@jahia/js-server-core-private';
 
 export default function (path, varName, options) {
     if (varName && path && path.endsWith('.json')) {

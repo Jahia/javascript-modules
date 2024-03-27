@@ -1,5 +1,5 @@
 import {getNodeFromPathOrId} from '../utils/getNodeFromPathOrId';
-import {server} from '@jahia/js-server-engine-private';
+import {server} from '@jahia/js-server-core-private';
 
 const absoluteUrlRegExp = /^(?:[a-z+]+:)?\/\//i;
 

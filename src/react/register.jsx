@@ -1,4 +1,4 @@
-import {server} from '@jahia/js-server-engine-private';
+import {server} from '@jahia/js-server-core-private';
 
 /**
  * Registers Jahia components into the global registry as views

@@ -1,5 +1,5 @@
 import {SafeString} from 'handlebars';
-import {server} from '@jahia/js-server-engine-private';
+import {server} from '@jahia/js-server-core-private';
 import setResult from '../../setResult';
 
 const allowedRenderAttributes = ['content', 'node', 'path', 'editable', 'advanceRenderingConfig', 'templateType', 'view', 'parameters'];

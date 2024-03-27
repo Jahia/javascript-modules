@@ -1,5 +1,5 @@
 import React from 'react';
-import {server} from '@jahia/js-server-engine-private';
+import {server} from '@jahia/js-server-core-private';
 import {useServerContext} from './useServerContext';
 
 /**
