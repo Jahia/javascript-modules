@@ -3,7 +3,7 @@ import InBrowser from './internal/InBrowser';
 
 /**
  * Will render the given React component in the browser.
- * Be careful, the component will not have access to the '@jahia/js-server-engine' library from the browser.
+ * Be careful, the component will not have access to the '@jahia/js-server-core' library from the browser.
  *
  * @param {Object} child The React component.
  * @param {Object} [props] The React component props, this props will be serialized/deserialized to be usable server and client side. The serialization and deserialization is done using JSON.stringify server side and JSON.parse in the browser. Please make sure that the props are serializable.

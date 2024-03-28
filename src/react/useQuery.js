@@ -1,5 +1,5 @@
 import {useServerContext} from './useServerContext';
-import {server} from '@jahia/js-server-engine-private';
+import {server} from '@jahia/js-server-core-private';
 
 /**
  * Execute a GraphQL query synchronously

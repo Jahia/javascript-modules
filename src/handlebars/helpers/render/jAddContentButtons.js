@@ -1,5 +1,5 @@
 import {SafeString} from 'handlebars';
-import {server} from '@jahia/js-server-engine-private';
+import {server} from '@jahia/js-server-core-private';
 
 export default function (options) {
     const {nodeTypes, childName, editCheck} = options.hash;

@@ -1,5 +1,5 @@
 import setResult from '../../setResult';
-import {server} from '@jahia/js-server-engine-private';
+import {server} from '@jahia/js-server-core-private';
 
 export default function (configPid, key, options) {
     return setResult(server.config.getConfigValue(configPid, key), this, options);

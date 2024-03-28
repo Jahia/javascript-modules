@@ -1,9 +1,9 @@
 {
-  "name": "@jahia/js-server-engine",
-  "version": "1.2.14",
+  "name": "@jahia/js-server-core",
+  "version": "0.0.1",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
-  "repository": "git@github.com:Jahia/jahia-js-server-engine.git",
+  "repository": "git@github.com:Jahia/js-server-core.git",
   "license": "MIT",
   "scripts": {
     "build": "babel src -d dist --copy-files && tsc",
