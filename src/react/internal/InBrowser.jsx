@@ -34,7 +34,8 @@ const getAppShellInitData = moduleBaseUrl => {
 };
 
 function InBrowser({child: Child, props, dataKey}) {
-    const {bundleKey, currentResource, renderContext, language} = useServerContext();
+    const {bundleKey, currentResource, renderContext} = useServerContext();
+    const language = currentResource.getLocale().getLanguage();
     const appShellInitDataScript = getAppShellInitData(buildUrl({value: '/modules'}, renderContext, currentResource));
     const i18nScript = getClientI18nStoreScript(language, bundleKey);
     // The paths are absolute here to avoid jAddResources to look for .js in other modules
