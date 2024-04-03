@@ -2,17 +2,15 @@ import React from 'react';
 import {useServerContext} from '../useServerContext';
 import {AddResources} from '../AddResources';
 import {buildUrl} from '../../urlBuilder';
-import {getInitialProps, I18nextProvider} from 'react-i18next';
+import {I18nextProvider} from 'react-i18next';
 import i18n from 'i18next';
 
-const getClientI18nStoreScript = (i18nStore, namespace, lang) => {
-    // I18n is a global instance share by all views, all bundles and contains all translations for all namespaces.
-    // Since we need to pass the initialI18nStore to the client, we need to filter it to keep only the necessary language and namespace.
-    // This way we can reduce the size of the initialI18nStore to the minimal required for the client side rendering.
-    if (i18nStore[lang] && i18nStore[lang][namespace]) {
+const getClientI18nStoreScript = (lang, namespace) => {
+    const i18nResourceBundle = i18n.getResourceBundle(lang, namespace);
+    if (i18nResourceBundle) {
         const filteredI18nStore = {};
         filteredI18nStore[lang] = {};
-        filteredI18nStore[lang][namespace] = i18nStore[lang][namespace];
+        filteredI18nStore[lang][namespace] = i18nResourceBundle;
 
         return '<script type="text/javascript">\n' +
             '        if(!window.__APPSHELL_INIT_DATA__) {\n' +
@@ -36,11 +34,9 @@ const getAppShellInitData = moduleBaseUrl => {
 };
 
 function InBrowser({child: Child, props, dataKey}) {
-    const {bundleKey, currentResource, renderContext} = useServerContext();
-    const {initialI18nStore, initialLanguage} = getInitialProps();
-
+    const {bundleKey, currentResource, renderContext, language} = useServerContext();
     const appShellInitDataScript = getAppShellInitData(buildUrl({value: '/modules'}, renderContext, currentResource));
-    const i18nScript = getClientI18nStoreScript(initialI18nStore, bundleKey, initialLanguage);
+    const i18nScript = getClientI18nStoreScript(language, bundleKey);
     // The paths are absolute here to avoid jAddResources to look for .js in other modules
     const remote = buildUrl({value: '/modules/' + bundleKey + '/javascript/client/remote.js'}, renderContext, currentResource);
     const appShell = buildUrl({value: '/modules/npm-modules-engine/javascript/apps/reactAppShell.js'}, renderContext, currentResource);
@@ -48,7 +44,7 @@ function InBrowser({child: Child, props, dataKey}) {
     const data = {};
     data[dataKey] = encodeURIComponent(JSON.stringify({
         name: Child.name,
-        lang: initialLanguage,
+        lang: language,
         bundle: bundleKey,
         props: props || {}
     }));
