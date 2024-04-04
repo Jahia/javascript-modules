@@ -85,7 +85,8 @@ export function buildUrl(props, renderContext, currentResource) {
         try {
             jcrNode = getNodeFromPathOrId({path: props.path}, currentResource.getNode().getSession());
         } catch (_) {
-            // Node not found
+            console.warn(`Unable to find node for path: ${props.path}\n Replacing by #`);
+            return '#';
         }
 
         if (jcrNode) {
@@ -108,7 +109,8 @@ export function buildUrl(props, renderContext, currentResource) {
         url = props.value;
     } else {
         console.warn('Missing parameter to build url, please provide either a content path using \'path\' parameter, ' +
-            'or a prebuild valid url using \'value\' parameter');
+            'or a prebuild valid url using \'value\' parameter\n replacing by #');
+        return '#';
     }
 
     if (url) {
@@ -121,5 +123,6 @@ export function buildUrl(props, renderContext, currentResource) {
         return finalizeUrl(url, renderContext);
     }
 
-    console.warn('Unable to build url for: ' + JSON.stringify(props));
+    console.warn(`Unable to build url for: ${JSON.stringify(props)}\n Replacing by #`);
+    return '#';
 }
