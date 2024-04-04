@@ -67,6 +67,7 @@ export function initUrlBuilder() {
 
 /**
  * Provide URL generation for contents/files
+ * If parameters are not valid, or if a node couldn't be found, it will log an warning and return '#'
  * @param {Object} props props used to build the URL
  * @param {string} props.value the value to use to build the URL
  * @param {string} props.path the path of the resource to build the URL for
