@@ -60,7 +60,7 @@ const extractPropValue = (session, value, type) => {
 
 /**
  * Extracts the properties from a node
- * @param {JCRNodeWrapper} node the node on which to extract the properties
+ * @param {import("org.jahia.services.content").JCRNodeWrapper} node the node on which to extract the properties
  * @param {Array} props the name of the properties to extract
  * @returns {Object} an object containing the property values
  */

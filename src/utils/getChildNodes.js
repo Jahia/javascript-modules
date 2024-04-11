@@ -1,10 +1,10 @@
 /**
  * Returns an array of child nodes of a given node.
- * @param {JCRNodeWrapper} node - The node to get the child nodes from.
+ * @param {import("org.jahia.services.content").JCRNodeWrapper} node - The node to get the child nodes from.
  * @param {number} limit the maximum number of nodes to return (-1 to return all nodes, but be careful with this as it can be very slow and memory consuming, it's better to use a reasonable limit and use pagination if needed)
  * @param {number} [offset=0] the offset to start from
  * @param {function} [filter] - A function to filter the nodes to be returned.
- * @returns {JCRNodeWrapper[]} An array of child nodes.
+ * @returns {import("org.jahia.services.content").JCRNodeWrapper[]} An array of child nodes.
  */
 export function getChildNodes(node, limit, offset = 0, filter = undefined) {
     let result = [];
@@ -36,5 +36,7 @@ export function getChildNodes(node, limit, offset = 0, filter = undefined) {
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     return result;
 }

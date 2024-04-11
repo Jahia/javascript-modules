@@ -2,7 +2,8 @@ import {server} from '@jahia/js-server-core-private';
 
 /**
  * Registers Jahia components into the global registry as views
- * @param {Object} jahiaComponents an object containing the jahia components to register
+ * @param {object} jahiaComponents an object containing the jahia components to register
+ * @returns {void}
  * TODO We will probably want to revisit this function once we handle global component registration in ticket https://jira.jahia.org/browse/BACKLOG-22400
  */
 export function registerJahiaComponents(jahiaComponents) {
@@ -27,7 +28,8 @@ export function registerJahiaComponents(jahiaComponents) {
 
         options = {
             name: 'default',
-            templateType: 'html'
+            templateType: 'html',
+            component: null
         };
 
         let id = props.id;

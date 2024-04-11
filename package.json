@@ -1,12 +1,14 @@
 {
   "name": "@jahia/js-server-core",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "repository": "git@github.com:Jahia/js-server-core.git",
   "license": "MIT",
   "scripts": {
-    "build": "babel src -d dist --copy-files && tsc",
+    "prebuild": "mkdir -p dist/types && ncp types/manual dist/types && ncp types/generated dist/types && ncp src dist",
+    "build": "tsc && node generate-index",
+    "doc" : "typedoc",
     "clean": "rm -rf dist",
     "lint": "eslint --ext js,jsx,json,ts .",
     "lint:fix": "eslint --ext js,jsx,json,ts --fix ."
@@ -48,6 +50,8 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "ncp": "^2.0.0",
+    "typedoc": "^0.25.13",
     "typescript": "^4.3.5"
   }
 }
