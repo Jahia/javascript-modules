@@ -36,7 +36,7 @@ else
     RUN_COMMAND=run_quiet
 fi
 
-project_dir="."
+project_dir=`pwd`
 
 # Create a directory for the source code and JAR files
 echo " Creating directories..."
