@@ -6,7 +6,7 @@
   "repository": "git@github.com:Jahia/js-server-core.git",
   "license": "MIT",
   "scripts": {
-    "prebuild": "mkdir -p dist/types && ncp types/manual dist/types && ncp types/generated dist/types && ncp src dist",
+    "prebuild": "mkdir -p dist/types && ncp types/manual dist/types && ncp types/generated/build/types dist/types && ncp src dist",
     "build": "tsc && node generate-index",
     "doc" : "typedoc",
     "clean": "rm -rf dist",

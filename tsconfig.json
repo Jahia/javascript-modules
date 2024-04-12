@@ -22,23 +22,24 @@
         "paths" : {
             "@jahia/js-server-core-private" : [ "types/manual/@jahia/js-server-core-private.d.ts"],
             "@jahia/js-server-core" : [ "types/manual/index.d.ts"],
-            "*" : [ "types/generated/*", "types/manual/*"]
-         }, 
+            "*" : [ "types/generated/build/types/*", "types/manual/*"]
+         },
     },
     "include": [
-        "src/**/*.js", 
-        "types/**/*.d.ts"
-, "types/manual/servercontext.ts"    ],
+        "src/**/*.js",
+        "types/manual/**/*.d.ts",
+        "types/generated/build/types/**/*.d.ts"
+    ],
     "exclude": [
-        "node_modules", 
-        "**/*.spec.ts", 
+        "node_modules",
+        "**/*.spec.ts",
         "**/*.spec.tsx"
-    ], 
+    ],
     "typedocOptions": {
         "entryPoints": [
-            "src/index.js", 
+            "src/index.js",
             "types/**/*.d.ts"
         ],
         "out": "dist/docs"
-    }    
+    }
 }
