@@ -36,10 +36,13 @@
         "**/*.spec.tsx"
     ],
     "typedocOptions": {
+        "name" : "Jahia v8.2.0.0 / js-server-core",
         "entryPoints": [
             "src/index.js",
             "types/**/*.d.ts"
         ],
-        "out": "dist/docs"
+        "out": "dist/docs", 
+        "includeVersion" : true, 
+        "readme": "typedoc-readme.md"
     }
 }
