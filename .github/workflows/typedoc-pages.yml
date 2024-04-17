@@ -1,5 +1,4 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+name: Generate typedoc and publish to Github pages
 
 on:
   pull_request:
@@ -42,7 +41,7 @@ jobs:
       - run: yarn clean
       - run: yarn build
       - run: yarn doc
-        
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
