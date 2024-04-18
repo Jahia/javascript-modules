@@ -149,7 +149,7 @@ const buildMenu = (node, navMenuLevel, config) => {
             }
 
             if (!referenceIsBroken && correctType && (config.startLevelValue < navMenuLevel || inpath)) {
-                const hasChildren = navMenuLevel < config.maxDepth && getMenuItemsChildren(config.workspace, menuItem.getPath()).length > 0;
+                const hasChildren = navMenuLevel < config.maxDepth && getMenuItemsChildren(config.workspace, menuItem.getPath(), ['jmix:navMenuItem']).length > 0;
                 if (config.startLevelValue < navMenuLevel) {
                     config.currentResource.getDependencies().add(menuItem.getCanonicalPath());
                     menuEntry.render = server.render.render({
