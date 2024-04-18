@@ -164,18 +164,19 @@ const buildMenu = (node, navMenuLevel, config, children) => {
             }
 
             if (!referenceIsBroken && correctType && (config.startLevelValue < navMenuLevel || inpath)) {
-                const menuItemChildren = getMenuItemsChildren(config.workspace, menuItem.getPath(), ['jmix:navMenuItem']);
-                const hasChildren = navMenuLevel < config.maxDepth && menuItemChildren.length > 0;
+                if (navMenuLevel < config.maxDepth) {
+                    const menuItemChildren = getMenuItemsChildren(config.workspace, menuItem.getPath(), ['jmix:navMenuItem']);
+                    if (menuItemChildren.length > 0) {
+                        menuEntry.children = buildMenu(menuItem, navMenuLevel + 1, config, menuItemChildren);
+                    }
+                }
+
                 if (config.startLevelValue < navMenuLevel) {
                     config.currentResource.getDependencies().add(menuItem.getCanonicalPath());
                     menuEntry.render = server.render.render({
                         path: menuItem.getPath(),
                         view: config.menuEntryView || 'menuElement'
                     }, config.renderContext, config.currentResource);
-                }
-
-                if (hasChildren) {
-                    menuEntry.children = buildMenu(menuItem, navMenuLevel + 1, config, menuItemChildren);
                 }
 
                 menuEntry.node = menuItem;
