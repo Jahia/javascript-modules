@@ -26,6 +26,18 @@ const getPageAncestors = (workspace, path, types) => {
     return result.data ? result.data.jcr.nodeByPath.ancestors : [];
 };
 
+/**
+ * @typedef {Object} MenuItemChild
+ * @property {string} path - The page of a menu item child node
+ */
+
+/**
+ * Get the children of a menu item that have a specific type
+ * @param {string} workspace the workspace to use: 'default' for the edit workspace, 'live' for the live workspace
+ * @param {string} path the path of the node to get the children from
+ * @param {string[]} types the types of the children to retrieve
+ * @returns {MenuItemChild[]}
+ */
 const getMenuItemsChildren = (workspace, path, types) => {
     const result = server.gql.executeQuerySync({
         query: print(gql`
@@ -106,13 +118,16 @@ const getBaseNode = (baseline, renderContext, workspace) => {
  * @param {import('org.jahia.services.content').JCRNodeWrapper} node the node from which to start building the menu
  * @param {number} navMenuLevel the current depth of the menu (1 for the root, 2 for the children of the root, etc.)
  * @param {MenuConfig} config the configuration object to build the navigation menu
+ * @param {MenuItemChild[]} [children] the paths of the children of the current node
  * @returns {MenuEntry[]} an array of menu entries objects
  */
-const buildMenu = (node, navMenuLevel, config) => {
+const buildMenu = (node, navMenuLevel, config, children) => {
     let result = [];
     if (node) {
         const session = node.getSession();
-        const children = getMenuItemsChildren(config.workspace, node.getPath(), ['jmix:navMenuItem']);
+        if (!children) {
+            children = getMenuItemsChildren(config.workspace, node.getPath(), ['jmix:navMenuItem']);
+        }
 
         for (let index = 0; index < children.length; index++) {
             const menuEntry = {};
@@ -149,17 +164,19 @@ const buildMenu = (node, navMenuLevel, config) => {
             }
 
             if (!referenceIsBroken && correctType && (config.startLevelValue < navMenuLevel || inpath)) {
-                const hasChildren = navMenuLevel < config.maxDepth && getMenuItemsChildren(config.workspace, menuItem.getPath()).length > 0;
+                if (navMenuLevel < config.maxDepth) {
+                    const menuItemChildren = getMenuItemsChildren(config.workspace, menuItem.getPath(), ['jmix:navMenuItem']);
+                    if (menuItemChildren.length > 0) {
+                        menuEntry.children = buildMenu(menuItem, navMenuLevel + 1, config, menuItemChildren);
+                    }
+                }
+
                 if (config.startLevelValue < navMenuLevel) {
                     config.currentResource.getDependencies().add(menuItem.getCanonicalPath());
                     menuEntry.render = server.render.render({
                         path: menuItem.getPath(),
                         view: config.menuEntryView || 'menuElement'
                     }, config.renderContext, config.currentResource);
-                }
-
-                if (hasChildren) {
-                    menuEntry.children = buildMenu(menuItem, navMenuLevel + 1, config);
                 }
 
                 menuEntry.node = menuItem;
