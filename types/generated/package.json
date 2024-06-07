@@ -17,7 +17,7 @@
       "build/sources/felix-framework/org.apache.felix.framework-6.0.5/src/main/java"
     ],
     "symbols": [
-      "build/jar-symbols/npm-modules-engine-0.2.0-SNAPSHOT.jar",
+      "build/jar-symbols/npm-modules-engine-0.3.0-SNAPSHOT.jar",
       "build/jar-symbols/jahia-impl-8.2.1.0-SNAPSHOT.jar",
       "build/jar-symbols/org.apache.felix.framework-6.0.5.jar",
       "build/jar-symbols/spring-web-3.2.18.jahia4_OSGI.jar",

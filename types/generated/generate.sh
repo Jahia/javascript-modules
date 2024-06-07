@@ -115,7 +115,7 @@ if [ ! -d "$npm_modules_engine_dir/.git" ]; then
     echo " Compiling project using Maven..."
     $RUN_COMMAND mvn clean install
     echo " Copying JAR files to $jar_symbols_dir ..."
-    cp target/*.jar ../../../../$jar_symbols_dir/
+    cp target/*.jar $jar_symbols_dir/
     cd -
 fi
 
@@ -127,7 +127,7 @@ if [ ! -d "$jahia_private_dir/.git" ]; then
     echo " Compiling project using Maven..."
     $RUN_COMMAND mvn clean install
     echo " Copying JAR files to $jar_symbols_dir ..."
-    cp core/target/*.jar ../../../../$jar_symbols_dir/
+    cp core/target/*.jar $jar_symbols_dir/
     cd -
 fi
 

@@ -136,3 +136,4 @@ dist
 /types/generated/build/jar-symbols/
 /types/generated/build/sources/
 /types/generated/build/java-ts-bind/
+/types/generated/yarn.lock
