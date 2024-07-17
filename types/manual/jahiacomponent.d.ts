@@ -1,7 +1,7 @@
 /**
- * An interface defining
+ * An interface definining the jahiaComponent object
  */
-export class JahiaComponent {
+export interface JahiaComponent {
     /**
      *  The content node type the component applies to
      */
