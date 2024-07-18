@@ -8,3 +8,4 @@ export * from './RenderInBrowser';
 export * from './useQuery';
 export * from './register';
 export * from './useServerContext';
+export * from './defineJahiaComponent';
