@@ -1,10 +1,10 @@
 /**
  * @typedef {Object} JahiaComponent
  * @property {string} name - The name of the component.
- * @property {string} displayName - The display name of the component (in jahia's UI).
+ * @property {string} [displayName] - The display name of the component (in jahia's UI), optional.
  * @property {"template"|"view"} componentType - The type of the component.
  * @property {string} nodeType - The content node type the component applies to.
- * @property {Record<string, string>} properties - Properties to add on the component
+ * @property {Record<string, string>} [properties] - Properties to add on the component, optional.
  */
 
 /**
