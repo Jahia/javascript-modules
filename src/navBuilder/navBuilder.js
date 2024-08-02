@@ -1,6 +1,6 @@
 import {server} from '@jahia/js-server-core-private';
-import {gql} from '@apollo/client';
 import {print} from 'graphql';
+import gql from 'graphql-tag';
 
 const getPageAncestors = (workspace, path, types) => {
     const result = server.gql.executeQuerySync({
