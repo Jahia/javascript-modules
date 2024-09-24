@@ -12,6 +12,6 @@ import InBrowser from './internal/InBrowser';
  * */
 export function RenderInBrowser({child: Child, props}) {
     return (
-        <InBrowser child={Child} props={props} dataKey="data-reactrender"/>
+        <InBrowser preRender={false} child={Child} props={props} dataKey="data-reactrender"/>
     );
 }

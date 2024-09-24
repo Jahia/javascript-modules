@@ -33,7 +33,7 @@ const getAppShellInitData = moduleBaseUrl => {
         '    </script>';
 };
 
-function InBrowser({child: Child, props, dataKey}) {
+function InBrowser({child: Child, props, dataKey, preRender}) {
     const {bundleKey, currentResource, renderContext} = useServerContext();
     const language = currentResource.getLocale().getLanguage();
     const appShellInitDataScript = getAppShellInitData(buildUrl({value: '/modules'}, renderContext, currentResource));
@@ -53,9 +53,7 @@ function InBrowser({child: Child, props, dataKey}) {
     return (
         <>
             <div {...data}>
-                <I18nextProvider i18n={i18n}>
-                    <Child {...props}/>
-                </I18nextProvider>
+                {preRender && <I18nextProvider i18n={i18n}><Child {...props}/></I18nextProvider>}
             </div>
 
             {i18nScript && <AddResources key={`i18n_initialStore_${bundleKey}`} insert inlineResource={i18nScript}/>}

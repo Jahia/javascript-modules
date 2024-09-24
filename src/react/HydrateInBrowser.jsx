@@ -12,6 +12,6 @@ import InBrowser from './internal/InBrowser';
  */
 export function HydrateInBrowser({child: Child, props}) {
     return (
-        <InBrowser child={Child} props={props} dataKey="data-reacthydrate"/>
+        <InBrowser preRender child={Child} props={props} dataKey="data-reacthydrate"/>
     );
 }

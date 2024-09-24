@@ -1,6 +1,6 @@
 {
   "name": "@jahia/js-server-core",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "repository": "git@github.com:Jahia/js-server-core.git",
