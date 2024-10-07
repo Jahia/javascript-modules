@@ -6,6 +6,25 @@ import { QueryWrapper } from 'org.jahia.services.query';
 import { JCRSiteNode } from 'org.jahia.services.content.decorator';
 import { JahiaUser } from 'org.jahia.services.usermanager';
 import { NodeIterator, Item, Node, PropertyIterator, Binary, Property } from 'javax.jcr';
+export class JCRCallback<T> {
+  /**
+   * Called by {@link JCRTemplate} within an active JCR
+   * {@link javax.jcr.JCRSession}. It is not responsible for logging
+   * out of the Session or handling transactions.
+   *
+   * Allows for returning a result object created within the
+   * callback, i.e. a domain object or a collection of domain
+   * objects. A thrown {@link RuntimeException} is treated as an
+   * application exception; it is propagated to the caller of the
+   * template.
+   *
+   * @param session
+   *            session passed by the JCRTemplate
+   * @return a result object returned by the action, or null
+   * @throws RepositoryException in case of JCR errors
+  */
+  doInJCR(session: JCRSessionWrapper): T;
+}
 /**
  * Interface for wrappers around javax.jcr.Item to be able to inject
  * Jahia specific actions.

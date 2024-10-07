@@ -2,8 +2,8 @@ declare module 'org.jahia.modules.npm.modules.engine.js.server' {
 import { Bundle } from 'org.osgi.framework';
 import { Collection, List, Map } from 'java.util';
 
-import { JCRNodeWrapper } from 'org.jahia.services.content';
-
+import { JCRNodeWrapper, JCRCallback } from 'org.jahia.services.content';
+import { Promise } from 'org.jahia.modules.npm.modules.engine.jsengine';
 
 import { JCRSiteNode } from 'org.jahia.services.content.decorator';
 import { RenderContext, Resource } from 'org.jahia.services.render';
@@ -86,6 +86,24 @@ export class GQLHelper {
    * @throws IOException
   */
   executeQuerySync(parameters: any): any;
+}
+/**
+ * Helper class to perform JCR operations.
+*/
+export class JcrHelper {
+  /**
+   * Execute JCR operations on a JCR session authenticated using the guest user and the "live" workspace.
+   * This is intended for server-side use. Example:
+   *      *     import {server, useServerContext} from '@jahia/js-server-core';
+   *     ...
+   *     const {renderContext, currentResource} = useServerContext();
+   *     server.jcr.doExecuteAsGuest(session => performJcrOperations(session, renderContext, currentResource));
+   * 
+   *
+   * @param callback the callback to execute using the JCR session
+   * @return the result of the callback
+  */
+  doExecuteAsGuest(callback: JCRCallback<any>): any;
 }
 /**
  * Helper class to make it possible to access OSGi bundle resources from the JavaScript engine

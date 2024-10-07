@@ -19,7 +19,9 @@ using the following steps:
 
     `./build.sh`
 
-3. Launch the script that will download all the required source code and JARs for the type generation and that will
+3. Update the classes and methods declared in [types/generated/package.json](types/generated/package.json) in case you added/removed classes or methods.
+
+4. Launch the script that will download all the required source code and JARs for the type generation and that will
 also compile the source to generated the required symbols JARs. Then it will generate the types, and finally apply
 some post-processing to the generated types to make  usable :
 
