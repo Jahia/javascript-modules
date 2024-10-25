@@ -14,6 +14,7 @@ export class RenderContext {
   getResponse(): HttpServletResponse;
   getUser(): JahiaUser;
   getSite(): JCRSiteNode;
+  getURLGenerator(): URLGenerator;
   getDisplayedModules(): Set<string>;
   isEditMode(): boolean;
   getMode(): string;
@@ -90,6 +91,78 @@ export class Resource {
   getMissingResources(): string[];
   getPath(): string;
   getNodePath(): string;
+}
+/**
+ * Main URL generation class. This class is exposed to the template developers to make it easy to them to access basic URLs such as ${url.edit}, ${url.userProfile}. User: toto Date: Sep 14, 2009 Time: 11:13:37 AM
+*/
+export class URLGenerator {
+  getResourcePath(): string;
+  getContext(): string;
+  getFiles(): string;
+  getFilesPlaceholders(): string;
+  getBase(): string;
+  getBasePlaceholders(): string;
+  getLive(): string;
+  getEdit(): string;
+  getPreview(): string;
+  getContribute(): string;
+  /**
+   * Returns the URL for the current resource in studio mode.
+   *
+   * @return the URL for the current resource in studio mode
+  */
+  getStudio(): string;
+  /**
+   * Returns the URL for the current resource in visual studio mode.
+   *
+   * @return the URL for the current resource in visual studio mode
+  */
+  getStudioVisual(): string;
+  getLogout(): string;
+  getCurrentModule(): string;
+  getCurrent(): string;
+  getLanguages(): Map<string, string>;
+  getLanguage(languageCode: string): string;
+  getTemplates(): Map<string, string>;
+  getTemplate(template: string): string;
+  getTemplateTypes(): Map<string, string>;
+  getTemplateType(templateType: string): string;
+  getBases(): Map<string, string>;
+  getBase(languageCode: string): string;
+  /**
+   * Returns the path to the templates folder.
+   *
+   * @return the path to the templates folder
+  */
+  getTemplatesPath(): string;
+  /**
+   * Returns the URL of the main resource (normally, page), depending on the current mode.
+   *
+   * @return the URL of the main resource (normally, page), depending on the current mode
+  */
+  getMainResource(): string;
+  getInitializers(): string;
+  getBaseContribute(): string;
+  getBaseEdit(): string;
+  getBaseLive(): string;
+  getBasePreview(): string;
+  getConvert(): string;
+  getBaseUserBoardEdit(): string;
+  getBaseUserBoardLive(): string;
+  getBaseUserBoardFrameEdit(): string;
+  getBaseUserBoardFrameLive(): string;
+  getRealResource(): string;
+  /**
+   * Returns the server URL, including scheme, host and port, depending on the current site. The URL is in the form :, e.g. http://www.jahia.org:8080. The port is omitted in case of standard
+   * HTTP (80) and HTTPS (443) ports.
+   * 
+   * If the site's server name is configured to be "localhost", then take the servername from the request.
+   *
+   * @return the server URL, including scheme, host and port, depending on the current site
+  */
+  getServer(): string;
+  getMyProfile(): string;
+  getLogin(): string;
 }
 
 }
