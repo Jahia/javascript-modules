@@ -1,7 +1,7 @@
 import React from 'react';
-import {useServerContext} from '../useServerContext';
-import {AddResources} from '../AddResources';
-import {buildUrl} from '../../urlBuilder';
+import {useServerContext} from '../../../hooks/useServerContext';
+import {AddResources} from '../../AddResources';
+import {buildUrl} from '../../../utils/urlBuilder';
 import {I18nextProvider} from 'react-i18next';
 import i18n from 'i18next';
 

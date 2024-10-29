@@ -1,6 +1,6 @@
 import React from 'react';
 import {server} from '@jahia/js-server-core-private';
-import {useServerContext} from './useServerContext';
+import {useServerContext} from '../hooks/useServerContext';
 
 /**
  * Generates add content buttons for a content object

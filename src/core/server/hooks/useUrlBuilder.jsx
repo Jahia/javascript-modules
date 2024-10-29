@@ -1,5 +1,5 @@
-import {useServerContext} from '../react';
-import {buildUrl as originalBuildUrl} from '../urlBuilder';
+import {useServerContext} from './useServerContext';
+import {buildUrl as originalBuildUrl} from '../utils/urlBuilder';
 
 /**
  * @typedef {Object} UrlBuilderType

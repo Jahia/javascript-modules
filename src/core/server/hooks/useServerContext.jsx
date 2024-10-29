@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 
-export const UseServerContext = React.createContext({});
+const ServerContext = React.createContext({});
 
 /**
  * Returns the current server context
@@ -9,13 +9,13 @@ export const UseServerContext = React.createContext({});
 export function useServerContext() {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    return useContext(UseServerContext);
+    return useContext(ServerContext);
 }
 
 export function ServerContextProvider({renderContext, currentResource, currentNode, mainNode, bundleKey, children}) {
     return (
-        <UseServerContext.Provider value={{renderContext, currentResource, currentNode, mainNode, bundleKey}}>
+        <ServerContext.Provider value={{renderContext, currentResource, currentNode, mainNode, bundleKey}}>
             {children}
-        </UseServerContext.Provider>
+        </ServerContext.Provider>
     );
 }
