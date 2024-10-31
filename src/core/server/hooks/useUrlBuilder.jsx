@@ -4,6 +4,8 @@ import {buildUrl as originalBuildUrl} from '../utils/urlBuilder';
 /**
  * @typedef {Object} UrlBuilderType
  * @property {function({assetPath: string, moduleName?: string, parameters?: object}): string} buildStaticUrl
+ * @property {function({nodePath: string, extension?: string, language?:string, mode?:string, parameters?: object}): string} buildNodeUrl
+ * @property {function({nodePath: string, extension?: string, language?:string, mode?:string, parameters?: object}): string} buildHtmlFragmentUrl
  */
 
 /**
@@ -32,7 +34,55 @@ export function useUrlBuilder() {
         }, renderContext, currentResource);
     };
 
+    /**
+     * Builds a URL for a JCR node
+     * @param {object} props - The properties for building the URL
+     * @param {string} props.nodePath - The path of JCR node
+     * @param {string} [props.mode] the mode to use to build the URL ('edit', 'preview', 'live')
+     * @param {string} [props.language] the language to use to build the URL
+     * @param {string} [props.extension] the extension to use to build the URL
+     * @param {object} [props.parameters] - The parameters to append to the URL
+     * @returns {string} The built URL.
+     */
+    const buildNodeUrl = ({
+        nodePath,
+        extension,
+        language,
+        mode,
+        parameters
+    }) => {
+        return originalBuildUrl({
+            path: nodePath,
+            extension: extension,
+            language: language,
+            mode: mode,
+            parameters: parameters
+        }, renderContext, currentResource);
+    };
+
+    /**
+     * Builds an HTML fragment URL for a JCR node
+     * @param {object} props - The properties for building the URL
+     * @param {string} props.nodePath - The path of JCR node
+     * @param {string} [props.mode] the mode to use to build the URL ('edit', 'preview', 'live')
+     * @param {string} [props.language] the language to use to build the URL
+     * @param {string} [props.extension] the extension to use to build the URL
+     * @param {object} [props.parameters] - The parameters to append to the URL
+     * @returns {string} The built URL.
+     */
+    const buildHtmlFragmentUrl = ({
+        nodePath,
+        extension,
+        language,
+        mode,
+        parameters
+    }) => {
+        return buildNodeUrl({nodePath, extension, language, mode, parameters}) + '.ajax';
+    };
+
     return {
-        buildStaticUrl
+        buildStaticUrl,
+        buildNodeUrl,
+        buildHtmlFragmentUrl
     };
 }
