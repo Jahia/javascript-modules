@@ -6,8 +6,11 @@
   "repository": "git@github.com:Jahia/js-server-core.git",
   "license": "MIT",
   "scripts": {
-    "prebuild": "mkdir -p dist/types && ncp types/manual dist/types && ncp types/generated/build/types dist/types && ncp src dist",
-    "build": "tsc && node generate-index",
+    "types:copy": "mkdir -p dist/types && ncp types/manual dist/types && ncp types/generated/build/types dist/types",
+    "build:development": "run types:copy && tsc && node generate-index",
+    "build:production": "run build:development && run minify",
+    "build": "run build:production",
+    "minify": "node minify",
     "doc": "typedoc",
     "clean": "rm -rf dist",
     "lint": "eslint --ext js,jsx,json,ts .",
@@ -48,6 +51,7 @@
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "ncp": "^2.0.0",
+    "terser": "^5.36.0",
     "typedoc": "^0.25.13",
     "typescript": "^4.3.5"
   },
