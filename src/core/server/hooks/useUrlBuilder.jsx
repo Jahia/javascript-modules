@@ -66,18 +66,16 @@ export function useUrlBuilder() {
      * @param {string} props.nodePath - The path of JCR node
      * @param {string} [props.mode] the mode to use to build the URL ('edit', 'preview', 'live')
      * @param {string} [props.language] the language to use to build the URL
-     * @param {string} [props.extension] the extension to use to build the URL
      * @param {object} [props.parameters] - The parameters to append to the URL
      * @returns {string} The built URL.
      */
     const buildHtmlFragmentUrl = ({
         nodePath,
-        extension,
         language,
         mode,
         parameters
     }) => {
-        return buildNodeUrl({nodePath, extension, language, mode, parameters}) + '.ajax';
+        return buildNodeUrl({nodePath, extension: '.html.ajax', language, mode, parameters});
     };
 
     return {
