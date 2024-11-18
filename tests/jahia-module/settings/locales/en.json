@@ -1,0 +1,6 @@
+{
+    "greeting": "Hello !",
+    "test": {
+        "composed": "This is a composed string: {{placeholder}}"
+    }
+}

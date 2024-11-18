@@ -1,0 +1,6 @@
+- include: 'provisioning.yml'
+- installBundle:
+    - 'mvn:org.jahia.modules/npm-modules-engine'
+    - 'npm:mvn:org.example.modules.npm/jahia-npm-module-example/1.0.0-SNAPSHOT/tgz'
+  autoStart: true
+  uninstallPreviousVersion: true

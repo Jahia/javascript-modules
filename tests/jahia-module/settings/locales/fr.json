@@ -1,0 +1,6 @@
+{
+    "greeting": "Salut !",
+    "test": {
+        "composed": "Ceci est un test composé: {{placeholder}}"
+    }
+}

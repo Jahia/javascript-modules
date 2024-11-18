@@ -1,0 +1,44 @@
+# Eclipse
+/.classpath
+/.project
+/.settings
+
+# Intellij
+.idea
+*.iml
+*.ipr
+
+# Maven
+target
+
+.DS_Store
+/node_modules
+/node
+/src/main/resources/javascript/apps
+junit.xml
+
+# Jahia DX Studio
+repository.xml.generated
+
+src/main/resources/META-INF/js
+
+# Files used by the testing framework
+/tests/.env
+/tests/artifacts
+/tests/build-dependencies
+/tests/node_modules
+yarn-error.log
+
+#Yarn
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+yarn-error.log
+.pnp.*
+
+**/.yalc
+**/yalc.lock

@@ -1,0 +1,21 @@
+package org.jahia.modules.npmExample
+
+// list any import classes here.
+import org.jahia.services.content.rules.*
+import org.slf4j.Logger
+
+expander rules.dsl
+
+// declare any global variables here
+global User user
+global Service service
+global Logger logger
+
+rule "Npm module - testing rule deployement"
+    salience 25
+    when
+        A property triggerProp has been set on a node
+             - the node has the type npmExample:testRule
+    then
+        Set the property resultProp of the node with the value "It works"
+end
