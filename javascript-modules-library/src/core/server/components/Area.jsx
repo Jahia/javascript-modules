@@ -1,6 +1,6 @@
 import React from 'react';
 import {useServerContext} from '../hooks/useServerContext';
-import {server} from '@jahia/js-server-core-private';
+import {server} from '@jahia/javascript-modules-library-private';
 
 /**
  * Generates an area in which editors may insert content objects.

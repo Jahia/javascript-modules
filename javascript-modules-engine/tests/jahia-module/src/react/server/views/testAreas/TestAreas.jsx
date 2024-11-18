@@ -1,5 +1,5 @@
 import React from 'react';
-import {Area, defineJahiaComponent} from '@jahia/js-server-core';
+import {Area, defineJahiaComponent} from '@jahia/javascript-modules-library';
 
 export const TestAreas = () => {
     return (

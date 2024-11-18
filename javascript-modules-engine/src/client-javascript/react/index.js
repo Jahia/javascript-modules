@@ -7,7 +7,7 @@ const hydrateReactComponent = element => {
         const conf = JSON.parse(decodeURIComponent(element.dataset.reacthydrate));
 
         if (!window.appShell || !window.appShell[conf.bundle]) {
-            console.error(`npm-modules-engine AppShell: React hydration Failed, cannot find module [${conf.bundle}]. 
+            console.error(`javascript-modules-engine AppShell: React hydration Failed, cannot find module [${conf.bundle}].
             Make sure you have a registered appShell for this module and that the component is registered in it.`);
             return;
         }
@@ -15,7 +15,7 @@ const hydrateReactComponent = element => {
         window.appShell[conf.bundle].get(conf.name).then(f => {
             hydrateRoot(element, React.createElement(BaseApp, {ns: conf.bundle, lang: conf.lang, app: f().default, appProps: conf.props}));
             element.dataset.hydrated = 'true';
-            console.log('npm-modules-engine AppShell: React component hydrated', element);
+            console.log('javascript-modules-engine AppShell: React component hydrated', element);
         });
     }
 };
@@ -25,7 +25,7 @@ const renderReactComponent = element => {
         const conf = JSON.parse(decodeURIComponent(element.dataset.reactrender));
 
         if (!window.appShell || !window.appShell[conf.bundle]) {
-            console.error(`npm-modules-engine AppShell: React render Failed, cannot find module [${conf.bundle}]. 
+            console.error(`javascript-modules-engine AppShell: React render Failed, cannot find module [${conf.bundle}].
             Make sure you have a registered appShell for this module and that the component is registered in it.`);
             return;
         }
@@ -34,7 +34,7 @@ const renderReactComponent = element => {
             const root = createRoot(element);
             root.render(React.createElement(BaseApp, {ns: conf.bundle, lang: conf.lang, app: f().default, appProps: conf.props}));
             element.dataset.hydrated = 'true';
-            console.log('npm-modules-engine AppShell: React component rendered', element);
+            console.log('javascript-modules-engine AppShell: React component rendered', element);
         });
     }
 };

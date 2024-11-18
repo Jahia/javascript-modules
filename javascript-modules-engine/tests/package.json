@@ -1,5 +1,5 @@
 {
-  "name": "@jahia/npm-modules-engine-cypress",
+  "name": "@jahia/javascript-modules-engine-cypress",
   "version": "1.0.0",
   "scripts": {
     "instrument": "nyc instrument --compact=false cypress instrumented",

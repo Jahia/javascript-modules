@@ -1,5 +1,5 @@
 import React from 'react';
-import {defineJahiaComponent} from "@jahia/js-server-core";
+import {defineJahiaComponent} from "@jahia/javascript-modules-library";
 
 export const TestContentTemplateOtherView = () => {
     return (

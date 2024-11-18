@@ -1,9 +1,9 @@
 {
-  "name": "@jahia/js-server-core",
-  "version": "0.0.17",
+  "name": "@jahia/javascript-modules-library",
+  "version": "${project.version}",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
-  "repository": "git@github.com:Jahia/js-server-core.git",
+  "repository": "git@github.com:Jahia/javascript-modules.git",
   "license": "MIT",
   "scripts": {
     "types:copy": "mkdir -p dist/types && ncp types/manual dist/types && ncp types/generated/build/types dist/types",
@@ -14,7 +14,8 @@
     "doc": "typedoc",
     "clean": "rm -rf dist",
     "lint": "eslint --ext js,jsx,json,ts .",
-    "lint:fix": "eslint --ext js,jsx,json,ts --fix ."
+    "lint:fix": "eslint --ext js,jsx,json,ts --fix .",
+    "prepack": "echo 'Please run 'mvn package' to create the tgz so the Maven version can be injected in the package.json' && exit 1"
   },
   "files": [
     "dist"

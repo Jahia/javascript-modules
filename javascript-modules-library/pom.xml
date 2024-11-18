@@ -1,0 +1,183 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>javascript-modules</artifactId>
+        <groupId>org.jahia.modules</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <artifactId>javascript-modules-library</artifactId>
+    <name>Javascript Modules Library</name>
+    <packaging>pom</packaging>
+    <description>Javascript library (wrapped as a Maven project) used to build Javascript modules that run on Jahia.</description>
+
+    <properties>
+        <node.version>v22.10.0</node.version>
+        <!-- frontend-maven-plugin requires to use yarn 1.22.x as a "bootstrap" but then, the .yarnrc.yml will be detected and Yarn Berry (4+) will be used -->
+        <yarn.version>v1.22.19</yarn.version>
+        <npm.version>10.9.0</npm.version>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.github.eirslett</groupId>
+                    <artifactId>frontend-maven-plugin</artifactId>
+                    <version>1.15.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <!-- use an Ant task to create the target/ directory, as it's not created by Maven for "pom" packaging -->
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${project.build.directory}" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <executions>
+                    <!-- Executions bound on the "pre-clean" phase: -->
+                    <execution>
+                        <id>npm install node and yarn pre-clean</id>
+                        <phase>pre-clean</phase>
+                        <goals>
+                            <goal>install-node-and-yarn</goal>
+                        </goals>
+                        <configuration>
+                            <nodeVersion>${node.version}</nodeVersion>
+                            <yarnVersion>${yarn.version}</yarnVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>yarn install pre-clean</id>
+                        <phase>pre-clean</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                    </execution>
+                    <!-- Execution bound on the "clean" phase: -->
+                    <execution>
+                        <id>yarn clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>clean</arguments>
+                        </configuration>
+                    </execution>
+                    <!-- Executions bound on the "initialize" phase (executed in order of declaration): -->
+                    <execution>
+                        <id>install node, yarn and npm</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>install-node-and-yarn</goal>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <configuration>
+                            <nodeVersion>${node.version}</nodeVersion>
+                            <yarnVersion>${yarn.version}</yarnVersion>
+                            <npmVersion>${npm.version}</npmVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>yarn install</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                    </execution>
+                    <!-- Executions bound on the "compile" phase (executed in order of declaration): -->
+                    <execution>
+                        <id>yarn lint</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>lint</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>yarn build</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>build</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <!-- manually package the .tgz file to be able to inject the version in the package.json -->
+                    <execution>
+                        <id>package-tgz</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>.m2/assembly-tgz.xml</descriptor>
+                            </descriptors>
+                            <finalName>${project.build.finalName}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <releaseProfiles>release-package</releaseProfiles>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>release-package</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <executions>
+                            <!-- Executions bound on the "deploy" phase: -->
+                            <execution>
+                                <id>publish-package</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- publish the tgz in the target/ folder as its package.json is properly filtered (with the right version) -->
+                                    <arguments>publish ${project.build.directory}/${project.build.finalName}.tgz --access public</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

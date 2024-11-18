@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-   Copyright (C) 2002-2023 Jahia Solutions Group SA. All rights reserved.
+   Copyright (C) 2002-2024 Jahia Solutions Group SA. All rights reserved.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -19,25 +19,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>jahia-modules</artifactId>
+        <artifactId>javascript-modules</artifactId>
         <groupId>org.jahia.modules</groupId>
-        <version>8.2.0.0</version>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>npm-modules-engine</artifactId>
-    <name>NPM modules engine</name>
-    <version>0.6.0-SNAPSHOT</version>
+    <artifactId>javascript-modules-engine</artifactId>
+    <name>Javascript Modules Engine</name>
     <packaging>bundle</packaging>
     <description>This is the engine allowing NPM modules to run on a Jahia server.</description>
 
-    <scm>
-        <connection>scm:git:git@github.com:Jahia/npm-modules-engine.git</connection>
-        <developerConnection>scm:git:git@github.com:Jahia/npm-modules-engine.git</developerConnection>
-        <url>scm:git:git@github.com:Jahia/npm-modules-engine.git</url>
-        <tag>HEAD</tag>
-    </scm>
-
     <properties>
-        <jahia-module-signature>MC0CFQCJKtCm1I+ehyiZ5o25hG2dqyvNUQIUeuOf5obgfPppNRDgSDku+5EPlxc=</jahia-module-signature>
+        <jahia-module-signature>MCwCFAS3l9VIV1imlsBcEYUBOC7+cJ+AAhR3KynIRtvNyeAZrifrQP8Cjkxw5Q==</jahia-module-signature>
         <import-package>
             graphql.annotations.annotationTypes;version="[7.2,99)",
             graphql.schema;version="[13.0,22)",
@@ -49,21 +41,6 @@
         <frontend-maven-plugin.nodeVersion>v18.12.0</frontend-maven-plugin.nodeVersion>
         <frontend-maven-plugin.yarnVersion>v1.22.19</frontend-maven-plugin.yarnVersion>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>jahia-public</id>
-            <name>Jahia Public Repository</name>
-            <url>https://devtools.jahia.com/nexus/content/groups/public</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -145,6 +122,14 @@
             <groupId>pl.touk</groupId>
             <artifactId>throwing-function</artifactId>
             <version>1.3</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javascript-modules-library</artifactId>
+            <version>${project.version}</version>
+            <type>tgz</type>
             <scope>provided</scope>
         </dependency>
 
@@ -233,7 +218,7 @@
                     </execution>
                     <execution>
                         <id>yarn install</id>
-                        <phase>generate-resources</phase>
+                        <phase>initialize</phase>
                         <goals>
                             <goal>yarn</goal>
                         </goals>
@@ -259,7 +244,6 @@
                     <release>11</release>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 </project>

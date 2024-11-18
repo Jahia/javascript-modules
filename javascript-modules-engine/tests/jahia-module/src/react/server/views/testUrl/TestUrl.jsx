@@ -1,5 +1,5 @@
 import React from 'react';
-import {buildUrl, defineJahiaComponent, server, useServerContext, useUrlBuilder} from '@jahia/js-server-core';
+import {buildUrl, defineJahiaComponent, server, useServerContext, useUrlBuilder} from '@jahia/javascript-modules-library';
 
 export const TestUrl = () => {
     const {currentResource, renderContext} = useServerContext();

@@ -1,6 +1,6 @@
 import React from 'react';
 import SampleI18n from "../../../../client/SampleI18n";
-import {defineJahiaComponent, HydrateInBrowser, RenderInBrowser} from "@jahia/js-server-core";
+import {defineJahiaComponent, HydrateInBrowser, RenderInBrowser} from "@jahia/javascript-modules-library";
 
 export const TestI18n = () => {
     return (

@@ -1684,9 +1684,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jahia/js-server-core@workspace:.":
+"@jahia/javascript-modules-library@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@jahia/js-server-core@workspace:."
+  resolution: "@jahia/javascript-modules-library@workspace:."
   dependencies:
     "@babel/cli": "npm:^7.23.4"
     "@babel/core": "npm:^7.23.7"

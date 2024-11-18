@@ -1,6 +1,11 @@
 {
   "name": "@jahia/npm-module-example",
   "description": "Jahia NPM Test module",
+  "workspaces": {
+    "packages": [
+      "../../../javascript-modules-library"
+    ]
+  },
   "version": "1.0.0",
   "license": "MIT",
   "author": "Jahia Solutions Group SA",
@@ -58,10 +63,15 @@
     "webpack-shell-plugin-next": "^2.3.1"
   },
   "resolutions": {
-    "minimist": "^1.2.6"
+    "minimist": "^1.2.6",
+    "@babel/core": "7.22.5",
+    "eslint": "8.45.0",
+    "typescript": "5.3.3",
+    "@babel/preset-env": "7.22.9",
+    "@babel/preset-react": "7.22.5"
   },
   "dependencies": {
-    "@jahia/js-server-core": "^0.0.17",
+    "@jahia/javascript-modules-library": "workspace:*",
     "i18next": "^23.10.1",
     "react": "^18.2.0",
     "react-i18next": "^14.1.0"

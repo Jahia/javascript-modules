@@ -1,5 +1,5 @@
 import React from 'react';
-import {getChildNodes, getNodeProps, Render, useServerContext, defineJahiaComponent} from '@jahia/js-server-core';
+import {getChildNodes, getNodeProps, Render, useServerContext, defineJahiaComponent} from '@jahia/javascript-modules-library';
 
 export const TestRenderEditable = () => {
     const {currentNode} = useServerContext();

@@ -1,5 +1,5 @@
 import React from 'react';
-import {AddResources, Area, defineJahiaComponent, Render, useServerContext} from '@jahia/js-server-core';
+import {AddResources, Area, defineJahiaComponent, Render, useServerContext} from '@jahia/javascript-modules-library';
 import {footer, header, login, navMenu} from '../../templates/pageComponents';
 
 export const TestContentTemplate = () => {

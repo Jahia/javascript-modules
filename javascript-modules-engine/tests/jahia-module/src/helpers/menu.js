@@ -1,4 +1,4 @@
-import {buildUrl} from '@jahia/js-server-core';
+import {buildUrl} from '@jahia/javascript-modules-library';
 
 /**
  * @typedef {Object} NavigationItem

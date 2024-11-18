@@ -38,7 +38,7 @@ NPM modules can contain templates, definitions, filter, and other jahia extensio
 
 ## Prerequisites
  - It must be run inside a GraalVM environment in order to support Javascript language.
- - Install npm-modules-engine module
+ - Install javascript-modules-engine module
  - Have npm, node, yarn installed
 
 ## Jahia Snapshot Environtment
@@ -150,10 +150,10 @@ This is specified in the properties file with `template=true`.
 
 Standard views can only be included in other views or templates.
 
-Handlebars templating documentation can be found [here](https://github.com/Jahia/npm-modules-engine/blob/main/handlebars.md).
+Handlebars templating documentation can be found [here](https://github.com/Jahia/javascript-modules-engine/blob/main/handlebars.md).
 
-You can, however, include more complex views by writing Javascript code, by following this [documentation](https://github.com/Jahia/npm-modules-engine/blob/main/README.md#views).
+You can, however, include more complex views by writing Javascript code, by following this [documentation](https://github.com/Jahia/javascript-modules-engine/blob/main/README.md#views).
 
 ## Read more
 
-More in-depth documentation of the internals of npm-modules-engine can be found in [npm-modules-engine](https://github.com/Jahia/npm-modules-engine).
+More in-depth documentation of the internals of javascript-modules-engine can be found in [javascript-modules-engine](https://github.com/Jahia/javascript-modules-engine).

@@ -20,8 +20,8 @@
         "declarationDir": "dist/types",
         "baseUrl" : ".",
         "paths" : {
-            "@jahia/js-server-core-private" : [ "types/manual/@jahia/js-server-core-private.d.ts"],
-            "@jahia/js-server-core" : [ "types/manual/index.d.ts"],
+            "@jahia/javascript-modules-library-private" : [ "types/manual/@jahia/javascript-modules-library-private.d.ts"],
+            "@jahia/javascript-modules-library" : [ "types/manual/index.d.ts"],
             "*" : [ "types/generated/build/types/*", "types/manual/*"]
          },
     },
@@ -36,7 +36,7 @@
         "**/*.spec.tsx"
     ],
     "typedocOptions": {
-        "name" : "Jahia v8.2.0.0 / js-server-core",
+        "name" : "Jahia v8.2.0.0 / javascript-modules-library",
         "entryPoints": [
             "src/index.js",
             "types/**/*.d.ts"

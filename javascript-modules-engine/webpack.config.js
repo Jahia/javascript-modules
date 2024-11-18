@@ -19,8 +19,8 @@ module.exports = (env, argv) => {
             path: path.resolve(__dirname, 'src/main/resources/META-INF/js')
         },
         externals: {
-            '@jahia/js-server-core-builder': 'jsServerCoreLibraryBuilder',
-            '@jahia/js-server-core-private': 'jsServerCoreLibraryBuilder.getLibrary()',
+            '@jahia/javascript-modules-library-builder': 'javascriptModulesLibraryBuilder',
+            '@jahia/javascript-modules-library-private': 'javascriptModulesLibraryBuilder.getLibrary()',
         },
         resolve: {
             alias: {
@@ -45,7 +45,7 @@ module.exports = (env, argv) => {
                     test: /\.jsx$/,
                     include: [
                         path.join(__dirname, 'src'),
-                        path.resolve(__dirname, "node_modules/@jahia/js-server-core")
+                        path.resolve(__dirname, "node_modules/@jahia/javascript-modules-library")
                     ],
                     use: {
                         loader: 'babel-loader',

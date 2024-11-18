@@ -1,5 +1,5 @@
 import React from 'react';
-import {defineJahiaComponent, useGQLQuery, useServerContext} from "@jahia/js-server-core";
+import {defineJahiaComponent, useGQLQuery, useServerContext} from "@jahia/javascript-modules-library";
 
 export const TestGQL = () => {
     const {currentNode} = useServerContext();

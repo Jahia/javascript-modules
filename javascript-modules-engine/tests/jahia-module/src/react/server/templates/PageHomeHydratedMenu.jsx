@@ -1,5 +1,5 @@
 import React from 'react';
-import {AddResources, Render, Area, defineJahiaComponent} from '@jahia/js-server-core';
+import {AddResources, Render, Area, defineJahiaComponent} from '@jahia/javascript-modules-library';
 import {footer, header, login, hydratedNavMenu} from "./pageComponents";
 
 export const PageHomeHydratedMenu = () => {
