@@ -18,6 +18,22 @@
     </properties>
 
     <build>
+        <resources>
+            <resource>
+                <directory>${project.basedir}</directory>
+                <includes>
+                    <include>package.json</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>${project.basedir}</directory>
+                <includes>
+                    <include>LICENSE</include>
+                    <include>README.md</include>
+                </includes>
+            </resource>
+        </resources>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -127,32 +143,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-<!--                <version>3.2.0</version>-->
                 <executions>
                     <execution>
-                        <!-- filter the package.json file to set the Maven version and copy it to the dist/ folder  -->
-                        <id>inject-version-in-package-json</id>
+                        <!-- copy the resources declared as build.resources to the dist/ folder, in order to create the final tgz file -->
+                        <!-- also, the dist/ folder can be referenced in the package.json using the file protocol (ex: "file:../javascript-modules-library/dist") -->
+                        <id>copy-resources-to-dist-folder</id>
                         <phase>process-resources</phase>
                         <goals>
                             <goal>resources</goal>
                         </goals>
                         <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>${project.basedir}</directory>
-                                    <includes>
-                                        <include>package.json</include>
-                                    </includes>
-                                    <filtering>true</filtering>
-                                </resource>
-                                <resource>
-                                    <directory>${project.basedir}</directory>
-                                    <includes>
-                                        <include>LICENSE</include>
-                                        <include>README.md</include>
-                                    </includes>
-                                </resource>
-                            </resources>
                             <outputDirectory>${project.basedir}/dist</outputDirectory>
                         </configuration>
                     </execution>
@@ -173,8 +173,6 @@
                             <descriptors>
                                 <descriptor>.m2/assembly-tgz.xml</descriptor>
                             </descriptors>
-                            <!-- fix the generated filename so it can be referenced in the package.json files without the version in the path -->
-                            <finalName>javascript-modules-library</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
