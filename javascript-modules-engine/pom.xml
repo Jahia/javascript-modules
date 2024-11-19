@@ -52,11 +52,10 @@
 
 <!--        <dependency>-->
 <!--            <groupId>org.osgi</groupId>-->
-<!--            <artifactId>osgi.compendium</artifactId>-->
-<!--            <version>${osgi.compendium.version}</version>-->
+<!--            <artifactId>osgi.annotation</artifactId>-->
+<!--            <version>${osgi.version}</version>-->
 <!--            <scope>provided</scope>-->
 <!--        </dependency>-->
-<!--        -->
 
         <dependency>
             <groupId>org.ops4j.pax.swissbox</groupId>
@@ -132,13 +131,18 @@
             <type>tgz</type>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javascript-modules-engine-java</artifactId>
+            <version>${project.version}</version>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>junit</groupId>-->
+<!--            <artifactId>junit</artifactId>-->
+<!--            <version>${junit.version}</version>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
     </dependencies>
 
     <build>
@@ -163,8 +167,43 @@
                 <configuration>
                     <instructions>
                         <_dsannotations>*</_dsannotations>
+<!--                        <Include-Resource>-->
+<!--                            @${project.build.directory}/classes-->
+<!--                        </Include-Resource>-->
+<!--                        <Import-Package>-->
+<!--                            org.jahia.modules.npm.modules.engine.jsengine.*;resolution:=optional,-->
+<!--                            *-->
+<!--                        </Import-Package>-->
+<!--                        <Embed-Dependency>-->
+<!--                            !javascript-modules-engine-java-->
+<!--                        </Embed-Dependency>-->
                     </instructions>
+                    <excludeDependencies>javascript-modules-engine-java</excludeDependencies>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.8.1</version>
+                <executions>
+                    <execution>
+                        <id>unpack-javascript-modules-library</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>javascript-modules-engine-java</artifactId>
+                                    <version>${project.version}</version>
+                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
