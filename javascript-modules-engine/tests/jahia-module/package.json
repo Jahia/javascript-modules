@@ -59,10 +59,10 @@
   },
   "resolutions": {
     "minimist": "^1.2.6",
-    "@jahia/javascript-modules-library": "portal:../../../javascript-modules-library"
+    "@jahia/javascript-modules-library": "portal:../../../javascript-modules-library/dist"
   },
   "dependencies": {
-    "@jahia/javascript-modules-library": "../../../javascript-modules-library/target/javascript-modules-library.tgz",
+    "@jahia/javascript-modules-library": "*",
     "i18next": "^23.10.1",
     "react": "^18.2.0",
     "react-i18next": "^14.1.0"

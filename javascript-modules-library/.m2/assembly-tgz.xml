@@ -8,7 +8,7 @@
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
-        <!-- copy some files as-is while the package.json is filtered in order to inject the Maven version -->
+        <!-- copy the files as-is as the package.json has already been filtered (with the correct version injected) -->
         <fileSet>
             <directory>${project.basedir}</directory>
             <outputDirectory>package</outputDirectory>
@@ -17,14 +17,6 @@
                 <include>LICENSE</include>
                 <include>README.md</include>
             </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}</directory>
-            <outputDirectory>package</outputDirectory>
-            <includes>
-                <include>package.json</include>
-            </includes>
-            <filtered>true</filtered>
         </fileSet>
     </fileSets>
 </assembly>

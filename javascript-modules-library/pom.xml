@@ -126,9 +126,36 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+<!--                <version>3.2.0</version>-->
+                <executions>
+                    <execution>
+                        <!-- filter the package.json file to set the Maven version and move it to the dist/ folder  -->
+                        <id>inject-version-in-package-json</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <includes>
+                                        <include>package.json</include>
+                                    </includes>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.basedir}/dist</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
-                    <!-- manually package the .tgz file to be able to inject the version in the package.json -->
+                    <!-- manually package the .tgz file from the dist/ folder, where the version has been injected in the package.json -->
                     <execution>
                         <id>package-tgz</id>
                         <phase>package</phase>
@@ -139,8 +166,6 @@
                             <descriptors>
                                 <descriptor>.m2/assembly-tgz.xml</descriptor>
                             </descriptors>
-                            <!-- fix the generated filename so it can be referenced in the package.json files without the version in the path -->
-                            <finalName>javascript-modules-library</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
