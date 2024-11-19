@@ -13,3 +13,6 @@ node_modules/
 **/.yarn/cache/
 javascript-modules-engine/src/main/resources/javascript/
 javascript-modules-engine/src/main/resources/META-INF/js/
+javascript-modules-engine/tests/jahia-module/jahia-npm-module-example-v1.0.0.tgz
+javascript-modules-engine/tests/jahia-module/javascript/client/
+javascript-modules-engine/tests/results/

@@ -139,7 +139,8 @@
                             <descriptors>
                                 <descriptor>.m2/assembly-tgz.xml</descriptor>
                             </descriptors>
-                            <finalName>${project.build.finalName}</finalName>
+                            <!-- fix the generated filename so it can be referenced in the package.json files without the version in the path -->
+                            <finalName>javascript-modules-library</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
