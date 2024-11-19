@@ -1701,9 +1701,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jahia/javascript-modules-library@portal:../../../javascript-modules-library/dist::locator=%40jahia%2Fnpm-module-example%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@jahia/javascript-modules-library@portal:../../../javascript-modules-library/dist::locator=%40jahia%2Fnpm-module-example%40workspace%3A."
+"@jahia/javascript-modules-library@file:../../../javascript-modules-library/dist::locator=%40jahia%2Fnpm-module-example%40workspace%3A.":
+  version: 0.0.1-SNAPSHOT
+  resolution: "@jahia/javascript-modules-library@file:../../../javascript-modules-library/dist#../../../javascript-modules-library/dist::hash=e4184b&locator=%40jahia%2Fnpm-module-example%40workspace%3A."
   dependencies:
     graphql: "npm:^16.0.1"
     graphql-tag: "npm:^2.12.6"
@@ -1711,8 +1711,9 @@ __metadata:
     prop-types: "npm:^15.8.1"
     react: "npm:^18.2.0"
     react-i18next: "npm:^14.1.0"
+  checksum: 10/03d9577cdd3faf8f0f7898885568e8acbdd56580803d3759f53085cd6be206f828383d6941ff38cb60810e39ca615c46aa9a47a0d2b5953b31ead9189774a334
   languageName: node
-  linkType: soft
+  linkType: hard
 
 "@jahia/npm-module-example@workspace:.":
   version: 0.0.0-use.local
@@ -1724,7 +1725,7 @@ __metadata:
     "@babel/preset-react": "npm:^7.0.0"
     "@babel/preset-typescript": "npm:^7.21.5"
     "@jahia/eslint-config": "npm:^2.1.0"
-    "@jahia/javascript-modules-library": "npm:*"
+    "@jahia/javascript-modules-library": "file:../../../javascript-modules-library/dist"
     "@jahia/scripts": "npm:^1.3.3"
     babel-loader: "npm:^9.1.3"
     clean-webpack-plugin: "npm:^4.0.0"
