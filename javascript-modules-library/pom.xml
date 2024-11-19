@@ -19,11 +19,13 @@
 
     <build>
         <resources>
+            <!-- declare some files as resources so they can be packaged in the .tgz file -->
             <resource>
                 <directory>${project.basedir}</directory>
                 <includes>
                     <include>package.json</include>
                 </includes>
+                <!-- note that the package.json is filtered so its version can be set from the Maven ${project.version} -->
                 <filtering>true</filtering>
             </resource>
             <resource>
