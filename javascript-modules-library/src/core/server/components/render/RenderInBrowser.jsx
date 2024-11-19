@@ -3,7 +3,7 @@ import InBrowser from './internal/InBrowser';
 
 /**
  * Will render the given React component in the browser.
- * Be careful, the component will not have access to the '@jahia/js-server-core' library from the browser.
+ * Be careful, the component will not have access to the '@jahia/javascript-modules-library' library from the browser.
  *
  * @param {object} params The React component.
  * @param {object} params.child The React component.

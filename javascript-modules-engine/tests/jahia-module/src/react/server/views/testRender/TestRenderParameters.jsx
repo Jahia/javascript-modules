@@ -1,5 +1,5 @@
 import React from 'react';
-import {useServerContext, defineJahiaComponent} from '@jahia/js-server-core';
+import {useServerContext, defineJahiaComponent} from '@jahia/javascript-modules-library';
 
 export const TestRenderParameters = () => {
     const {currentResource} = useServerContext();

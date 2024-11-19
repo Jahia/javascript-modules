@@ -94,7 +94,7 @@ export class JcrHelper {
   /**
    * Execute JCR operations on a JCR session authenticated using the guest user and the "live" workspace.
    * This is intended for server-side use. Example:
-   *      *     import {server, useServerContext} from '@jahia/js-server-core';
+   *      *     import {server, useServerContext} from '@jahia/javascript-modules-library';
    *     ...
    *     const {renderContext, currentResource} = useServerContext();
    *     server.jcr.doExecuteAsGuest(session => performJcrOperations(session, renderContext, currentResource));

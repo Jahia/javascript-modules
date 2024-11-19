@@ -1,5 +1,5 @@
 import React from 'react';
-import {AddContentButtons, Render, defineJahiaComponent} from '@jahia/js-server-core';
+import {AddContentButtons, Render, defineJahiaComponent} from '@jahia/javascript-modules-library';
 
 export const TestRender = () => {
     return (

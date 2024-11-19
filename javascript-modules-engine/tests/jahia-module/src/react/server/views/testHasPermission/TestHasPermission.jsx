@@ -1,5 +1,5 @@
 import React from 'react';
-import {defineJahiaComponent, useServerContext} from '@jahia/js-server-core';
+import {defineJahiaComponent, useServerContext} from '@jahia/javascript-modules-library';
 
 export const testHasPermission = () => {
     const {currentNode} = useServerContext();

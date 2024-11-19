@@ -219,18 +219,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jahia/jcontent-cypress@npm:^3.0.0-tests.8":
-  version: 3.0.0-tests.8
-  resolution: "@jahia/jcontent-cypress@npm:3.0.0-tests.8"
-  dependencies:
-    cypress-real-events: "npm:^1.7.6"
-  checksum: 10c0/fded981a6bd34b497a7bb80072298c1b5c98f14d19d4532c449bb484c17d9ec924276e1b7e6f17ac941892547209572ab8cf0ac98b1c19c42ed6e2364d563476
-  languageName: node
-  linkType: hard
-
-"@jahia/npm-modules-engine-cypress@workspace:.":
+"@jahia/javascript-modules-engine-cypress@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@jahia/npm-modules-engine-cypress@workspace:."
+  resolution: "@jahia/javascript-modules-engine-cypress@workspace:."
   dependencies:
     "@4tw/cypress-drag-drop": "npm:^2.2.1"
     "@jahia/cypress": "npm:^3.21.2"
@@ -261,6 +252,15 @@ __metadata:
     typescript: "npm:^4.7.2"
   languageName: unknown
   linkType: soft
+
+"@jahia/jcontent-cypress@npm:^3.0.0-tests.8":
+  version: 3.0.0-tests.8
+  resolution: "@jahia/jcontent-cypress@npm:3.0.0-tests.8"
+  dependencies:
+    cypress-real-events: "npm:^1.7.6"
+  checksum: 10c0/fded981a6bd34b497a7bb80072298c1b5c98f14d19d4532c449bb484c17d9ec924276e1b7e6f17ac941892547209572ab8cf0ac98b1c19c42ed6e2364d563476
+  languageName: node
+  linkType: hard
 
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5

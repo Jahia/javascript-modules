@@ -1,4 +1,4 @@
-# js-server-core
+# javascript-modules-library
 Javascript Library for NPM Javascript Module Engine
 
 ## Generated types

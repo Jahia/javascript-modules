@@ -1,5 +1,5 @@
 import React from 'react';
-import {defineJahiaComponent, server, useServerContext} from '@jahia/js-server-core';
+import {defineJahiaComponent, server, useServerContext} from '@jahia/javascript-modules-library';
 
 export const TestFindDisplayableContent = () => {
     const {currentResource, renderContext} = useServerContext();

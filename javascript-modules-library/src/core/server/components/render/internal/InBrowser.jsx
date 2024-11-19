@@ -40,7 +40,7 @@ function InBrowser({child: Child, props, dataKey, preRender}) {
     const i18nScript = getClientI18nStoreScript(language, bundleKey);
     // The paths are absolute here to avoid jAddResources to look for .js in other modules
     const remote = buildUrl({value: '/modules/' + bundleKey + '/javascript/client/remote.js'}, renderContext, currentResource);
-    const appShell = buildUrl({value: '/modules/npm-modules-engine/javascript/apps/reactAppShell.js'}, renderContext, currentResource);
+    const appShell = buildUrl({value: '/modules/javascript-modules-engine/javascript/apps/reactAppShell.js'}, renderContext, currentResource);
 
     const data = {};
     data[dataKey] = encodeURIComponent(JSON.stringify({

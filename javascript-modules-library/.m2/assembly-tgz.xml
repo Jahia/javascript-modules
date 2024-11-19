@@ -1,0 +1,20 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 http://maven.apache.org/xsd/assembly-1.1.3.xsd">
+    <!-- this descriptor is used during the Maven build to create the Javascript package .tgz file -->
+    <id>tgz</id>
+    <formats>
+        <format>tgz</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <!-- copy the files as-is as the package.json has already been filtered (with the correct version injected) -->
+        <fileSet>
+            <directory>${project.basedir}/dist</directory>
+            <outputDirectory>package</outputDirectory>
+            <includes>
+                <include>**</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>

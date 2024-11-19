@@ -1,4 +1,4 @@
-import {useGQLQuery} from '@jahia/js-server-core';
+import {useGQLQuery} from '@jahia/javascript-modules-library';
 import {print} from 'graphql/index';
 import gql from 'graphql-tag';
 

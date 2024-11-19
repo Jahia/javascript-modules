@@ -1,5 +1,5 @@
 import React from 'react';
-import {server, defineJahiaComponent} from '@jahia/js-server-core';
+import {server, defineJahiaComponent} from '@jahia/javascript-modules-library';
 
 export const TestReactViewRegistration = () => {
     const testAreasName = server.registry.get('view', 'jahia-npm-module-example_view_npmExample:testAreas_default').name;

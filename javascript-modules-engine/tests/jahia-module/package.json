@@ -61,7 +61,7 @@
     "minimist": "^1.2.6"
   },
   "dependencies": {
-    "@jahia/js-server-core": "^0.0.17",
+    "@jahia/javascript-modules-library": "file:../../../javascript-modules-library/dist",
     "i18next": "^23.10.1",
     "react": "^18.2.0",
     "react-i18next": "^14.1.0"

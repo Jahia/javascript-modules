@@ -5,8 +5,8 @@ export default () => {
         .use(initReactI18next)
         .init({
             fallbackLng: 'en',
-            ns: 'npm-modules-engine',
-            defaultNS: 'npm-modules-engine',
+            ns: 'javascript-modules-engine',
+            defaultNS: 'javascript-modules-engine',
             initImmediate: false,
             react: {
                 useSuspense: false

@@ -1,4 +1,4 @@
-import {server} from '@jahia/js-server-core-private';
+import {server} from '@jahia/javascript-modules-library-private';
 import {print} from 'graphql';
 import gql from 'graphql-tag';
 
