@@ -1347,9 +1347,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jahia/javascript-modules-library@file:../javascript-modules-library/target/javascript-modules-library.tgz::locator=javascript-modules-engine%40workspace%3A.":
+"@jahia/javascript-modules-library@file:../javascript-modules-library/dist::locator=javascript-modules-engine%40workspace%3A.":
   version: 0.0.1-SNAPSHOT
-  resolution: "@jahia/javascript-modules-library@file:../javascript-modules-library/target/javascript-modules-library.tgz#../javascript-modules-library/target/javascript-modules-library.tgz::hash=8e0fcc&locator=javascript-modules-engine%40workspace%3A."
+  resolution: "@jahia/javascript-modules-library@file:../javascript-modules-library/dist#../javascript-modules-library/dist::hash=5f6b97&locator=javascript-modules-engine%40workspace%3A."
   dependencies:
     graphql: "npm:^16.0.1"
     graphql-tag: "npm:^2.12.6"
@@ -1357,7 +1357,7 @@ __metadata:
     prop-types: "npm:^15.8.1"
     react: "npm:^18.2.0"
     react-i18next: "npm:^14.1.0"
-  checksum: 10c0/c979fac633224a4cc6a133bbd7a4060297a5e9fc230dc97cc65998418650d30fcb4cc25934487f84084f88983941b717c92f7ae2d905f5a5cb420b4554f71940
+  checksum: 10c0/3e67b82c4040307bb0f23427e3a57b53f4fc06a640eec5c49ca9c41f5ce48f71ac31f4207f3b084064f544f3b1a0689d0775b817ca1d911179b015cf88eae970
   languageName: node
   linkType: hard
 
@@ -4115,7 +4115,7 @@ __metadata:
     "@babel/preset-react": "npm:^7.22.15"
     "@cyclonedx/webpack-plugin": "npm:^3.11.0"
     "@jahia/eslint-config": "npm:^1.1.0"
-    "@jahia/javascript-modules-library": ../javascript-modules-library/target/javascript-modules-library.tgz
+    "@jahia/javascript-modules-library": ../javascript-modules-library/dist
     babel-loader: "npm:^8.2.3"
     eslint: "npm:^6.7.2"
     eslint-plugin-jest: "npm:^23.8.0"
