@@ -1,6 +1,6 @@
 {
   "name": "@jahia/javascript-modules-library",
-  "version": "${project.version}",
+  "version": "${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
   "main": "index.js",
   "types": "types/index.d.ts",
   "repository": "git@github.com:Jahia/javascript-modules.git",
