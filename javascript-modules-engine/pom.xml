@@ -52,10 +52,11 @@
 
 <!--        <dependency>-->
 <!--            <groupId>org.osgi</groupId>-->
-<!--            <artifactId>osgi.annotation</artifactId>-->
-<!--            <version>${osgi.version}</version>-->
+<!--            <artifactId>osgi.compendium</artifactId>-->
+<!--            <version>${osgi.compendium.version}</version>-->
 <!--            <scope>provided</scope>-->
 <!--        </dependency>-->
+<!--        -->
 
         <dependency>
             <groupId>org.ops4j.pax.swissbox</groupId>
@@ -167,16 +168,6 @@
                 <configuration>
                     <instructions>
                         <_dsannotations>*</_dsannotations>
-<!--                        <Include-Resource>-->
-<!--                            @${project.build.directory}/classes-->
-<!--                        </Include-Resource>-->
-<!--                        <Import-Package>-->
-<!--                            org.jahia.modules.npm.modules.engine.jsengine.*;resolution:=optional,-->
-<!--                            *-->
-<!--                        </Import-Package>-->
-<!--                        <Embed-Dependency>-->
-<!--                            !javascript-modules-engine-java-->
-<!--                        </Embed-Dependency>-->
                     </instructions>
                     <excludeDependencies>javascript-modules-engine-java</excludeDependencies>
                 </configuration>
