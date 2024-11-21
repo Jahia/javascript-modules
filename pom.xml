@@ -57,6 +57,7 @@
     </repositories>
     <build>
         <pluginManagement>
+            <!-- set the versions/default configuration of plugins not defined in the parent pom -->
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

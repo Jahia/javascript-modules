@@ -265,7 +265,7 @@
                 <plugins>
                     <plugin>
                         <!-- by default on CI environment, yarn has the "immutable" option set -->
-                        <!-- however, during the release process (i.e. with the "release-additional-goals" profile enabled,
+                        <!-- however, during the release process (i.e. with the "release-additional-goals" profile enabled),
                         it must be explicitly disabled to recompute the checksums in the yarn.lock files after the version change -->
                         <groupId>com.github.eirslett</groupId>
                         <artifactId>frontend-maven-plugin</artifactId>
