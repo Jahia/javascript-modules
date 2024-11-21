@@ -25,7 +25,7 @@
     </parent>
     <artifactId>javascript-modules</artifactId>
     <name>Javascript Modules</name>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>Multi-module project with the backend engine and the frontend library allowing Javascript modules to run on a Jahia server.</description>
 
@@ -55,5 +55,35 @@
             </snapshots>
         </repository>
     </repositories>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <!-- when releasing, the checksum of the javascript-modules-library package in the yarn.lock files changes -->
+                    <!-- scm:checkin allows to commit those files -->
+                    <preparationGoals>-P release-additional-goals clean verify scm:checkin</preparationGoals>
+                    <completionGoals>-P release-additional-goals clean install scm:checkin</completionGoals>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>release-additional-goals</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-scm-plugin</artifactId>
+                        <configuration>
+                            <includes>javascript-modules-engine/yarn.lock,javascript-modules-engine/tests/jahia-module/yarn.lock</includes>
+                            <message>[skip ci] [maven-release-plugin] Update yarn.lock files for version ${project.version}</message>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

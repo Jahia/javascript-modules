@@ -21,7 +21,7 @@
     <parent>
         <artifactId>javascript-modules</artifactId>
         <groupId>org.jahia.modules</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.2.0-SNAPSHOT</version>
     </parent>
     <artifactId>javascript-modules-engine</artifactId>
     <name>Javascript Modules Engine</name>
@@ -29,7 +29,7 @@
     <description>This is the engine allowing NPM modules to run on a Jahia server.</description>
 
     <properties>
-        <jahia-module-signature>MCwCFAS3l9VIV1imlsBcEYUBOC7+cJ+AAhR3KynIRtvNyeAZrifrQP8Cjkxw5Q==</jahia-module-signature>
+        <jahia-module-signature>MCwCFEpxx0pCqzsrtAS9IrvMwr0V/UQaAhQsDEmvViO1DXB+y3EQQDgi7iXgVA==</jahia-module-signature>
         <import-package>
             graphql.annotations.annotationTypes;version="[7.2,99)",
             graphql.schema;version="[13.0,22)",
@@ -207,7 +207,7 @@
                     </execution>
                     <execution>
                         <id>npm install node and yarn</id>
-                        <phase>generate-resources</phase>
+                        <phase>initialize</phase>
                         <goals>
                             <goal>install-node-and-yarn</goal>
                         </goals>
@@ -231,6 +231,31 @@
                         </goals>
                         <configuration>
                             <arguments>build</arguments>
+                        </configuration>
+                    </execution>
+
+                    <!-- hack: until we find a cleaner solution, run a 'yarn install' on the jahia-module project (used for testing) as part of Maven build -->
+                    <!-- this forces the checksum in the yarn.lock file to be recomputed when the version of javascript-modules-library changes -->
+                    <execution>
+                        <id>npm install node and yarn for tests jahia-module</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>install-node-and-yarn</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>tests/jahia-module</workingDirectory>
+                            <nodeVersion>${frontend-maven-plugin.nodeVersion}</nodeVersion>
+                            <yarnVersion>${frontend-maven-plugin.yarnVersion}</yarnVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>yarn install for tests jahia-module</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>tests/jahia-module</workingDirectory>
                         </configuration>
                     </execution>
                 </executions>
