@@ -17,6 +17,13 @@
         <npm.version>10.9.0</npm.version>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javascript-modules-engine-java</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
     <build>
         <resources>
             <!-- declare some files as resources so they can be packaged in the .tgz file -->
@@ -132,6 +139,23 @@
                         <configuration>
                             <!-- publish the tgz in the target/ folder as its package.json is properly filtered (with the right version) -->
                             <arguments>publish ${project.build.directory}/${project.build.finalName}.tgz --access public</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies-for-java2ts</id>
+<!--                        <phase>process-resources</phase>-->
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/java2ts-dependencies</outputDirectory>
+                            <classifier>sources</classifier>
+                            <includeArtifactIds>jahia-impl,org.apache.felix.framework,javascript-modules-engine-java,osgi.annotation</includeArtifactIds>
                         </configuration>
                     </execution>
                 </executions>

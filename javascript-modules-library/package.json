@@ -13,8 +13,9 @@
     "minify": "node minify",
     "doc": "typedoc",
     "clean": "rm -rf dist",
-    "lint": "eslint --ext js,jsx,json,ts .",
-    "lint:fix": "eslint --ext js,jsx,json,ts --fix .",
+    "lint": "eslint --ext js,jsx,json,ts src/",
+    "lint:fix": "eslint --ext js,jsx,json,ts --fix src/",
+    "java2ts": "java2ts java2ts.json",
     "prepack": "echo 'Please run 'mvn package' to create the tgz so the Maven version can be injected in the package.json' && exit 1"
   },
   "files": [
@@ -51,6 +52,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "java2typescript": "^1.1.0",
     "ncp": "^2.0.0",
     "terser": "^5.36.0",
     "typedoc": "^0.25.13",

@@ -91,26 +91,26 @@
                     <release>11</release>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.bsc.maven</groupId>
-                <artifactId>maven-processor-plugin</artifactId>
-                <version>5.1</version>
-                <executions>
-                    <execution>
-                        <id>process</id>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                        <phase>generate-sources</phase>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                            <options>
-                                <ts.outfile>name</ts.outfile><!-- name of generated file -->
-                            </options>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.bsc.maven</groupId>-->
+<!--                <artifactId>maven-processor-plugin</artifactId>-->
+<!--                <version>5.1</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>process</id>-->
+<!--                        <goals>-->
+<!--                            <goal>process</goal>-->
+<!--                        </goals>-->
+<!--                        <phase>generate-sources</phase>-->
+<!--                        <configuration>-->
+<!--                            <outputDirectory>${project.build.directory}</outputDirectory>-->
+<!--                            <options>-->
+<!--                                <ts.outfile>name</ts.outfile>&lt;!&ndash; name of generated file &ndash;&gt;-->
+<!--                            </options>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 </project>

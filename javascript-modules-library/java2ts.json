@@ -1,0 +1,11 @@
+{
+  "packageRoot": "./target/java2ts-dependencies",
+  "outputPath": "./target/java2ts",
+  "options": {
+    "prefix": "\n/* eslint-disable @typescript-eslint/naming-convention */",
+    "addIndexFiles": true
+  },
+  "excludes": [
+    "org/jahia/gwt/"
+  ]
+}
