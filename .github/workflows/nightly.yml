@@ -28,6 +28,7 @@ jobs:
       - uses: jahia/jahia-modules-action/integration-tests@v2
         with:
           module_id: javascript-modules-engine
+          tests_path: 'javascript-modules-engine/tests/'
           testrail_project: Javascript Modules Engine
           tests_manifest: provisioning-manifest-snapshot.yml
           jahia_image: ${{ matrix.jahia_image }}
