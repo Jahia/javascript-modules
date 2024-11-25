@@ -48,6 +48,18 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <!-- equivalent of 'yarn clean' -->
+                            <directory>${project.basedir}/dist/</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <!-- use an Ant task to create the target/ directory, as it's not created by Maven for "pom" packaging -->
@@ -68,36 +80,6 @@
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
                 <executions>
-                    <!-- Executions bound on the "pre-clean" phase: -->
-                    <execution>
-                        <id>npm install node and yarn pre-clean</id>
-                        <phase>pre-clean</phase>
-                        <goals>
-                            <goal>install-node-and-yarn</goal>
-                        </goals>
-                        <configuration>
-                            <nodeVersion>${node.version}</nodeVersion>
-                            <yarnVersion>${yarn.version}</yarnVersion>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>yarn install pre-clean</id>
-                        <phase>pre-clean</phase>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                    </execution>
-                    <!-- Execution bound on the "clean" phase: -->
-                    <execution>
-                        <id>yarn clean</id>
-                        <phase>clean</phase>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>clean</arguments>
-                        </configuration>
-                    </execution>
                     <!-- Executions bound on the "initialize" phase (executed in order of declaration): -->
                     <execution>
                         <id>install node, yarn and npm</id>
@@ -140,10 +122,10 @@
                             <arguments>build</arguments>
                         </configuration>
                     </execution>
-                    <!-- Execution bound on the "deploy" phase: -->
+                    <!-- Execution bound on any phase that can be executed using its id: -->
                     <execution>
                         <id>publish-package</id>
-                        <phase>deploy</phase>
+                        <phase>none</phase>
                         <goals>
                             <goal>npm</goal>
                         </goals>
@@ -191,6 +173,13 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <goals>deploy frontend-maven-plugin@publish-package</goals>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -56,12 +56,22 @@
         </repository>
     </repositories>
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.4.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <!-- when releasing, the checksum of the javascript-modules-library package in the yarn.lock files changes -->
+                    <!-- 'clean verify/install' is used to recompute the checksum of the yarn.lock files as part of the regular Maven build -->
                     <!-- scm:checkin allows to commit those files -->
                     <preparationGoals>-P release-additional-goals clean verify scm:checkin</preparationGoals>
                     <completionGoals>-P release-additional-goals clean install scm:checkin</completionGoals>
