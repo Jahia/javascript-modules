@@ -49,8 +49,7 @@ jobs:
           nexus_password: ${{ secrets.NEXUS_PASSWORD }}
           mvn_settings_filepath: '.github/maven.settings.xml'
           slack-webhook-qa: ${{ secrets.SLACK_WEBHOOK_URL_RC_FOR_QA }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PUBLISH_TOKEN }}
+          npmjs_publish_token: ${{ secrets.NPMJS_PUBLISH_TOKEN }}
 
 
       - uses: jahia/jahia-modules-action/update-signature@v2
