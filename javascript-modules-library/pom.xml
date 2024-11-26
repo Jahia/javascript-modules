@@ -17,6 +17,13 @@
         <npm.version>10.9.0</npm.version>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javascript-modules-engine-java</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
     <build>
         <resources>
             <!-- declare some files as resources so they can be packaged in the .tgz file -->
@@ -144,12 +151,34 @@
                         <!-- copy the resources declared as build.resources to the dist/ folder, in order to create the final tgz file -->
                         <!-- also, the dist/ folder can be referenced in the package.json using the file protocol (ex: "file:../javascript-modules-library/dist") -->
                         <id>copy-resources-to-dist-folder</id>
-                        <phase>process-resources</phase>
+                        <phase>initialize</phase>
                         <goals>
                             <goal>resources</goal>
                         </goals>
                         <configuration>
                             <outputDirectory>${project.basedir}/dist</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-backend-typescript-types</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>
+                                javascript-modules-engine-java
+                            </includeArtifactIds>
+                            <classifier>typescript-types</classifier>
+                            <type>tgz</type>
+                            <outputDirectory>${project.build.directory}/types
+                            </outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

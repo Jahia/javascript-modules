@@ -1,4 +1,4 @@
-import {ConfigHelper, GQLHelper, OSGiHelper, RegistryHelper, RenderHelper} from 'org.jahia.modules.npm.modules.engine.js.server';
+import {ConfigHelper, GQLHelper, OSGiHelper, RegistryHelper, RenderHelper} from 'org.jahia.modules.javascript.modules.engine.js.server';
 import {JCRNodeWrapper} from 'org.jahia.services.content';
 import {Resource, RenderContext} from 'org.jahia.services.render';
 

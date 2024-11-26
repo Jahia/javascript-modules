@@ -20,15 +20,13 @@
         "declarationDir": "dist/types",
         "baseUrl" : ".",
         "paths" : {
-            "@jahia/javascript-modules-library-private" : [ "types/manual/@jahia/javascript-modules-library-private.d.ts"],
-            "@jahia/javascript-modules-library" : [ "types/manual/index.d.ts"],
-            "*" : [ "types/generated/build/types/*", "types/manual/*"]
+            "@jahia/javascript-modules-library-private" : [ "target/types/@jahia/javascript-modules-library-private.d.ts"],
+            "@jahia/javascript-modules-library" : [ "target/types/index.d.ts"],
+            "*" : [ "target/types/*"]
          },
     },
     "include": [
         "src/**/*.js",
-        "types/manual/**/*.d.ts",
-        "types/generated/build/types/**/*.d.ts"
     ],
     "exclude": [
         "node_modules",
@@ -39,7 +37,7 @@
         "name" : "Jahia v8.2.0.0 / javascript-modules-library",
         "entryPoints": [
             "src/index.js",
-            "types/**/*.d.ts"
+            "target/types/**/*.d.ts"
         ],
         "out": "dist/docs", 
         "includeVersion" : true, 

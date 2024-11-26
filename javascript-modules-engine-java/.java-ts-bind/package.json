@@ -1,46 +1,35 @@
 {
-  "name": "@jahia-types/npm-modules-engine",
-  "version": "0.0.1",
-  "description": "NPM Modules engine base types",
-  "license": "MIT",
-  "author": "Serge Huber",
-  "scripts": {
-    "build": "tsc"
-  },
   "tsbindOptions": {
     "in": [
-      "build/sources/npm-modules-engine/src/main/java",
-      "build/sources/jahia-private/core/src/main/java",
-      "build/sources/jdk11/jdk11u-master/src/java.base/share/classes",
-      "build/sources/servlet-api",
-      "build/sources/jcr2",
-      "build/sources/felix-framework/org.apache.felix.framework-6.0.5/src/main/java"
+      "src/main/java",
+      "target/java-ts-bind/sources/jdk11u-master/src/java.base/share/classes",
+      "target/java-ts-bind/sources/dependencies"
     ],
     "symbols": [
-      "build/jar-symbols/npm-modules-engine-0.6.0-SNAPSHOT.jar",
-      "build/jar-symbols/jahia-impl-8.2.1.0-SNAPSHOT.jar",
-      "build/jar-symbols/org.apache.felix.framework-6.0.5.jar",
-      "build/jar-symbols/spring-web-3.2.18.jahia4_OSGI.jar",
-      "build/jar-symbols/spring-beans-3.2.18.RELEASE_OSGI.jar",
-      "build/jar-symbols/graal-sdk-22.3.3.jar",
-      "build/jar-symbols/jboss-jsp-api_2.3_spec-1.0.3.Final.jar",
-      "build/jar-symbols/javax.servlet-api-3.1.0.jar",
-      "build/jar-symbols/jsp-api-2.1.jar",
-      "build/jar-symbols/jcr-2.0.jar",
-      "build/jar-symbols/commons-lang-2.6.jar",
-      "build/jar-symbols/xml-apis-1.4.01.jar",
-      "build/jar-symbols/osgi.annotation-7.0.0.jar",
-      "build/jar-symbols/spring-context-3.2.18.RELEASE_OSGI.jar",
-      "build/jar-symbols/jackrabbit-spi-commons-2.18.4-jahia1.jar"
+      "target/java-ts-bind/jars/commons-lang.jar",
+      "target/java-ts-bind/jars/graal-sdk.jar",
+      "target/java-ts-bind/jars/jackrabbit-spi-commons.jar",
+      "target/java-ts-bind/jars/jahia-impl.jar",
+      "target/java-ts-bind/jars/javascript-modules-engine-java-classes.jar",
+      "target/java-ts-bind/jars/javax.servlet-api.jar",
+      "target/java-ts-bind/jars/jboss-servlet-api_3.1_spec.jar",
+      "target/java-ts-bind/jars/jcr.jar",
+      "target/java-ts-bind/jars/jsp-api.jar",
+      "target/java-ts-bind/jars/org.apache.felix.framework.jar",
+      "target/java-ts-bind/jars/osgi.annotation.jar",
+      "target/java-ts-bind/jars/spring-beans.jar",
+      "target/java-ts-bind/jars/spring-context.jar",
+      "target/java-ts-bind/jars/spring-web.jar",
+      "target/java-ts-bind/jars/xml-apis.jar"
     ],
-    "out": "build/types",
+    "out": "target/java-ts-bind/types",
     "rootTypes": [
-      "org.jahia.modules.npm.modules.engine.js.server.ConfigHelper",
-      "org.jahia.modules.npm.modules.engine.js.server.GQLHelper",
-      "org.jahia.modules.npm.modules.engine.js.server.JcrHelper",
-      "org.jahia.modules.npm.modules.engine.js.server.OSGiHelper",
-      "org.jahia.modules.npm.modules.engine.js.server.RegistryHelper",
-      "org.jahia.modules.npm.modules.engine.js.server.RenderHelper",
+      "org.jahia.modules.javascript.modules.engine.js.server.ConfigHelper",
+      "org.jahia.modules.javascript.modules.engine.js.server.GQLHelper",
+      "org.jahia.modules.javascript.modules.engine.js.server.JcrHelper",
+      "org.jahia.modules.javascript.modules.engine.js.server.OSGiHelper",
+      "org.jahia.modules.javascript.modules.engine.js.server.RegistryHelper",
+      "org.jahia.modules.javascript.modules.engine.js.server.RenderHelper",
       "org.jahia.services.render.RenderContext",
       "org.jahia.services.render.Resource",
       "org.jahia.services.content.JCRNodeWrapper"
@@ -94,7 +83,7 @@
       "javax.servlet.http.HttpServletResponse",
       "javax.servlet.http.HttpSession",
       "javax.servlet.http.Part",
-      "org.jahia.modules.npm.modules.engine.js.server",
+      "org.jahia.modules.javascript.modules.engine.js.server",
       "org.jahia.services.content.JCRCallback",
       "org.jahia.services.content.JCRItemWrapper",
       "org.jahia.services.content.JCRNodeIteratorWrapper",
@@ -239,12 +228,12 @@
       "javax.servlet.http.HttpSession.setAttribute",
       "javax.servlet.http.HttpSession.setMaxInactiveInterval",
       "javax.servlet.http.Part.get.*",
-      "org.jahia.modules.npm.modules.engine.js.server.ConfigHelper.*",
-      "org.jahia.modules.npm.modules.engine.js.server.JcrHelper.*",
-      "org.jahia.modules.npm.modules.engine.js.server.GQLHelper.execute.*",
-      "org.jahia.modules.npm.modules.engine.js.server.OSGiHelper.*",
-      "org.jahia.modules.npm.modules.engine.js.server.RegistryHelper.*",
-      "org.jahia.modules.npm.modules.engine.js.server.RenderHelper.*",
+      "org.jahia.modules.javascript.modules.engine.js.server.ConfigHelper.*",
+      "org.jahia.modules.javascript.modules.engine.js.server.JcrHelper.*",
+      "org.jahia.modules.javascript.modules.engine.js.server.GQLHelper.execute.*",
+      "org.jahia.modules.javascript.modules.engine.js.server.OSGiHelper.*",
+      "org.jahia.modules.javascript.modules.engine.js.server.RegistryHelper.*",
+      "org.jahia.modules.javascript.modules.engine.js.server.RenderHelper.*",
       "org.jahia.services.content.JCRCallback.*",
       "org.jahia.services.content.JCRItemWrapper.get.*",
       "org.jahia.services.content.JCRItemWrapper.is.*",
@@ -489,8 +478,5 @@
     "groupByModule": true,
     "flattenTypes": true,
     "forceParentJavadocs": true
-  },
-  "dependencies": {
-    "typescript": "^5.4.4"
   }
 }

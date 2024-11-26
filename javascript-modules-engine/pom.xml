@@ -132,13 +132,12 @@
             <type>tgz</type>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>javascript-modules-engine-java</artifactId>
+            <version>${project.version}</version>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -169,6 +168,31 @@
                     </filesets>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-javascript-modules-engine-java</id>
+                        <!-- unzip the .jar with the Java classes so from an OSGI standpoint, it's equivalent to have the Java sources in this module -->
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>javascript-modules-engine-java</artifactId>
+                                    <version>${project.version}</version>
+                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>

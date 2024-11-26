@@ -1,4 +1,4 @@
-import {ConfigHelper, GQLHelper, OSGiHelper, RegistryHelper, RenderHelper} from 'org.jahia.modules.npm.modules.engine.js.server';
+import {ConfigHelper, GQLHelper, OSGiHelper, RegistryHelper, RenderHelper} from 'org.jahia.modules.javascript.modules.engine.js.server';
 
 /**
  * A set of helpers that provide common functionality provided by Jahia for Javascript server-side rendering

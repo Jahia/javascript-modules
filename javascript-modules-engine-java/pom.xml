@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+   Copyright (C) 2002-2024 Jahia Solutions Group SA. All rights reserved.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>javascript-modules</artifactId>
+        <groupId>org.jahia.modules</groupId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>javascript-modules-engine-java</artifactId>
+    <name>Javascript modules engine Java</name>
+    <description>This is the Java part of the Javascript modules engine.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.annotation</artifactId>
+            <version>${osgi.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ops4j.pax.swissbox</groupId>
+            <artifactId>pax-swissbox-bnd</artifactId>
+            <version>1.8.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.fileinstall</artifactId>
+            <version>${felix.fileinstall.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>graal-sdk</artifactId>
+            <version>22.3.3</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bsc.processor</groupId>
+            <artifactId>java2ts-processor</artifactId>
+            <version>1.3.1</version>
+        </dependency>
+        <!-- tool used to generate *.d.ts files -->
+        <dependency>
+            <groupId>io.github.bensku</groupId>
+            <artifactId>java-ts-bind</artifactId>
+            <version>1.0.0-jahia-1</version>
+            <classifier>all</classifier>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- dependencies not present / different required to generate the *d.ts files: -->
+        <dependency>
+            <groupId>javax.jcr</groupId>
+            <artifactId>jcr</artifactId>
+            <version>2.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>2.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <release>11</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>download-unpack-jdk-sources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${project.build.directory}/java-ts-bind/sources"/>
+                                <get src="https://codeload.github.com/openjdk/jdk11u/zip/refs/heads/master"
+                                     dest="${project.build.directory}/java-ts-bind/sources/jdk11u-master.zip"/>
+                                <unzip src="${project.build.directory}/java-ts-bind/sources/jdk11u-master.zip"
+                                       dest="${project.build.directory}/java-ts-bind/sources">
+                                    <patternset>
+                                        <include name="jdk11u-master/src/java.base/share/classes/**"/>
+                                    </patternset>
+                                </unzip>
+                                <!-- generate the output folder for the *.d.ts files -->
+                                <mkdir dir="${project.build.directory}/java-ts-bind/types"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-java-ts-bind-sources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>
+                                jahia-impl,
+                                javax.servlet-api,
+                                jcr,
+                                org.apache.felix.framework
+                            </includeArtifactIds>
+                            <classifier>sources</classifier>
+                            <outputDirectory>${project.build.directory}/java-ts-bind/sources/dependencies
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-java-ts-bind-exec</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>
+                                java-ts-bind
+                            </includeArtifactIds>
+                            <classifier>all</classifier>
+                            <outputDirectory>${project.build.directory}/java-ts-bind/exec</outputDirectory>
+                            <stripVersion>true</stripVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-java-ts-bind-jars</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>
+                                commons-lang,
+                                graal-sdk,
+                                jackrabbit-spi-commons,
+                                jahia-impl,
+                                javax.servlet-api,
+                                jboss-servlet-api_3.1_spec,
+                                jcr,
+                                jsp-api,
+                                org.apache.felix.framework,
+                                osgi.annotation,
+                                spring-beans,
+                                spring-context,
+                                spring-web,
+                                xml-apis
+                            </includeArtifactIds>
+                            <outputDirectory>${project.build.directory}/java-ts-bind/jars</outputDirectory>
+                            <stripVersion>true</stripVersion>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-d.ts-files-from-java</id>
+                        <!-- important to be executed between the "process-classes" and the "package" phases: -->
+                        <!-- the "process-classes" phase is when the .jar file with the classes is created (which is required by java-ts-bind in this execution) -->
+                        <!-- the "package" phase is when the .tgz file is created with the *.d.ts files generated here -->
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-jar</argument>
+                                <argument>${project.basedir}/target/java-ts-bind/exec/java-ts-bind-all.jar</argument>
+                                <argument>--packageJson</argument>
+                                <argument>${project.basedir}/.java-ts-bind/package.json</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>patch-d.ts-files</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${project.basedir}/.java-ts-bind/apply-patch.sh</executable>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>package-classes</id>
+                        <!-- must be after "compile" phase as it includes classes -->
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>.m2/assembly-classes.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>${project.build.directory}/java-ts-bind/jars</outputDirectory>
+                            <finalName>${project.artifactId}</finalName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- package the typescript *.d.ts files that have been previously generated -->
+                        <!-- NB: the generated .tgz file will be attached to the project and will be installed/deployed along with the .jar file -->
+                        <id>package-typescript-types-tgz</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>.m2/assembly-typescript-types.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Directory containing the TypeScript definition files
-DIR="build/types"
+DIR="target/java-ts-bind/types"
 
 # Define arrays for search and replace pairs
 searches=(
