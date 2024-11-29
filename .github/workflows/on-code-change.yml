@@ -26,16 +26,12 @@ jobs:
     env:
       NEXUS_INTERNAL_URL: ${{ secrets.NEXUS_INTERNAL_URL }}
     container:
-      image: jahia/cimg-mvn-cache:ga_cimg_openjdk_8.0.312-node
+      image: jahia/cimg-mvn-cache:ga_cimg_openjdk_11.0.20-node
       credentials:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '11.0.19'
       - uses: jahia/jahia-modules-action/build@v2
         with:
           tests_module_type: 'npm'
