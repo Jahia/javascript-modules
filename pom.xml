@@ -38,6 +38,7 @@
 
     <modules>
         <module>javascript-modules-engine</module>
+        <module>javascript-modules-engine-java</module>
         <module>javascript-modules-library</module>
     </modules>
 
@@ -57,11 +58,22 @@
     </repositories>
     <build>
         <pluginManagement>
+            <!-- define plugins versions not set in parent pom -->
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>3.4.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.8.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>3.5.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>

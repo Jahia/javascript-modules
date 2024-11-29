@@ -6,15 +6,15 @@
   "repository": "git@github.com:Jahia/javascript-modules.git",
   "license": "MIT",
   "scripts": {
-    "types:copy": "mkdir -p dist/types && ncp types/manual dist/types && ncp types/generated/build/types dist/types",
+    "types:copy": "mkdir -p dist/types && ncp target/types dist/types",
     "build:development": "run types:copy && tsc && node generate-index",
     "build:production": "run build:development && run minify",
     "build": "run build:production",
     "minify": "node minify",
     "doc": "typedoc",
     "clean": "rm -rf dist",
-    "lint": "eslint --ext js,jsx,json,ts .",
-    "lint:fix": "eslint --ext js,jsx,json,ts --fix .",
+    "lint": "eslint --ext js,jsx,json,ts src/",
+    "lint:fix": "eslint --ext js,jsx,json,ts --fix src/",
     "prepack": "echo 'Please run 'mvn package' to create the tgz so the Maven version can be injected in the package.json' && exit 1"
   },
   "files": [
