@@ -21,7 +21,7 @@
     <parent>
         <artifactId>javascript-modules</artifactId>
         <groupId>org.jahia.modules</groupId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.2.0</version>
     </parent>
     <artifactId>javascript-modules-engine-java</artifactId>
     <name>Javascript modules engine Java</name>
@@ -126,17 +126,15 @@
                         </goals>
                         <configuration>
                             <target>
-                                <mkdir dir="${project.build.directory}/java-ts-bind/sources"/>
-                                <get src="https://codeload.github.com/openjdk/jdk11u/zip/refs/heads/master"
-                                     dest="${project.build.directory}/java-ts-bind/sources/jdk11u-master.zip"/>
-                                <unzip src="${project.build.directory}/java-ts-bind/sources/jdk11u-master.zip"
-                                       dest="${project.build.directory}/java-ts-bind/sources">
+                                <mkdir dir="${project.build.directory}/java-ts-bind/sources" />
+                                <get src="https://codeload.github.com/openjdk/jdk11u/zip/refs/heads/master" dest="${project.build.directory}/java-ts-bind/sources/jdk11u-master.zip" />
+                                <unzip src="${project.build.directory}/java-ts-bind/sources/jdk11u-master.zip" dest="${project.build.directory}/java-ts-bind/sources">
                                     <patternset>
-                                        <include name="jdk11u-master/src/java.base/share/classes/**"/>
+                                        <include name="jdk11u-master/src/java.base/share/classes/**" />
                                     </patternset>
                                 </unzip>
                                 <!-- generate the output folder for the *.d.ts files -->
-                                <mkdir dir="${project.build.directory}/java-ts-bind/types"/>
+                                <mkdir dir="${project.build.directory}/java-ts-bind/types" />
                             </target>
                         </configuration>
                     </execution>
