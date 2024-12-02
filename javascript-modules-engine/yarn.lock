@@ -1348,8 +1348,8 @@ __metadata:
   linkType: hard
 
 "@jahia/javascript-modules-library@file:../javascript-modules-library/dist::locator=javascript-modules-engine%40workspace%3A.":
-  version: 0.1.0-SNAPSHOT
-  resolution: "@jahia/javascript-modules-library@file:../javascript-modules-library/dist#../javascript-modules-library/dist::hash=279d23&locator=javascript-modules-engine%40workspace%3A."
+  version: 0.2.0
+  resolution: "@jahia/javascript-modules-library@file:../javascript-modules-library/dist#../javascript-modules-library/dist::hash=722e90&locator=javascript-modules-engine%40workspace%3A."
   dependencies:
     graphql: "npm:^16.0.1"
     graphql-tag: "npm:^2.12.6"
@@ -1357,7 +1357,7 @@ __metadata:
     prop-types: "npm:^15.8.1"
     react: "npm:^18.2.0"
     react-i18next: "npm:^14.1.0"
-  checksum: 10c0/46148e80d6567161056d0bb7ec306bdf39b223953055c789c4a22cdb61e0852aacae9a4534e8a191a6490edb9bf333b3636903eb954e43bc60515a9e76962164
+  checksum: 10c0/977073e078005c5d20805a3906de5ac2585d7f19cdbd3f9045bb0c2252b19ec69af90f519608c0e8ee49532d9ee09d973a34fbc2bb29b71133dfa8e088b2d4fb
   languageName: node
   linkType: hard
 
