@@ -1,6 +1,3 @@
-![GitHub tag (latest by version)](https://img.shields.io/github/v/tag/Jahia/javascript-modules?sort=semver)
-![License](https://img.shields.io/github/license/jahia/javascript-modules)
-
 <a href="https://www.jahia.com/">
     <img src="https://www.jahia.com/modules/jahiacom-templates/images/jahia-3x.png" alt="Jahia logo" title="Jahia" style="float: right; background-color: white" height="60" />
 </a>
