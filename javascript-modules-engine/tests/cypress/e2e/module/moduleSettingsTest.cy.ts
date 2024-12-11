@@ -33,7 +33,7 @@ describe('Check that NPM module settings (UI extensions, rules, configs) are cor
         const jcontent = new JContentPageBuilder(JContent.visit('npmTestSite', 'en', 'pages/home/testModuleSettings'));
         jcontent.getModule('/sites/npmTestSite/home/testModuleSettings/pagecontent').get().scrollIntoView();
         jcontent.getModule('/sites/npmTestSite/home/testModuleSettings/pagecontent/testContentEditorExtension').doubleClick();
-        getComponentBySelector(Collapsible, '[data-sel-content-editor-fields-group="Classification and Metadata"]').shouldBeExpanded();
+        getComponentBySelector(Collapsible, '[data-sel-content-editor-fields-group="metadata"]').shouldBeExpanded();
         cy.logout();
     });
 
