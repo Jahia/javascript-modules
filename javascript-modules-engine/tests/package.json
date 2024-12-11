@@ -21,7 +21,7 @@
   "license": "MIT",
   "devDependencies": {
     "@4tw/cypress-drag-drop": "^2.2.1",
-    "@jahia/cypress": "^3.34.0",
+    "@jahia/cypress": "^3.35.0",
     "@jahia/jahia-reporter": "^1.0.30",
     "@jahia/jcontent-cypress": "^3.0.0-tests.8",
     "@types/node": "^18.11.18",
