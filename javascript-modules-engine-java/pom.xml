@@ -71,7 +71,7 @@
         <dependency>
             <groupId>io.github.bensku</groupId>
             <artifactId>java-ts-bind</artifactId>
-            <version>1.0.0-jahia-1</version>
+            <version>1.0.0-jahia-2</version>
             <classifier>all</classifier>
             <scope>runtime</scope>
         </dependency>
