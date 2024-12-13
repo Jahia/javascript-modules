@@ -35,6 +35,7 @@ import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.RenderException;
 import org.jahia.services.render.RenderService;
 import org.jahia.services.render.Resource;
+import org.jahia.services.usermanager.JahiaUser;
 import org.jahia.taglibs.template.include.*;
 import org.jahia.taglibs.uicomponents.Functions;
 import org.slf4j.Logger;
@@ -121,7 +122,12 @@ public class RenderHelper {
     }
 
     public String renderComponent(Map<String, ?> attr, RenderContext renderContext) throws RepositoryException {
-        return jcrTemplate.doExecuteWithSystemSessionAsUser(jcrSessionFactory.getCurrentUser(), renderContext.getWorkspace(),
+        // first try to get the aliased user from the session (when using customized preview for instance), otherwise use the current user
+        JahiaUser user = jcrSessionFactory.getCurrentAliasedUser();
+        if (user == null) {
+            user = jcrSessionFactory.getCurrentUser();
+        }
+        return jcrTemplate.doExecuteWithSystemSessionAsUser(user, renderContext.getWorkspace(),
                 renderContext.getMainResource().getLocale(), session -> {
 
             JCRNodeWrapper node = JSNodeMapper.toVirtualNode((Map<String, ?>) attr.get("content"), session, renderContext);

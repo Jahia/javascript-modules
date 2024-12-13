@@ -137,3 +137,8 @@
 [npmExample:testRule] > jnt:content, npmExampleMix:npmExampleComponent, mix:title
  - triggerProp (string)
  - resultProp (string)
+
+[npmExample:testVirtualNode] > jnt:content, npmExampleMix:npmExampleComponent, mix:title
+
+[npmExample:testVirtualNodeSample] > jnt:content, npmExampleMix:npmExampleComponent, mix:title
+ - myProperty (string)
