@@ -16,7 +16,8 @@
    limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>jahia-modules</artifactId>
@@ -27,7 +28,9 @@
     <name>Javascript Modules</name>
     <version>0.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <description>Multi-module project with the backend engine and the frontend library allowing Javascript modules to run on a Jahia server.</description>
+    <description>Multi-module project with the backend engine and the frontend library allowing Javascript modules to
+        run on a Jahia server.
+    </description>
 
     <scm>
         <connection>scm:git:git@github.com:Jahia/javascript-modules.git</connection>
@@ -56,6 +59,81 @@
             </snapshots>
         </repository>
     </repositories>
+    <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.annotation</artifactId>
+            <version>${osgi.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ops4j.pax.swissbox</groupId>
+            <artifactId>pax-swissbox-bnd</artifactId>
+            <version>1.8.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.fileinstall</artifactId>
+            <version>${felix.fileinstall.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.26</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>2.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>graal-sdk</artifactId>
+            <version>23.0.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jahia.modules</groupId>
+            <artifactId>graphql-dxm-provider</artifactId>
+            <version>2.7.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.graphql-java</groupId>
+            <artifactId>graphql-java-annotations</artifactId>
+            <version>${graphql-java-annotations.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>pl.touk</groupId>
+            <artifactId>throwing-function</artifactId>
+            <version>1.3</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
     <build>
         <pluginManagement>
             <!-- define plugins versions not set in parent pom -->
@@ -101,8 +179,12 @@
                     <plugin>
                         <artifactId>maven-scm-plugin</artifactId>
                         <configuration>
-                            <includes>javascript-modules-engine/yarn.lock,javascript-modules-engine/tests/jahia-module/yarn.lock</includes>
-                            <message>[skip ci] [maven-release-plugin] Update yarn.lock files for version ${project.version}</message>
+                            <includes>
+                                javascript-modules-engine/yarn.lock,javascript-modules-engine/tests/jahia-module/yarn.lock
+                            </includes>
+                            <message>[skip ci] [maven-release-plugin] Update yarn.lock files for version
+                                ${project.version}
+                            </message>
                         </configuration>
                     </plugin>
                 </plugins>
