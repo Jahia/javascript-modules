@@ -73,7 +73,7 @@
             <artifactId>java-ts-bind</artifactId>
             <version>1.0.0-jahia-2</version>
             <classifier>all</classifier>
-            <scope>runtime</scope>
+            <scope>provided</scope>
         </dependency>
         <!-- dependencies not present / different required to generate the *d.ts files: -->
         <dependency>
