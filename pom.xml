@@ -16,7 +16,8 @@
    limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>jahia-modules</artifactId>
@@ -27,7 +28,9 @@
     <name>Javascript Modules</name>
     <version>0.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <description>Multi-module project with the backend engine and the frontend library allowing Javascript modules to run on a Jahia server.</description>
+    <description>Multi-module project with the backend engine and the frontend library allowing Javascript modules to
+        run on a Jahia server.
+    </description>
 
     <scm>
         <connection>scm:git:git@github.com:Jahia/javascript-modules.git</connection>
@@ -41,6 +44,10 @@
         <module>javascript-modules-engine-java</module>
         <module>javascript-modules-library</module>
     </modules>
+
+    <properties>
+        <graalvm.sdk.version>23.0.2</graalvm.sdk.version>
+    </properties>
 
     <repositories>
         <repository>
@@ -101,8 +108,12 @@
                     <plugin>
                         <artifactId>maven-scm-plugin</artifactId>
                         <configuration>
-                            <includes>javascript-modules-engine/yarn.lock,javascript-modules-engine/tests/jahia-module/yarn.lock</includes>
-                            <message>[skip ci] [maven-release-plugin] Update yarn.lock files for version ${project.version}</message>
+                            <includes>
+                                javascript-modules-engine/yarn.lock,javascript-modules-engine/tests/jahia-module/yarn.lock
+                            </includes>
+                            <message>[skip ci] [maven-release-plugin] Update yarn.lock files for version
+                                ${project.version}
+                            </message>
                         </configuration>
                     </plugin>
                 </plugins>

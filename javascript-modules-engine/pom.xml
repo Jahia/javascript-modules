@@ -40,23 +40,16 @@
         </import-package>
         <frontend-maven-plugin.nodeVersion>v18.12.0</frontend-maven-plugin.nodeVersion>
         <frontend-maven-plugin.yarnVersion>v1.22.19</frontend-maven-plugin.yarnVersion>
+        <require-capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version>=17))"</require-capability>
     </properties>
 
     <dependencies>
-        <dependency>
+         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi.annotation</artifactId>
             <version>${osgi.version}</version>
             <scope>provided</scope>
         </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>org.osgi</groupId>-->
-<!--            <artifactId>osgi.compendium</artifactId>-->
-<!--            <version>${osgi.compendium.version}</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
-<!--        -->
 
         <dependency>
             <groupId>org.ops4j.pax.swissbox</groupId>
@@ -94,7 +87,7 @@
         <dependency>
             <groupId>org.graalvm.sdk</groupId>
             <artifactId>graal-sdk</artifactId>
-            <version>22.3.3</version>
+            <version>${graalvm.sdk.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -124,7 +117,6 @@
             <version>1.3</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>javascript-modules-library</artifactId>
@@ -268,7 +260,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <release>11</release>
+                    <release>17</release>
                 </configuration>
             </plugin>
         </plugins>

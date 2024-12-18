@@ -1,5 +1,6 @@
 #!/bin/bash
-
+# This script should fail on any error
+set -e
 # Directory containing the TypeScript definition files
 DIR="target/java-ts-bind/types"
 
@@ -62,5 +63,9 @@ replaces=(
 
 # Iterate over the arrays and perform the replacements
 for i in "${!searches[@]}"; do
-    find $DIR -name "*.d.ts" -exec sed -i '' -e "s/${searches[$i]}/${replaces[$i]}/g" {} \;
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+     find $DIR -name "*.d.ts" -exec sed -i '' -e "s/${searches[$i]}/${replaces[$i]}/g" {} \;
+  else
+     find $DIR -name "*.d.ts" -exec sed -i -e "s/${searches[$i]}/${replaces[$i]}/g" {} \;
+  fi
 done

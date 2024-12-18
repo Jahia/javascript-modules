@@ -2,7 +2,7 @@
   "tsbindOptions": {
     "in": [
       "src/main/java",
-      "target/java-ts-bind/sources/jdk11u-master/src/java.base/share/classes",
+      "target/java-ts-bind/sources/jdk17u-master/src/java.base/share/classes",
       "target/java-ts-bind/sources/dependencies"
     ],
     "symbols": [
