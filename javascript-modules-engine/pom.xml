@@ -26,7 +26,7 @@
     <artifactId>javascript-modules-engine</artifactId>
     <name>Javascript Modules Engine</name>
     <packaging>bundle</packaging>
-    <description>This is the engine allowing NPM modules to run on a Jahia server.</description>
+    <description>This is the engine allowing Javascript modules to run on a Jahia server.</description>
 
     <properties>
         <jahia-module-signature>MCwCFBJEmGCjTLucq4kjFZXIUdgIa5iXAhRog+SngNKsG41US2+divtyEQpSEQ==</jahia-module-signature>

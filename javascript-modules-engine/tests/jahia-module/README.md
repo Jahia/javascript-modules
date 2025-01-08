@@ -11,14 +11,14 @@
     <img src="https://www.jahia.com/modules/jahiacom-templates/images/jahia-3x.png" alt="Jahia logo" title="Jahia" align="right" height="60" />
 </a>
 
-NPM Plugin Module Example
+Javascript Module Example
 ======================
 
-<p align="center">A NPM-style modules example</p>
+<p align="center">A Javascript-style modules example</p>
 
-<p align="left">This modules provide an example of a NPM-styled module. 
+<p align="left">This modules provide an example of a Javascript-styled module. 
 It must be run inside a GraalVM environment in order to support Javascript language. 
-NPM modules can contain templates, definitions, filter, and other jahia extensions.
+Javascript modules can contain templates, definitions, filter, and other jahia extensions.
 </p>
 
 ## Table of content
@@ -31,8 +31,8 @@ NPM modules can contain templates, definitions, filter, and other jahia extensio
     - [Deploying via API](#deploying-via-api) 
     - [Deploying via Script InstallBundle](#deploying-via-script-installbundle) 
     - [Deploying via Fileinstall](#deploying-via-fileinstall) 
-- [Activating NPM Module](#activating-npm-module)
-- [Creating new NPM modules](#creating-new-npm-modules)
+- [Activating Javascript Module](#activating-javascript-module)
+- [Creating new Javascript modules](#creating-new-javascript-modules)
 - [Views](#views)
 
 
@@ -43,7 +43,7 @@ NPM modules can contain templates, definitions, filter, and other jahia extensio
 
 ## Jahia Snapshot Environtment
 
-In order to run npm-modules at Jahia, we need to start an environment with GraalVM running.
+In order to run javascript modules at Jahia, we need to start an environment with GraalVM running.
 Run the command below to start the jahia image with docker (please note that you have to be logged in to be able to pull this image)
 
 ```shell
@@ -64,15 +64,15 @@ Build the module using:
 yarn build
 ```
 
-Packing the module (It will generate jahia-npm-module-example-v1.0.0.tgz in the root of you project) :
+Packing the module (It will generate jahia-javascript-module-example-v1.0.0.tgz in the root of you project) :
 ```shell
 yarn pack
 ```
 
 ## Module deployment
 
-NPM modules can be installed in different ways being the most indicated via Module management UI
-Below are all the possible ways to install a npm module:
+Javascript modules can be installed in different ways being the most indicated via Module management UI
+Below are all the possible ways to install a javascript module:
 
 
 ### Deploying via Module management UI
@@ -89,7 +89,7 @@ In Administration - Modules
 - Ensure you replace the X's in the version number of the bundle with the version number of the `.tgz` file that was created
 
 ```shell
-curl -s --user root:root1234 --form bundle=@jahia-npm-module-example-vX.X.X.tgz --form start=true http://localhost:8080/modules/api/bundles
+curl -s --user root:root1234 --form bundle=@jahia-javascript-module-example-vX.X.X.tgz --form start=true http://localhost:8080/modules/api/bundles
 ```
 
 ### Deploying via Script InstallBundle
@@ -115,17 +115,17 @@ yarn deploy
 docker cp *.tgz jahia-dev:/var/jahia/modules
 ```
 
-## Activating NPM Module
+## Activating Javascript Module
 
-In order to test the views and templates created we need to create a site with this npm module as in the example below:
+In order to test the views and templates created we need to create a site with this javascript module as in the example below:
 
 <img width="1518" alt="Screenshot 2021-05-18 at 09 24 09" src="https://user-images.githubusercontent.com/729255/118614476-16429c00-b7c0-11eb-9821-b582dfcf8768.png">
 
-## NPM plugin example content 
+## Javascript plugin example content 
 
-NPM modules must be packaged with `npm pack` and must contain a `package.json` file, containing all package information.
+Javascript modules must be packaged with `npm pack` and must contain a `package.json` file, containing all package information.
 In addition to standard mandatory fields, the `package.json` file must contain a `jahia` section with a `server` entry. This entry points to the initialization script of the module, which will be responsible of registering the extensions.
-You can specify the module type here (by default, it will be `module`). Our NPM example is a templates set, so it needs to define `"module-type": "templatesSet"`.
+You can specify the module type here (by default, it will be `module`). Our Javascript example is a templates set, so it needs to define `"module-type": "templatesSet"`.
 
 ```json
 {

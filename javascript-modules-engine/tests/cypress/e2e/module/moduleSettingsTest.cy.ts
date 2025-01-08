@@ -1,7 +1,7 @@
 import {JContent, JContentPageBuilder} from '@jahia/jcontent-cypress/dist/page-object/jcontent';
 import {addNode, Collapsible, getComponentBySelector, publishAndWaitJobEnding} from '@jahia/cypress';
 import {addSimplePage} from '../../utils/Utils';
-describe('Check that NPM module settings (UI extensions, rules, configs) are correctly deployed', () => {
+describe('Check that Javascript module settings (UI extensions, rules, configs) are correctly deployed', () => {
     before('Create test page and contents', () => {
         addSimplePage('/sites/npmTestSite/home', 'testModuleSettings', 'testModuleSettings', 'en', 'simple', [
             {

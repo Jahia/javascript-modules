@@ -190,7 +190,7 @@ public class NpmProtocolConnection extends URLConnection {
         instructions.put("Bundle-Category", jahiaProps.getOrDefault("category", "jahia-npm-module"));
         setIfPresent(properties, "description", instructions, "Bundle-Description");
         String name = (String) properties.get("name");
-        instructions.put("Bundle-Name", name + " (npm module)");
+        instructions.put("Bundle-Name", name + " (javascript module)");
         instructions.put("Bundle-SymbolicName", name.replace("@", "")
                 .replace('/', '-')
                 .replaceAll("[^a-zA-Z0-9\\-\\.\\s]", "_"));
