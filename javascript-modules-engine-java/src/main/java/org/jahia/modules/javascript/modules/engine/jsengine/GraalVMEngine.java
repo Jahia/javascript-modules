@@ -170,14 +170,14 @@ public class GraalVMEngine {
         // check VM
         String vmVendor = System.getProperty("java.vm.vendor", "Unknown");
         if (!vmVendor.contains("GraalVM")) {
-            logger.warn("NPM Modules Engine requires GraalVM for production usage, detected {}.", vmVendor);
+            logger.warn("Javascript Modules Engine requires GraalVM for production usage, detected {}.", vmVendor);
             return;
         }
 
         // Check if the 'js' extension is installed
         try (Context context = Context.create()) {
             if (!context.getEngine().getLanguages().containsKey(JS)) {
-                logger.error("NPM Modules Engine detected GraalVM, but the 'js' extension is not installed. You can install it by running: gu install js");
+                logger.error("Javascript Modules Engine detected GraalVM, but the 'js' extension is not installed. You can install it by running: gu install js");
             }
         }
     }
