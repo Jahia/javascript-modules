@@ -1716,6 +1716,23 @@ __metadata:
     terser: "npm:^5.36.0"
     typedoc: "npm:^0.25.13"
     typescript: "npm:^4.3.5"
+  peerDependencies:
+    i18next: ">=23.0.0 <23.11.0"
+    react: ">=18.0.0 <18.3.0"
+    react-dom: ">=18.0.0 <18.3.0"
+    react-i18next: ">=14.0.0 <14.2.0"
+    styled-jsx: ">=5.0.0 <5.2.0"
+  peerDependenciesMeta:
+    i18next:
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+    react-i18next:
+      optional: true
+    styled-jsx:
+      optional: true
   languageName: unknown
   linkType: soft
 
