@@ -103,11 +103,11 @@ public class NpmProtocolConnection extends URLConnection {
                         jos.putNextEntry(new ZipEntry("META-INF/jahia-content-editor-forms/" + StringUtils.substringAfter(packageRelativePath, "settings/content-editor-forms/")));
                     }
                     // Special mapping settings/content-types-icons to icons/
-                    else if(packageRelativePath.startsWith("settings/content-types-icons/")) {
+                    else if (packageRelativePath.startsWith("settings/content-types-icons/")) {
                         jos.putNextEntry(new ZipEntry("icons/" + StringUtils.substringAfter(packageRelativePath, "content-types-icons/")));
                     }
                     // Special mapping settings/resources/*.properties to resources/*.properties
-                    else if(packageRelativePath.startsWith("settings/resources/") && packageRelativePath.endsWith(".properties")) {
+                    else if (packageRelativePath.startsWith("settings/resources/") && packageRelativePath.endsWith(".properties")) {
                         jos.putNextEntry(new ZipEntry(StringUtils.substringAfter(packageRelativePath, "settings/")));
                     }
                     // Special mapping settings/template-thumbnail.png to images/template-preview/template-thumbnail.png
@@ -200,7 +200,7 @@ public class NpmProtocolConnection extends URLConnection {
         setIfPresent(properties, "license", instructions, "Bundle-License");
 
         // Next lets setup Jahia headers
-        instructions.put("Jahia-Depends", jahiaProps.getOrDefault("module-dependencies", "default"));
+        instructions.put("Jahia-Depends", StringUtils.defaultIfEmpty((String) jahiaProps.get("module-dependencies"), "default") + ",javascript-modules-engine");
         setIfPresent(jahiaProps, "deploy-on-site", instructions, "Jahia-Deploy-On-Site");
         Map<String, Object> mavenProps = getMavenProps(jahiaProps);
         instructions.put("Jahia-GroupId", mavenProps.getOrDefault("groupId", "org.example.javascript"));
@@ -218,7 +218,7 @@ public class NpmProtocolConnection extends URLConnection {
 
     private Map<String, Object> getMavenProps(Map<String, Object> jahiaProps) {
         try {
-            return (Map<String, Object>) jahiaProps.getOrDefault("maven",Collections.emptyMap());
+            return (Map<String, Object>) jahiaProps.getOrDefault("maven", Collections.emptyMap());
         } catch (ClassCastException e) {
             logger.warn("The 'maven' section is expected to be a map! The whole section will be ignored.");
             return Collections.emptyMap();
