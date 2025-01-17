@@ -203,7 +203,7 @@ public class NpmProtocolConnection extends URLConnection {
         instructions.put("Jahia-Depends", jahiaProps.getOrDefault("module-dependencies", "default"));
         setIfPresent(jahiaProps, "deploy-on-site", instructions, "Jahia-Deploy-On-Site");
         Map<String, Object> mavenProps = getMavenProps(jahiaProps);
-        instructions.put("Jahia-GroupId", mavenProps.getOrDefault("groupId", "org.jahia.javascript"));
+        instructions.put("Jahia-GroupId", mavenProps.getOrDefault("groupId", "org.example.javascript"));
         setIfPresent(jahiaProps, "module-signature", instructions, "Jahia-Module-Signature");
         setIfPresent(jahiaProps, "module-priority", instructions, "Jahia-Module-Priority");
         instructions.put("Jahia-Module-Type", jahiaProps.getOrDefault("module-type", "module"));
