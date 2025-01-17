@@ -1703,15 +1703,29 @@ __metadata:
 
 "@jahia/javascript-modules-library@file:../../../javascript-modules-library/dist::locator=%40jahia%2Fnpm-module-example%40workspace%3A.":
   version: 0.3.0-SNAPSHOT
-  resolution: "@jahia/javascript-modules-library@file:../../../javascript-modules-library/dist#../../../javascript-modules-library/dist::hash=0531a1&locator=%40jahia%2Fnpm-module-example%40workspace%3A."
+  resolution: "@jahia/javascript-modules-library@file:../../../javascript-modules-library/dist#../../../javascript-modules-library/dist::hash=587d61&locator=%40jahia%2Fnpm-module-example%40workspace%3A."
   dependencies:
     graphql: "npm:^16.0.1"
     graphql-tag: "npm:^2.12.6"
-    i18next: "npm:^23.10.1"
     prop-types: "npm:^15.8.1"
-    react: "npm:^18.2.0"
-    react-i18next: "npm:^14.1.0"
-  checksum: 10/95cbb053f952ea849c2eb11491a09e1b9b593335c59e36072e5e66851f6e6f449a868309888ca2b60b719354c7dbff11004451b5188c8a0cef15691ccf48d4c5
+  peerDependencies:
+    i18next: ">=23.0.0 <23.11.0"
+    react: ">=18.0.0 <18.3.0"
+    react-dom: ">=18.0.0 <18.3.0"
+    react-i18next: ">=14.0.0 <14.2.0"
+    styled-jsx: ">=5.0.0 <5.2.0"
+  peerDependenciesMeta:
+    i18next:
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+    react-i18next:
+      optional: true
+    styled-jsx:
+      optional: true
+  checksum: 10/7797e3a5d220e6494e413d5dac254eaca7cb60e52d0522ad9f2e2eedf2aca3587f4a387a2978125dbd429585062f90d66b21b0a6f6ab26728ca995a1f1a1ce1f
   languageName: node
   linkType: hard
 

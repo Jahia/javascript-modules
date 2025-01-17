@@ -1277,15 +1277,29 @@ __metadata:
 
 "@jahia/javascript-modules-library@file:../javascript-modules-library/dist::locator=javascript-modules-engine%40workspace%3A.":
   version: 0.3.0-SNAPSHOT
-  resolution: "@jahia/javascript-modules-library@file:../javascript-modules-library/dist#../javascript-modules-library/dist::hash=f712e9&locator=javascript-modules-engine%40workspace%3A."
+  resolution: "@jahia/javascript-modules-library@file:../javascript-modules-library/dist#../javascript-modules-library/dist::hash=0bc9d9&locator=javascript-modules-engine%40workspace%3A."
   dependencies:
     graphql: "npm:^16.0.1"
     graphql-tag: "npm:^2.12.6"
-    i18next: "npm:^23.10.1"
     prop-types: "npm:^15.8.1"
-    react: "npm:^18.2.0"
-    react-i18next: "npm:^14.1.0"
-  checksum: 10c0/35a3bf1df5856c0ba52c22516e63f679762b8152417ab0f1d3f755fdb85be2f7e0edfa57b7272ea46ce4fec2464af8937ae6c3a26272b1b408270ca6fcdf114a
+  peerDependencies:
+    i18next: ">=23.0.0 <23.11.0"
+    react: ">=18.0.0 <18.3.0"
+    react-dom: ">=18.0.0 <18.3.0"
+    react-i18next: ">=14.0.0 <14.2.0"
+    styled-jsx: ">=5.0.0 <5.2.0"
+  peerDependenciesMeta:
+    i18next:
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+    react-i18next:
+      optional: true
+    styled-jsx:
+      optional: true
+  checksum: 10c0/c0c10c1fa609e943fa7c679d72ff0e5e8f694de9db0854476b79e775eee979571208f9c09983ffff72d84cd63f01f1e07ef5beb9f8e0ca8e3aaa21421b240044
   languageName: node
   linkType: hard
 
@@ -3497,7 +3511,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:23.10.1, i18next@npm:^23.10.1":
+"i18next@npm:23.10.1":
   version: 23.10.1
   resolution: "i18next@npm:23.10.1"
   dependencies:
@@ -4924,7 +4938,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-i18next@npm:14.1.0, react-i18next@npm:^14.1.0":
+"react-i18next@npm:14.1.0":
   version: 14.1.0
   resolution: "react-i18next@npm:14.1.0"
   dependencies:
@@ -4949,7 +4963,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:18.2.0, react@npm:^18.2.0":
+"react@npm:18.2.0":
   version: 18.2.0
   resolution: "react@npm:18.2.0"
   dependencies:
