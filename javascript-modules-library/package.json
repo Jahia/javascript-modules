@@ -23,10 +23,31 @@
   "dependencies": {
     "graphql": "^16.0.1",
     "graphql-tag": "^2.12.6",
-    "i18next": "^23.10.1",
-    "prop-types": "^15.8.1",
-    "react": "^18.2.0",
-    "react-i18next": "^14.1.0"
+    "prop-types": "^15.8.1"
+  },
+  "peerDependencies": {
+    "i18next": ">=23.0.0 <23.11.0",
+    "react": ">=18.0.0 <18.3.0",
+    "react-dom": ">=18.0.0 <18.3.0",
+    "react-i18next": ">=14.0.0 <14.2.0",
+    "styled-jsx": ">=5.0.0 <5.2.0"
+  },
+  "peerDependenciesMeta": {
+    "i18next": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "react-i18next": {
+      "optional": true
+    },
+    "styled-jsx": {
+      "optional": true
+    }
   },
   "resolutions": {
     "minimist": "^1.2.6",
@@ -51,7 +72,10 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "i18next": "^23.10.1",
     "ncp": "^2.0.0",
+    "react": "^18.2.0",
+    "react-i18next": "^14.1.0",
     "terser": "^5.36.0",
     "typedoc": "^0.25.13",
     "typescript": "^4.3.5"
