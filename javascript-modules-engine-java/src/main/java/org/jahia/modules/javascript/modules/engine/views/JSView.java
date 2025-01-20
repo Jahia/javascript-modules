@@ -17,7 +17,9 @@ package org.jahia.modules.javascript.modules.engine.views;
 
 import org.jahia.data.templates.JahiaTemplatesPackage;
 import org.jahia.modules.javascript.modules.engine.jsengine.ContextProvider;
+import org.jahia.registries.ServicesRegistry;
 import org.jahia.services.render.View;
+import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +29,8 @@ import java.util.Properties;
 
 public class JSView implements View, Comparable<View> {
 
-    private final JahiaTemplatesPackage module;
+    private JahiaTemplatesPackage module;
+    private final Bundle bundle;
     private final Map<String, Object> jsValues;
     private Properties properties;
     private Properties defaultProperties;
@@ -37,8 +40,8 @@ public class JSView implements View, Comparable<View> {
 
     private static final Logger logger = LoggerFactory.getLogger(JSView.class);
 
-    public JSView(Map<String, Object> jsValues, JahiaTemplatesPackage module) {
-        this.module = module;
+    public JSView(Map<String, Object> jsValues, Bundle bundle) {
+        this.bundle = bundle;
         this.jsValues = jsValues;
         this.properties = new Properties();
         if (jsValues.containsKey("properties")) {
@@ -53,7 +56,7 @@ public class JSView implements View, Comparable<View> {
         this.isTemplate = "template".equals(componentType);
 
         this.defaultProperties = new Properties();
-        this.path = getModule().getBundleKey() + "/" + getRegistryKey();
+        this.path = bundle.getBundleId()+ "/" + bundle.getSymbolicName() + "/" + getRegistryKey();
     }
 
     public Map<String, Object> getRegistryInstance(ContextProvider contextProvider) {
@@ -71,12 +74,15 @@ public class JSView implements View, Comparable<View> {
 
     @Override
     public JahiaTemplatesPackage getModule() {
+        if (module == null) {
+            this.module = ServicesRegistry.getInstance().getJahiaTemplateManagerService().getTemplatePackageById(bundle.getSymbolicName());
+        }
         return module;
     }
 
     @Override
     public String getModuleVersion() {
-        return module != null && module.getVersion() != null ? module.getVersion().toString() : null;
+        return bundle != null && bundle.getVersion() != null ? bundle.getVersion().toString() : null;
     }
 
     @Override
@@ -136,7 +142,7 @@ public class JSView implements View, Comparable<View> {
         JSView jsView = (JSView) o;
         return getRegistryKey().equals(jsView.getRegistryKey()) &&
                 getKey().equals(jsView.getKey()) &&
-                module.equals(jsView.module) &&
+                getModule().equals(jsView.getModule()) &&
                 Objects.equals(path, jsView.path) &&
                 getNodeType().equals(jsView.getNodeType()) &&
                 getTemplateType().equals(jsView.getTemplateType()) &&
@@ -145,12 +151,12 @@ public class JSView implements View, Comparable<View> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getRegistryKey(), getKey(), module, path, getNodeType(), getTemplateType(), isTemplate());
+        return Objects.hash(getRegistryKey(), getKey(), getModule(), path, getNodeType(), getTemplateType(), isTemplate());
     }
 
     @Override
     public int compareTo(View otherView) {
-        if (module == null) {
+        if (getModule() == null) {
             if (otherView.getModule() != null) {
                 return 1;
             } else {
@@ -159,8 +165,8 @@ public class JSView implements View, Comparable<View> {
         } else {
             if (otherView.getModule() == null) {
                 return -1;
-            } else if (!module.equals(otherView.getModule())) {
-                return module.getName().compareTo(otherView.getModule().getName());
+            } else if (!getModule().equals(otherView.getModule())) {
+                return getModule().getName().compareTo(otherView.getModule().getName());
             } else {
                 return getKey().compareTo(otherView.getKey());
             }

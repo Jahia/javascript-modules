@@ -15,12 +15,10 @@
  */
 package org.jahia.modules.javascript.modules.engine.registrars;
 
-import org.jahia.data.templates.JahiaTemplatesPackage;
 import org.jahia.modules.javascript.modules.engine.jsengine.ContextProvider;
 import org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine;
 import org.jahia.modules.javascript.modules.engine.views.JSScript;
 import org.jahia.modules.javascript.modules.engine.views.JSView;
-import org.jahia.registries.ServicesRegistry;
 import org.jahia.services.content.decorator.JCRSiteNode;
 import org.jahia.services.content.nodetypes.ExtendedNodeType;
 import org.jahia.services.content.nodetypes.NodeTypeRegistry;
@@ -105,14 +103,13 @@ public class ViewsRegistrar implements ScriptResolver, TemplateResolver, Registr
     }
 
     private Collection<JSView> getRegistryViewsSet(Bundle bundle, ContextProvider contextProvider) {
-        JahiaTemplatesPackage module = ServicesRegistry.getInstance().getJahiaTemplateManagerService().getTemplatePackageById(bundle.getSymbolicName());
         Map<String, Object> filter = new HashMap<>();
         filter.put("type", "view");
         filter.put("bundleKey", bundle.getSymbolicName());
         return contextProvider.getRegistry()
                 .find(filter)
                 .stream()
-                .map(registryEntry -> new JSView(registryEntry, module))
+                .map(registryEntry -> new JSView(registryEntry, bundle))
                 .collect(Collectors.toSet());
     }
 

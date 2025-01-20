@@ -219,7 +219,7 @@ public class GraalVMEngine {
                     context.eval(entry.getValue());
                     context.getBindings(JS).removeMember("bundle");
                 } catch (Exception e) {
-                    logger.error("Cannot execute init script {}", entry.getValue(), e);
+                    logger.error("Cannot execute init script {} in bundle {}", entry.getValue(), entry.getKey(), e);
                 }
             }
 
