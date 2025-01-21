@@ -22,3 +22,5 @@ jobs:
       git_branch: ${{ matrix.git_branch }}
       incident_service: javascript-modules-engine-sonar
       job_container: jahia/cimg-mvn-cache:ga_cimg_openjdk_17.0.9-node
+      java_distribution: temurin
+      java_version: 17.0.9
