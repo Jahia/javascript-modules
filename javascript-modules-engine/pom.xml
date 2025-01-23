@@ -29,7 +29,7 @@
     <description>This is the engine allowing Javascript modules to run on a Jahia server.</description>
 
     <properties>
-        <jahia-module-signature>MCwCFBJEmGCjTLucq4kjFZXIUdgIa5iXAhRog+SngNKsG41US2+divtyEQpSEQ==</jahia-module-signature>
+        <jahia-module-signature>MCwCFHGnyd4YcPsg+JEUu25t7EXypVPZAhQk1qAfs0jKTMsuyt7+XfvQqaoX0Q==</jahia-module-signature>
         <import-package>
             graphql.annotations.annotationTypes;version="[7.2,99)",
             graphql.schema;version="[13.0,22)",
