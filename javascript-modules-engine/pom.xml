@@ -21,7 +21,7 @@
     <parent>
         <artifactId>javascript-modules</artifactId>
         <groupId>org.jahia.modules</groupId>
-        <version>0.3.0-SNAPSHOT</version>
+        <version>0.3.0</version>
     </parent>
     <artifactId>javascript-modules-engine</artifactId>
     <name>Javascript Modules Engine</name>
@@ -40,7 +40,7 @@
         </import-package>
         <frontend-maven-plugin.nodeVersion>v18.12.0</frontend-maven-plugin.nodeVersion>
         <frontend-maven-plugin.yarnVersion>v1.22.19</frontend-maven-plugin.yarnVersion>
-        <require-capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version>=17))"</require-capability>
+        <require-capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version&gt;=17))"</require-capability>
     </properties>
 
     <dependencies>
