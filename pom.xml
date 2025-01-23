@@ -47,6 +47,8 @@
 
     <properties>
         <graalvm.sdk.version>23.0.2</graalvm.sdk.version>
+        <!-- override the version of org.sonatype.plugins:nexus-staging-maven-plugin to ensure compatibility with JDK 17 -->
+        <nexus.maven.plugin.version>1.7.0</nexus.maven.plugin.version>
     </properties>
 
     <repositories>
