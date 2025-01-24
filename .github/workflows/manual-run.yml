@@ -28,3 +28,4 @@ jobs:
       pagerduty_skip_notification: true
       provisioning_manifest: ${{ github.event.inputs.manifest }}
       artifact_prefix: jsme
+      tests_path: 'javascript-modules-engine/tests/'
