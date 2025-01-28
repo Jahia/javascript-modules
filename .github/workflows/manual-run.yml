@@ -30,6 +30,7 @@ jobs:
       - uses: jahia/jahia-modules-action/integration-tests@v2
         with:
           module_id: javascript-modules-engine
+          tests_path: 'javascript-modules-engine/tests/'
           testrail_project: Javascript Modules Engine
           tests_manifest: ${{ github.event.inputs.manifest }}
           jahia_image: ${{ github.event.inputs.jahia_image }}
