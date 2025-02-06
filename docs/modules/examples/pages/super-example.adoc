@@ -1,0 +1,4 @@
+= This is a super example
+:page-category: Examples
+
+This is a super example

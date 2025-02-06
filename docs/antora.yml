@@ -2,7 +2,8 @@ name: javascript-modules
 title: Javascript Modules
 version:
   antora-guild-day-(?<version>+({0..9}).+({0..9})).x: $<version>
-#nav:
-#  - modules/ROOT/nav.adoc
-#  - modules/module-one/nav.adoc
+prerelease: '-SNAPSHOT'
+nav:
+  - modules/ROOT/nav.adoc
+  - modules/examples/nav.adoc
 
