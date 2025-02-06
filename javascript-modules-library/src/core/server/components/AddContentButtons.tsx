@@ -4,13 +4,22 @@ import {useServerContext} from '../hooks/useServerContext';
 
 /**
  * Generates add content buttons for a content object
- * @param {object} properties The React properties for the component.
- * @param {string} [properties.nodeTypes] The node types to add.
- * @param {string} [properties.childName='*'] The child name.
- * @param {boolean} [properties.editCheck=false] If true, the edit check will be performed.
- * @returns {JSX.Element} The add content buttons.
+ * @returns The add content buttons.
  */
-export function AddContentButtons({nodeTypes, childName = '*', editCheck = false}) {
+export function AddContentButtons({nodeTypes, childName = '*', editCheck = false}: Readonly<{
+    /** The node types to add. */
+    nodeTypes?: string;
+    /**
+     * The child name.
+     * @default *
+     */
+    childName?: string;
+    /**
+     * If true, the edit check will be performed.
+     * @default false
+     */
+    editCheck?: boolean;
+}>): React.JSX.Element {
     const {renderContext, currentResource} = useServerContext();
     return (
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
