@@ -1,5 +1,6 @@
 name: javascript-modules
 title: Javascript Modules
+version: true
 #nav:
 #  - modules/ROOT/nav.adoc
 #  - modules/module-one/nav.adoc
