@@ -1703,7 +1703,7 @@ __metadata:
 
 "@jahia/javascript-modules-library@file:../../../javascript-modules-library/dist::locator=%40jahia%2Fnpm-module-example%40workspace%3A.":
   version: 0.4.0-SNAPSHOT
-  resolution: "@jahia/javascript-modules-library@file:../../../javascript-modules-library/dist#../../../javascript-modules-library/dist::hash=cd3405&locator=%40jahia%2Fnpm-module-example%40workspace%3A."
+  resolution: "@jahia/javascript-modules-library@file:../../../javascript-modules-library/dist#../../../javascript-modules-library/dist::hash=6b9ce5&locator=%40jahia%2Fnpm-module-example%40workspace%3A."
   dependencies:
     graphql: "npm:^16.0.1"
     graphql-tag: "npm:^2.12.6"
@@ -1725,7 +1725,7 @@ __metadata:
       optional: true
     styled-jsx:
       optional: true
-  checksum: 10/1559e3d2dbd8ffa113c2ceb65fb4c24cff752c6a8e35251af5928c433e67c7577c3da89df59610ff6b4df57de7aae2cd554136057a12ec5d109118ef30019971
+  checksum: 10/cafb04abfb128a244fbc167331cdb32405a1dd94c517309356199b8a2419d06433f21573e5be65f7ddd60eb3e0d53e4a33b161e682d0dcd2194b186f14b20896
   languageName: node
   linkType: hard
 
