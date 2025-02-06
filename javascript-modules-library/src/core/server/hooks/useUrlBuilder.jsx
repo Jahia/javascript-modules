@@ -1,5 +1,5 @@
 import {useServerContext} from './useServerContext';
-import {buildUrl as originalBuildUrl} from '../utils/urlBuilder';
+import {buildUrl as originalBuildUrl} from '../utils/urlBuilder/urlBuilder';
 
 /**
  * @typedef {Object} UrlBuilderType

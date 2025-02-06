@@ -1,5 +1,5 @@
 import {useServerContext} from './useServerContext';
-import {getNodesByJCRQuery} from '../utils/jcr';
+import {getNodesByJCRQuery} from '../utils/jcr/getNodesByJCRQuery';
 
 /**
  * Execute a JCR query

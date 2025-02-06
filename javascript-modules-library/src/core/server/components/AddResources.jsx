@@ -1,6 +1,6 @@
 import React from 'react';
-import {useServerContext} from '../hooks';
 import {server} from '@jahia/javascript-modules-library-private';
+import {useServerContext} from '../hooks/useServerContext';
 
 /**
  * Adds a resources to the head tag of the HTML page.
