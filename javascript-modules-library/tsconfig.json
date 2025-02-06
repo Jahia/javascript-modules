@@ -7,10 +7,10 @@
         "moduleResolution": "node",
         "jsx": "react",
         "esModuleInterop": true,
-        "strict": false,
+        // TODO: "strict": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "noImplicitAny": false,
+        // TODO: "noImplicitAny": true,
         "allowSyntheticDefaultImports": true,
         "resolveJsonModule": true,
         "isolatedModules": true,
@@ -39,8 +39,8 @@
             "src/index.js",
             "target/types/**/*.d.ts"
         ],
-        "out": "dist/docs", 
-        "includeVersion" : true, 
+        "out": "dist/docs",
+        "includeVersion" : true,
         "readme": "typedoc-readme.md"
     }
 }

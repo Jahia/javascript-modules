@@ -5,12 +5,10 @@ import {I18nextProvider} from 'react-i18next';
 import i18n from 'i18next';
 import {buildUrl} from '../../../utils/urlBuilder/urlBuilder';
 
-const getClientI18nStoreScript = (lang, namespace) => {
+const getClientI18nStoreScript = (lang: string, namespace: string) => {
     const i18nResourceBundle = i18n.getResourceBundle(lang, namespace);
     if (i18nResourceBundle) {
-        const filteredI18nStore = {};
-        filteredI18nStore[lang] = {};
-        filteredI18nStore[lang][namespace] = i18nResourceBundle;
+        const filteredI18nStore = {[lang]: {[namespace]: i18nResourceBundle}};
 
         return '<script type="text/javascript">\n' +
             '        if(!window.__APPSHELL_INIT_DATA__) {\n' +
@@ -19,21 +17,22 @@ const getClientI18nStoreScript = (lang, namespace) => {
             '        if(!window.__APPSHELL_INIT_DATA__.initialI18nStore) {\n' +
             '            window.__APPSHELL_INIT_DATA__.initialI18nStore = [];\n' +
             '        }\n' +
+            // TODO: JSON.stringify is not safe for accidental XSS
             `        window.__APPSHELL_INIT_DATA__.initialI18nStore.push(${JSON.stringify(filteredI18nStore)});\n` +
             '    </script>';
     }
 };
 
-const getAppShellInitData = moduleBaseUrl => {
+const getAppShellInitData = (moduleBaseUrl: string) => {
     return '<script type="text/javascript">\n' +
         '        if(!window.__APPSHELL_INIT_DATA__) {\n' +
         '            window.__APPSHELL_INIT_DATA__ = {};\n' +
         '        }\n' +
-        `        window.__APPSHELL_INIT_DATA__.moduleBaseUrl = '${moduleBaseUrl}';\n` +
+        `        window.__APPSHELL_INIT_DATA__.moduleBaseUrl = ${JSON.stringify(moduleBaseUrl)};\n` +
         '    </script>';
 };
 
-function InBrowser({child: Child, props, dataKey, preRender}) {
+function InBrowser<T>({child: Child, props, dataKey, preRender}: Readonly<{ child: React.ComponentType<T>, props: T & React.JSX.IntrinsicAttributes, dataKey: string, preRender?: boolean }>): React.JSX.Element {
     const {bundleKey, currentResource, renderContext} = useServerContext();
     const language = currentResource.getLocale().getLanguage();
     const appShellInitDataScript = getAppShellInitData(buildUrl({value: '/modules'}, renderContext, currentResource));
@@ -42,13 +41,14 @@ function InBrowser({child: Child, props, dataKey, preRender}) {
     const remote = buildUrl({value: '/modules/' + bundleKey + '/javascript/client/remote.js'}, renderContext, currentResource);
     const appShell = buildUrl({value: '/modules/javascript-modules-engine/javascript/apps/reactAppShell.js'}, renderContext, currentResource);
 
-    const data = {};
-    data[dataKey] = encodeURIComponent(JSON.stringify({
-        name: Child.name,
-        lang: language,
-        bundle: bundleKey,
-        props: props || {}
-    }));
+    const data = {
+        [dataKey]: encodeURIComponent(JSON.stringify({
+            name: Child.name,
+            lang: language,
+            bundle: bundleKey,
+            props: props || {}
+        }))
+    };
 
     return (
         <>
