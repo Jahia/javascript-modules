@@ -1276,8 +1276,13 @@ __metadata:
   linkType: hard
 
 "@jahia/javascript-modules-library@file:../javascript-modules-library/dist::locator=javascript-modules-engine%40workspace%3A.":
+<<<<<<< HEAD
   version: 0.5.0-SNAPSHOT
   resolution: "@jahia/javascript-modules-library@file:../javascript-modules-library/dist#../javascript-modules-library/dist::hash=1faff7&locator=javascript-modules-engine%40workspace%3A."
+=======
+  version: 0.4.0-SNAPSHOT
+  resolution: "@jahia/javascript-modules-library@file:../javascript-modules-library/dist#../javascript-modules-library/dist::hash=4d14c9&locator=javascript-modules-engine%40workspace%3A."
+>>>>>>> bbc98b4 (lockfile)
   dependencies:
     dotenv: "npm:^16.4.7"
     graphql: "npm:^16.0.1"
@@ -1302,7 +1307,11 @@ __metadata:
       optional: true
   bin:
     jahia-deploy: bin/jahia-deploy.mjs
+<<<<<<< HEAD
   checksum: 10c0/be326474bfeaf42d6ce2a3ea556730a99f6d734cb0b94a5bba18f4de15652e867cc30da26138eec97665bfc9cdc72bc92db89724dd698850eda4c6af48650b65
+=======
+  checksum: 10c0/42ec3071b7a7fff0d9d3db71cfb27d1012ab1641272c460df79d0ac04b5997340aa81c469e9876755590395eed7fc258d9c55be6dc94c16c2d184aaf633d66ea
+>>>>>>> bbc98b4 (lockfile)
   languageName: node
   linkType: hard
 

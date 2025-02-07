@@ -45,7 +45,13 @@ export function useUrlBuilder(): UrlBuilderType {
             mode,
             parameters
         }) {
-            return this.buildNodeUrl({nodePath, extension: '.html.ajax', language, mode, parameters});
+            return originalBuildUrl({
+                path: nodePath,
+                extension: '.html.ajax',
+                language,
+                mode,
+                parameters
+            }, renderContext, currentResource);
         }
     };
 }
