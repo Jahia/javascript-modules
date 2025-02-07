@@ -5,7 +5,6 @@ import type {JahiaComponent} from './defineJahiaComponent';
  * Registers Jahia components into the global registry as views
  * @param jahiaComponents an object containing the jahia components to register
  * TODO We will probably want to revisit this function once we handle global component registration in ticket https://jira.jahia.org/browse/BACKLOG-22400
- * @deprecated
  */
 export function registerJahiaComponents(jahiaComponents: Record<string | number | symbol, {
     (): React.JSX.Element,
