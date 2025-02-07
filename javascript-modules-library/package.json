@@ -7,10 +7,10 @@
   "license": "MIT",
   "scripts": {
     "types:copy": "mkdir -p dist/types && ncp target/types dist/types",
-    "build:development": "run types:copy && tsc && node generate-index.js",
+    "build:development": "run types:copy && tsc && node generate-index",
     "build:production": "run build:development && run minify",
     "build": "run build:production",
-    "minify": "node minify.js",
+    "minify": "node minify",
     "doc": "typedoc",
     "clean": "rm -rf dist",
     "lint": "eslint --ext js,jsx,json,ts src/",
