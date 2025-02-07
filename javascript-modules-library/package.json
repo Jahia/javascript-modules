@@ -7,20 +7,24 @@
   "license": "MIT",
   "scripts": {
     "types:copy": "mkdir -p dist/types && ncp target/types dist/types",
-    "build:development": "run types:copy && tsc && node generate-index",
+    "build:development": "run types:copy && tsc && node generate-index.js",
     "build:production": "run build:development && run minify",
     "build": "run build:production",
-    "minify": "node minify",
+    "minify": "node minify.js",
     "doc": "typedoc",
     "clean": "rm -rf dist",
     "lint": "eslint --ext js,jsx,json,ts src/",
     "lint:fix": "eslint --ext js,jsx,json,ts --fix src/",
     "prepack": "echo 'Please run 'mvn package' to create the tgz so the Maven version can be injected in the package.json' && exit 1"
   },
+  "bin": {
+    "jahia-deploy": "bin/jahia-deploy.mjs"
+  },
   "files": [
     "dist"
   ],
   "dependencies": {
+    "dotenv": "^16.4.7",
     "graphql": "^16.0.1",
     "graphql-tag": "^2.12.6",
     "prop-types": "^15.8.1"

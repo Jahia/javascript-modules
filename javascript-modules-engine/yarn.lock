@@ -1277,8 +1277,9 @@ __metadata:
 
 "@jahia/javascript-modules-library@file:../javascript-modules-library/dist::locator=javascript-modules-engine%40workspace%3A.":
   version: 0.4.0-SNAPSHOT
-  resolution: "@jahia/javascript-modules-library@file:../javascript-modules-library/dist#../javascript-modules-library/dist::hash=2a2152&locator=javascript-modules-engine%40workspace%3A."
+  resolution: "@jahia/javascript-modules-library@file:../javascript-modules-library/dist#../javascript-modules-library/dist::hash=e5271e&locator=javascript-modules-engine%40workspace%3A."
   dependencies:
+    dotenv: "npm:^16.4.7"
     graphql: "npm:^16.0.1"
     graphql-tag: "npm:^2.12.6"
     prop-types: "npm:^15.8.1"
@@ -1299,7 +1300,9 @@ __metadata:
       optional: true
     styled-jsx:
       optional: true
-  checksum: 10c0/5899a54137b102251184b691c8c72f0f168685da4f0da676e5369a143ccb2d9a21f012fbed50bafa1e032dde1b67a722a1e1525e69c4970be0eefd99b0b9a85c
+  bin:
+    jahia-deploy: bin/jahia-deploy.mjs
+  checksum: 10c0/241e3ca0bcc8c289f01548277263d023fe6c81215eed3464e47223ae434257ceb9e338fdbc24ca081bbe7504c5fa15c6c4b0324dbaefa673b7631039ca9abfb4
   languageName: node
   linkType: hard
 
@@ -2530,6 +2533,13 @@ __metadata:
   dependencies:
     esutils: "npm:^2.0.2"
   checksum: 10c0/c96bdccabe9d62ab6fea9399fdff04a66e6563c1d6fb3a3a063e8d53c3bb136ba63e84250bbf63d00086a769ad53aef92d2bd483f03f837fc97b71cbee6b2520
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^16.4.7":
+  version: 16.4.7
+  resolution: "dotenv@npm:16.4.7"
+  checksum: 10c0/be9f597e36a8daf834452daa1f4cc30e5375a5968f98f46d89b16b983c567398a330580c88395069a77473943c06b877d1ca25b4afafcdd6d4adb549e8293462
   languageName: node
   linkType: hard
 
