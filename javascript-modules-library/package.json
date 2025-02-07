@@ -17,10 +17,14 @@
     "lint:fix": "eslint --ext js,jsx,json,ts --fix src/",
     "prepack": "echo 'Please run 'mvn package' to create the tgz so the Maven version can be injected in the package.json' && exit 1"
   },
+  "bin": {
+    "jahia-deploy": "bin/jahia-deploy.mjs"
+  },
   "files": [
     "dist"
   ],
   "dependencies": {
+    "dotenv": "^16.4.7",
     "graphql": "^16.0.1",
     "graphql-tag": "^2.12.6",
     "prop-types": "^15.8.1"
