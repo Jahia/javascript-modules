@@ -12,7 +12,7 @@ describe('Check that the Javascript module has been transformed properly and has
                     expect(result).to.contain('Bundle-SymbolicName: jahia-npm-module-example');
                     expect(result).to.contain('Bundle-Vendor: Jahia Solutions Group SA');
                     expect(result).to.contain('Bundle-Version: 1.0.0');
-                    expect(result).to.contain('Jahia-Depends: default,javascript-modules-engine');
+                    expect(result).to.contain('Jahia-Depends: default,legacy-default-components,javascript-modules-engine');
                     expect(result).to.contain('Jahia-Module-Type: templatesSet');
                     expect(result).to.contain('Jahia-NPM-InitScript: dist/main.js');
                     expect(result).to.contain('Jahia-Required-Version: 8.2.0.0-SNAPSHOT');
