@@ -6,7 +6,7 @@ import {useServerContext} from '../hooks/useServerContext';
  * Generates add content buttons for a content object
  * @returns The add content buttons.
  */
-export function AddContentButtons({nodeTypes, childName = '*', editCheck = false}: Readonly<{
+export function AddContentButtons({nodeTypes = '', childName = '*', editCheck = false}: Readonly<{
     /** The node types to add. */
     nodeTypes?: string;
     /**
