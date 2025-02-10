@@ -2,12 +2,48 @@ import {useServerContext} from './useServerContext';
 import {buildUrl as originalBuildUrl} from '../utils/urlBuilder/urlBuilder';
 
 interface UrlBuilderType {
-    /** Builds a static URL for an asset. */
-    buildStaticUrl({assetPath, moduleName, parameters}: {assetPath: string; moduleName?: string; parameters?: Record<string, string>; }): string;
-    /** Builds a URL for a JCR node. */
-    buildNodeUrl({nodePath, extension, language, mode, parameters}: {nodePath: string; extension?: string; language?: string; mode?: string; parameters?: Record<string, string>; }): string;
-    /** Builds an HTML fragment URL for a JCR node. */
-    buildHtmlFragmentUrl({nodePath, language, mode, parameters}: {nodePath: string; language?: string; mode?: string; parameters?: Record<string, string>; }): string;
+    /**
+     * Builds a static URL for an asset.
+     * @returns The built URL.
+    */
+    buildStaticUrl(props: {
+        /** The path of the asset */
+        assetPath: string;
+        /** The name of the module used as prefix for the URL. If not provided, the current module is used. */
+        moduleName?: string;
+        /** The parameters to append to the URL */
+        parameters?: Record<string, string>;
+    }): string;
+    /**
+     * Builds a URL for a JCR node.
+     * @returns {string} The built URL.
+     */
+    buildNodeUrl(props: {
+        /** The path of JCR node */
+        nodePath: string;
+        /** The extension to use to build the URL */
+        extension?: string;
+        /** The language to use to build the URL */
+        language?: string;
+        /** The mode to use to build the URL ('edit', 'preview', 'live') */
+        mode?: 'edit' | 'preview' | 'live';
+        /** The parameters to append to the URL */
+        parameters?: Record<string, string>;
+    }): string;
+    /**
+     * Builds an HTML fragment URL for a JCR node.
+     * @returns {string} The built URL.
+     */
+    buildHtmlFragmentUrl(props: {
+        /** The path of JCR node */
+        nodePath: string;
+        /** The language to use to build the URL */
+        language?: string;
+        /** The mode to use to build the URL ('edit', 'preview', 'live') */
+        mode?: 'edit' | 'preview' | 'live';
+        /** The parameters to append to the URL */
+        parameters?: Record<string, string>;
+    }): string;
 }
 
 export function useUrlBuilder(): UrlBuilderType {
