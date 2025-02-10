@@ -28,8 +28,7 @@
     "include": [
         "src/**/*.js",
         "src/**/*.mjs",
-        "src/**/*.ts",
-        "target/types/globals.d.ts"
+        "src/**/*.ts"
     ],
     "exclude": [
         "node_modules",
