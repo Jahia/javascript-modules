@@ -1,18 +1,21 @@
+import type {RenderContext, Resource} from 'org.jahia.services.render';
 import {getNodeFromPathOrId} from '../jcr/getNodeFromPathOrId';
 import {server} from '@jahia/javascript-modules-library-private';
+import type {JCRNodeWrapper} from 'org.jahia.services.content';
 
 const absoluteUrlRegExp = /^(?:[a-z+]+:)?\/\//i;
 
-const finalizeUrl = (url, renderContext) => {
+const finalizeUrl = (url: string, renderContext: RenderContext) => {
     if (!absoluteUrlRegExp.test(url)) {
         url = url.startsWith('/') ? renderContext.getRequest().getContextPath() + url : url;
+        // @ts-expect-error The types are wrong here! TODO: Fix the types
         return renderContext.getResponse().encodeURL(url);
     }
 
     return url;
 };
 
-function appendParameters(url, parameters) {
+function appendParameters(url: string, parameters: Record<string, string>) {
     const separator = url.includes('?') ? '&' : '?';
     const URLParameters = Object.keys(parameters)
         .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(parameters[key])}`)
@@ -23,13 +26,12 @@ function appendParameters(url, parameters) {
 
 /**
  * Initialize the registry with default url builders
- * @returns {void}
  */
-export function initUrlBuilder() {
+export function initUrlBuilder(): void {
     server.registry.add('urlBuilder', 'nt:file', {
         priority: 1,
-        buildURL: ({jcrNode, mode, currentResource}) => {
-            let workspace = mode ?
+        buildURL: ({jcrNode, mode, currentResource}: {jcrNode: JCRNodeWrapper, mode: string, currentResource: Resource}) => {
+            const workspace = mode ?
                 ((mode === 'edit' || mode === 'preview') ? 'default' : 'live') :
                 currentResource.getWorkspace();
             return '/files/' + workspace + server.render.escapePath(jcrNode.getCanonicalPath());
@@ -37,9 +39,16 @@ export function initUrlBuilder() {
     });
     server.registry.add('urlBuilder', '*', {
         priority: 0,
-        buildURL: ({jcrNode, mode, language, extension, renderContext, currentResource}) => {
-            let workspace;
-            let servletPath;
+        buildURL: ({jcrNode, mode, language, extension, renderContext, currentResource}: {
+            jcrNode: JCRNodeWrapper,
+            mode: string,
+            language: string,
+            extension: string,
+            renderContext: RenderContext,
+            currentResource: Resource
+        }) => {
+            let workspace: string;
+            let servletPath: string;
             if (mode) {
                 switch (mode) {
                     case 'edit':
@@ -69,21 +78,27 @@ export function initUrlBuilder() {
 /**
  * Provide URL generation for contents/files
  * If parameters are not valid, or if a node couldn't be found, it will log an warning and return '#'
- * @param {object} props props used to build the URL
- * @param {string} [props.value] the value to use to build the URL
- * @param {string} [props.path] the path of the resource to build the URL for
- * @param {object} [props.parameters] the parameters to append to the URL
- * @param {string} [props.mode] the mode to use to build the URL
- * @param {string} [props.language] the language to use to build the URL
- * @param {string} [props.extension] the extension to use to build the URL
- * @param {import('org.jahia.services.render').RenderContext} renderContext the current renderContext
- * @param {import('org.jahia.services.render').Resource} currentResource the current resource
- * @returns {string} the final URL
+ * @param renderContext the current renderContext
+ * @param currentResource the current resource
+ * @returns the final URL
  */
-export function buildUrl(props, renderContext, currentResource) {
-    let url;
+export function buildUrl(props: {
+    /** The path of the resource to build the URL for */
+    value?: string;
+    /** The path of the resource to build the URL for */
+    path?: string;
+    /** The parameters to append to the URL */
+    parameters?: Record<string, string>;
+    /** The mode to use to build the URL */
+    mode?: string;
+    /** The language to use to build the URL */
+    language?: string;
+    /** The extension to use to build the URL */
+    extension?: string;
+}, renderContext: RenderContext, currentResource: Resource): string {
+    let url: string | undefined;
     if (props.path) {
-        let jcrNode;
+        let jcrNode: JCRNodeWrapper | null;
         try {
             jcrNode = getNodeFromPathOrId({path: props.path}, currentResource.getNode().getSession());
         } catch (_) {

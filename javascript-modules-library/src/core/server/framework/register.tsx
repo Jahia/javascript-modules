@@ -1,5 +1,9 @@
 import {server} from '@jahia/javascript-modules-library-private';
 import type {JahiaComponent} from './defineJahiaComponent';
+import type {Bundle} from 'org.osgi.framework';
+
+/** This is provided by Jahia runtime */
+declare const bundle : Bundle;
 
 /**
  * Registers Jahia components into the global registry as views

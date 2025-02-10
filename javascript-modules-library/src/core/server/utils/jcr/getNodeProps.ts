@@ -1,3 +1,5 @@
+import type {JCRNodeWrapper, JCRSessionWrapper, JCRValueWrapper} from 'org.jahia.services.content';
+
 const STRING = 1;
 const LONG = 3;
 const DOUBLE = 4;
@@ -10,7 +12,7 @@ const WEAKREFERENCE = 10;
 const URI = 11;
 const DECIMAL = 12;
 
-const extractProp = (node, propName) => {
+const extractProp = (node: JCRNodeWrapper, propName: string) => {
     if (node.hasProperty(propName)) {
         const property = node.getProperty(propName);
         if (property.isMultiple()) {
@@ -29,7 +31,7 @@ const extractProp = (node, propName) => {
     return undefined;
 };
 
-const extractPropValue = (session, value, type) => {
+const extractPropValue = (session: JCRSessionWrapper, value: JCRValueWrapper, type: number) => {
     switch (type) {
         case STRING:
         case DATE:
@@ -60,12 +62,14 @@ const extractPropValue = (session, value, type) => {
 
 /**
  * Extracts the properties from a node
- * @param {import("org.jahia.services.content").JCRNodeWrapper} node the node on which to extract the properties
- * @param {Array} props the name of the properties to extract
- * @returns {Object} an object containing the property values
+ * @param node the node on which to extract the properties
+ * @param props the name of the properties to extract
+ * @returns an object containing the property values
  */
-export function getNodeProps(node, props) {
-    let result = {};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getNodeProps(node: JCRNodeWrapper, props: string[]): Record<string, any> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result: Record<string, any> = {};
     if (node && props && props.length > 0) {
         for (const prop of props) {
             if (node.hasProperty(prop)) {
