@@ -142,6 +142,7 @@ const buildMenu = (node: JCRNodeWrapper, navMenuLevel: number, config: MenuConfi
         }
 
         for (let index = 0; index < children.length; index++) {
+            const menuEntry = {} as MenuEntry;
             const child = children[index];
             const itemPath = child.path;
             const menuItem = session.getNode(itemPath);
@@ -175,15 +176,6 @@ const buildMenu = (node: JCRNodeWrapper, navMenuLevel: number, config: MenuConfi
             }
 
             if (!referenceIsBroken && correctType && (config.startLevelValue < navMenuLevel || inpath)) {
-                const menuEntry: MenuEntry = {
-                    node: menuItem,
-                    inPath: inpath,
-                    selected,
-                    level: navMenuLevel,
-                    render: '',
-                    children: []
-                };
-
                 if (navMenuLevel < config.maxDepth) {
                     const menuItemChildren = getMenuItemsChildren(config.workspace, menuItem.getPath(), ['jmix:navMenuItem']);
                     if (menuItemChildren.length > 0) {
@@ -199,8 +191,13 @@ const buildMenu = (node: JCRNodeWrapper, navMenuLevel: number, config: MenuConfi
                     }, config.renderContext, config.currentResource);
                 }
 
-                result.push(menuEntry);
+                menuEntry.node = menuItem;
+                menuEntry.inPath = inpath;
+                menuEntry.selected = selected;
+                menuEntry.level = navMenuLevel;
             }
+
+            result.push(menuEntry);
         }
     }
 

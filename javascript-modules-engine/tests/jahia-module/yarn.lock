@@ -1702,25 +1702,8 @@ __metadata:
   linkType: hard
 
 "@jahia/javascript-modules-library@file:../../../javascript-modules-library/dist::locator=%40jahia%2Fnpm-module-example%40workspace%3A.":
-<<<<<<< HEAD
   version: 0.5.0-SNAPSHOT
-  resolution: "@jahia/javascript-modules-library@file:../../../javascript-modules-library/dist#../../../javascript-modules-library/dist::hash=31c003&locator=%40jahia%2Fnpm-module-example%40workspace%3A."
-=======
-  version: 0.4.0-SNAPSHOT
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  resolution: "@jahia/javascript-modules-library@file:../../../javascript-modules-library/dist#../../../javascript-modules-library/dist::hash=42258e&locator=%40jahia%2Fnpm-module-example%40workspace%3A."
->>>>>>> bbc98b4 (lockfile)
-=======
-  resolution: "@jahia/javascript-modules-library@file:../../../javascript-modules-library/dist#../../../javascript-modules-library/dist::hash=50f89d&locator=%40jahia%2Fnpm-module-example%40workspace%3A."
->>>>>>> 5877edd (lockfile)
-=======
-  resolution: "@jahia/javascript-modules-library@file:../../../javascript-modules-library/dist#../../../javascript-modules-library/dist::hash=b6105c&locator=%40jahia%2Fnpm-module-example%40workspace%3A."
->>>>>>> ed1f30b (more docs)
-=======
-  resolution: "@jahia/javascript-modules-library@file:../../../javascript-modules-library/dist#../../../javascript-modules-library/dist::hash=f421dc&locator=%40jahia%2Fnpm-module-example%40workspace%3A."
->>>>>>> 6eb54ba (1st fix)
+  resolution: "@jahia/javascript-modules-library@file:../../../javascript-modules-library/dist#../../../javascript-modules-library/dist::hash=43d5f1&locator=%40jahia%2Fnpm-module-example%40workspace%3A."
   dependencies:
     dotenv: "npm:^16.4.7"
     graphql: "npm:^16.0.1"
@@ -1745,23 +1728,7 @@ __metadata:
       optional: true
   bin:
     jahia-deploy: bin/jahia-deploy.mjs
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  checksum: 10/b022a81af2f8f724646f0835d9b9f72b4e992e0a461fb28f396b1fb9b3849cee8b7d861c87fa535a4ccbeb3a0e6c5b4f48d5dbfa504093c16738b430959d3f44
-=======
-  checksum: 10/361323200efc7489a89f579f72c115c0429d67a4f2ddafe77ad55c2dd5d3f573678e1ae6411b7b1801054de9182744aa8f15e93c45f029012ee18901a4d15085
->>>>>>> bbc98b4 (lockfile)
-=======
-  checksum: 10/3b7de811bdd8fff7d7905bdac1dde42bfaf86edff5dc41f9d23f75c9863a85f218122bf83b0b40a017c2d9c2e89379fcfdb98890a814d37bd68d96e7832d662f
->>>>>>> 5877edd (lockfile)
-=======
-  checksum: 10/cdb9ac523cc573636381b870f06f259e1fdd9935607d0c72e7dd109af6d0965e30a881d306ae33a923f00450f8c8db725d592b49c5ced451c25f65357fd2aaed
->>>>>>> ed1f30b (more docs)
-=======
-  checksum: 10/c6cd84efc38c70e88b59f2847f7798a01f9a465059ad7dd4b2bf9d8763714abc6445857751d48f3bc1be58d9bcdc910a0e2e5d126927de9e59a6cf3b8689f4a5
->>>>>>> 6eb54ba (1st fix)
+  checksum: 10/7252bb61e667d0ea1a830d3878e9380c464c20e423c1536e2e504e0ca84cba7fc6943a6c57ce12541388acf32e289784a29d3d23e28bef2e9b56c303df373dd1
   languageName: node
   linkType: hard
 
