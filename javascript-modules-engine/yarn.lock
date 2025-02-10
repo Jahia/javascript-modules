@@ -1283,6 +1283,7 @@ __metadata:
   version: 0.4.0-SNAPSHOT
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   resolution: "@jahia/javascript-modules-library@file:../javascript-modules-library/dist#../javascript-modules-library/dist::hash=4d14c9&locator=javascript-modules-engine%40workspace%3A."
 >>>>>>> bbc98b4 (lockfile)
 =======
@@ -1291,6 +1292,9 @@ __metadata:
 =======
   resolution: "@jahia/javascript-modules-library@file:../javascript-modules-library/dist#../javascript-modules-library/dist::hash=759583&locator=javascript-modules-engine%40workspace%3A."
 >>>>>>> ed1f30b (more docs)
+=======
+  resolution: "@jahia/javascript-modules-library@file:../javascript-modules-library/dist#../javascript-modules-library/dist::hash=c42b87&locator=javascript-modules-engine%40workspace%3A."
+>>>>>>> 6eb54ba (1st fix)
   dependencies:
     dotenv: "npm:^16.4.7"
     graphql: "npm:^16.0.1"
@@ -1318,6 +1322,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 10c0/be326474bfeaf42d6ce2a3ea556730a99f6d734cb0b94a5bba18f4de15652e867cc30da26138eec97665bfc9cdc72bc92db89724dd698850eda4c6af48650b65
 =======
   checksum: 10c0/42ec3071b7a7fff0d9d3db71cfb27d1012ab1641272c460df79d0ac04b5997340aa81c469e9876755590395eed7fc258d9c55be6dc94c16c2d184aaf633d66ea
@@ -1328,6 +1333,9 @@ __metadata:
 =======
   checksum: 10c0/fe36cccd33fdb64e96bfae69d7091a6302ccde1cb3b13da6512bb30c2a586c6fcbfc41ba649a587aff42087462e9a207793393b6bd46eda129ae141fc557e532
 >>>>>>> ed1f30b (more docs)
+=======
+  checksum: 10c0/b411ed7d8f3991d261743e9237e7ec8b6adb976bdfc900512c1d6d4170de5ecadf7a09d2e84b283550ed233c4040c8429c1eec175a36513f4d85a3e015a6d845
+>>>>>>> 6eb54ba (1st fix)
   languageName: node
   linkType: hard
 

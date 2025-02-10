@@ -133,7 +133,7 @@ interface MenuConfig {
  * @param children the paths of the children of the current node
  * @returns an array of menu entries objects
  */
-const buildMenu = (node: JCRNodeWrapper, navMenuLevel: number, config: MenuConfig, children: MenuItemChild[] = []): MenuEntry[] => {
+const buildMenu = (node: JCRNodeWrapper, navMenuLevel: number, config: MenuConfig, children?: MenuItemChild[]): MenuEntry[] => {
     const result: MenuEntry[] = [];
     if (node) {
         const session = node.getSession();
