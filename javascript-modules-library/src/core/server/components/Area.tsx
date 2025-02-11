@@ -1,5 +1,5 @@
 import React from 'react';
-import {useServerContext} from '../hooks/useServerContext';
+import {useServerContext} from '../hooks/useServerContext.js';
 import {server} from '@jahia/javascript-modules-library-private';
 
 /**

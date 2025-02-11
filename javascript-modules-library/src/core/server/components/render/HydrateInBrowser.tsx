@@ -1,5 +1,5 @@
 import React from 'react';
-import InBrowser from './internal/InBrowser';
+import InBrowser from './internal/InBrowser.js';
 
 /**
  * Will render the given React component server side and hydrate it in the browser to make it dynamic.

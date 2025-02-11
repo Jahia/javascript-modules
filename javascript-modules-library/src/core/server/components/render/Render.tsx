@@ -1,6 +1,6 @@
 import React from 'react';
 import {server} from '@jahia/javascript-modules-library-private';
-import {useServerContext} from '../../hooks/useServerContext';
+import {useServerContext} from '../../hooks/useServerContext.js';
 import type {JCRNodeWrapper} from 'org.jahia.services.content';
 
 /**

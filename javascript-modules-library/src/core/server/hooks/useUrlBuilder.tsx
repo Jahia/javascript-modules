@@ -1,5 +1,5 @@
-import {useServerContext} from './useServerContext';
-import {buildUrl as originalBuildUrl} from '../utils/urlBuilder/urlBuilder';
+import {useServerContext} from './useServerContext.js';
+import {buildUrl as originalBuildUrl} from '../utils/urlBuilder/urlBuilder.js';
 
 interface UrlBuilderType {
     /**
