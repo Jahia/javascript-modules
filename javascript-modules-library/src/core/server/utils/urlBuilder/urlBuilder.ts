@@ -1,5 +1,5 @@
 import type {RenderContext, Resource} from 'org.jahia.services.render';
-import {getNodeFromPathOrId} from '../jcr/getNodeFromPathOrId';
+import {getNodeFromPathOrId} from '../jcr/getNodeFromPathOrId.js';
 import {server} from '@jahia/javascript-modules-library-private';
 import type {JCRNodeWrapper} from 'org.jahia.services.content';
 

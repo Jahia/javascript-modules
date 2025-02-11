@@ -1,5 +1,5 @@
 import type {GraphQLFormattedError} from 'graphql';
-import {useServerContext} from './useServerContext';
+import {useServerContext} from './useServerContext.js';
 import {server} from '@jahia/javascript-modules-library-private';
 
 /**

@@ -1,9 +1,9 @@
 import React from 'react';
-import {useServerContext} from '../../../hooks/useServerContext';
-import {AddResources} from '../../AddResources';
+import {useServerContext} from '../../../hooks/useServerContext.js';
+import {AddResources} from '../../AddResources.js';
 import {I18nextProvider} from 'react-i18next';
 import i18n from 'i18next';
-import {buildUrl} from '../../../utils/urlBuilder/urlBuilder';
+import {buildUrl} from '../../../utils/urlBuilder/urlBuilder.js';
 
 const getClientI18nStoreScript = (lang: string, namespace: string) => {
     const i18nResourceBundle = i18n.getResourceBundle(lang, namespace);
