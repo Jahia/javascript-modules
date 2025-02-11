@@ -1,4 +1,3 @@
-import React from 'react';
 import {defineJahiaComponent, server, useServerContext} from '@jahia/javascript-modules-library';
 
 export const TestBoundComponent = () => {

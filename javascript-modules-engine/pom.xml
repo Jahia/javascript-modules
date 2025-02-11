@@ -41,6 +41,7 @@
         <frontend-maven-plugin.nodeVersion>v18.12.0</frontend-maven-plugin.nodeVersion>
         <frontend-maven-plugin.yarnVersion>v1.22.19</frontend-maven-plugin.yarnVersion>
         <require-capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version&gt;=17))"</require-capability>
+        <yarn-build>build</yarn-build>
     </properties>
 
     <dependencies>
@@ -224,7 +225,7 @@
                             <goal>yarn</goal>
                         </goals>
                         <configuration>
-                            <arguments>build</arguments>
+                            <arguments>${yarn-build}</arguments>
                         </configuration>
                     </execution>
 
@@ -266,6 +267,12 @@
         </plugins>
     </build>
     <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <yarn-build>build:development</yarn-build>
+            </properties>
+        </profile>
         <profile>
             <id>release-prepare</id>
             <build>

@@ -1,4 +1,4 @@
-import React from 'react';
+import type {JSX} from 'react';
 import {server} from '@jahia/javascript-modules-library-private';
 import {useServerContext} from '../hooks/useServerContext.js';
 
@@ -31,7 +31,7 @@ export function AddResources(props: Readonly<{
     media?: string,
     /** A condition that must be met for the resource to be loaded. This could be used for conditional comments in IE, for example. */
     condition?: string
-}>): React.JSX.Element {
+}>): JSX.Element {
     const {renderContext} = useServerContext();
     return (
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment

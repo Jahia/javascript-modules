@@ -44,7 +44,9 @@ module.exports = (env, mode) => {
                             options: {
                                 presets: [
                                     ['@babel/preset-env', {modules: false, targets: {safari: '7', ie: '10'}}],
-                                    '@babel/preset-react'
+                                    ["@babel/preset-react", {
+                                        "runtime": "automatic"
+                                    }]
                                 ],
                                 plugins: [
                                     'styled-jsx/babel'
@@ -105,7 +107,9 @@ module.exports = (env, mode) => {
                             options: {
                                 presets: [
                                     ['@babel/preset-env', {modules: false, targets: {safari: '7', ie: '10'}}],
-                                    '@babel/preset-react'
+                                    ["@babel/preset-react", {
+                                        "runtime": "automatic"
+                                    }]
                                 ],
                                 plugins: [
                                     'styled-jsx/babel'

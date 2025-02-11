@@ -1,5 +1,4 @@
 import {server} from '@jahia/javascript-modules-library-private';
-import React from 'react';
 import ReactDOMServer from 'react-dom/server.edge';
 import {createStyleRegistry, StyleRegistry} from 'styled-jsx';
 import {ServerContextProvider} from '@jahia/javascript-modules-library';
@@ -30,8 +29,14 @@ export default () => {
             const styleRegistry = createStyleRegistry();
             const currentNode = currentResource.getNode();
             const mainNode = renderContext.getMainResource().getNode();
+            const View = view.component;
             const element =
-                React.createElement(StyleRegistry, {registry: styleRegistry}, React.createElement(ServerContextProvider, {renderContext, currentResource, currentNode, mainNode, bundleKey}, React.createElement(I18nextProvider, {i18n}, React.createElement(view.component, {...props}))));
+                <StyleRegistry registry={styleRegistry}>
+                    <ServerContextProvider renderContext={renderContext} currentResource={currentResource} currentNode={currentNode}  mainNode={mainNode} bundleKey={bundleKey}>
+                        <I18nextProvider i18n={i18n}/>
+                        <View {...props}/>
+                    </ServerContextProvider>
+                </StyleRegistry>
 
             // Some server side components are using dangerouslySetInnerHTML to render their content,
             // we need to clean the output to avoid having unwanted divs in the final output (e.g. <unwanteddiv>content</unwanteddiv>)

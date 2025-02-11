@@ -1,6 +1,6 @@
+import React from 'react';
 import * as javascriptModulesLibrary from '@jahia/javascript-modules-library';
 import javascriptModulesLibraryBuilder from '@jahia/javascript-modules-library-builder';
-import React from 'react';
 import * as ReactI18Next from 'react-i18next';
 import I18next from 'i18next';
 import styledJsx from 'styled-jsx/style';

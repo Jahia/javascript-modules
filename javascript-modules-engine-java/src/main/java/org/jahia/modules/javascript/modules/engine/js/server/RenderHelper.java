@@ -48,6 +48,7 @@ import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLDecoder;
 import java.util.*;
@@ -265,11 +266,12 @@ public class RenderHelper {
      * @throws IOException if the underlying tag throws an IO exception
      */
     public String addResources(Map<String, Object> attr, RenderContext renderContext) throws IllegalAccessException, InvocationTargetException, JspException, IOException {
+        Map<String, Object> ressourcesAttrs = new HashMap<>(attr);
+
         if (attr.containsKey("inlineResource")){
-            attr.put("body", attr.get("inlineResource").toString());
-            attr.remove("inlineResource");
+            ressourcesAttrs.put("body", attr.get("inlineResource").toString());
         }
-        return renderTag(new AddResourcesTag(), attr, renderContext);
+        return renderTag(new AddResourcesTag(), ressourcesAttrs, renderContext);
     }
 
     /**
@@ -358,9 +360,8 @@ public class RenderHelper {
     }
 
     private String renderTag(TagSupport tag, Map<String, Object> attr, RenderContext renderContext) throws IllegalAccessException, InvocationTargetException, JspException, IOException {
-
-        Map<String, Serializable> renderParameters = (Map<String, Serializable>) attr.remove("parameters");
-        if (tag instanceof ParamParent && renderParameters != null && !renderParameters.isEmpty()) {
+        Map<String, Serializable> renderParameters = (Map<String, Serializable>) attr.get("parameters");
+        if (renderParameters != null && !renderParameters.isEmpty() && tag instanceof ParamParent) {
             for (Map.Entry<String, Serializable> tagParam : renderParameters.entrySet()) {
                 // only allow String params due to ParamParent parameters being a <String,String> map
                 if (tagParam.getValue() instanceof String) {
@@ -370,11 +371,11 @@ public class RenderHelper {
         }
 
         String body = null;
-        if (tag instanceof BodyTagSupport && attr.get("body") != null) {
-           body = (String) attr.remove("body");
+        if (tag instanceof BodyTagSupport &&  attr.get("body") != null) {
+           body = (String) attr.get("body");
         }
 
-        BeanUtils.populate(tag, attr);
+        safePopulate(tag, attr);
         MockPageContext pageContext = new MockPageContext(renderContext);
         tag.setPageContext(pageContext);
         tag.doStartTag();
@@ -410,6 +411,18 @@ public class RenderHelper {
             }
         }
         return ProxyObject.fromMap(mapToProxy);
+    }
+
+
+    // Utiiity method to populate a tag with attributes ignoring any missing attributes.
+    private void safePopulate(Object tag, Map<String, Object> attr) {
+        for (Map.Entry<String, Object> entry : attr.entrySet()) {
+            try {
+                BeanUtils.setProperty(tag, entry.getKey(), entry.getValue());
+            } catch (Throwable  e) {
+                // Ignore any errors
+            }
+        }
     }
 
     @Inject

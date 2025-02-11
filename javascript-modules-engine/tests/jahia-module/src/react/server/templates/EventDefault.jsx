@@ -1,4 +1,3 @@
-import React from 'react';
 import {AddResources, Area, defineJahiaComponent, Render, useServerContext} from '@jahia/javascript-modules-library';
 import {footer, header, login, navMenu} from "./pageComponents";
 

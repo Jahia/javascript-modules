@@ -1,4 +1,4 @@
-import React from 'react';
+import type {JSX} from 'react';
 import {server} from '@jahia/javascript-modules-library-private';
 import {useServerContext} from '../hooks/useServerContext.js';
 
@@ -19,7 +19,7 @@ export function AddContentButtons({nodeTypes = '', childName = '*', editCheck = 
      * @default false
      */
     editCheck?: boolean;
-}>): React.JSX.Element {
+}>): JSX.Element {
     const {renderContext, currentResource} = useServerContext();
     return (
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment

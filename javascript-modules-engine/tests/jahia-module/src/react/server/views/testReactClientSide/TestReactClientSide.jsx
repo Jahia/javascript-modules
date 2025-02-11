@@ -1,4 +1,3 @@
-import React from 'react';
 import {defineJahiaComponent, HydrateInBrowser, RenderInBrowser, useServerContext} from '@jahia/javascript-modules-library';
 import SampleHydrateInBrowserReact from "../../../../client/SampleHydrateInBrowserReact";
 import SampleRenderInBrowserReact from "../../../../client/SampleRenderInBrowserReact";

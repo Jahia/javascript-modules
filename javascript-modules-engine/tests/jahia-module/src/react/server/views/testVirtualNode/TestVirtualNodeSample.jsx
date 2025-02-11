@@ -1,4 +1,3 @@
-import React from 'react';
 import {defineJahiaComponent, getNodeProps, useServerContext} from '@jahia/javascript-modules-library';
 
 export const TestVirtualNodeSample = () => {
