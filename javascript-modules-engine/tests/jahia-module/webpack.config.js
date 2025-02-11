@@ -166,7 +166,7 @@ module.exports = (env, mode) => {
                 new WebpackShellPluginNext({
                     onAfterDone: {
                         scripts: [
-                            'yarn jahia-pack',
+                            'yarn run pack',
                             'yarn jahia-deploy',
                             process.platform === 'win32' ? 'timeout ' + sleepTime : 'sleep ' + sleepTime,
                         ],
