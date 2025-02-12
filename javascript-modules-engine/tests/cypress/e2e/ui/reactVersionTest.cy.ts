@@ -1,8 +1,8 @@
 import {addNode, deleteNode, publishAndWaitJobEnding} from '@jahia/cypress';
 import {addSimplePage} from '../../utils/Utils';
 
-describe('Test on url helper', () => {
-    before('Create test page and contents', () => {
+describe('Test React version', () => {
+    before('Create test data', () => {
         addSimplePage('/sites/npmTestSite/home', 'testReactVersion', 'testReactVersion', 'en', 'simple', [
             {
                 name: 'pagecontent',
@@ -19,7 +19,7 @@ describe('Test on url helper', () => {
         publishAndWaitJobEnding('/sites/npmTestSite');
     });
 
-    after('Clean', () => {
+    after('Cleanup test data', () => {
         deleteNode('/sites/npmTestSite/home/testReactVersion');
         publishAndWaitJobEnding('/sites/npmTestSite');
     });
