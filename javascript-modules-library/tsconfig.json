@@ -35,14 +35,4 @@
         "**/*.spec.ts",
         "**/*.spec.tsx"
     ],
-    "typedocOptions": {
-        "name" : "Jahia v8.2.0.0 / javascript-modules-library",
-        "entryPoints": [
-            "src/index.js",
-            "target/types/**/*.d.ts"
-        ],
-        "out": "dist/docs",
-        "includeVersion" : true,
-        "readme": "typedoc-readme.md"
-    }
 }
