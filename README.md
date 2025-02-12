@@ -9,7 +9,7 @@ This project is designed to support Javascript developers working with _Jahia_. 
 - [javascript-modules-library](javascript-modules-library/): a NPM package that provides TypeScript typings (.d.ts files) for the backend methods exposed by the Java OSGi bundle, along with some utility/helper code.
 By using this project, you can seamlessly integrate and manage Javascript modules within a _Jahia_ environment.
 
-Under the hood, this project used [GraalJS](https://www.graalvm.org/latest/reference-manual/js/) (to run Javascript in a Java application) and includes a React (18.2.x) environment.
+Under the hood, this project used [GraalJS](https://www.graalvm.org/latest/reference-manual/js/) (to run Javascript in a Java application) and includes a React (19.x) environment.
 
 
 ## Build

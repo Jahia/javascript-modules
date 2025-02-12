@@ -1,6 +1,6 @@
 import {server} from '@jahia/javascript-modules-library-private';
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
+import ReactDOMServer from 'react-dom/server.edge';
 import {createStyleRegistry, StyleRegistry} from 'styled-jsx';
 import {ServerContextProvider} from '@jahia/javascript-modules-library';
 import i18n from 'i18next';
