@@ -22,6 +22,7 @@ export * from './testIsNodeType/TestIsNodeType';
 export * from './testJCRQuery/TestJCRQuery';
 export * from './testLocale/TestLocale';
 export * from './testReactClientSide/TestReactClientSide';
+export * from './testReactVersion/TestReactVersion';
 export * from './testReactViewRegistration/TestReactViewRegistration';
 export * from './testRender';
 export * from './testRule/TestRule';
