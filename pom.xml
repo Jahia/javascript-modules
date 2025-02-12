@@ -110,7 +110,7 @@
                         <artifactId>maven-scm-plugin</artifactId>
                         <configuration>
                             <includes>
-                                javascript-modules-engine/yarn.lock,javascript-modules-engine/tests/jahia-module/yarn.lock
+                                javascript-modules-engine/yarn.lock,jahia-test-module/yarn.lock
                             </includes>
                             <message>[skip ci] [maven-release-plugin] Update yarn.lock files for version
                                 ${project.version}

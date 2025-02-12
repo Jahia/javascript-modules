@@ -1,0 +1,14 @@
+{
+  "name": "javascript-modules-monorepo",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "javascript-modules-engine",
+    "jahia-test-module",
+    "javascript-modules-library"
+  ],
+  "scripts": {
+    "lint": "echo 'Coming in a follow-up PR'"
+  },
+  "packageManager": "yarn@4.6.0"
+}

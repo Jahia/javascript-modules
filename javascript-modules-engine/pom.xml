@@ -233,7 +233,7 @@
 
                     <!-- hack: until we find a cleaner solution, run a 'yarn install' on the jahia-module project (used for testing) as part of Maven build -->
                     <!-- this forces the checksum in the yarn.lock file to be recomputed when the version of javascript-modules-library changes -->
-                    <execution>
+                    <!-- <execution>
                         <id>npm install node and yarn for tests jahia-module</id>
                         <phase>initialize</phase>
                         <goals>
@@ -244,8 +244,8 @@
                             <nodeVersion>${frontend-maven-plugin.nodeVersion}</nodeVersion>
                             <yarnVersion>${frontend-maven-plugin.yarnVersion}</yarnVersion>
                         </configuration>
-                    </execution>
-                    <execution>
+                    </execution> -->
+                    <!-- <execution>
                         <id>yarn install for tests jahia-module</id>
                         <phase>initialize</phase>
                         <goals>
@@ -254,7 +254,7 @@
                         <configuration>
                             <workingDirectory>tests/jahia-module</workingDirectory>
                         </configuration>
-                    </execution>
+                    </execution> -->
                 </executions>
             </plugin>
 
