@@ -1,7 +1,0 @@
-node
-node_modules
-webpack.config.js
-dist
-generate-index.js
-minify.js
-types/generated
