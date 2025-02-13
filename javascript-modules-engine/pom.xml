@@ -41,7 +41,9 @@
         <frontend-maven-plugin.nodeVersion>v18.12.0</frontend-maven-plugin.nodeVersion>
         <frontend-maven-plugin.yarnVersion>v1.22.19</frontend-maven-plugin.yarnVersion>
         <require-capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version&gt;=17))"</require-capability>
-        <yarn-build>build</yarn-build>
+        <!--  Since React 19 and new JSX transformation, in production, all other jsmodules should be production  -->
+        <!--  To get a full compatibility, we use dev mode by default  -->
+        <yarn-build>build:development</yarn-build>
     </properties>
 
     <dependencies>

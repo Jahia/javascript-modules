@@ -414,7 +414,7 @@ public class RenderHelper {
     }
 
 
-    // Utiiity method to populate a tag with attributes ignoring any missing attributes.
+    // Utility method to populate a tag with attributes ignoring any missing attributes.
     private void safePopulate(Object tag, Map<String, Object> attr) {
         for (Map.Entry<String, Object> entry : attr.entrySet()) {
             try {

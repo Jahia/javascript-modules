@@ -5,8 +5,8 @@
   "license": "MIT",
   "author": "Jahia Solutions Group SA",
   "scripts": {
-    "build:development": "webpack --mode=development && run pack",
-    "build": "webpack --mode=production && run pack",
+    "build": "webpack --mode=development && run pack",
+    "build:production": "webpack --mode=production && run pack",
     "pack": "mkdir -p dist/build && cd dist/build && yarn pack --out package.tgz && mv package.tgz ..",
     "deploy": "jahia-deploy",
     "watch": "webpack --mode=development --watch",
