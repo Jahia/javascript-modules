@@ -24,7 +24,7 @@ jobs:
       - name: Add safe directory
         shell: bash
         run: |
-          git config --global --add safe.directory $GITHUB_WORKSPACE    
+          git config --global --add safe.directory $GITHUB_WORKSPACE
       # Providing the SSH PRIVATE of a user part of an admin group
       # is necessary to bypass PR checks
       - uses: actions/checkout@v4
@@ -47,10 +47,9 @@ jobs:
           github_api_token: ${{ secrets.GH_API_TOKEN }}
           nexus_username: ${{ secrets.NEXUS_USERNAME }}
           nexus_password: ${{ secrets.NEXUS_PASSWORD }}
-          mvn_settings_filepath: '.github/maven.settings.xml'
+          mvn_settings_filepath: ".github/maven.settings.xml"
           slack-webhook-qa: ${{ secrets.SLACK_WEBHOOK_URL_RC_FOR_QA }}
           npmjs_publish_token: ${{ secrets.NPMJS_PUBLISH_TOKEN }}
-
 
       - uses: jahia/jahia-modules-action/update-signature@v2
         with:

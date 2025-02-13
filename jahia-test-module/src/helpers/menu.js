@@ -1,4 +1,4 @@
-import {buildUrl} from '@jahia/javascript-modules-library';
+import { buildUrl } from "@jahia/javascript-modules-library";
 
 /**
  * @typedef {Object} NavigationItem
@@ -7,18 +7,17 @@ import {buildUrl} from '@jahia/javascript-modules-library';
  * @property {NavigationItem[]} children
  */
 export const buildNode = (origNode, session, renderContext, currentResource) => {
-    let node = session.getNode(origNode.getPath());
+  let node = session.getNode(origNode.getPath());
 
-    /** @type {NavigationItem} */
-    let navigationItem = {
-        displayName: node.getI18N(currentResource.getLocale()).getProperty('jcr:title').getString(),
-        url: buildUrl({path: node.getPath()}, renderContext, currentResource),
-        children: node.getNodes().getSize() ?
-            Array.from(node.getNodes())
-                .filter(child => child.isNodeType('jnt:page'))
-                .map(child => buildNode(child, session, renderContext, currentResource)) :
-            null
-    };
-    return navigationItem;
+  /** @type {NavigationItem} */
+  let navigationItem = {
+    displayName: node.getI18N(currentResource.getLocale()).getProperty("jcr:title").getString(),
+    url: buildUrl({ path: node.getPath() }, renderContext, currentResource),
+    children: node.getNodes().getSize()
+      ? Array.from(node.getNodes())
+          .filter((child) => child.isNodeType("jnt:page"))
+          .map((child) => buildNode(child, session, renderContext, currentResource))
+      : null,
+  };
+  return navigationItem;
 };
-

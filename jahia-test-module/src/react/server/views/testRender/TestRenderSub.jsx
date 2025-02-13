@@ -1,18 +1,18 @@
-import {useServerContext, defineJahiaComponent} from '@jahia/javascript-modules-library';
+import { useServerContext, defineJahiaComponent } from "@jahia/javascript-modules-library";
 
 export const TestRenderSub = () => {
-    const {currentResource} = useServerContext();
-    return (
-        <div>
-            Sub view {currentResource.getNode().getName()} <br/>
-            prop1={currentResource.getNode().getPropertyAsString('prop1')}
-        </div>
-    )
-}
+  const { currentResource } = useServerContext();
+  return (
+    <div>
+      Sub view {currentResource.getNode().getName()} <br />
+      prop1={currentResource.getNode().getPropertyAsString("prop1")}
+    </div>
+  );
+};
 
 TestRenderSub.jahiaComponent = defineJahiaComponent({
-    nodeType: 'npmExample:testRender',
-    name: 'sub',
-    displayName: 'test Render (sub react)',
-    componentType: 'view'
+  nodeType: "npmExample:testRender",
+  name: "sub",
+  displayName: "test Render (sub react)",
+  componentType: "view",
 });

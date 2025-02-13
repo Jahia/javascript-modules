@@ -1,8 +1,8 @@
 {
-  "name": "jahia-module",
-  "private": true,
-  "scripts": {
-    "build": "cd $PROJECT_CWD/../../jahia-test-module && yarn install && yarn build && cp dist/package.tgz $INIT_CWD/package.tgz",
-    "jahia-pack": "echo 'This step is handled by /jahia-test-module'"
-  }
+    "name": "jahia-module",
+    "private": true,
+    "scripts": {
+        "build": "cd $PROJECT_CWD/../../jahia-test-module && yarn install && yarn build && cp dist/package.tgz $INIT_CWD/package.tgz",
+        "jahia-pack": "echo 'This step is handled by /jahia-test-module'"
+    }
 }

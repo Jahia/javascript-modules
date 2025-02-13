@@ -1,4 +1,4 @@
-"use strict";
+'use strict'
 /**
  * @module JSON
  */
@@ -6,19 +6,19 @@
  * Module dependencies.
  */
 
-var Base = require("./base");
-var fs = require("fs");
-var EVENT_TEST_PASS = "pass";
-var EVENT_TEST_FAIL = "fail";
-var EVENT_TEST_END = "test end";
-var EVENT_RUN_END = "end";
-var EVENT_TEST_PENDING = "pending";
+var Base = require('./base')
+var fs = require('fs')
+var EVENT_TEST_PASS = 'pass'
+var EVENT_TEST_FAIL = 'fail'
+var EVENT_TEST_END = 'test end'
+var EVENT_RUN_END = 'end'
+var EVENT_TEST_PENDING = 'pending'
 
 /**
  * Expose `JSON`.
  */
 
-exports = module.exports = JSONReporter;
+exports = module.exports = JSONReporter
 
 /**
  * Constructs a new `JSON` reporter instance.
@@ -31,29 +31,29 @@ exports = module.exports = JSONReporter;
  * @param {Object} [options] - runner options
  */
 function JSONReporter(runner, options) {
-    Base.call(this, runner, options);
+    Base.call(this, runner, options)
 
-    var self = this;
-    var tests = [];
-    var pending = [];
-    var failures = [];
-    var passes = [];
+    var self = this
+    var tests = []
+    var pending = []
+    var failures = []
+    var passes = []
 
     runner.on(EVENT_TEST_END, function (test) {
-        tests.push(test);
-    });
+        tests.push(test)
+    })
 
     runner.on(EVENT_TEST_PASS, function (test) {
-        passes.push(test);
-    });
+        passes.push(test)
+    })
 
     runner.on(EVENT_TEST_FAIL, function (test) {
-        failures.push(test);
-    });
+        failures.push(test)
+    })
 
     runner.on(EVENT_TEST_PENDING, function (test) {
-        pending.push(test);
-    });
+        pending.push(test)
+    })
 
     runner.once(EVENT_RUN_END, function () {
         var obj = {
@@ -62,38 +62,31 @@ function JSONReporter(runner, options) {
             pending: pending.map(clean),
             failures: failures.map(clean),
             passes: passes.map(clean),
-        };
+        }
 
-        runner.testResults = obj;
+        runner.testResults = obj
         var fileName
         if (tests.length !== 0) {
-            fileName = tests[0].parent.parent.file.split("/").pop();
+            fileName = tests[0].parent.parent.file.split('/').pop()
         } else if (failures.length !== 0) {
-            fileName = failures[0].parent.parent.file.split("/").pop();
+            fileName = failures[0].parent.parent.file.split('/').pop()
         } else {
-            console.log("Failed to write to report");
-            return;
+            console.log('Failed to write to report')
+            return
         }
         var reportsPath = options.reporterOptions.reportsPath
-        if (!fs.existsSync(reportsPath)){
-            fs.mkdirSync(reportsPath);
+        if (!fs.existsSync(reportsPath)) {
+            fs.mkdirSync(reportsPath)
         }
-        fs.writeFile(
-            reportsPath + fileName + ".json",
-            JSON.stringify(obj, null, 2),
-            "utf8",
-            function (err) {
-                if (err) {
-                    console.log(
-                        "An error occured while writing JSON Object to File."
-                    );
-                    return console.log(err);
-                }
-
-                console.log(reportsPath + fileName + ".json" + " file has been saved.");
+        fs.writeFile(reportsPath + fileName + '.json', JSON.stringify(obj, null, 2), 'utf8', function (err) {
+            if (err) {
+                console.log('An error occured while writing JSON Object to File.')
+                return console.log(err)
             }
-        );
-    });
+
+            console.log(reportsPath + fileName + '.json' + ' file has been saved.')
+        })
+    })
 }
 
 /**
@@ -105,9 +98,9 @@ function JSONReporter(runner, options) {
  * @return {Object}
  */
 function clean(test) {
-    var err = test.err || {};
+    var err = test.err || {}
     if (err instanceof Error) {
-        err = errorJSON(err);
+        err = errorJSON(err)
     }
 
     return {
@@ -119,7 +112,7 @@ function clean(test) {
         duration: test.duration,
         currentRetry: test.currentRetry(),
         err: cleanCycles(err),
-    };
+    }
 }
 
 /**
@@ -130,21 +123,21 @@ function clean(test) {
  * @return {Object}
  */
 function cleanCycles(obj) {
-    var cache = [];
+    var cache = []
     return JSON.parse(
         JSON.stringify(obj, function (key, value) {
-            if (typeof value === "object" && value !== null) {
+            if (typeof value === 'object' && value !== null) {
                 if (cache.indexOf(value) !== -1) {
                     // Instead of going in a circle, we'll print [object Object]
-                    return String(value);
+                    return String(value)
                 }
 
-                cache.push(value);
+                cache.push(value)
             }
 
-            return value;
-        })
-    );
+            return value
+        }),
+    )
 }
 
 /**
@@ -155,11 +148,11 @@ function cleanCycles(obj) {
  * @return {Object}
  */
 function errorJSON(err) {
-    var res = {};
+    var res = {}
     Object.getOwnPropertyNames(err).forEach(function (key) {
-        res[key] = err[key];
-    }, err);
-    return res;
+        res[key] = err[key]
+    }, err)
+    return res
 }
 
-JSONReporter.description = "single JSON object";
+JSONReporter.description = 'single JSON object'

@@ -1,2 +1,2 @@
-export * from './templates';
-export * from './views';
+export * from "./templates";
+export * from "./views";

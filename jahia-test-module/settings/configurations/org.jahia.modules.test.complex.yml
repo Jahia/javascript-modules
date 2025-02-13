@@ -37,10 +37,11 @@ spec:
       initContainers:
         - name: init-my-db
           image: busybox
-          command: [ 'sh', '-c', 'until nslookup my-db; do echo waiting for my-db; sleep 2; done;' ]
+          command: ["sh", "-c", "until nslookup my-db; do echo waiting for my-db; sleep 2; done;"]
         - name: init-my-config
           image: busybox
-          command: [ 'sh', '-c', 'until nslookup my-config; do echo waiting for my-config; sleep 2; done;' ]
+          command:
+            ["sh", "-c", "until nslookup my-config; do echo waiting for my-config; sleep 2; done;"]
       volumes:
         - name: config-volume
           configMap:

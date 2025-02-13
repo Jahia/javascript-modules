@@ -8,42 +8,42 @@ import eslintReact from "@eslint-react/eslint-plugin";
 import pluginCypress from "eslint-plugin-cypress/flat";
 
 export default tseslint.config(
-	{
-		languageOptions: {
-			globals: {
-				...globals.browser,
-				...globals.node,
-				// Webpack-specific globals
-				__webpack_public_path__: "writable",
-				__webpack_init_sharing__: "readonly",
-				__webpack_share_scopes__: "readonly",
-			},
-		},
-	},
+  {
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        // Webpack-specific globals
+        __webpack_public_path__: "writable",
+        __webpack_init_sharing__: "readonly",
+        __webpack_share_scopes__: "readonly",
+      },
+    },
+  },
 
-	// JS/TS recommended
-	eslint.configs.recommended,
-	{ files: ["**/*.ts", "**/*.tsx"], extends: tseslint.configs.recommended },
+  // JS/TS recommended
+  eslint.configs.recommended,
+  { files: ["**/*.ts", "**/*.tsx"], extends: tseslint.configs.recommended },
 
-	// React
-	eslintReact.configs["recommended-typescript"],
-	{
-		rules: {
-			// We know what we're doing
-			"@eslint-react/dom/no-dangerously-set-innerhtml": "off",
-		},
-	},
+  // React
+  eslintReact.configs["recommended-typescript"],
+  {
+    rules: {
+      // We know what we're doing
+      "@eslint-react/dom/no-dangerously-set-innerhtml": "off",
+    },
+  },
 
-	// Cypress
-	pluginCypress.configs.recommended,
-	{
-		files: ["**/*.cy.ts"],
-		rules: {
-			// Stop reporting `expect().to.exist`
-			"@typescript-eslint/no-unused-expressions": "off",
-		},
-	},
+  // Cypress
+  pluginCypress.configs.recommended,
+  {
+    files: ["**/*.cy.ts"],
+    rules: {
+      // Stop reporting `expect().to.exist`
+      "@typescript-eslint/no-unused-expressions": "off",
+    },
+  },
 
-	// Ignore the same files as .gitignore
-	includeIgnoreFile(path.resolve(import.meta.dirname, ".gitignore")),
+  // Ignore the same files as .gitignore
+  includeIgnoreFile(path.resolve(import.meta.dirname, ".gitignore")),
 );

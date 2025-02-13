@@ -7,15 +7,13 @@ __webpack_init_sharing__("default");
 
 console.log("javascript-modules-engine AppShell: Initializing remotes ..");
 Promise.all([
-	...Object.values(window.appShell || {}).map((container) =>
-		container.init(__webpack_share_scopes__.default),
-	),
+  ...Object.values(window.appShell || {}).map((container) =>
+    container.init(__webpack_share_scopes__.default),
+  ),
 ]).then(() => {
-	console.log(
-		"javascript-modules-engine AppShell: Bootstrapping application ..",
-	);
+  console.log("javascript-modules-engine AppShell: Bootstrapping application ..");
 
-	import("./bootstrap").then(() => {
-		console.log("javascript-modules-engine AppShell: Application started");
-	});
+  import("./bootstrap").then(() => {
+    console.log("javascript-modules-engine AppShell: Application started");
+  });
 });
