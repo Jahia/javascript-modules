@@ -1,4 +1,3 @@
-import React from 'react';
 import {AddContentButtons, defineJahiaComponent, getChildNodes, useServerContext} from '@jahia/javascript-modules-library';
 
 const PrintChildren = ({children, title, testid}) => {

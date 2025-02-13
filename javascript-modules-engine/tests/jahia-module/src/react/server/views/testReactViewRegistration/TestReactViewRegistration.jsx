@@ -1,4 +1,3 @@
-import React from 'react';
 import {server, defineJahiaComponent} from '@jahia/javascript-modules-library';
 
 export const TestReactViewRegistration = () => {

@@ -1,7 +1,7 @@
 import type Lib from '@jahia/javascript-modules-library-private';
-import React, {type ReactNode, useContext} from 'react';
+import {createContext, type ReactNode, useContext} from 'react';
 
-const ServerContext = React.createContext<Lib.ServerContext>({} as never);
+const ServerContext = createContext<Lib.ServerContext>({} as never);
 
 /**
  * Returns the current server context

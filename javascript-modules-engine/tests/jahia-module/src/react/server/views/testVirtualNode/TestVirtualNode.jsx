@@ -1,4 +1,3 @@
-import React from 'react';
 import {defineJahiaComponent, Render, useServerContext} from '@jahia/javascript-modules-library';
 
 

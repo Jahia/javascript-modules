@@ -1,4 +1,3 @@
-import React from 'react';
 import {defineJahiaComponent, server} from '@jahia/javascript-modules-library';
 
 export const TestConfig = () => {

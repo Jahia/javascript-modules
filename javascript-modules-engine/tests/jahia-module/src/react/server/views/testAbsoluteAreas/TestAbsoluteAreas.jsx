@@ -1,4 +1,3 @@
-import React from 'react';
 import {AbsoluteArea, defineJahiaComponent} from '@jahia/javascript-modules-library';
 
 export const TestAbsoluteAreas = () => {

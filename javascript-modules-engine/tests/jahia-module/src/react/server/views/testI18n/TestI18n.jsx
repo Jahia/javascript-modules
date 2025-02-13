@@ -1,4 +1,3 @@
-import React from 'react';
 import SampleI18n from "../../../../client/SampleI18n";
 import {defineJahiaComponent, HydrateInBrowser, RenderInBrowser} from "@jahia/javascript-modules-library";
 

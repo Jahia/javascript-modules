@@ -1,4 +1,3 @@
-import React from 'react';
 import {getChildNodes, getNodeProps, Render, useServerContext, defineJahiaComponent} from '@jahia/javascript-modules-library';
 
 export const TestRenderEditable = () => {

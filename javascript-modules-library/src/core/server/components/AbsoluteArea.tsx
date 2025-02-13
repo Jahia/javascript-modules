@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import {useServerContext} from '../hooks/useServerContext.js';
 import {server} from '@jahia/javascript-modules-library-private';
 

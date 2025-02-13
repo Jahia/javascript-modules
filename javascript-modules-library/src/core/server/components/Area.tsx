@@ -1,4 +1,4 @@
-import React from 'react';
+import type {JSX} from 'react';
 import {useServerContext} from '../hooks/useServerContext.js';
 import {server} from '@jahia/javascript-modules-library-private';
 
@@ -33,7 +33,7 @@ export function Area({name, areaView, allowedTypes, numberOfItems, subNodesView,
     areaType?: string,
     /** The parameters to pass to the area */
     parameters?: Record<string, unknown>
-}>): React.JSX.Element {
+}>): JSX.Element {
     const {renderContext} = useServerContext();
     return (
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment

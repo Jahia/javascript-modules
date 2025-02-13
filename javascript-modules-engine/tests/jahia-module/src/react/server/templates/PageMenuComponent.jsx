@@ -1,4 +1,3 @@
-import React from 'react';
 import {defineJahiaComponent, useServerContext} from '@jahia/javascript-modules-library';
 
 export const PageMenuComponent = () => {
