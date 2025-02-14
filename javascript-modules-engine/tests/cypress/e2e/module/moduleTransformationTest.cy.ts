@@ -6,7 +6,7 @@ describe('Check that the Javascript module has been transformed properly and has
         }).then((result) => {
             console.log(result)
             expect(result).to.contain('Bundle-Category: jahia-javascript-module')
-            expect(result).to.contain('Bundle-Description: Jahia javascript module Test')
+            expect(result).to.contain('Bundle-Description: Javascript module test')
             expect(result).to.contain('Jahia-GroupId: org.example.modules.javascript')
             expect(result).to.contain('Bundle-License: MIT')
             expect(result).to.contain('Bundle-Name: @jahia/javascript-module-example (javascript module)')
