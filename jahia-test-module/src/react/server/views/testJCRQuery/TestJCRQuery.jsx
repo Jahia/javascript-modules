@@ -59,7 +59,7 @@ export const TestJCRQuery = () => {
 };
 
 TestJCRQuery.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testJCRQuery",
+  nodeType: "javascriptExample:testJCRQuery",
   displayName: "Test JCR query",
   componentType: "view",
 });

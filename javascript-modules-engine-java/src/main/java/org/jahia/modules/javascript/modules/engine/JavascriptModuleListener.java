@@ -31,14 +31,14 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
-import static org.jahia.modules.javascript.modules.engine.npmhandler.NpmProtocolConnection.BUNDLE_HEADER_NPM_INIT_SCRIPT;
+import static org.jahia.modules.javascript.modules.engine.jshandler.JavascriptProtocolConnection.BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT;
 
 /**
  * Listener to execute scripts at activate/deactivate time
  */
 @Component(immediate = true)
-public class NpmModuleListener implements BundleListener {
-    private static final Logger logger = LoggerFactory.getLogger(NpmModuleListener.class);
+public class JavascriptModuleListener implements BundleListener {
+    private static final Logger logger = LoggerFactory.getLogger(JavascriptModuleListener.class);
     private GraalVMEngine engine;
     private final Queue<Registrar> registrars = new ConcurrentLinkedQueue<>();
 
@@ -49,7 +49,7 @@ public class NpmModuleListener implements BundleListener {
 
     @Reference(service = Registrar.class, policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MULTIPLE, policyOption = ReferencePolicyOption.GREEDY)
     public void addRegistrar(Registrar registrar) {
-        for (Bundle bundle : getNPMModules()) {
+        for (Bundle bundle : getJavascriptModules()) {
             registrar.register(bundle);
         }
 
@@ -59,15 +59,15 @@ public class NpmModuleListener implements BundleListener {
     public void removeRegistrar(Registrar registrar) {
         registrars.remove(registrar);
 
-        for (Bundle bundle : getNPMModules()) {
+        for (Bundle bundle : getJavascriptModules()) {
             registrar.unregister(bundle);
         }
     }
 
     @Activate
     public void activate(BundleContext context) {
-        for (Bundle bundle : getNPMModules()) {
-            engine.enableNpmModule(bundle);
+        for (Bundle bundle : getJavascriptModules()) {
+            engine.enableJavascriptModule(bundle);
         }
 
         context.addBundleListener(this);
@@ -77,8 +77,8 @@ public class NpmModuleListener implements BundleListener {
     public void deactivate(BundleContext context) {
         context.removeBundleListener(this);
 
-        for (Bundle bundle : getNPMModules()) {
-            engine.disableNpmModule(bundle);
+        for (Bundle bundle : getJavascriptModules()) {
+            engine.disableJavascriptModule(bundle);
         }
     }
 
@@ -86,9 +86,9 @@ public class NpmModuleListener implements BundleListener {
     public void bundleChanged(BundleEvent event) {
         try {
             Bundle bundle = event.getBundle();
-            if (isNPMModule(bundle)) {
+            if (isJavascriptModule(bundle)) {
                 if (event.getType() == BundleEvent.STARTED) {
-                    engine.enableNpmModule(bundle);
+                    engine.enableJavascriptModule(bundle);
                     for (Registrar registrar : registrars) {
                         registrar.register(bundle);
                     }
@@ -96,7 +96,7 @@ public class NpmModuleListener implements BundleListener {
                     for (Registrar registrar : registrars) {
                         registrar.unregister(bundle);
                     }
-                    engine.disableNpmModule(bundle);
+                    engine.disableJavascriptModule(bundle);
                 }
             }
         } catch (Exception e) {
@@ -104,14 +104,14 @@ public class NpmModuleListener implements BundleListener {
         }
     }
 
-    public List<Bundle> getNPMModules() {
+    public List<Bundle> getJavascriptModules() {
         return Arrays.stream(engine.getBundleContext().getBundles())
-                .filter(bundle -> bundle.getState() == Bundle.ACTIVE && isNPMModule(bundle))
+                .filter(bundle -> bundle.getState() == Bundle.ACTIVE && isJavascriptModule(bundle))
                 .collect(Collectors.toList());
     }
 
-    public boolean isNPMModule(Bundle bundle) {
+    public boolean isJavascriptModule(Bundle bundle) {
         return bundle.getBundleId() != engine.getBundleContext().getBundle().getBundleId() &&
-                bundle.getHeaders().get(BUNDLE_HEADER_NPM_INIT_SCRIPT) != null;
+                bundle.getHeaders().get(BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT) != null;
     }
 }

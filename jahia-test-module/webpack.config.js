@@ -15,7 +15,7 @@ fs.readdirSync(componentsDir).forEach((file) => {
     exposes[componentName] = path.resolve(componentsDir, file);
   }
 });
-const moduleName = "jahia-npm-module-example";
+const moduleName = "jahia-javascript-module-example";
 
 module.exports = (env, mode) => {
   let configs = [
@@ -25,7 +25,7 @@ module.exports = (env, mode) => {
     {
       name: "client",
       entry: {
-        "jahia-npm-module-example": path.resolve(__dirname, "./src/client/index"),
+        "jahia-javascript-module-example": path.resolve(__dirname, "./src/client/index"),
       },
       output: {
         path: path.resolve(__dirname, "javascript/client"),

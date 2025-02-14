@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jahia.modules.javascript.modules.engine.npmhandler;
+package org.jahia.modules.javascript.modules.engine.jshandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
@@ -34,23 +34,24 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 
 /**
- * Npm protocol handler
- * Transform npm pack into bundle
+ * javascript protocol handler
+ * Transform javascript module into bundle
  */
-public class NpmProtocolConnection extends URLConnection {
-    public static final String BUNDLE_HEADER_NPM_INIT_SCRIPT = "Jahia-NPM-InitScript";
+public class JavascriptProtocolConnection extends URLConnection {
+    public static final String BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT = "Jahia-javascript-InitScript";
+    public static final String JAVASCRIPT_MODULE_PROTOCOL = "js";
 
-    private static final Logger logger = LoggerFactory.getLogger(NpmProtocolConnection.class);
+    private static final Logger logger = LoggerFactory.getLogger(JavascriptProtocolConnection.class);
 
     private final URL wrappedUrl;
 
-    public NpmProtocolConnection(URL url) throws MalformedURLException {
+    public JavascriptProtocolConnection(URL url) throws MalformedURLException {
         super(url);
         String urlStr = this.url.toString();
-        if (urlStr.startsWith("npm://")) {
-            wrappedUrl = new URL(urlStr.substring("npm://".length()));
+        if (urlStr.startsWith(JAVASCRIPT_MODULE_PROTOCOL + "://")) {
+            wrappedUrl = new URL(urlStr.substring((JAVASCRIPT_MODULE_PROTOCOL + "://").length()));
         } else {
-            wrappedUrl = new URL(urlStr.substring("npm:".length()));
+            wrappedUrl = new URL(urlStr.substring((JAVASCRIPT_MODULE_PROTOCOL + ":").length()));
         }
     }
 
@@ -63,8 +64,8 @@ public class NpmProtocolConnection extends URLConnection {
     public InputStream getInputStream() throws IOException {
         connect();
 
-        logger.info("Handling JS module using npm protocol wrapper for package: {}", wrappedUrl);
-        File outputDir = Files.createTempDirectory("npm.").toFile();
+        logger.info("Handling JS module using javascript protocol wrapper for package: {}", wrappedUrl);
+        File outputDir = Files.createTempDirectory("javascript.").toFile();
         TarUtils.unTar(new GZIPInputStream(wrappedUrl.openStream()), outputDir);
         Properties instructions = new Properties();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -187,7 +188,7 @@ public class NpmProtocolConnection extends URLConnection {
         Properties instructions = new Properties();
 
         // First let's setup Bundle headers
-        instructions.put("Bundle-Category", jahiaProps.getOrDefault("category", "jahia-npm-module"));
+        instructions.put("Bundle-Category", jahiaProps.getOrDefault("category", "jahia-javascript-module"));
         setIfPresent(properties, "description", instructions, "Bundle-Description");
         String name = (String) properties.get("name");
         instructions.put("Bundle-Name", name + " (javascript module)");
@@ -209,7 +210,7 @@ public class NpmProtocolConnection extends URLConnection {
         instructions.put("Jahia-Module-Type", jahiaProps.getOrDefault("module-type", "module"));
         setIfPresent(jahiaProps, "private-app-store", instructions, "Jahia-Private-App-Store");
         instructions.put("Jahia-Required-Version", jahiaProps.getOrDefault("required-version", "8.2.0.0"));
-        setIfPresent(jahiaProps, "server", instructions, BUNDLE_HEADER_NPM_INIT_SCRIPT);
+        setIfPresent(jahiaProps, "server", instructions, BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT);
         // always include "/static" as folder for the static resources
         instructions.put("Jahia-Static-Resources", StringUtils.defaultIfEmpty((String) jahiaProps.get("static-resources"), "/css,/icons,/images,/img,/javascript") + ",/static");
         instructions.put("-removeheaders", "Private-Package, Export-Package");

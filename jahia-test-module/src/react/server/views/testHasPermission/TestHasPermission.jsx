@@ -6,7 +6,7 @@ export const testHasPermission = () => {
     <>
       <h3>Node has permission</h3>
       <div data-testid="currentNode_hasPermission">
-        {currentNode.hasPermission("component-npmExampleMix_npmExampleComponent")
+        {currentNode.hasPermission("component-javascriptExampleMix_javascriptExampleComponent")
           ? "true"
           : "false"}
       </div>
@@ -19,7 +19,7 @@ export const testHasPermission = () => {
 };
 
 testHasPermission.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testHasPermission",
+  nodeType: "javascriptExample:testHasPermission",
   name: "default",
   displayName: "test has permission",
   componentType: "view",

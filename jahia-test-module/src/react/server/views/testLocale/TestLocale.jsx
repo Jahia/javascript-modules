@@ -50,7 +50,7 @@ export const TestLocale = () => {
 };
 
 TestLocale.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testLocale",
+  nodeType: "javascriptExample:testLocale",
   name: "default",
   displayName: "test locale",
   componentType: "view",

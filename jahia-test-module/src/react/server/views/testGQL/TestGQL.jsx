@@ -13,7 +13,7 @@ export const TestGQL = () => {
   });
   return (
     <>
-      <div data-testid="npm-view">NPM (react) view working</div>
+      <div data-testid="react-view">React view working</div>
       <hr />
 
       <h3>GraphQL</h3>
@@ -35,7 +35,7 @@ export const TestGQL = () => {
 };
 
 TestGQL.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testGQL",
+  nodeType: "javascriptExample:testGQL",
   name: "default",
   displayName: "test JGQL (react)",
   componentType: "view",

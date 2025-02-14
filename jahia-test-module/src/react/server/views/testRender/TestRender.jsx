@@ -3,7 +3,7 @@ import { AddContentButtons, Render, defineJahiaComponent } from "@jahia/javascri
 export const TestRender = () => {
   return (
     <>
-      <div data-testid="npm-view">NPM view working</div>
+      <div data-testid="react-view">React view working</div>
       <hr />
       <h3>Components</h3>
       Render a jnt:text as JSON Node :
@@ -31,14 +31,14 @@ export const TestRender = () => {
           }}
         />
       </div>
-      Render a npmExample:test with view sub as JSON Node with conf OPTION :
-      <div data-testid="component-npm-json-node-option" className="case">
+      Render a javascriptExample:test with view sub as JSON Node with conf OPTION :
+      <div data-testid="component-react-json-node-option" className="case">
         <Render
           advanceRenderingConfig={"OPTION"}
           view={"sub"}
           content={{
             name: "npmOption",
-            nodeType: "npmExample:testRender",
+            nodeType: "javascriptExample:testRender",
             properties: {
               prop1: "prop1 value it is",
             },
@@ -46,7 +46,7 @@ export const TestRender = () => {
         />
       </div>
       Render a simple predefined richtext component with conf INCLUDE :
-      <div data-testid="component-npm-node-include" className="case">
+      <div data-testid="component-react-node-include" className="case">
         <Render advanceRenderingConfig={"INCLUDE"} view={"sub"} />
       </div>
       Render a text child node :
@@ -60,7 +60,7 @@ export const TestRender = () => {
           view={"tagged"}
           content={{
             name: "viewWithMixin",
-            nodeType: "npmExample:testRender",
+            nodeType: "javascriptExample:testRender",
             mixins: ["jmix:tagged"],
             properties: {
               "j:tagList": ["tag1", "tag2"],
@@ -74,7 +74,7 @@ export const TestRender = () => {
           view={"parameters"}
           content={{
             name: "viewWithParameters",
-            nodeType: "npmExample:testRender",
+            nodeType: "javascriptExample:testRender",
             properties: {
               prop1: "prop1 value it is",
             },
@@ -90,7 +90,7 @@ export const TestRender = () => {
         />
       </div>
       Render an existing content Node with parameters :
-      <div data-testid="component-npm-node-with-parameters" className="case">
+      <div data-testid="component-react-node-with-parameters" className="case">
         <Render
           advanceRenderingConfig={"INCLUDE"}
           view={"parameters"}
@@ -117,7 +117,7 @@ export const TestRender = () => {
 };
 
 TestRender.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testRender",
+  nodeType: "javascriptExample:testRender",
   name: "default",
   displayName: "test Render (parameters react)",
   componentType: "view",

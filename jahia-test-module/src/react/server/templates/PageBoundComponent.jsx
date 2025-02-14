@@ -33,7 +33,7 @@ export const PageBoundComponent = () => {
               <Render
                 content={{
                   name: "boundComponentTest",
-                  nodeType: "npmExample:testBoundComponent",
+                  nodeType: "javascriptExample:testBoundComponent",
                   boundComponentRelativePath: "/events",
                 }}
               />

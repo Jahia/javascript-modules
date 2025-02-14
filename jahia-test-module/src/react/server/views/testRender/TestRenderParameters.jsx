@@ -20,7 +20,7 @@ export const TestRenderParameters = () => {
 };
 
 TestRenderParameters.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testRender",
+  nodeType: "javascriptExample:testRender",
   name: "parameters",
   displayName: "test Render (parameters react)",
   componentType: "view",

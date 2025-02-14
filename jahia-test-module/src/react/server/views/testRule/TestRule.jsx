@@ -19,7 +19,7 @@ export const TestRule = () => {
 };
 
 TestRule.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testRule",
+  nodeType: "javascriptExample:testRule",
   name: "default",
   displayName: "test rule registration",
   componentType: "view",

@@ -15,7 +15,7 @@ export const login = {
 
 export const navMenu = {
   name: "navMenu",
-  nodeType: "npmExample:navMenu",
+  nodeType: "javascriptExample:navMenu",
   mixins: ["jmix:renderable"],
   properties: {
     "j:maxDepth": "10",
@@ -26,7 +26,7 @@ export const navMenu = {
 
 export const hydratedNavMenu = {
   name: "hydratedNavMenu",
-  nodeType: "npmExample:hydratedNavMenu",
+  nodeType: "javascriptExample:hydratedNavMenu",
   mixins: ["jmix:renderable"],
   properties: {
     "j:maxDepth": "10",

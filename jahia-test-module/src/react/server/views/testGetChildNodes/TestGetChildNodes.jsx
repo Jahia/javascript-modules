@@ -77,7 +77,7 @@ export const TestGetChildNodes = () => {
 };
 
 TestGetChildNodes.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testGetChildNodes",
+  nodeType: "javascriptExample:testGetChildNodes",
   name: "default",
   displayName: "test getChildNodes",
   componentType: "view",

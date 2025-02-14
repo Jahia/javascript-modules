@@ -6,7 +6,7 @@ export const TestVirtualNode = () => {
   // create a virtual node (TestVirtualNodeSample)
   const testVirtualNodeSample = {
     name: "testVirtualNodeSample",
-    nodeType: "npmExample:testVirtualNodeSample",
+    nodeType: "javascriptExample:testVirtualNodeSample",
     properties: {
       myProperty: "this is a virtual node property",
     },
@@ -26,7 +26,7 @@ export const TestVirtualNode = () => {
 };
 
 TestVirtualNode.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testVirtualNode",
+  nodeType: "javascriptExample:testVirtualNode",
   name: "default",
   displayName: "test virtual node",
   componentType: "view",

@@ -150,7 +150,7 @@ export const TestGetNodeProps = () => {
 };
 
 TestGetNodeProps.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testGetNodeProps",
+  nodeType: "javascriptExample:testGetNodeProps",
   name: "default",
   displayName: "test getNodeProps",
   componentType: "view",
