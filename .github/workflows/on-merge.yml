@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'main'
+      - "main"
     tags-ignore:
-      - '**'
+      - "**"
 
 jobs:
   update-signature:
@@ -37,9 +37,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: jahia/jahia-modules-action/build@v2
         with:
-          tests_module_type: 'npm'
-          tests_module_path: 'jahia-test-module/'
-          mvn_settings_filepath: '.github/maven.settings.xml'
+          tests_module_type: "npm"
+          tests_module_path: "jahia-test-module/"
+          mvn_settings_filepath: ".github/maven.settings.xml"
           nexus_username: ${{ secrets.NEXUS_USERNAME }}
           nexus_password: ${{ secrets.NEXUS_PASSWORD }}
 
@@ -54,7 +54,7 @@ jobs:
         with:
           dependencytrack_hostname: ${{ vars.DEPENDENCYTRACK_HOSTNAME }}
           dependencytrack_apikey: ${{ secrets.DEPENDENCYTRACK_APIKEY }}
-          sbom_artifacts: 'build-artifacts'
+          sbom_artifacts: "build-artifacts"
 
   integration-tests-standalone:
     name: Integration Tests (Standalone)
@@ -65,15 +65,15 @@ jobs:
       - uses: jahia/jahia-modules-action/helper@v2
       - uses: KengoTODA/actions-setup-docker-compose@main
         with:
-          version: '1.29.2'
+          version: "1.29.2"
       - uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: "lts/*"
       - uses: actions/checkout@v4
       - uses: jahia/jahia-modules-action/integration-tests@v2
         with:
           module_id: javascript-modules-engine
-          tests_path: 'javascript-modules-engine/tests/'
+          tests_path: "javascript-modules-engine/tests/"
           testrail_project: Javascript Modules Engine
           tests_manifest: provisioning-manifest-build.yml
           jahia_image: jahia/jahia-ee-dev:8-SNAPSHOT
@@ -103,7 +103,7 @@ jobs:
           name: Tests Report (Standalone)
           path: javascript-modules-engine/tests/artifacts/results/xml_reports/**/*.xml
           reporter: java-junit
-          fail-on-error: 'false'
+          fail-on-error: "false"
 
   publish:
     name: Publish module
@@ -119,8 +119,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: jahia/jahia-modules-action/publish@v2
         with:
-          tests_module_path: 'jahia-test-module/'
-          tests_module_type: 'npm'
+          tests_module_path: "jahia-test-module/"
+          tests_module_type: "npm"
           nexus_username: ${{ secrets.NEXUS_USERNAME }}
           nexus_password: ${{ secrets.NEXUS_PASSWORD }}
-          mvn_settings_filepath: '.github/maven.settings.xml'
+          mvn_settings_filepath: ".github/maven.settings.xml"

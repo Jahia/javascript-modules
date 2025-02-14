@@ -1,21 +1,11 @@
 {
   "name": "@jahia/javascript-modules-library",
   "version": "0.5.0-SNAPSHOT",
+  "repository": "git@github.com:Jahia/javascript-modules.git",
+  "license": "MIT",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
-  "repository": "git@github.com:Jahia/javascript-modules.git",
-  "license": "MIT",
-  "scripts": {
-    "types:copy": "mkdir -p dist/types && ncp target/types dist/types",
-    "build:development": "run types:copy && tsc && node generate-index.cjs",
-    "build:production": "run build:development && run minify",
-    "build": "run build:production",
-    "minify": "node minify.cjs",
-    "clean": "rm -rf dist",
-    "prepack": "echo 'Please run 'mvn package' to create the tgz so the Maven version can be injected in the package.json' && exit 1",
-    "lint": "yarn run --top-level lint"
-  },
   "bin": {
     "jahia-deploy": "bin/jahia-deploy.mjs"
   },
@@ -23,11 +13,37 @@
     "bin",
     "dist"
   ],
+  "scripts": {
+    "build": "run build:production",
+    "build:development": "run types:copy && tsc && node generate-index.cjs",
+    "build:production": "run build:development && run minify",
+    "clean": "rm -rf dist",
+    "doc": "typedoc",
+    "lint": "yarn run --top-level lint",
+    "minify": "node minify.cjs",
+    "types:copy": "mkdir -p dist/types && ncp target/types dist/types"
+  },
   "dependencies": {
     "dotenv": "^16.4.7",
     "graphql": "^16.0.1",
     "graphql-tag": "^2.12.6",
     "prop-types": "^15.8.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.23.4",
+    "@babel/core": "^7.23.7",
+    "@babel/preset-env": "^7.23.8",
+    "@babel/preset-react": "^7.23.3",
+    "@types/node-fetch": "^2.6.11",
+    "@types/react": "^19.0.8",
+    "babel-loader": "^9.1.3",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "i18next": "^23.10.1",
+    "ncp": "^2.0.0",
+    "react-i18next": "^15.4.0",
+    "terser": "^5.36.0",
+    "typedoc": "^0.25.13",
+    "typescript": "^4.3.5"
   },
   "peerDependencies": {
     "i18next": ">=23.0.0 <23.11.0",
@@ -52,20 +68,5 @@
     "styled-jsx": {
       "optional": true
     }
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.23.4",
-    "@babel/core": "^7.23.7",
-    "@babel/preset-env": "^7.23.8",
-    "@babel/preset-react": "^7.23.3",
-    "@types/node-fetch": "^2.6.11",
-    "@types/react": "^19.0.8",
-    "babel-loader": "^9.1.3",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
-    "i18next": "^23.10.1",
-    "ncp": "^2.0.0",
-    "react-i18next": "^15.4.0",
-    "terser": "^5.36.0",
-    "typescript": "^4.3.5"
   }
 }

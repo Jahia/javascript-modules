@@ -1,4 +1,4 @@
-"use strict";
+'use strict'
 
 /**
  * Various utility functions used throughout Mocha's codebase.
@@ -9,11 +9,11 @@
  * Module dependencies.
  */
 
-var path = require("path");
-var util = require("util");
-var he = require("he");
+var path = require('path')
+var util = require('util')
+var he = require('he')
 
-var assign = (exports.assign = require("object.assign").getPolyfill());
+var assign = (exports.assign = require('object.assign').getPolyfill())
 
 /**
  * Inherit the prototype methods from one constructor into another.
@@ -24,7 +24,7 @@ var assign = (exports.assign = require("object.assign").getPolyfill());
  * @throws {TypeError} if either constructor is null, or if super constructor
  *     lacks a prototype.
  */
-exports.inherits = util.inherits;
+exports.inherits = util.inherits
 
 /**
  * Escape special characters in the given string of html.
@@ -34,8 +34,8 @@ exports.inherits = util.inherits;
  * @return {string}
  */
 exports.escape = function (html) {
-    return he.encode(String(html), { useNamedReferences: false });
-};
+    return he.encode(String(html), { useNamedReferences: false })
+}
 
 /**
  * Test if the given obj is type of string.
@@ -45,8 +45,8 @@ exports.escape = function (html) {
  * @return {boolean}
  */
 exports.isString = function (obj) {
-    return typeof obj === "string";
-};
+    return typeof obj === 'string'
+}
 
 /**
  * Compute a slug from the given `str`.
@@ -58,10 +58,10 @@ exports.isString = function (obj) {
 exports.slug = function (str) {
     return str
         .toLowerCase()
-        .replace(/\s+/g, "-")
-        .replace(/[^-\w]/g, "")
-        .replace(/-{2,}/g, "-");
-};
+        .replace(/\s+/g, '-')
+        .replace(/[^-\w]/g, '')
+        .replace(/-{2,}/g, '-')
+}
 
 /**
  * Strip the function definition from `str`, and re-indent for pre whitespace.
@@ -71,25 +71,22 @@ exports.slug = function (str) {
  */
 exports.clean = function (str) {
     str = str
-        .replace(/\r\n?|[\n\u2028\u2029]/g, "\n")
-        .replace(/^\uFEFF/, "")
+        .replace(/\r\n?|[\n\u2028\u2029]/g, '\n')
+        .replace(/^\uFEFF/, '')
         // (traditional)->  space/name     parameters    body     (lambda)-> parameters       body   multi-statement/single          keep body content
         .replace(
             /^function(?:\s*|\s+[^(]*)\([^)]*\)\s*\{((?:.|\n)*?)\s*\}$|^\([^)]*\)\s*=>\s*(?:\{((?:.|\n)*?)\s*\}|((?:.|\n)*))$/,
-            "$1$2$3"
-        );
+            '$1$2$3',
+        )
 
-    var spaces = str.match(/^\n?( *)/)[1].length;
-    var tabs = str.match(/^\n?(\t*)/)[1].length;
-    var re = new RegExp(
-        "^\n?" + (tabs ? "\t" : " ") + "{" + (tabs || spaces) + "}",
-        "gm"
-    );
+    var spaces = str.match(/^\n?( *)/)[1].length
+    var tabs = str.match(/^\n?(\t*)/)[1].length
+    var re = new RegExp('^\n?' + (tabs ? '\t' : ' ') + '{' + (tabs || spaces) + '}', 'gm')
 
-    str = str.replace(re, "");
+    str = str.replace(re, '')
 
-    return str.trim();
-};
+    return str.trim()
+}
 
 /**
  * If a value could have properties, and has none, this function is called,
@@ -107,14 +104,14 @@ exports.clean = function (str) {
  */
 function emptyRepresentation(value, typeHint) {
     switch (typeHint) {
-        case "function":
-            return "[Function]";
-        case "object":
-            return "{}";
-        case "array":
-            return "[]";
+        case 'function':
+            return '[Function]'
+        case 'object':
+            return '{}'
+        case 'array':
+            return '[]'
         default:
-            return value.toString();
+            return value.toString()
     }
 }
 
@@ -141,22 +138,22 @@ function emptyRepresentation(value, typeHint) {
  */
 var type = (exports.type = function type(value) {
     if (value === undefined) {
-        return "undefined";
+        return 'undefined'
     }
 
     if (value === null) {
-        return "null";
+        return 'null'
     }
 
     if (Buffer.isBuffer(value)) {
-        return "buffer";
+        return 'buffer'
     }
 
     return Object.prototype.toString
         .call(value)
-        .replace(/^\[.+\s(.+?)]$/, "$1")
-        .toLowerCase();
-});
+        .replace(/^\[.+\s(.+?)]$/, '$1')
+        .toLowerCase()
+})
 
 /**
  * Stringify `value`. Different behavior depending on type of value:
@@ -174,42 +171,36 @@ var type = (exports.type = function type(value) {
  * @return {string}
  */
 exports.stringify = function (value) {
-    var typeHint = type(value);
+    var typeHint = type(value)
 
-    if (!~["object", "array", "function"].indexOf(typeHint)) {
-        if (typeHint === "buffer") {
-            var json = Buffer.prototype.toJSON.call(value);
+    if (!~['object', 'array', 'function'].indexOf(typeHint)) {
+        if (typeHint === 'buffer') {
+            var json = Buffer.prototype.toJSON.call(value)
             // Based on the toJSON result
-            return jsonStringify(
-                json.data && json.type ? json.data : json,
-                2
-            ).replace(/,(\n|$)/g, "$1");
+            return jsonStringify(json.data && json.type ? json.data : json, 2).replace(/,(\n|$)/g, '$1')
         }
 
         // IE7/IE8 has a bizarre String constructor; needs to be coerced
         // into an array and back to obj.
-        if (typeHint === "string" && typeof value === "object") {
-            value = value.split("").reduce(function (acc, char, idx) {
-                acc[idx] = char;
-                return acc;
-            }, {});
-            typeHint = "object";
+        if (typeHint === 'string' && typeof value === 'object') {
+            value = value.split('').reduce(function (acc, char, idx) {
+                acc[idx] = char
+                return acc
+            }, {})
+            typeHint = 'object'
         } else {
-            return jsonStringify(value);
+            return jsonStringify(value)
         }
     }
 
     for (var prop in value) {
         if (Object.prototype.hasOwnProperty.call(value, prop)) {
-            return jsonStringify(
-                exports.canonicalize(value, null, typeHint),
-                2
-            ).replace(/,(\n|$)/g, "$1");
+            return jsonStringify(exports.canonicalize(value, null, typeHint), 2).replace(/,(\n|$)/g, '$1')
         }
     }
 
-    return emptyRepresentation(value, typeHint);
-};
+    return emptyRepresentation(value, typeHint)
+}
 
 /**
  * Like JSON.stringify but more sense.
@@ -221,84 +212,76 @@ exports.stringify = function (value) {
  * @returns {*}
  */
 function jsonStringify(object, spaces, depth) {
-    if (typeof spaces === "undefined") {
+    if (typeof spaces === 'undefined') {
         // Primitive types
-        return _stringify(object);
+        return _stringify(object)
     }
 
-    depth = depth || 1;
-    var space = spaces * depth;
-    var str = Array.isArray(object) ? "[" : "{";
-    var end = Array.isArray(object) ? "]" : "}";
-    var length =
-        typeof object.length === "number"
-            ? object.length
-            : Object.keys(object).length;
+    depth = depth || 1
+    var space = spaces * depth
+    var str = Array.isArray(object) ? '[' : '{'
+    var end = Array.isArray(object) ? ']' : '}'
+    var length = typeof object.length === 'number' ? object.length : Object.keys(object).length
     // `.repeat()` polyfill
     function repeat(s, n) {
-        return new Array(n).join(s);
+        return new Array(n).join(s)
     }
 
     function _stringify(val) {
         switch (type(val)) {
-            case "null":
-            case "undefined":
-                val = "[" + val + "]";
-                break;
-            case "array":
-            case "object":
-                val = jsonStringify(val, spaces, depth + 1);
-                break;
-            case "boolean":
-            case "regexp":
-            case "symbol":
-            case "number":
+            case 'null':
+            case 'undefined':
+                val = '[' + val + ']'
+                break
+            case 'array':
+            case 'object':
+                val = jsonStringify(val, spaces, depth + 1)
+                break
+            case 'boolean':
+            case 'regexp':
+            case 'symbol':
+            case 'number':
                 val =
                     val === 0 && 1 / val === -Infinity // `-0`
-                        ? "-0"
-                        : val.toString();
-                break;
-            case "date":
-                var sDate = isNaN(val.getTime())
-                    ? val.toString()
-                    : val.toISOString();
-                val = "[Date: " + sDate + "]";
-                break;
-            case "buffer":
-                var json = val.toJSON();
+                        ? '-0'
+                        : val.toString()
+                break
+            case 'date':
+                var sDate = isNaN(val.getTime()) ? val.toString() : val.toISOString()
+                val = '[Date: ' + sDate + ']'
+                break
+            case 'buffer':
+                var json = val.toJSON()
                 // Based on the toJSON result
-                json = json.data && json.type ? json.data : json;
-                val = "[Buffer: " + jsonStringify(json, 2, depth + 1) + "]";
-                break;
+                json = json.data && json.type ? json.data : json
+                val = '[Buffer: ' + jsonStringify(json, 2, depth + 1) + ']'
+                break
             default:
-                val =
-                    val === "[Function]" || val === "[Circular]"
-                        ? val
-                        : JSON.stringify(val); // String
+                val = val === '[Function]' || val === '[Circular]' ? val : JSON.stringify(val) // String
         }
 
-        return val;
+        return val
     }
 
     for (var i in object) {
         if (!Object.prototype.hasOwnProperty.call(object, i)) {
-            continue; // Not my business
+            continue // Not my business
         }
 
-        --length;
+        --length
         str +=
-            "\n " +
-            repeat(" ", space) +
-            (Array.isArray(object) ? "" : '"' + i + '": ') + // Key
+            '\n ' +
+            repeat(' ', space) +
+            (Array.isArray(object) ? '' : '"' + i + '": ') + // Key
             _stringify(object[i]) + // Value
-            (length ? "," : ""); // Comma
+            (length ? ',' : '') // Comma
     }
 
     return (
         str +
         // [], {}
-        (str.length !== 1 ? "\n" + repeat(" ", --space) + end : end)
-    );
+        (str.length !== 1 ? '\n' + repeat(' ', --space) + end : end)
+    )
 }
 
 /**
@@ -321,73 +304,70 @@ function jsonStringify(object, spaces, depth) {
  * @return {(Object|Array|Function|string|undefined)}
  */
 exports.canonicalize = function canonicalize(value, stack, typeHint) {
-    var canonicalizedObj;
-    var prop;
-    typeHint = typeHint || type(value);
+    var canonicalizedObj
+    var prop
+    typeHint = typeHint || type(value)
     function withStack(value, fn) {
-        stack.push(value);
-        fn();
-        stack.pop();
+        stack.push(value)
+        fn()
+        stack.pop()
     }
 
-    stack = stack || [];
+    stack = stack || []
 
     if (stack.indexOf(value) !== -1) {
-        return "[Circular]";
+        return '[Circular]'
     }
 
     switch (typeHint) {
-        case "undefined":
-        case "buffer":
-        case "null":
-            canonicalizedObj = value;
-            break;
-        case "array":
+        case 'undefined':
+        case 'buffer':
+        case 'null':
+            canonicalizedObj = value
+            break
+        case 'array':
             withStack(value, function () {
                 canonicalizedObj = value.map(function (item) {
-                    return exports.canonicalize(item, stack);
-                });
-            });
-            break;
-        case "function":
+                    return exports.canonicalize(item, stack)
+                })
+            })
+            break
+        case 'function':
             /* eslint-disable-next-line no-unused-vars */
             for (prop in value) {
-                canonicalizedObj = {};
-                break;
+                canonicalizedObj = {}
+                break
             }
 
             if (!canonicalizedObj) {
-                canonicalizedObj = emptyRepresentation(value, typeHint);
-                break;
+                canonicalizedObj = emptyRepresentation(value, typeHint)
+                break
             }
 
         /* Falls through */
-        case "object":
-            canonicalizedObj = canonicalizedObj || {};
+        case 'object':
+            canonicalizedObj = canonicalizedObj || {}
             withStack(value, function () {
                 Object.keys(value)
                     .sort()
                     .forEach(function (key) {
-                        canonicalizedObj[key] = exports.canonicalize(
-                            value[key],
-                            stack
-                        );
-                    });
-            });
-            break;
-        case "date":
-        case "number":
-        case "regexp":
-        case "boolean":
-        case "symbol":
-            canonicalizedObj = value;
-            break;
+                        canonicalizedObj[key] = exports.canonicalize(value[key], stack)
+                    })
+            })
+            break
+        case 'date':
+        case 'number':
+        case 'regexp':
+        case 'boolean':
+        case 'symbol':
+            canonicalizedObj = value
+            break
         default:
-            canonicalizedObj = String(value);
+            canonicalizedObj = String(value)
     }
 
-    return canonicalizedObj;
-};
+    return canonicalizedObj
+}
 
 /**
  * Process.emitWarning or a polyfill
@@ -396,11 +376,11 @@ exports.canonicalize = function canonicalize(value, stack, typeHint) {
  */
 function emitWarning(msg, type) {
     if (process.emitWarning) {
-        process.emitWarning(msg, type);
+        process.emitWarning(msg, type)
     } else {
         process.nextTick(function () {
-            console.warn(type + ": " + msg);
-        });
+            console.warn(type + ': ' + msg)
+        })
     }
 }
 
@@ -412,14 +392,14 @@ function emitWarning(msg, type) {
  * @private
  */
 exports.deprecate = function deprecate(msg) {
-    msg = String(msg);
+    msg = String(msg)
     if (msg && !deprecate.cache[msg]) {
-        deprecate.cache[msg] = true;
-        emitWarning(msg, "DeprecationWarning");
+        deprecate.cache[msg] = true
+        emitWarning(msg, 'DeprecationWarning')
     }
-};
+}
 
-exports.deprecate.cache = {};
+exports.deprecate.cache = {}
 
 /**
  * Show a generic warning.
@@ -430,9 +410,9 @@ exports.deprecate.cache = {};
  */
 exports.warn = function warn(msg) {
     if (msg) {
-        emitWarning(msg);
+        emitWarning(msg)
     }
-};
+}
 
 /**
  * @summary
@@ -445,63 +425,59 @@ exports.warn = function warn(msg) {
  */
 exports.stackTraceFilter = function () {
     // TODO: Replace with `process.browser`
-    var is =
-        typeof document === "undefined" ? { node: true } : { browser: true };
-    var slash = path.sep;
-    var cwd;
+    var is = typeof document === 'undefined' ? { node: true } : { browser: true }
+    var slash = path.sep
+    var cwd
     if (is.node) {
-        cwd = exports.cwd() + slash;
+        cwd = exports.cwd() + slash
     } else {
-        cwd = (typeof location === "undefined"
-                ? window.location
-                : location
-        ).href.replace(/\/[^/]*$/, "/");
-        slash = "/";
+        cwd = (typeof location === 'undefined' ? window.location : location).href.replace(/\/[^/]*$/, '/')
+        slash = '/'
     }
 
     function isMochaInternal(line) {
         return (
-            ~line.indexOf("node_modules" + slash + "mocha" + slash) ||
-            ~line.indexOf(slash + "mocha.js") ||
-            ~line.indexOf(slash + "mocha.min.js")
-        );
+            ~line.indexOf('node_modules' + slash + 'mocha' + slash) ||
+            ~line.indexOf(slash + 'mocha.js') ||
+            ~line.indexOf(slash + 'mocha.min.js')
+        )
     }
 
     function isNodeInternal(line) {
         return (
-            ~line.indexOf("(timers.js:") ||
-            ~line.indexOf("(events.js:") ||
-            ~line.indexOf("(node.js:") ||
-            ~line.indexOf("(module.js:") ||
-            ~line.indexOf("GeneratorFunctionPrototype.next (native)") ||
+            ~line.indexOf('(timers.js:') ||
+            ~line.indexOf('(events.js:') ||
+            ~line.indexOf('(node.js:') ||
+            ~line.indexOf('(module.js:') ||
+            ~line.indexOf('GeneratorFunctionPrototype.next (native)') ||
             false
-        );
+        )
     }
 
     return function (stack) {
-        stack = stack.split("\n");
+        stack = stack.split('\n')
 
         stack = stack.reduce(function (list, line) {
             if (isMochaInternal(line)) {
-                return list;
+                return list
             }
 
             if (is.node && isNodeInternal(line)) {
-                return list;
+                return list
             }
 
             // Clean up cwd(absolute)
             if (/:\d+:\d+\)?$/.test(line)) {
-                line = line.replace("(" + cwd, "(");
+                line = line.replace('(' + cwd, '(')
             }
 
-            list.push(line);
-            return list;
-        }, []);
+            list.push(line)
+            return list
+        }, [])
 
-        return stack.join("\n");
-    };
-};
+        return stack.join('\n')
+    }
+}
 
 /**
  * Crude, but effective.
@@ -510,12 +486,8 @@ exports.stackTraceFilter = function () {
  * @returns {boolean} Whether or not `value` is a Promise
  */
 exports.isPromise = function isPromise(value) {
-    return (
-        typeof value === "object" &&
-        value !== null &&
-        typeof value.then === "function"
-    );
-};
+    return typeof value === 'object' && value !== null && typeof value.then === 'function'
+}
 
 /**
  * Clamps a numeric value to an inclusive range.
@@ -525,8 +497,8 @@ exports.isPromise = function isPromise(value) {
  * @returns {number} clamped value
  */
 exports.clamp = function clamp(value, range) {
-    return Math.min(Math.max(value, range[0]), range[1]);
-};
+    return Math.min(Math.max(value, range[0]), range[1])
+}
 
 /**
  * Single quote text by combining with undirectional ASCII quotation marks.
@@ -544,8 +516,8 @@ exports.clamp = function clamp(value, range) {
  * sQuote('n') // => 'n'
  */
 exports.sQuote = function (str) {
-    return "'" + str + "'";
-};
+    return "'" + str + "'"
+}
 
 /**
  * Double quote text by combining with undirectional ASCII quotation marks.
@@ -563,14 +535,14 @@ exports.sQuote = function (str) {
  * dQuote('number') // => "number"
  */
 exports.dQuote = function (str) {
-    return '"' + str + '"';
-};
+    return '"' + str + '"'
+}
 
 /**
  * It's a noop.
  * @public
  */
-exports.noop = function () {};
+exports.noop = function () {}
 
 /**
  * Creates a map-like object.
@@ -588,11 +560,8 @@ exports.noop = function () {};
  * @returns {Object} An object with no prototype, having `...obj` properties
  */
 exports.createMap = function () {
-    return assign.apply(
-        null,
-        [Object.create(null)].concat(Array.prototype.slice.call(arguments))
-    );
-};
+    return assign.apply(null, [Object.create(null)].concat(Array.prototype.slice.call(arguments)))
+}
 
 /**
  * Creates a read-only map-like object.
@@ -607,12 +576,12 @@ exports.createMap = function () {
  * @throws {TypeError} if argument is not a non-empty object.
  */
 exports.defineConstants = function (obj) {
-    if (type(obj) !== "object" || !Object.keys(obj).length) {
-        throw new TypeError("Invalid argument; expected a non-empty object");
+    if (type(obj) !== 'object' || !Object.keys(obj).length) {
+        throw new TypeError('Invalid argument; expected a non-empty object')
     }
 
-    return Object.freeze(exports.createMap(obj));
-};
+    return Object.freeze(exports.createMap(obj))
+}
 
 /**
  * Whether current version of Node support ES modules
@@ -628,17 +597,17 @@ exports.defineConstants = function (obj) {
  */
 exports.supportsEsModules = function (partialSupport) {
     if (!exports.isBrowser() && process.versions && process.versions.node) {
-        var versionFields = process.versions.node.split(".");
-        var major = Number(versionFields[0]);
-        var minor = Number(versionFields[1]);
+        var versionFields = process.versions.node.split('.')
+        var major = Number(versionFields[0])
+        var minor = Number(versionFields[1])
 
         if (!partialSupport) {
-            return major >= 13 || (major === 12 && minor >= 11);
+            return major >= 13 || (major === 12 && minor >= 11)
         }
 
-        return major >= 10;
+        return major >= 10
     }
-};
+}
 
 /**
  * Returns current working directory
@@ -647,8 +616,8 @@ exports.supportsEsModules = function (partialSupport) {
  * @private
  */
 exports.cwd = function cwd() {
-    return process.cwd();
-};
+    return process.cwd()
+}
 
 /**
  * Returns `true` if Mocha is running in a browser.
@@ -657,5 +626,5 @@ exports.cwd = function cwd() {
  * @private
  */
 exports.isBrowser = function isBrowser() {
-    return Boolean(process.browser);
-};
+    return Boolean(process.browser)
+}

@@ -3,7 +3,7 @@ name: Nightly Test run
 on:
   workflow_dispatch:
   schedule:
-    - cron:  '0 0 * * *'
+    - cron: "0 0 * * *"
 
 jobs:
   integration-tests-standalone:
@@ -20,15 +20,15 @@ jobs:
       - uses: jahia/jahia-modules-action/helper@v2
       - uses: KengoTODA/actions-setup-docker-compose@main
         with:
-          version: '1.29.2'
+          version: "1.29.2"
       - uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: "lts/*"
       - uses: actions/checkout@v4
       - uses: jahia/jahia-modules-action/integration-tests@v2
         with:
           module_id: javascript-modules-engine
-          tests_path: 'javascript-modules-engine/tests/'
+          tests_path: "javascript-modules-engine/tests/"
           testrail_project: Javascript Modules Engine
           tests_manifest: provisioning-manifest-snapshot.yml
           jahia_image: ${{ matrix.jahia_image }}
@@ -57,4 +57,4 @@ jobs:
           name: Tests Report (Standalone)
           path: javascript-modules-engine/tests/artifacts/results/xml_reports/**/*.xml
           reporter: java-junit
-          fail-on-error: 'false'
+          fail-on-error: "false"
