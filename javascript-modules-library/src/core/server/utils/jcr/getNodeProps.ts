@@ -50,7 +50,7 @@ const extractPropValue = (session: JCRSessionWrapper, value: JCRValueWrapper, ty
         case WEAKREFERENCE:
             try {
                 return session.getNodeByIdentifier(value.getString());
-            } catch (_) {
+            } catch {
                 // Ref does not exist
                 return undefined;
             }

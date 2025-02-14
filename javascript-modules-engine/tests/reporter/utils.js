@@ -322,9 +322,7 @@ function jsonStringify(object, spaces, depth) {
  */
 exports.canonicalize = function canonicalize(value, stack, typeHint) {
     var canonicalizedObj;
-    /* eslint-disable no-unused-vars */
     var prop;
-    /* eslint-enable no-unused-vars */
     typeHint = typeHint || type(value);
     function withStack(value, fn) {
         stack.push(value);
@@ -352,13 +350,12 @@ exports.canonicalize = function canonicalize(value, stack, typeHint) {
             });
             break;
         case "function":
-            /* eslint-disable guard-for-in */
+            /* eslint-disable-next-line no-unused-vars */
             for (prop in value) {
                 canonicalizedObj = {};
                 break;
             }
 
-            /* eslint-enable guard-for-in */
             if (!canonicalizedObj) {
                 canonicalizedObj = emptyRepresentation(value, typeHint);
                 break;
@@ -590,7 +587,7 @@ exports.noop = function () {};
  * @param {...*} [obj] - Arguments to `Object.assign()`.
  * @returns {Object} An object with no prototype, having `...obj` properties
  */
-exports.createMap = function (obj) {
+exports.createMap = function () {
     return assign.apply(
         null,
         [Object.create(null)].concat(Array.prototype.slice.call(arguments))

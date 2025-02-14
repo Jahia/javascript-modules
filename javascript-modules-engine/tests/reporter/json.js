@@ -65,10 +65,11 @@ function JSONReporter(runner, options) {
         };
 
         runner.testResults = obj;
+        var fileName
         if (tests.length !== 0) {
-            var fileName = tests[0].parent.parent.file.split("/").pop();
+            fileName = tests[0].parent.parent.file.split("/").pop();
         } else if (failures.length !== 0) {
-            var fileName = failures[0].parent.parent.file.split("/").pop();
+            fileName = failures[0].parent.parent.file.split("/").pop();
         } else {
             console.log("Failed to write to report");
             return;

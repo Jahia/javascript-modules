@@ -91,7 +91,6 @@
                         </goals>
                     </execution>
                     <!-- Executions bound on the "compile" phase (executed in order of declaration): -->
-                    <!-- Disabled linting on compilation for now
                     <execution>
                         <id>yarn lint</id>
                         <phase>compile</phase>
@@ -101,7 +100,7 @@
                         <configuration>
                             <arguments>lint</arguments>
                         </configuration>
-                    </execution> -->
+                    </execution>
                     <execution>
                         <id>yarn build</id>
                         <phase>compile</phase>

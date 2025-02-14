@@ -12,7 +12,6 @@ initJsServerEngineLibrary();
 // Uses setTimeout polyfill
 global.setTimeout = ((cb, t) => {
     if (t === 0) {
-        // eslint-disable-next-line no-new
         new Promise(resolve => {
             console.log('Execute timeout');
             cb();

@@ -200,7 +200,7 @@ var generateDiff = (exports.generateDiff = function (actual, expected) {
         return exports.inlineDiffs
             ? inlineDiff(actual, expected)
             : unifiedDiff(actual, expected);
-    } catch (err) {
+    } catch {
         var msg =
             "\n      " +
             color("diff added", "+ expected") +

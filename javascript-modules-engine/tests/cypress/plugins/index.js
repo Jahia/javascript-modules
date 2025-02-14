@@ -16,9 +16,7 @@
  */
 module.exports = (on, config) => {
     require('./env')(on, config);
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     require('@jahia/cypress/dist/plugins/registerPlugins').registerPlugins(on, config);
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     require('cypress-terminal-report/src/installLogsPrinter')(on, {
         printLogsToConsole: 'onFail',
         printLogsToFile: 'always',
