@@ -35,7 +35,7 @@ import java.util.zip.ZipEntry;
 
 /**
  * javascript protocol handler
- * Transform javascript m into bundle
+ * Transform javascript module into bundle
  */
 public class JavascriptProtocolConnection extends URLConnection {
     public static final String BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT = "Jahia-javascript-InitScript";
