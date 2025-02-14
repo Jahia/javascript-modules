@@ -56,7 +56,7 @@ export const TestAbsoluteAreas = () => {
 
       <h2>Area type</h2>
       <div data-testid="areaType">
-        <AbsoluteArea name="areaType" areaType="npmExample:testAreaColumns" level={1} />
+        <AbsoluteArea name="areaType" areaType="javascriptExample:testAreaColumns" level={1} />
       </div>
 
       <h2>Limited absolute area editing</h2>
@@ -81,7 +81,7 @@ export const TestAbsoluteAreas = () => {
 };
 
 TestAbsoluteAreas.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testAbsoluteAreas",
+  nodeType: "javascriptExample:testAbsoluteAreas",
   name: "default",
   displayName: "Test Absolute Areas (react)",
   componentType: "view",

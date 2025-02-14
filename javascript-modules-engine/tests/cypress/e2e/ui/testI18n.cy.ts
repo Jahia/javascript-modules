@@ -24,14 +24,14 @@ const testData = {
 
 describe('Test i18n', () => {
     before('Create test site/contents', () => {
-        createSite('npmI18NTestSite', {
+        createSite('javascriptI18NTestSite', {
             languages: 'en,fr_LU,fr,de',
-            templateSet: 'jahia-npm-module-example',
+            templateSet: 'jahia-javascript-module-example',
             locale: 'en',
             serverName: 'localhost',
         })
 
-        addSimplePage('/sites/npmI18NTestSite/home', 'testPageI18N', 'Test i18n en', 'en', 'simple', [
+        addSimplePage('/sites/javascriptI18NTestSite/home', 'testPageI18N', 'Test i18n en', 'en', 'simple', [
             {
                 name: 'pagecontent',
                 primaryNodeType: 'jnt:contentList',
@@ -39,7 +39,7 @@ describe('Test i18n', () => {
         ]).then(() => {
             cy.apollo({
                 variables: {
-                    pathOrId: '/sites/npmI18NTestSite/home/testPageI18N',
+                    pathOrId: '/sites/javascriptI18NTestSite/home/testPageI18N',
                     properties: [
                         { name: 'jcr:title', value: 'Test i18n fr_LU', language: 'fr_LU' },
                         { name: 'jcr:title', value: 'Test i18n fr', language: 'fr' },
@@ -50,20 +50,20 @@ describe('Test i18n', () => {
             })
 
             addNode({
-                parentPathOrId: '/sites/npmI18NTestSite/home/testPageI18N/pagecontent',
+                parentPathOrId: '/sites/javascriptI18NTestSite/home/testPageI18N/pagecontent',
                 name: 'test',
-                primaryNodeType: 'npmExample:testI18n',
+                primaryNodeType: 'javascriptExample:testI18n',
             })
         })
 
-        publishAndWaitJobEnding('/sites/npmI18NTestSite/home/testPageI18N', ['en', 'fr_LU', 'fr', 'de'])
+        publishAndWaitJobEnding('/sites/javascriptI18NTestSite/home/testPageI18N', ['en', 'fr_LU', 'fr', 'de'])
     })
 
     it('Test I18n values in various workspace/locales and various type of usage SSR/hydrate/rendered client side', () => {
         cy.login()
         ;['live', 'default'].forEach((workspace) => {
             ;['en', 'fr_LU', 'fr', 'de'].forEach((locale) => {
-                cy.visit(`/cms/render/${workspace}/${locale}/sites/npmI18NTestSite/home/testPageI18N.html`)
+                cy.visit(`/cms/render/${workspace}/${locale}/sites/javascriptI18NTestSite/home/testPageI18N.html`)
                 testI18n(workspace, locale, 'div[data-testid="i18n-server-side"]', 'We are server side !', false)
                 testI18n(
                     workspace,
@@ -117,6 +117,6 @@ describe('Test i18n', () => {
 
     after('Cleanup', () => {
         cy.visit('/start', { failOnStatusCode: false })
-        deleteSite('npmI18NTestSite')
+        deleteSite('javascriptI18NTestSite')
     })
 })

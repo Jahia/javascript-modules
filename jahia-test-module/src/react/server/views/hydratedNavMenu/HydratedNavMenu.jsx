@@ -25,7 +25,7 @@ export const HydratedNavMenu = () => {
 };
 
 HydratedNavMenu.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:hydratedNavMenu",
+  nodeType: "javascriptExample:hydratedNavMenu",
   name: "default",
   displayName: "hydratedNavMenu",
   componentType: "view",

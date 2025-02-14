@@ -8,7 +8,7 @@ describe('getNodesByJCRQuery function test', () => {
         tomorrow.setDate(tomorrow.getDate() + 1)
 
         return {
-            parentPath: '/sites/npmTestSite/contents/events',
+            parentPath: '/sites/javascriptTestSite/contents/events',
             name: `event-${index}`,
             title: `Event ${index}`,
             startDate: today,
@@ -17,28 +17,28 @@ describe('getNodesByJCRQuery function test', () => {
     }
 
     before('Create test page and contents', () => {
-        addSimplePage('/sites/npmTestSite/home', 'getNodesByJCRQuery', 'Test getNodesByJCRQuery', 'en', 'simple', [
+        addSimplePage('/sites/javascriptTestSite/home', 'getNodesByJCRQuery', 'Test getNodesByJCRQuery', 'en', 'simple', [
             {
                 name: 'pagecontent',
                 primaryNodeType: 'jnt:contentList',
             },
         ]).then(() => {
             addNode({
-                parentPathOrId: '/sites/npmTestSite/home/getNodesByJCRQuery/pagecontent',
+                parentPathOrId: '/sites/javascriptTestSite/home/getNodesByJCRQuery/pagecontent',
                 name: 'getNodesByJCRQuery',
-                primaryNodeType: 'npmExample:testJCRQuery',
+                primaryNodeType: 'javascriptExample:testJCRQuery',
             })
 
             addNode({
-                parentPathOrId: '/sites/npmTestSite/contents',
+                parentPathOrId: '/sites/javascriptTestSite/contents',
                 name: 'events',
                 primaryNodeType: 'jnt:contentFolder',
             }).then(() => {
-                addEvent('npmTestSite', initEvent(1))
-                addEvent('npmTestSite', initEvent(2))
-                addEvent('npmTestSite', initEvent(3))
-                addEvent('npmTestSite', initEvent(4))
-                addEvent('npmTestSite', initEvent(5))
+                addEvent('javascriptTestSite', initEvent(1))
+                addEvent('javascriptTestSite', initEvent(2))
+                addEvent('javascriptTestSite', initEvent(3))
+                addEvent('javascriptTestSite', initEvent(4))
+                addEvent('javascriptTestSite', initEvent(5))
             })
         })
     })
@@ -46,18 +46,18 @@ describe('getNodesByJCRQuery function test', () => {
         {
             testCase: 'all',
             expected: [
-                '/sites/npmTestSite/contents/events/event-1',
-                '/sites/npmTestSite/contents/events/event-2',
-                '/sites/npmTestSite/contents/events/event-3',
-                '/sites/npmTestSite/contents/events/event-4',
-                '/sites/npmTestSite/contents/events/event-5',
+                '/sites/javascriptTestSite/contents/events/event-1',
+                '/sites/javascriptTestSite/contents/events/event-2',
+                '/sites/javascriptTestSite/contents/events/event-3',
+                '/sites/javascriptTestSite/contents/events/event-4',
+                '/sites/javascriptTestSite/contents/events/event-5',
             ],
         },
         {
             testCase: 'limit',
             expected: [
-                '/sites/npmTestSite/contents/events/event-1',
-                '/sites/npmTestSite/contents/events/event-2',
+                '/sites/javascriptTestSite/contents/events/event-1',
+                '/sites/javascriptTestSite/contents/events/event-2',
                 undefined,
                 undefined,
                 undefined,
@@ -70,9 +70,9 @@ describe('getNodesByJCRQuery function test', () => {
         {
             testCase: 'offset',
             expected: [
-                '/sites/npmTestSite/contents/events/event-3',
-                '/sites/npmTestSite/contents/events/event-4',
-                '/sites/npmTestSite/contents/events/event-5',
+                '/sites/javascriptTestSite/contents/events/event-3',
+                '/sites/javascriptTestSite/contents/events/event-4',
+                '/sites/javascriptTestSite/contents/events/event-5',
                 undefined,
                 undefined,
             ],
@@ -80,8 +80,8 @@ describe('getNodesByJCRQuery function test', () => {
         {
             testCase: 'limitOffset',
             expected: [
-                '/sites/npmTestSite/contents/events/event-3',
-                '/sites/npmTestSite/contents/events/event-4',
+                '/sites/javascriptTestSite/contents/events/event-3',
+                '/sites/javascriptTestSite/contents/events/event-4',
                 undefined,
                 undefined,
                 undefined,
@@ -90,8 +90,8 @@ describe('getNodesByJCRQuery function test', () => {
     ].forEach((test) => {
         it(`Test getNodesByJCRQuery, case: ${test.testCase}`, function () {
             cy.login()
-            cy.visit('/jahia/page-composer/default/en/sites/npmTestSite/home/getNodesByJCRQuery.html')
-            cy.visit('/cms/render/default/en/sites/npmTestSite/home/getNodesByJCRQuery.html')
+            cy.visit('/jahia/page-composer/default/en/sites/javascriptTestSite/home/getNodesByJCRQuery.html')
+            cy.visit('/cms/render/default/en/sites/javascriptTestSite/home/getNodesByJCRQuery.html')
 
             for (let i = 0; i < test.expected.length; i++) {
                 const expectedElement = test.expected[i]

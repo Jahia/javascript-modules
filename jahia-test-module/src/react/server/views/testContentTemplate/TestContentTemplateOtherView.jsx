@@ -9,7 +9,7 @@ export const TestContentTemplateOtherView = () => {
 };
 
 TestContentTemplateOtherView.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testContentTemplate",
+  nodeType: "javascriptExample:testContentTemplate",
   componentType: "view",
   name: "other",
 });

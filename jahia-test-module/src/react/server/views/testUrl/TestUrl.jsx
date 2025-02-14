@@ -110,7 +110,7 @@ export const TestUrl = () => {
       <div data-testid="fragment_link">
         <a
           href={buildHtmlFragmentUrl({
-            nodePath: "/sites/npmTestSite/home/testUrl/pagecontent/test",
+            nodePath: "/sites/javascriptTestSite/home/testUrl/pagecontent/test",
           })}
         >
           fragment link
@@ -129,7 +129,7 @@ export const TestUrl = () => {
 };
 
 TestUrl.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testUrl",
+  nodeType: "javascriptExample:testUrl",
   name: "default",
   displayName: "test buildUrl",
   componentType: "view",

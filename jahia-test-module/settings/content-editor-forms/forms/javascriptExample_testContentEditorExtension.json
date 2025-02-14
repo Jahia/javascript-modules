@@ -1,5 +1,5 @@
 {
-  "nodeType": "npmExample:testContentEditorExtension",
+  "nodeType": "javascriptExample:testContentEditorExtension",
   "priority": 1.0,
   "sections": [
     {

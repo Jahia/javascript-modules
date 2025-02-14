@@ -13,7 +13,7 @@ export const TestCurrentUser = () => {
 };
 
 TestCurrentUser.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testCurrentUser",
+  nodeType: "javascriptExample:testCurrentUser",
   name: "default",
   displayName: "test current user",
   componentType: "view",

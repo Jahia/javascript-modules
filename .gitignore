@@ -14,7 +14,7 @@ node_modules/
 javascript-modules-engine/src/main/resources/javascript/
 javascript-modules-engine/src/main/resources/META-INF/js/
 javascript-modules-engine/tests/artifacts/
-jahia-test-module/jahia-npm-module-example-v1.0.0.tgz
+jahia-test-module/jahia-javascript-module-example-v1.0.0.tgz
 jahia-test-module/javascript/client/
 javascript-modules-engine/tests/results/
 javascript-modules-engine/tests/jahia-module/*.tgz

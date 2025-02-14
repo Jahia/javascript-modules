@@ -4,9 +4,9 @@
 
 <urlrewrite>
     <rule>
-        <name>URLRewrite test for npm module</name>
+        <name>URLRewrite test for javascript module</name>
         <note>Redirects old cms/contentmanager urls</note>
-        <from>^/npmModuleURLRewriteTest$</from>
-        <to type="redirect">/en/sites/npmTestSite/home/testModuleSettings.html</to>
+        <from>^/javascriptModuleURLRewriteTest$</from>
+        <to type="redirect">/en/sites/javascriptTestSite/home/testModuleSettings.html</to>
     </rule>
 </urlrewrite>

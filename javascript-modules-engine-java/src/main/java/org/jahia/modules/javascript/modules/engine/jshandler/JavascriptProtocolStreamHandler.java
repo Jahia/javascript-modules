@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jahia.modules.javascript.modules.engine.npmhandler;
+package org.jahia.modules.javascript.modules.engine.jshandler;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.url.AbstractURLStreamHandlerService;
@@ -24,13 +24,13 @@ import java.net.URL;
 import java.net.URLConnection;
 
 /**
- * Npm protocol handler
+ * Javascript protocol handler
  */
-@Component(service = {URLStreamHandlerService.class}, property = {"url.handler.protocol=npm"}, immediate = true)
-public class NpmProtocolStreamHandler extends AbstractURLStreamHandlerService {
+@Component(service = {URLStreamHandlerService.class}, property = {"url.handler.protocol=js"}, immediate = true)
+public class JavascriptProtocolStreamHandler extends AbstractURLStreamHandlerService {
 
     @Override
     public URLConnection openConnection(URL u) throws IOException {
-        return new NpmProtocolConnection(u);
+        return new JavascriptProtocolConnection(u);
     }
 }

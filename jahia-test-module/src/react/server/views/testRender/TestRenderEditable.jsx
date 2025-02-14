@@ -11,8 +11,8 @@ export const TestRenderEditable = () => {
   const allChildren = getChildNodes(currentNode, -1);
   return (
     <>
-      <div data-testid="npm-render-editable-default">
-        <h3>NPM JRender generates editable items by default</h3>
+      <div data-testid="react-render-editable-default">
+        <h3>Render generates editable items by default</h3>
         <div class="childs">
           {allChildren &&
             allChildren.map(function (child, i) {
@@ -20,8 +20,8 @@ export const TestRenderEditable = () => {
             })}
         </div>
       </div>
-      <div data-testid="npm-render-editable">
-        <h3>NPM JRender generates editable items when precised true</h3>
+      <div data-testid="react-render-editable">
+        <h3>Render generates editable items when precised true</h3>
         <div class="childs">
           {allChildren &&
             allChildren.map(function (child, i) {
@@ -29,8 +29,8 @@ export const TestRenderEditable = () => {
             })}
         </div>
       </div>
-      <div data-testid="npm-render-not-editable">
-        <h3>NPM JRender generates non editable items when precised false</h3>
+      <div data-testid="react-render-not-editable">
+        <h3>Render generates non editable items when precised false</h3>
         <div class="childs">
           {allChildren &&
             allChildren.map(function (child, i) {
@@ -43,7 +43,7 @@ export const TestRenderEditable = () => {
 };
 
 TestRenderEditable.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testRenderEditable",
+  nodeType: "javascriptExample:testRenderEditable",
   displayName: "Test JRender Editable",
   componentType: "view",
 });
@@ -55,7 +55,7 @@ export const SimpleText = () => {
 };
 
 SimpleText.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:simpleText",
+  nodeType: "javascriptExample:simpleText",
   displayName: "Simple Text",
   componentType: "view",
 });
