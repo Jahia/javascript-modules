@@ -18,7 +18,6 @@
     "build:development": "run types:copy && tsc && node generate-index.cjs",
     "build:production": "run build:development && run minify",
     "clean": "rm -rf dist",
-    "doc": "typedoc",
     "lint": "yarn run --top-level lint",
     "minify": "node minify.cjs",
     "types:copy": "mkdir -p dist/types && ncp target/types dist/types"
@@ -41,7 +40,6 @@
     "ncp": "^2.0.0",
     "react-i18next": "^15.4.0",
     "terser": "^5.36.0",
-    "typedoc": "^0.25.13",
     "typescript": "^5.7.3"
   },
   "peerDependencies": {
