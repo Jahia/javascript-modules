@@ -52,7 +52,7 @@ export const TestRender = () => {
       Render a text child node :
       <div data-testid="component-text-child-node" className="case">
         <Render path={"simpletext"} />
-        <AddContentButtons childName={"simpletext"} nodeTypes={"jnt:text"} />
+        <AddContentButtons childName={"simpletext"} nodeTypes={["jnt:text"]} />
       </div>
       Render a JSON Node with mixins :
       <div data-testid="component-json-node-with-mixin" className="case">
