@@ -31,7 +31,7 @@ describe('Test virtual nodes', () => {
     });
     it(`${pageName}: Check virtual nodes are correctly rendered in customized preview mode`, function () {
         cy.login();
-        let users = ['fooUser', 'barUser'];
+        const users = ['fooUser', 'barUser'];
         users.forEach(user => {
             createUser(user, 'testPassword');
             cy.visit(`/cms/render/default/en/sites/npmTestSite/home/${pageName}.html?alias=${user}`);

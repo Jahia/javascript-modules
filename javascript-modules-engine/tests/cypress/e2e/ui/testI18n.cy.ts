@@ -11,7 +11,6 @@ const testData = {
             simple: 'Salut !',
             composed: 'Ceci est un test composé: {{placeholder}}'
         },
-        // eslint-disable-next-line camelcase
         fr_LU: {
             simple: 'Salut !',
             composed: 'Ceci est un test composé: {{placeholder}}'

@@ -10,7 +10,7 @@
     "pack": "yarn pack --out dist/package.tgz",
     "deploy": "jahia-deploy",
     "watch": "webpack --mode=development --watch",
-    "lint": "echo 'Linting not implemented at package level, please run it at the root of the workspace.'"
+    "lint": "yarn run --top-level lint"
   },
   "jahia": {
     "maven": {

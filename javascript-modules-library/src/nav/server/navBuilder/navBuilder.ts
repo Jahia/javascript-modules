@@ -214,7 +214,6 @@ const buildMenu = (node: JCRNodeWrapper, navMenuLevel: number, config: MenuConfi
  * @param currentResource the current resource
  * @returns an array of menu entries objects
  */
-/* eslint-disable-next-line max-params */
 export function buildNavMenu(maxDepth: number, base: string, menuEntryView: string, startLevelValue: number, renderContext: RenderContext, currentResource: Resource): MenuEntry[] {
     const workspace = renderContext.isLiveMode() ? 'LIVE' : 'EDIT';
 

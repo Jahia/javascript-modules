@@ -101,7 +101,7 @@ export function buildUrl(props: {
         let jcrNode: JCRNodeWrapper | null;
         try {
             jcrNode = getNodeFromPathOrId({path: props.path}, currentResource.getNode().getSession());
-        } catch (_) {
+        } catch {
             console.warn(`Unable to find node for path: ${props.path}\n Replacing by #`);
             return '#';
         }

@@ -37,8 +37,7 @@ export function Render(
 ): React.JSX.Element {
     const {renderContext, currentResource} = useServerContext();
     return (
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        /* eslint-disable-next-line react/no-danger */ // @ts-ignore
+        // @ts-expect-error <unwanteddiv> is not a valid HTML element
         <unwanteddiv dangerouslySetInnerHTML={{
             __html: server.render.render({
                 content,

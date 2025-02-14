@@ -1,5 +1,5 @@
 import type Lib from '@jahia/javascript-modules-library-private';
-import {createContext, type ReactNode, useContext} from 'react';
+import {createContext, type ReactNode, use} from 'react';
 
 const ServerContext = createContext<Lib.ServerContext>({} as never);
 
@@ -8,13 +8,13 @@ const ServerContext = createContext<Lib.ServerContext>({} as never);
  * @returns the server context
  */
 export function useServerContext(): Lib.ServerContext {
-    return useContext(ServerContext);
+    return use(ServerContext);
 }
 
 export function ServerContextProvider({renderContext, currentResource, currentNode, mainNode, bundleKey, children}: Lib.ServerContext & {readonly children: ReactNode}): React.JSX.Element {
     return (
-        <ServerContext.Provider value={{renderContext, currentResource, currentNode, mainNode, bundleKey}}>
+        <ServerContext value={{renderContext, currentResource, currentNode, mainNode, bundleKey}}>
             {children}
-        </ServerContext.Provider>
+        </ServerContext>
     );
 }
