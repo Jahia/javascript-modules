@@ -1,6 +1,6 @@
 # javascript-modules-library
 
-Javascript Library for NPM Javascript Module Engine
+Javascript Library for Javascript Module Engine
 
 ## Generated types
 

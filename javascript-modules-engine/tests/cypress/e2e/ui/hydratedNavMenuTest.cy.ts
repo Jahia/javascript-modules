@@ -17,12 +17,12 @@ const pages = [
 ]
 
 function buildLink(page) {
-    return `/sites/npmTestSite/${homePage}/${page.path}.html`
+    return `/sites/javascriptTestSite/${homePage}/${page.path}.html`
 }
 
 describe('Test hydration of the navigation menu', () => {
     before(() => {
-        addSimplePage('/sites/npmTestSite', homePage, 'Home (with hydrated menu)', 'en', 'homeHydratedMenu', [
+        addSimplePage('/sites/javascriptTestSite', homePage, 'Home (with hydrated menu)', 'en', 'homeHydratedMenu', [
             {
                 name: 'pagecontent',
                 primaryNodeType: 'jnt:contentList',
@@ -32,18 +32,18 @@ describe('Test hydration of the navigation menu', () => {
         pages.forEach((page) => {
             const parentPath = page.path.includes('/') ? page.path.substring(0, page.path.lastIndexOf('/')) : ''
             addSimplePage(
-                `/sites/npmTestSite/${homePage}/${parentPath}`,
+                `/sites/javascriptTestSite/${homePage}/${parentPath}`,
                 page.path.split('/').pop(),
                 page.title,
                 'en',
                 'homeHydratedMenu',
             )
             if (page.restricted) {
-                revokeRoles(`/sites/npmTestSite/${homePage}/${page.path}`, ['reader'], 'guest', 'USER')
+                revokeRoles(`/sites/javascriptTestSite/${homePage}/${page.path}`, ['reader'], 'guest', 'USER')
             }
         })
 
-        publishAndWaitJobEnding(`/sites/npmTestSite/${homePage}`)
+        publishAndWaitJobEnding(`/sites/javascriptTestSite/${homePage}`)
     })
 
     beforeEach(() => {
@@ -55,7 +55,7 @@ describe('Test hydration of the navigation menu', () => {
     })
 
     it('Should only have the links to the public pages in the initial HTML returned by the server', () => {
-        cy.request(`/sites/npmTestSite/${homePage}.html`).then((resp) => {
+        cy.request(`/sites/javascriptTestSite/${homePage}.html`).then((resp) => {
             pages.forEach((page) => {
                 const link = buildLink(page)
                 if (page.restricted) {
@@ -68,7 +68,7 @@ describe('Test hydration of the navigation menu', () => {
     })
 
     it('Should have all links available as root after hydration', () => {
-        cy.visit(`/sites/npmTestSite/${homePage}.html`)
+        cy.visit(`/sites/javascriptTestSite/${homePage}.html`)
 
         // Wait for the page to be hydrated
         cy.get('div.hydrated').should('exist')
@@ -82,7 +82,7 @@ describe('Test hydration of the navigation menu', () => {
     it('Should not have restricted links available as guest after hydration', () => {
         cy.logout() // Force to be guest
 
-        cy.visit(`/sites/npmTestSite/${homePage}.html`)
+        cy.visit(`/sites/javascriptTestSite/${homePage}.html`)
 
         // Wait for the page to be hydrated
         cy.get('div.hydrated').should('exist')

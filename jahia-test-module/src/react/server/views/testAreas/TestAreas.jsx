@@ -47,7 +47,7 @@ export const TestAreas = () => {
 
       <h2>Area type</h2>
       <div data-testid="areaType">
-        <Area name="areaType" areaType="npmExample:testAreaColumns" />
+        <Area name="areaType" areaType="javascriptExample:testAreaColumns" />
       </div>
 
       <h2>Area parameters</h2>
@@ -66,7 +66,7 @@ export const TestAreas = () => {
 };
 
 TestAreas.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testAreas",
+  nodeType: "javascriptExample:testAreas",
   name: "default",
   displayName: "test Areas (react)",
   componentType: "view",

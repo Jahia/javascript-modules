@@ -24,6 +24,6 @@ export const TestReactClientSide = () => {
 
 TestReactClientSide.jahiaComponent = defineJahiaComponent({
   id: "test_react_react_client_side",
-  nodeType: "npmExample:testReactClientSide",
+  nodeType: "javascriptExample:testReactClientSide",
   componentType: "view",
 });

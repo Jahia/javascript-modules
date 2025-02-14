@@ -1,7 +1,7 @@
 {
-  "name": "@jahia/npm-module-example",
+  "name": "@jahia/javascript-module-example",
   "version": "1.0.0",
-  "description": "Jahia NPM Test module",
+  "description": "Javascript module test",
   "license": "MIT",
   "author": "Jahia Solutions Group SA",
   "scripts": {
@@ -43,7 +43,7 @@
   },
   "jahia": {
     "maven": {
-      "groupId": "org.example.modules.npm",
+      "groupId": "org.example.modules.javascript",
       "distributionManagement": {
         "repository": {
           "id": "jahia-releases",

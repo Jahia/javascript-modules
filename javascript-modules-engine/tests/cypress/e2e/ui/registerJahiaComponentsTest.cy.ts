@@ -4,7 +4,7 @@ import { addSimplePage } from '../../utils/Utils'
 describe('Verify that registerJahiaComponents behaves as expected', () => {
     before('Create test contents', () => {
         addSimplePage(
-            '/sites/npmTestSite/home',
+            '/sites/javascriptTestSite/home',
             'testRegisterJahiaComponents',
             'Test registerJahiaComponents',
             'en',
@@ -17,16 +17,16 @@ describe('Verify that registerJahiaComponents behaves as expected', () => {
             ],
         ).then(() => {
             addNode({
-                parentPathOrId: '/sites/npmTestSite/home/testRegisterJahiaComponents/pagecontent',
+                parentPathOrId: '/sites/javascriptTestSite/home/testRegisterJahiaComponents/pagecontent',
                 name: 'test',
-                primaryNodeType: 'npmExample:testReactViewRegistration',
+                primaryNodeType: 'javascriptExample:testReactViewRegistration',
             })
         })
     })
 
     beforeEach('Login and visit', () => {
         cy.login()
-        cy.visit('/jahia/jcontent/npmTestSite/en/pages/home/testRegisterJahiaComponents')
+        cy.visit('/jahia/jcontent/javascriptTestSite/en/pages/home/testRegisterJahiaComponents')
     })
 
     it('Check that components are properly registered', () => {

@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.jahia.modules.javascript.modules.engine.npmhandler.NpmProtocolConnection.BUNDLE_HEADER_NPM_INIT_SCRIPT;
+import static org.jahia.modules.javascript.modules.engine.jshandler.JavascriptProtocolConnection.BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT;
 
 /**
  * Base JS engine based on GraalVM
@@ -70,9 +70,9 @@ public class GraalVMEngine {
         this.globals = globals;
     }
 
-    public void enableNpmModule(Bundle bundle) {
+    public void enableJavascriptModule(Bundle bundle) {
         try {
-            initScripts.put(bundle, getGraalSource(bundle, bundle.getHeaders().get(BUNDLE_HEADER_NPM_INIT_SCRIPT)));
+            initScripts.put(bundle, getGraalSource(bundle, bundle.getHeaders().get(BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT)));
             version.incrementAndGet();
             logger.info("Registered bundle {} in GraalVM engine", bundle.getSymbolicName());
         } catch (IOException ioe) {
@@ -80,7 +80,7 @@ public class GraalVMEngine {
         }
     }
 
-    public void disableNpmModule(Bundle bundle) {
+    public void disableJavascriptModule(Bundle bundle) {
         if (initScripts.remove(bundle) != null) {
             version.incrementAndGet();
             logger.info("Unregistered bundle {} from GraalVM engine", bundle.getSymbolicName());

@@ -6,25 +6,25 @@ describe('Area test', () => {
     const pageName = 'testJArea'
 
     before('Create test page and contents', () => {
-        enableModule('event', 'npmTestSite')
+        enableModule('event', 'javascriptTestSite')
 
-        addSimplePage('/sites/npmTestSite/home', pageName, pageName, 'en', 'simple', [
+        addSimplePage('/sites/javascriptTestSite/home', pageName, pageName, 'en', 'simple', [
             {
                 name: 'pagecontent',
                 primaryNodeType: 'jnt:contentList',
             },
         ]).then(() => {
             addNode({
-                parentPathOrId: `/sites/npmTestSite/home/${pageName}/pagecontent`,
+                parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/pagecontent`,
                 name: 'test',
-                primaryNodeType: 'npmExample:testAreas',
+                primaryNodeType: 'javascriptExample:testAreas',
             })
         })
     })
 
     it(`${pageName}: Basic Area test`, () => {
         cy.login()
-        cy.visit(`/jahia/jcontent/npmTestSite/en/pages/home/${pageName}`)
+        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         cy.iframe('#page-builder-frame-1').within(() => {
             cy.get('div[data-testid="basicArea"]').find('div[type="area"]').should('be.visible')
         })
@@ -33,7 +33,7 @@ describe('Area test', () => {
 
     it(`${pageName}: Allowed types area`, () => {
         cy.login()
-        cy.visit(`/jahia/jcontent/npmTestSite/en/pages/home/${pageName}`)
+        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         cy.iframe('#page-builder-frame-1').within(() => {
             cy.get('div[data-testid="allowedTypesArea"]')
                 .find('div[type="placeholder"]')
@@ -51,14 +51,14 @@ describe('Area test', () => {
 
     it(`${pageName}: Number of items area`, () => {
         cy.login()
-        cy.visit(`/jahia/jcontent/npmTestSite/en/pages/home/${pageName}`)
+        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         addNode({
-            parentPathOrId: `/sites/npmTestSite/home/${pageName}/numberOfItemsArea`,
+            parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/numberOfItemsArea`,
             name: 'item1',
             primaryNodeType: 'jnt:bigText',
         })
         addNode({
-            parentPathOrId: `/sites/npmTestSite/home/${pageName}/numberOfItemsArea`,
+            parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/numberOfItemsArea`,
             name: 'item2',
             primaryNodeType: 'jnt:bigText',
         })
@@ -71,7 +71,7 @@ describe('Area test', () => {
 
     it(`${pageName}: areaView Area`, () => {
         cy.login()
-        cy.visit(`/jahia/jcontent/npmTestSite/en/pages/home/${pageName}`)
+        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         cy.iframe('#page-builder-frame-1').within(() => {
             cy.get('div[data-testid="areaViewArea"]').find('ul[class*="dropdown"]').should('be.visible')
         })
@@ -80,9 +80,9 @@ describe('Area test', () => {
 
     it(`${pageName}: subNodesView Area`, () => {
         cy.login()
-        cy.visit(`/jahia/jcontent/npmTestSite/en/pages/home/${pageName}`)
+        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         addNode({
-            parentPathOrId: `/sites/npmTestSite/home/${pageName}/subNodesViewArea`,
+            parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/subNodesViewArea`,
             name: 'item1',
             primaryNodeType: 'jnt:bigText',
         })
@@ -95,7 +95,7 @@ describe('Area test', () => {
 
     it(`${pageName}: path Area`, () => {
         cy.login()
-        cy.visit(`/jahia/jcontent/npmTestSite/en/pages/home/${pageName}`)
+        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         cy.iframe('#page-builder-frame-1').within(() => {
             cy.get('div[data-testid="pathArea"]').find('div[type="area"]').should('exist')
         })
@@ -104,7 +104,7 @@ describe('Area test', () => {
 
     it(`${pageName}: non editable Area`, () => {
         cy.login()
-        cy.visit(`/jahia/jcontent/npmTestSite/en/pages/home/${pageName}`)
+        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         cy.iframe('#page-builder-frame-1').within(() => {
             cy.get('div[data-testid="nonEditableArea"]').should('be.empty')
         })
@@ -113,7 +113,7 @@ describe('Area test', () => {
 
     it(`${pageName}: Area as sub node`, () => {
         cy.login()
-        cy.visit(`/jahia/jcontent/npmTestSite/en/pages/home/${pageName}`)
+        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         cy.iframe('#page-builder-frame-1').within(() => {
             cy.get('div[data-testid="areaAsSubNode"]')
                 .find('div[type="area"]')
@@ -125,7 +125,7 @@ describe('Area test', () => {
 
     it(`${pageName}: Area type`, () => {
         cy.login()
-        cy.visit(`/jahia/jcontent/npmTestSite/en/pages/home/${pageName}`)
+        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         cy.iframe('#page-builder-frame-1').within(() => {
             cy.get('div[data-testid="areaType"]').find('div[data-testid="row-areaType"]').should('exist')
         })
@@ -134,7 +134,7 @@ describe('Area test', () => {
 
     it(`${pageName}: should render area with parameters`, function () {
         cy.login()
-        cy.visit(`/jahia/jcontent/npmTestSite/en/pages/home/${pageName}`)
+        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         cy.iframe('#page-builder-frame-1').within(() => {
             cy.get('div[data-testid="areaParam-string1"]').should('contain', 'stringParam1=stringValue1')
             cy.get('div[data-testid="areaParam-string2"]').should('contain', 'stringParam2=stringValue2')

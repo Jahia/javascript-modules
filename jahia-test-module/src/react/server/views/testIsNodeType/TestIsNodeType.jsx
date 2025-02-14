@@ -6,7 +6,7 @@ export const TestIsNodeType = () => {
     <>
       <h3>Current node type is testIsNodeType</h3>
       <div data-testid="currentNode_isNodeType">
-        {currentNode.isNodeType("npmExample:testIsNodeType") ? "true" : "false"}
+        {currentNode.isNodeType("javascriptExample:testIsNodeType") ? "true" : "false"}
       </div>
 
       <h3>Current node type is not jnt:page</h3>
@@ -18,7 +18,7 @@ export const TestIsNodeType = () => {
 };
 
 TestIsNodeType.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testIsNodeType",
+  nodeType: "javascriptExample:testIsNodeType",
   name: "default",
   displayName: "test is node type",
   componentType: "view",

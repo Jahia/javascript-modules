@@ -78,7 +78,7 @@ public class OSGiHelper {
     public String loadResource(Bundle bundle, String path, boolean optional) throws RenderException {
         String result = GraalVMEngine.loadResource(bundle, path);
         if (!optional && result == null) {
-            // todo (BACKLOG-21263) handle exception correctly in NPM views
+            // todo (BACKLOG-21263) handle exception correctly in javascript views
             //throw new RenderException(String.format("Unable to load resource: %s from bundle: %s", path, bundle.getSymbolicName()));
             logger.error("Unable to load resource: {} from bundle: {}", path, bundle.getSymbolicName());
         }
