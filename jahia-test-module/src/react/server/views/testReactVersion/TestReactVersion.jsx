@@ -10,7 +10,7 @@ export const TestReactVersion = () => {
 };
 
 TestReactVersion.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testReactVersion",
+  nodeType: "javascriptExample:testReactVersion",
   name: "default",
   componentType: "view",
 });

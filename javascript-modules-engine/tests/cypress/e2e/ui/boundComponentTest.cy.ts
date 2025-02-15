@@ -2,14 +2,14 @@ import { enableModule, publishAndWaitJobEnding } from '@jahia/cypress'
 import { addEvent, addEventPageAndEvents, addSimplePage } from '../../utils/Utils'
 
 describe('Check on bound components', () => {
-    const siteKey = 'npmTestSite'
+    const siteKey = 'javascriptTestSite'
 
     before(() => {
         enableModule('calendar', siteKey)
         enableModule('event', siteKey)
 
         addSimplePage(
-            '/sites/npmTestSite/home',
+            '/sites/javascriptTestSite/home',
             'testBoundComponent',
             'testBoundComponent',
             'en',
@@ -118,32 +118,32 @@ describe('Check on bound components', () => {
     it('Test boundComponent behavior with area/list creation by edit mode', function () {
         cy.login()
         // The page have been published without rendering in edit mode, list for area won't be created yet, check live:
-        cy.visit('/sites/npmTestSite/home/testBoundComponent.html', { failOnStatusCode: false })
+        cy.visit('/sites/javascriptTestSite/home/testBoundComponent.html', { failOnStatusCode: false })
         cy.get('[data-testid="boundComponent_path"]').should('contain', 'null')
         // Check preview:
-        cy.visit('/cms/render/default/en/sites/npmTestSite/home/testBoundComponent.html')
+        cy.visit('/cms/render/default/en/sites/javascriptTestSite/home/testBoundComponent.html')
         cy.get('[data-testid="boundComponent_path"]').should('contain', 'null')
 
         // Go to edit mode to trigger the area/list creation
-        cy.visit('/jahia/jcontent/npmTestSite/en/pages/home/testBoundComponent')
+        cy.visit('/jahia/jcontent/javascriptTestSite/en/pages/home/testBoundComponent')
         cy.iframe('[data-sel-role="page-builder-frame-active"]', { timeout: 90000, log: true }).within(() => {
             // The list should have been created
             cy.get('[data-testid="boundComponent_path"]').should(
                 'contain',
-                '/npmTestSite/home/testBoundComponent/events',
+                '/javascriptTestSite/home/testBoundComponent/events',
             )
         })
         // Retest preview that should now be correct
-        cy.visit('/cms/render/default/en/sites/npmTestSite/home/testBoundComponent.html')
-        cy.get('[data-testid="boundComponent_path"]').should('contain', '/npmTestSite/home/testBoundComponent/events')
+        cy.visit('/cms/render/default/en/sites/javascriptTestSite/home/testBoundComponent.html')
+        cy.get('[data-testid="boundComponent_path"]').should('contain', '/javascriptTestSite/home/testBoundComponent/events')
         // Retest live that should still not be correct, since we didn't publish the changes
-        cy.visit('/sites/npmTestSite/home/testBoundComponent.html', { failOnStatusCode: false })
+        cy.visit('/sites/javascriptTestSite/home/testBoundComponent.html', { failOnStatusCode: false })
         cy.get('[data-testid="boundComponent_path"]').should('contain', 'null')
 
         // Publish the changes, and retest live that should be correct
-        publishAndWaitJobEnding('/sites/npmTestSite/home/testBoundComponent')
-        cy.visit('/sites/npmTestSite/home/testBoundComponent.html', { failOnStatusCode: false })
-        cy.get('[data-testid="boundComponent_path"]').should('contain', '/npmTestSite/home/testBoundComponent/events')
+        publishAndWaitJobEnding('/sites/javascriptTestSite/home/testBoundComponent')
+        cy.visit('/sites/javascriptTestSite/home/testBoundComponent.html', { failOnStatusCode: false })
+        cy.get('[data-testid="boundComponent_path"]').should('contain', '/javascriptTestSite/home/testBoundComponent/events')
         cy.logout()
     })
 })

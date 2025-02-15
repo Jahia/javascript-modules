@@ -64,7 +64,7 @@ export const NavMenu = () => {
 };
 
 NavMenu.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:navMenu",
+  nodeType: "javascriptExample:navMenu",
   name: "default",
   displayName: "navMenu",
   componentType: "view",

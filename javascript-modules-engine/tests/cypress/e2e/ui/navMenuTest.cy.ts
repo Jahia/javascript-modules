@@ -17,7 +17,7 @@ import { addSimplePage } from '../../utils/Utils'
 import { addNode } from '@jahia/cypress'
 
 const menuUrl = (template, depth, lvl = 0, page = '', base = 'home') =>
-    `/cms/render/default/en/sites/npmTestSite/home${page}.${template}.html?maxDepth=${depth}&baseline=${base}&startLevel=${lvl}`
+    `/cms/render/default/en/sites/javascriptTestSite/home${page}.${template}.html?maxDepth=${depth}&baseline=${base}&startLevel=${lvl}`
 
 const cleanHTMLTags = (str) => {
     if (str.includes('<!DOCTYPE html>')) {
@@ -31,19 +31,19 @@ describe('navMenu helper test parameters', () => {
     const templateName = 'navMenu'
 
     before(() => {
-        addSimplePage('/sites/npmTestSite/home/', 'pageA', 'Page A', 'en', 'simple')
-        addSimplePage('/sites/npmTestSite/home/pageA', 'pageAA', 'Page A A', 'en', 'simple')
-        addSimplePage('/sites/npmTestSite/home/pageA/pageAA', 'pageAAA', 'Page A A A', 'en', 'simple')
-        addSimplePage('/sites/npmTestSite/home/pageA', 'pageAB', 'Page A B', 'en', 'simple')
-        addSimplePage('/sites/npmTestSite/home/pageA/pageAB', 'pageABA', 'Page A B A', 'en', 'simple')
-        addSimplePage('/sites/npmTestSite/home/', 'pageB', 'Page B', 'en', 'simple')
-        addSimplePage('/sites/npmTestSite/home/pageB', 'pageBA', 'Page B A', 'en', 'simple')
-        addSimplePage('/sites/npmTestSite/home/pageB/pageBA', 'pageBAA', 'Page B A A', 'en', 'simple')
-        addSimplePage('/sites/npmTestSite/home/pageB', 'pageBB', 'Page B B', 'en', 'simple')
-        addSimplePage('/sites/npmTestSite/home/pageB/pageBB', 'pageBBA', 'Page B B A', 'en', 'simple')
+        addSimplePage('/sites/javascriptTestSite/home/', 'pageA', 'Page A', 'en', 'simple')
+        addSimplePage('/sites/javascriptTestSite/home/pageA', 'pageAA', 'Page A A', 'en', 'simple')
+        addSimplePage('/sites/javascriptTestSite/home/pageA/pageAA', 'pageAAA', 'Page A A A', 'en', 'simple')
+        addSimplePage('/sites/javascriptTestSite/home/pageA', 'pageAB', 'Page A B', 'en', 'simple')
+        addSimplePage('/sites/javascriptTestSite/home/pageA/pageAB', 'pageABA', 'Page A B A', 'en', 'simple')
+        addSimplePage('/sites/javascriptTestSite/home/', 'pageB', 'Page B', 'en', 'simple')
+        addSimplePage('/sites/javascriptTestSite/home/pageB', 'pageBA', 'Page B A', 'en', 'simple')
+        addSimplePage('/sites/javascriptTestSite/home/pageB/pageBA', 'pageBAA', 'Page B A A', 'en', 'simple')
+        addSimplePage('/sites/javascriptTestSite/home/pageB', 'pageBB', 'Page B B', 'en', 'simple')
+        addSimplePage('/sites/javascriptTestSite/home/pageB/pageBB', 'pageBBA', 'Page B B A', 'en', 'simple')
         // Add menu items
         const externalLink = {
-            parentPathOrId: '/sites/npmTestSite/home/',
+            parentPathOrId: '/sites/javascriptTestSite/home/',
             name: 'externalLink',
             primaryNodeType: 'jnt:externalLink',
             properties: [{ name: 'j:url', value: 'https://www.jahia.com', language: 'en' }],
@@ -64,7 +64,7 @@ describe('navMenu helper test parameters', () => {
         cy.login()
         cy.request(menuUrl(templateName, 1)).then((resp) => {
             const tree = JSON.parse(cleanHTMLTags(resp.body))
-            expect(tree.filter((menu) => menu.render === '/sites/npmTestSite/home/pageA')).to.exist
+            expect(tree.filter((menu) => menu.render === '/sites/javascriptTestSite/home/pageA')).to.exist
         })
         cy.logout()
     })
@@ -79,8 +79,8 @@ describe('navMenu helper test parameters', () => {
             const tree = JSON.parse(cleanHTMLTags(resp.body))
             tree.forEach((menu) => {
                 if (
-                    menu.render === '/sites/npmTestSite/home/pageA' ||
-                    menu.render === '/sites/npmTestSite/home/pageB'
+                    menu.render === '/sites/javascriptTestSite/home/pageA' ||
+                    menu.render === '/sites/javascriptTestSite/home/pageB'
                 ) {
                     expect(menu.children.length).equals(2)
                     menu.children.forEach((subMenu) => expect(subMenu.children).to.not.exist)
@@ -91,8 +91,8 @@ describe('navMenu helper test parameters', () => {
             const tree = JSON.parse(cleanHTMLTags(resp.body))
             tree.forEach((menu) => {
                 if (
-                    menu.render === '/sites/npmTestSite/home/pageA' ||
-                    menu.render === '/sites/npmTestSite/home/pageB'
+                    menu.render === '/sites/javascriptTestSite/home/pageA' ||
+                    menu.render === '/sites/javascriptTestSite/home/pageB'
                 ) {
                     expect(menu.children.length).equals(2)
                     menu.children.forEach((subMenu) => expect(subMenu.children.length).equals(1))
@@ -137,13 +137,13 @@ describe('navMenu helper test parameters', () => {
             tree.forEach((menu) => {
                 console.log(menu)
 
-                if (menu.render === '/sites/npmTestSite/home/pageA/pageAA') {
-                    expect(menu.children[0].render).equals('/sites/npmTestSite/home/pageA/pageAA/pageAAA')
+                if (menu.render === '/sites/javascriptTestSite/home/pageA/pageAA') {
+                    expect(menu.children[0].render).equals('/sites/javascriptTestSite/home/pageA/pageAA/pageAAA')
                     return
                 }
 
-                if (menu.render === '/sites/npmTestSite/home/pageA/pageAB') {
-                    expect(menu.children[0].render).equals('/sites/npmTestSite/home/pageA/pageAB/pageABA')
+                if (menu.render === '/sites/javascriptTestSite/home/pageA/pageAB') {
+                    expect(menu.children[0].render).equals('/sites/javascriptTestSite/home/pageA/pageAB/pageABA')
                     return
                 }
 
@@ -158,7 +158,7 @@ describe('navMenu helper test parameters', () => {
         cy.request(menuUrl(templateName, 3, 0, '/pageA')).then((resp) => {
             const tree = JSON.parse(cleanHTMLTags(resp.body))
             tree.forEach((menu) => {
-                if (menu.render === '/sites/npmTestSite/home/pageA') {
+                if (menu.render === '/sites/javascriptTestSite/home/pageA') {
                     expect(menu.inPath).to.be.true
                     expect(menu.selected).to.be.true
                 } else {
@@ -178,7 +178,7 @@ describe('navMenu helper test parameters', () => {
         cy.request(menuUrl(templateName, 3, 0, '/pageA/pageAA')).then((resp) => {
             const tree = JSON.parse(cleanHTMLTags(resp.body))
             tree.forEach((menu) => {
-                if (menu.render === '/sites/npmTestSite/home/pageA') {
+                if (menu.render === '/sites/javascriptTestSite/home/pageA') {
                     expect(menu.inPath).to.be.true
                 } else {
                     expect(menu.inPath).to.be.false
@@ -187,7 +187,7 @@ describe('navMenu helper test parameters', () => {
                 expect(menu.selected).to.be.false
                 if (menu.children) {
                     menu.children.forEach((subMenu) => {
-                        if (subMenu.render === '/sites/npmTestSite/home/pageA/pageAA') {
+                        if (subMenu.render === '/sites/javascriptTestSite/home/pageA/pageAA') {
                             expect(subMenu.inPath).to.be.true
                             expect(subMenu.selected).to.be.true
                         } else {

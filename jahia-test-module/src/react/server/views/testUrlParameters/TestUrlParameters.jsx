@@ -12,7 +12,7 @@ export const TestUrlParameters = () => {
 };
 
 TestUrlParameters.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testUrlParameters",
+  nodeType: "javascriptExample:testUrlParameters",
   name: "default",
   displayName: "test url parameters",
   componentType: "view",

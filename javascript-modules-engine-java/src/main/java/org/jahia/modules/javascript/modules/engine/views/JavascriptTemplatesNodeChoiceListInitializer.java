@@ -42,8 +42,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component(immediate = true)
-public class NpmTemplatesNodeChoiceListInitializer implements ChoiceListInitializer {
-    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(NpmTemplatesNodeChoiceListInitializer.class);
+public class JavascriptTemplatesNodeChoiceListInitializer implements ChoiceListInitializer {
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(JavascriptTemplatesNodeChoiceListInitializer.class);
 
     private ChoiceListInitializerService service;
 

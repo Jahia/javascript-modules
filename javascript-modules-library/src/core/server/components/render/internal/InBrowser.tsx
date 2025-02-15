@@ -92,7 +92,7 @@ function InBrowser<T>({
         <AddResources key={`i18n_initialStore_${bundleKey}`} insert inlineResource={i18nScript} />
       )}
       <AddResources
-        key="npm-engine-appShellInitData"
+        key="javascript-engine-appShellInitData"
         insert
         inlineResource={appShellInitDataScript}
       />
