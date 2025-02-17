@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "strictBuiltinIteratorReturn": true,
+    "target": "esnext",
+    "verbatimModuleSyntax": true
+  },
+  "include": ["src/**/*", "*.mjs"]
+}

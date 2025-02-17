@@ -4,7 +4,7 @@ import {
   server,
   useServerContext,
 } from "@jahia/javascript-modules-library";
-import SampleHydratedMenu from "../../../../client/SampleHydratedMenu";
+import SampleHydratedMenu from "$client/components/SampleHydratedMenu";
 import { buildNode } from "../../../../helpers/menu";
 import { useBaseNode } from "../../../../hooks/useBaseNode";
 

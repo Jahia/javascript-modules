@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-export const SampleI18n = ({ placeholder = "" }) => {
+export default function SampleI18n({ placeholder = "" }) {
   const { t } = useTranslation();
   const [updatedPlaceholder, setUpdatedPlaceholder] = useState(placeholder);
 
@@ -25,6 +25,4 @@ export const SampleI18n = ({ placeholder = "" }) => {
       </p>
     </>
   );
-};
-
-export default SampleI18n;
+}

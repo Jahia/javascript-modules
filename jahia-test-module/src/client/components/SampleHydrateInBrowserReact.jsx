@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const SampleHydrateInBrowserReact = ({ initialValue }) => {
+export default function SampleHydrateInBrowserReact({ initialValue }) {
   const [count, setCount] = useState(initialValue);
 
   const handleClick = () => {
@@ -16,6 +16,4 @@ const SampleHydrateInBrowserReact = ({ initialValue }) => {
       </button>
     </div>
   );
-};
-
-export default SampleHydrateInBrowserReact;
+}
