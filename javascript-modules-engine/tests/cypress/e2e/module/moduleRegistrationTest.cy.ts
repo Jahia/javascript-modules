@@ -36,8 +36,9 @@ describe('Check that components of a module are correctly registered', () => {
                         .length,
                 ).to.eq(2)
                 expect(
-                    simpleType.supertypes.filter((superType) => superType.name === 'javascriptExampleMix:javascriptExampleComponent')
-                        .length,
+                    simpleType.supertypes.filter(
+                        (superType) => superType.name === 'javascriptExampleMix:javascriptExampleComponent',
+                    ).length,
                 ).to.eq(1)
                 expect(simpleType.icon).to.eq('/modules/jahia-javascript-module-example/icons/javascriptExample_test')
             })

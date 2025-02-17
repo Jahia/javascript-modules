@@ -11,6 +11,7 @@ export { Area } from "./core/server/components/Area.js";
 
 // Declaration and registration
 export { defineJahiaComponent } from "./core/server/framework/defineJahiaComponent.js";
+export { jahiaComponent } from "./core/server/framework/jahiaComponent.js";
 export { registerJahiaComponents } from "./core/server/framework/register.js";
 
 // Hooks

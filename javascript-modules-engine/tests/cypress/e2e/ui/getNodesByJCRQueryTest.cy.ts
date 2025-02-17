@@ -17,12 +17,19 @@ describe('getNodesByJCRQuery function test', () => {
     }
 
     before('Create test page and contents', () => {
-        addSimplePage('/sites/javascriptTestSite/home', 'getNodesByJCRQuery', 'Test getNodesByJCRQuery', 'en', 'simple', [
-            {
-                name: 'pagecontent',
-                primaryNodeType: 'jnt:contentList',
-            },
-        ]).then(() => {
+        addSimplePage(
+            '/sites/javascriptTestSite/home',
+            'getNodesByJCRQuery',
+            'Test getNodesByJCRQuery',
+            'en',
+            'simple',
+            [
+                {
+                    name: 'pagecontent',
+                    primaryNodeType: 'jnt:contentList',
+                },
+            ],
+        ).then(() => {
             addNode({
                 parentPathOrId: '/sites/javascriptTestSite/home/getNodesByJCRQuery/pagecontent',
                 name: 'getNodesByJCRQuery',

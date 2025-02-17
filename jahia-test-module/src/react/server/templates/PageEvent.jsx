@@ -1,13 +1,17 @@
-import {
-  AddResources,
-  Area,
-  defineJahiaComponent,
-  Render,
-} from "@jahia/javascript-modules-library";
+import { AddResources, Area, jahiaComponent, Render } from "@jahia/javascript-modules-library";
 import { calendar, facets, footer, header, login, navMenu } from "./pageComponents";
 
-export const PageEvent = () => {
-  return (
+jahiaComponent(
+  {
+    nodeType: "jnt:page",
+    name: "events",
+    displayName: "Events page",
+    componentType: "template",
+    properties: {
+      "cache.requestParameters": "N-*",
+    },
+  },
+  () => (
     <html lang="en">
       <head>
         <AddResources type={"css"} resources={"styles.css"} />
@@ -42,15 +46,5 @@ export const PageEvent = () => {
         </div>
       </body>
     </html>
-  );
-};
-
-PageEvent.jahiaComponent = defineJahiaComponent({
-  nodeType: "jnt:page",
-  name: "events",
-  displayName: "Events page",
-  componentType: "template",
-  properties: {
-    "cache.requestParameters": "N-*",
-  },
-});
+  ),
+);

@@ -1,6 +1,6 @@
 import { server } from "@jahia/javascript-modules-library-private";
-import type { JahiaComponent } from "./defineJahiaComponent.js";
 import type { Bundle } from "org.osgi.framework";
+import { JahiaComponent } from "./jahiaComponent";
 
 /** This is provided by Jahia runtime */
 declare const bundle: Bundle;
@@ -8,9 +8,8 @@ declare const bundle: Bundle;
 /**
  * Registers Jahia components into the global registry as views
  *
+ * @deprecated Use `jahiaComponent()` instead to define and register a component.
  * @param jahiaComponents An object containing the jahia components to register
- * @todo We will probably want to revisit this function once we handle global component registration
- *   in ticket https://jira.jahia.org/browse/BACKLOG-22400
  */
 export function registerJahiaComponents(
   jahiaComponents: Record<

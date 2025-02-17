@@ -20,6 +20,7 @@ export * from "./testHasPermission/TestHasPermission";
 export * from "./testI18n/TestI18n";
 export * from "./testIsNodeType/TestIsNodeType";
 export * from "./testJCRQuery/TestJCRQuery";
+export * from "./testLegacyRegistration/TestLegacyRegistration";
 export * from "./testLocale/TestLocale";
 export * from "./testReactClientSide/TestReactClientSide";
 export * from "./testReactVersion/TestReactVersion";

@@ -1,19 +1,19 @@
-import { defineJahiaComponent, useServerContext } from "@jahia/javascript-modules-library";
+import { jahiaComponent } from "@jahia/javascript-modules-library";
 
-export const TestCrashingView = () => {
-  const { currentNode } = useServerContext();
-  currentNode.getProperty("not_existing_property");
+jahiaComponent(
+  {
+    nodeType: "javascriptExample:testCrashingView",
+    name: "default",
+    displayName: "test crashing view",
+    componentType: "view",
+  },
+  (_, { currentNode }) => {
+    currentNode.getProperty("not_existing_property");
 
-  return (
-    <>
-      <p>This view is expected to crash</p>
-    </>
-  );
-};
-
-TestCrashingView.jahiaComponent = defineJahiaComponent({
-  nodeType: "javascriptExample:testCrashingView",
-  name: "default",
-  displayName: "test crashing view",
-  componentType: "view",
-});
+    return (
+      <>
+        <p>This view is expected to crash</p>
+      </>
+    );
+  },
+);

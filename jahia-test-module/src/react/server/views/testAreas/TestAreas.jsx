@@ -1,7 +1,13 @@
-import { Area, defineJahiaComponent } from "@jahia/javascript-modules-library";
+import { Area, jahiaComponent } from "@jahia/javascript-modules-library";
 
-export const TestAreas = () => {
-  return (
+jahiaComponent(
+  {
+    nodeType: "javascriptExample:testAreas",
+    name: "default",
+    displayName: "test Areas (react)",
+    componentType: "view",
+  },
+  () => (
     <>
       <h2>React JArea test component</h2>
 
@@ -62,12 +68,5 @@ export const TestAreas = () => {
         />
       </div>
     </>
-  );
-};
-
-TestAreas.jahiaComponent = defineJahiaComponent({
-  nodeType: "javascriptExample:testAreas",
-  name: "default",
-  displayName: "test Areas (react)",
-  componentType: "view",
-});
+  ),
+);

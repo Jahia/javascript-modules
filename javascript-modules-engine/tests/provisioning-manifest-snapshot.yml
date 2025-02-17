@@ -5,6 +5,6 @@
   uninstallPreviousVersion: true
 
 - installBundle:
-    - 'js:mvn:org.example.modules.javascript/jahia-javascript-module-example/1.0.0-SNAPSHOT/tgz'
+      - 'js:mvn:org.example.modules.javascript/jahia-javascript-module-example/1.0.0-SNAPSHOT/tgz'
   autoStart: true
   uninstallPreviousVersion: true

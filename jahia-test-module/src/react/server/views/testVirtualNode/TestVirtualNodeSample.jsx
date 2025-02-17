@@ -1,17 +1,13 @@
-import {
-  defineJahiaComponent,
-  getNodeProps,
-  useServerContext,
-} from "@jahia/javascript-modules-library";
+import { getNodeProps, jahiaComponent } from "@jahia/javascript-modules-library";
 
-export const TestVirtualNodeSample = () => {
-  const { currentNode } = useServerContext();
-  const props = getNodeProps(currentNode, ["myProperty"]);
+jahiaComponent(
+  {
+    nodeType: "javascriptExample:testVirtualNodeSample",
+    componentType: "view",
+  },
+  (_, { currentNode }) => {
+    const props = getNodeProps(currentNode, ["myProperty"]);
 
-  return <div data-testid="testVirtualNodeSample_myProperty">{props["myProperty"]}</div>;
-};
-
-TestVirtualNodeSample.jahiaComponent = defineJahiaComponent({
-  nodeType: "javascriptExample:testVirtualNodeSample",
-  componentType: "view",
-});
+    return <div data-testid="testVirtualNodeSample_myProperty">{props["myProperty"]}</div>;
+  },
+);
