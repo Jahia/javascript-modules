@@ -17,7 +17,7 @@ jobs:
         jahia_image: ["jahia/jahia-ee-dev:8-SNAPSHOT"]
     timeout-minutes: 45
     steps:
-      - uses: jahia/jahia-modules-action/helper@v2
+      - uses: jahia/jahia-modules-action/helper@chore/rename-npm-to-javascript
       - uses: KengoTODA/actions-setup-docker-compose@main
         with:
           version: "1.29.2"
@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: "lts/*"
       - uses: actions/checkout@v4
-      - uses: jahia/jahia-modules-action/integration-tests@v2
+      - uses: jahia/jahia-modules-action/integration-tests@chore/rename-npm-to-javascript
         with:
           module_id: javascript-modules-engine
           tests_path: "javascript-modules-engine/tests/"
