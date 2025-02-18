@@ -2213,12 +2213,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jahia-module@workspace:jahia-module":
-  version: 0.0.0-use.local
-  resolution: "jahia-module@workspace:jahia-module"
-  languageName: unknown
-  linkType: soft
-
 "js-base64@npm:^3.6.0":
   version: 3.7.2
   resolution: "js-base64@npm:3.7.2"
