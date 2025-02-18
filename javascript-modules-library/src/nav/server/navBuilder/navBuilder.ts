@@ -1,12 +1,10 @@
 import { server } from "@jahia/javascript-modules-library-private";
-import { print } from "graphql";
-import gql from "graphql-tag";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 import type { RenderContext, Resource } from "org.jahia.services.render";
 
 const getPageAncestors = (workspace: string, path: string, types: string[]) => {
   const result = server.gql.executeQuerySync({
-    query: print(gql`
+    query: /* GraphQL */ `
       query ($workspace: Workspace!, $path: String!, $types: [String]!) {
         jcr(workspace: $workspace) {
           nodeByPath(path: $path) {
@@ -17,7 +15,7 @@ const getPageAncestors = (workspace: string, path: string, types: string[]) => {
           }
         }
       }
-    `),
+    `,
     variables: {
       workspace,
       path,
@@ -47,7 +45,7 @@ const getMenuItemsChildren = (
   types: string[],
 ): MenuItemChild[] => {
   const result = server.gql.executeQuerySync({
-    query: print(gql`
+    query: /* GraphQL */ `
       query childrenOfType($workspace: Workspace!, $path: String!, $types: [String]!) {
         jcr(workspace: $workspace) {
           nodeByPath(path: $path) {
@@ -59,7 +57,7 @@ const getMenuItemsChildren = (
           }
         }
       }
-    `),
+    `,
     variables: {
       workspace,
       path,
