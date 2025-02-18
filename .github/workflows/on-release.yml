@@ -37,7 +37,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.GH_SSH_PRIVATE_KEY_JAHIACI }}
 
-      - uses: jahia/jahia-modules-action/release@chore/rename-npm-to-javascript
+      - uses: jahia/jahia-modules-action/release@v2
         name: Release Module
         with:
           github_slug: Jahia/javascript-modules
@@ -51,7 +51,7 @@ jobs:
           slack-webhook-qa: ${{ secrets.SLACK_WEBHOOK_URL_RC_FOR_QA }}
           npmjs_publish_token: ${{ secrets.NPMJS_PUBLISH_TOKEN }}
 
-      - uses: jahia/jahia-modules-action/update-signature@chore/rename-npm-to-javascript
+      - uses: jahia/jahia-modules-action/update-signature@v2
         with:
           nexus_username: ${{ secrets.NEXUS_USERNAME }}
           nexus_password: ${{ secrets.NEXUS_PASSWORD }}
@@ -72,7 +72,7 @@ jobs:
     container:
       image: cyclonedx/cyclonedx-cli:0.24.2
     steps:
-      - uses: jahia/jahia-modules-action/sbom-processing@chore/rename-npm-to-javascript
+      - uses: jahia/jahia-modules-action/sbom-processing@v2
         with:
           dependencytrack_hostname: ${{ vars.DEPENDENCYTRACK_HOSTNAME }}
           dependencytrack_apikey: ${{ secrets.DEPENDENCYTRACK_APIKEY }}

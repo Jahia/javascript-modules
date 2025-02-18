@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: jahia/jahia-modules-action/update-signature@chore/rename-npm-to-javascript
+      - uses: jahia/jahia-modules-action/update-signature@v2
         with:
           nexus_username: ${{ secrets.NEXUS_USERNAME }}
           nexus_password: ${{ secrets.NEXUS_PASSWORD }}
@@ -35,7 +35,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
-      - uses: jahia/jahia-modules-action/build@chore/rename-npm-to-javascript
+      - uses: jahia/jahia-modules-action/build@v2
         with:
           tests_module_type: "npm"
           tests_module_path: "jahia-test-module/"
@@ -50,7 +50,7 @@ jobs:
     container:
       image: cyclonedx/cyclonedx-cli:0.24.2
     steps:
-      - uses: jahia/jahia-modules-action/sbom-processing@chore/rename-npm-to-javascript
+      - uses: jahia/jahia-modules-action/sbom-processing@v2
         with:
           dependencytrack_hostname: ${{ vars.DEPENDENCYTRACK_HOSTNAME }}
           dependencytrack_apikey: ${{ secrets.DEPENDENCYTRACK_APIKEY }}
@@ -62,7 +62,7 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 45
     steps:
-      - uses: jahia/jahia-modules-action/helper@chore/rename-npm-to-javascript
+      - uses: jahia/jahia-modules-action/helper@v2
       - uses: KengoTODA/actions-setup-docker-compose@main
         with:
           version: "1.29.2"
@@ -70,7 +70,7 @@ jobs:
         with:
           node-version: "lts/*"
       - uses: actions/checkout@v4
-      - uses: jahia/jahia-modules-action/integration-tests@chore/rename-npm-to-javascript
+      - uses: jahia/jahia-modules-action/integration-tests@v2
         with:
           module_id: javascript-modules-engine
           tests_path: "javascript-modules-engine/tests/"
@@ -117,7 +117,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
-      - uses: jahia/jahia-modules-action/publish@chore/rename-npm-to-javascript
+      - uses: jahia/jahia-modules-action/publish@v2
         with:
           tests_module_path: "jahia-test-module/"
           tests_module_type: "npm"

@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: jahia/jahia-modules-action/static-analysis@chore/rename-npm-to-javascript
+      - uses: jahia/jahia-modules-action/static-analysis@v2
         with:
           node_version: 20
           yarn_version: 4.6.0
@@ -32,7 +32,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
-      - uses: jahia/jahia-modules-action/build@chore/rename-npm-to-javascript
+      - uses: jahia/jahia-modules-action/build@v2
         with:
           tests_module_type: "npm"
           tests_module_path: "jahia-test-module/"
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: jahia/jahia-modules-action/sonar-analysis@chore/rename-npm-to-javascript
+      - uses: jahia/jahia-modules-action/sonar-analysis@v2
         with:
           primary_release_branch: main
           github_pr_id: ${{github.event.number}}
@@ -64,7 +64,7 @@ jobs:
       fail-fast: false
     timeout-minutes: 45
     steps:
-      - uses: jahia/jahia-modules-action/helper@chore/rename-npm-to-javascript
+      - uses: jahia/jahia-modules-action/helper@v2
       - uses: KengoTODA/actions-setup-docker-compose@main
         with:
           version: "1.29.2"
@@ -74,7 +74,7 @@ jobs:
       # Enable corepack, the Node-provided package manager manager
       - run: corepack enable
       - uses: actions/checkout@v4
-      - uses: jahia/jahia-modules-action/integration-tests@chore/rename-npm-to-javascript
+      - uses: jahia/jahia-modules-action/integration-tests@v2
         with:
           module_id: javascript-modules-engine
           tests_path: "javascript-modules-engine/tests/"
