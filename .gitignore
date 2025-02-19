@@ -1,4 +1,5 @@
-# Intellij
+# OS/IDE junk
+.DS_Store
 .idea
 *.iml
 
