@@ -13,7 +13,13 @@ export const TestReactClientSide = () => {
   return (
     <>
       <h2>Just a normal view, that is using a client side react component: </h2>
-      <HydrateInBrowser child={SampleHydrateInBrowserReact} props={{ initialValue: 9 }} />
+      <HydrateInBrowser
+        child={SampleHydrateInBrowserReact}
+        props={{
+          initialValue: 9,
+          set: new Set(["a", "b", "c"]),
+        }}
+      />
       <RenderInBrowser
         child={SampleRenderInBrowserReact}
         props={{ path: currentResource.getNode().getPath() }}

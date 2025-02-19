@@ -1,6 +1,7 @@
 import i18next from "i18next";
 import type { ComponentType } from "react";
 import { hydrateRoot, createRoot } from "react-dom/client";
+import * as devalue from "devalue";
 import * as v from "valibot";
 
 /**
@@ -47,7 +48,7 @@ const ComponentWrapper = ({
  * care of importing the component from the module bundle.
  */
 const load = async (element: HTMLElement) => {
-  const { entry, bundle, lang, name, props } = v.parse(schema, JSON.parse(element.textContent));
+  const { entry, bundle, lang, name, props } = v.parse(schema, devalue.parse(element.textContent));
   const hydrate = element.dataset.hydrationMode === "hydrate";
 
   const { default: load } = await import(entry);

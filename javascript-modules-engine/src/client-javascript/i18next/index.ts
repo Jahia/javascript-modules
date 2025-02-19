@@ -1,5 +1,6 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
+import * as devalue from "devalue";
 
 export const initI18next = () => {
   i18n.use(initReactI18next).init({
@@ -17,7 +18,7 @@ export const initI18next = () => {
     const namespace = store.dataset.i18nStore;
     namespaces.push(namespace);
 
-    const allTranslations = JSON.parse(store.textContent);
+    const allTranslations = devalue.parse(store.textContent);
     for (const [lang, translations] of Object.entries(allTranslations)) {
       initialI18nStore[lang] ??= {};
       initialI18nStore[lang][namespace] = translations;

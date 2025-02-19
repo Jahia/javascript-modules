@@ -31,6 +31,7 @@ describe('Verify client side component are rehydrated as expected', () => {
             cy.visit(`/cms/render/${workspace}/en/sites/javascriptTestSite/home/testHydrateInBrowser.html`)
             cy.get('p[data-testid="count"]').should('exist')
             cy.get('p[data-testid="count"]').should('contain', 'Count: 9')
+            cy.get('p[data-testid="set"]').should('contain', 'Set: a, b, c')
 
             // Wait for the component to be declared as hydrated to avoid flakiness
             cy.get('[data-hydrated="true"]').should('exist')

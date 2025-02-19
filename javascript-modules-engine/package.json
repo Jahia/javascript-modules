@@ -38,6 +38,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.2",
     "babel-loader": "^8.2.3",
+    "devalue": "^5.1.1",
     "rollup": "^4.34.8",
     "rollup-plugin-sbom": "^2.0.2",
     "unlazy-loader": "^0.1.3",
