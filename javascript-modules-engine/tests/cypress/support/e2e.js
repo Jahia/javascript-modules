@@ -43,26 +43,26 @@ Cypress.on('uncaught:exception', () => {
     return false
 })
 
-before('Create NPM test site', () => {
-    createSite('npmTestSite', {
+before('Create test site', () => {
+    createSite('javascriptTestSite', {
         languages: 'en',
-        templateSet: 'jahia-npm-module-example',
+        templateSet: 'jahia-javascript-module-example',
         locale: 'en',
         serverName: 'localhost',
     })
 
-    addSimplePage('/sites/npmTestSite/home', 'testPage', 'testPage', 'en', 'simple', [
+    addSimplePage('/sites/javascriptTestSite/home', 'testPage', 'testPage', 'en', 'simple', [
         {
             name: 'pagecontent',
             primaryNodeType: 'jnt:contentList',
         },
     ]).then(() => {
         addNode({
-            parentPathOrId: '/sites/npmTestSite/home/testPage/pagecontent',
+            parentPathOrId: '/sites/javascriptTestSite/home/testPage/pagecontent',
             name: 'test',
-            primaryNodeType: 'npmExample:test',
+            primaryNodeType: 'javascriptExample:test',
             properties: [
-                { name: 'jcr:title', value: 'NPM test component' },
+                { name: 'jcr:title', value: 'test component' },
                 { name: 'prop1', value: 'prop1 value' },
                 { name: 'propMultiple', values: ['value 1', 'value 2', 'value 3'] },
                 {
@@ -76,6 +76,6 @@ before('Create NPM test site', () => {
 
 after('Clean', () => {
     cy.visit('/start', { failOnStatusCode: false })
-    deleteSite('npmTestSite')
+    deleteSite('javascriptTestSite')
     cy.logout()
 })

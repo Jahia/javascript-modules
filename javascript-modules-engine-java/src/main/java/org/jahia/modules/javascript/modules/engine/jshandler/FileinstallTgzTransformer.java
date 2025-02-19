@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jahia.modules.javascript.modules.engine.npmhandler;
+package org.jahia.modules.javascript.modules.engine.jshandler;
 
 import org.apache.felix.fileinstall.ArtifactListener;
 import org.apache.felix.fileinstall.ArtifactUrlTransformer;
@@ -25,7 +25,7 @@ import java.net.URL;
 /**
  * Artifact transformer for tgz files dropped in file install
  */
-@Component(service = {ArtifactUrlTransformer.class, ArtifactListener.class}, property = {"url.handler.protocol=npm"}, immediate = true)
+@Component(service = {ArtifactUrlTransformer.class, ArtifactListener.class}, property = {"url.handler.protocol=js"}, immediate = true)
 public class FileinstallTgzTransformer implements ArtifactUrlTransformer {
     @Override
     public boolean canHandle(File file) {
@@ -34,6 +34,6 @@ public class FileinstallTgzTransformer implements ArtifactUrlTransformer {
 
     @Override
     public URL transform(URL url) throws Exception {
-        return new URL("npm://" + url.toExternalForm());
+        return new URL("js://" + url.toExternalForm());
     }
 }

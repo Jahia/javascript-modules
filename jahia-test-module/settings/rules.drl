@@ -1,4 +1,4 @@
-package org.jahia.modules.npmExample
+package org.jahia.modules.javascriptExample
 
 // list any import classes here.
 import org.jahia.services.content.rules.*
@@ -11,11 +11,11 @@ global User user
 global Service service
 global Logger logger
 
-rule "Npm module - testing rule deployement"
+rule "Javascript module - testing rule deployement"
     salience 25
     when
         A property triggerProp has been set on a node
-             - the node has the type npmExample:testRule
+             - the node has the type javascriptExample:testRule
     then
         Set the property resultProp of the node with the value "It works"
 end

@@ -2,27 +2,27 @@ import { addNode, enableModule } from '@jahia/cypress'
 import { addEventPageAndEvents, addSimplePage } from '../../utils/Utils'
 
 describe('Content templates resolution testsuite', () => {
-    const siteKey = 'npmTestSite'
+    const siteKey = 'javascriptTestSite'
 
     before('Create test page and contents', () => {
         enableModule('calendar', siteKey)
         enableModule('event', siteKey)
 
         addEventPageAndEvents(siteKey, 'events', 'testEvents', () => {
-            addSimplePage('/sites/npmTestSite/home', 'testFindDisplayableNode', 'Simple page', 'en', 'simple', [
+            addSimplePage('/sites/javascriptTestSite/home', 'testFindDisplayableNode', 'Simple page', 'en', 'simple', [
                 {
                     name: 'pagecontent',
                     primaryNodeType: 'jnt:contentList',
                 },
             ]).then(() => {
                 addNode({
-                    parentPathOrId: '/sites/npmTestSite/home/testFindDisplayableNode/pagecontent',
+                    parentPathOrId: '/sites/javascriptTestSite/home/testFindDisplayableNode/pagecontent',
                     name: 'findDisplayableContent',
-                    primaryNodeType: 'npmExample:testFindDisplayableContent',
+                    primaryNodeType: 'javascriptExample:testFindDisplayableContent',
                     properties: [
                         {
                             name: 'target',
-                            value: '/sites/npmTestSite/home/testEvents/events/event-a',
+                            value: '/sites/javascriptTestSite/home/testEvents/events/event-a',
                             type: 'WEAKREFERENCE',
                         },
                     ],
@@ -30,21 +30,21 @@ describe('Content templates resolution testsuite', () => {
             })
         })
 
-        addSimplePage('/sites/npmTestSite/home', 'testContentTemplate', 'testContentTemplate', 'en', 'simple', [
+        addSimplePage('/sites/javascriptTestSite/home', 'testContentTemplate', 'testContentTemplate', 'en', 'simple', [
             {
                 name: 'pagecontent',
                 primaryNodeType: 'jnt:contentList',
             },
         ]).then(() => {
             addNode({
-                parentPathOrId: '/sites/npmTestSite/home/testContentTemplate/pagecontent',
+                parentPathOrId: '/sites/javascriptTestSite/home/testContentTemplate/pagecontent',
                 name: 'content',
-                primaryNodeType: 'npmExample:testContentTemplate',
+                primaryNodeType: 'javascriptExample:testContentTemplate',
             })
         })
 
         addSimplePage(
-            '/sites/npmTestSite/home',
+            '/sites/javascriptTestSite/home',
             'testContentTemplateWithView',
             'testContentTemplateWithView',
             'en',
@@ -57,9 +57,9 @@ describe('Content templates resolution testsuite', () => {
             ],
         ).then(() => {
             addNode({
-                parentPathOrId: '/sites/npmTestSite/home/testContentTemplateWithView/pagecontent',
+                parentPathOrId: '/sites/javascriptTestSite/home/testContentTemplateWithView/pagecontent',
                 name: 'content',
-                primaryNodeType: 'npmExample:testContentTemplate',
+                primaryNodeType: 'javascriptExample:testContentTemplate',
                 mixins: ['jmix:renderable'],
                 properties: [{ name: 'j:view', value: 'other' }],
             })
@@ -89,7 +89,7 @@ describe('Content templates resolution testsuite', () => {
         cy.visit(`/cms/render/default/en/sites/${siteKey}/home/testFindDisplayableNode.html`)
 
         cy.get('p[data-testid="displayableContent"]').contains(
-            'Found displayable content: /sites/npmTestSite/home/testEvents/events/event-a',
+            'Found displayable content: /sites/javascriptTestSite/home/testEvents/events/event-a',
         )
         cy.logout()
     })

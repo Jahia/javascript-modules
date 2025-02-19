@@ -3,7 +3,7 @@ import { addSimplePage } from '../../utils/Utils'
 
 describe('getNodeProps function test', () => {
     before('Create test page and contents', () => {
-        addSimplePage('/sites/npmTestSite/home', 'testGetNodeProps', 'Test getNodeProps', 'en', 'simple', [
+        addSimplePage('/sites/javascriptTestSite/home', 'testGetNodeProps', 'Test getNodeProps', 'en', 'simple', [
             {
                 name: 'pagecontent',
                 primaryNodeType: 'jnt:contentList',
@@ -14,9 +14,9 @@ describe('getNodeProps function test', () => {
             },
         ]).then(() => {
             addNode({
-                parentPathOrId: '/sites/npmTestSite/home/testGetNodeProps/pagecontent',
+                parentPathOrId: '/sites/javascriptTestSite/home/testGetNodeProps/pagecontent',
                 name: 'getNodePropsTest',
-                primaryNodeType: 'npmExample:testGetNodeProps',
+                primaryNodeType: 'javascriptExample:testGetNodeProps',
                 properties: [
                     { name: 'smallText', value: 'smallTextValue' },
                     { name: 'textarea', value: 'textareaValue' },
@@ -26,7 +26,7 @@ describe('getNodeProps function test', () => {
                     { name: 'boolean', value: 'true', type: 'BOOLEAN' },
                     {
                         name: 'weakreference',
-                        value: '/sites/npmTestSite/home/testGetNodeProps/pagecontent',
+                        value: '/sites/javascriptTestSite/home/testGetNodeProps/pagecontent',
                         type: 'WEAKREFERENCE',
                     },
                     { name: 'bigtext', value: '<div data-testid="getNodeProps_bigtext_inner">bigtext value</div>' },
@@ -34,7 +34,7 @@ describe('getNodeProps function test', () => {
                     { name: 'decimal', value: '4535353.55665775', type: 'DECIMAL' },
                     { name: 'uri', value: 'https://www.jahia.com' },
                     { name: 'name', value: 'nameValue' },
-                    { name: 'path', value: '/sites/npmTestSite/home/testGetNodeProps/pagecontent' },
+                    { name: 'path', value: '/sites/javascriptTestSite/home/testGetNodeProps/pagecontent' },
                     { name: 'multipleSmallText', values: ['smallTextValue1', 'smallTextValue2'] },
                     { name: 'multipleTextarea', values: ['textareaValue1', 'textareaValue2'] },
                     { name: 'multipleChoicelist', values: ['choice1', 'choice2'] },
@@ -44,8 +44,8 @@ describe('getNodeProps function test', () => {
                     {
                         name: 'multipleWeakreference',
                         values: [
-                            '/sites/npmTestSite/home/testGetNodeProps/pagecontent',
-                            '/sites/npmTestSite/home/testGetNodeProps/header',
+                            '/sites/javascriptTestSite/home/testGetNodeProps/pagecontent',
+                            '/sites/javascriptTestSite/home/testGetNodeProps/header',
                         ],
                         type: 'WEAKREFERENCE',
                     },
@@ -67,8 +67,8 @@ describe('getNodeProps function test', () => {
                     {
                         name: 'multiplePath',
                         values: [
-                            '/sites/npmTestSite/home/testGetNodeProps/pagecontent',
-                            '/sites/npmTestSite/home/testGetNodeProps/header',
+                            '/sites/javascriptTestSite/home/testGetNodeProps/pagecontent',
+                            '/sites/javascriptTestSite/home/testGetNodeProps/header',
                         ],
                     },
                 ],
@@ -78,8 +78,8 @@ describe('getNodeProps function test', () => {
 
     it('Verify property values from getNodeProps', function () {
         cy.login()
-        cy.visit('/jahia/page-composer/default/en/sites/npmTestSite/home/testGetNodeProps.html')
-        cy.visit('/cms/render/default/en/sites/npmTestSite/home/testGetNodeProps.html')
+        cy.visit('/jahia/page-composer/default/en/sites/javascriptTestSite/home/testGetNodeProps.html')
+        cy.visit('/cms/render/default/en/sites/javascriptTestSite/home/testGetNodeProps.html')
 
         cy.get('div[data-testid="getNodeProps_smallText"]').contains('smallTextValue')
         cy.get('div[data-testid="getNodeProps_textarea"]').contains('textareaValue')
@@ -88,22 +88,22 @@ describe('getNodeProps function test', () => {
         cy.get('div[data-testid="getNodeProps_double"]').contains('3.6')
         cy.get('div[data-testid="getNodeProps_boolean"]').contains('true')
         cy.get('div[data-testid="getNodeProps_weakreference"]').contains(
-            '/sites/npmTestSite/home/testGetNodeProps/pagecontent',
+            '/sites/javascriptTestSite/home/testGetNodeProps/pagecontent',
         )
         cy.get('div[data-testid="getNodeProps_bigtext_inner"]').contains('bigtext value')
         cy.get('div[data-testid="getNodeProps_date"]').contains('2023-12-26T01:30:25.243Z')
         cy.get('div[data-testid="getNodeProps_decimal"]').contains('4535353.55665775')
         cy.get('div[data-testid="getNodeProps_uri"]').contains('https://www.jahia.com')
         cy.get('div[data-testid="getNodeProps_name"]').contains('nameValue')
-        cy.get('div[data-testid="getNodeProps_path"]').contains('/sites/npmTestSite/home/testGetNodeProps/pagecontent')
+        cy.get('div[data-testid="getNodeProps_path"]').contains('/sites/javascriptTestSite/home/testGetNodeProps/pagecontent')
 
         cy.logout()
     })
 
     it('Verify property values from getNodeProps (multiple)', function () {
         cy.login()
-        cy.visit('/jahia/page-composer/default/en/sites/npmTestSite/home/testGetNodeProps.html')
-        cy.visit('/cms/render/default/en/sites/npmTestSite/home/testGetNodeProps.html')
+        cy.visit('/jahia/page-composer/default/en/sites/javascriptTestSite/home/testGetNodeProps.html')
+        cy.visit('/cms/render/default/en/sites/javascriptTestSite/home/testGetNodeProps.html')
 
         cy.get('div[data-testid="getNodeProps_multipleSmallText_1"]').contains('smallTextValue1')
         cy.get('div[data-testid="getNodeProps_multipleSmallText_2"]').contains('smallTextValue2')
@@ -118,10 +118,10 @@ describe('getNodeProps function test', () => {
         cy.get('div[data-testid="getNodeProps_multipleBoolean_1"]').contains('true')
         cy.get('div[data-testid="getNodeProps_multipleBoolean_2"]').contains('false')
         cy.get('div[data-testid="getNodeProps_multipleWeakreference_1"]').contains(
-            '/sites/npmTestSite/home/testGetNodeProps/pagecontent',
+            '/sites/javascriptTestSite/home/testGetNodeProps/pagecontent',
         )
         cy.get('div[data-testid="getNodeProps_multipleWeakreference_2"]').contains(
-            '/sites/npmTestSite/home/testGetNodeProps/header',
+            '/sites/javascriptTestSite/home/testGetNodeProps/header',
         )
         cy.get('div[data-testid="getNodeProps_multipleBigtext_inner1"]').contains('bigtext value1')
         cy.get('div[data-testid="getNodeProps_multipleBigtext_inner2"]').contains('bigtext value2')
@@ -134,10 +134,10 @@ describe('getNodeProps function test', () => {
         cy.get('div[data-testid="getNodeProps_multipleName_1"]').contains('nameValue1')
         cy.get('div[data-testid="getNodeProps_multipleName_2"]').contains('nameValue2')
         cy.get('div[data-testid="getNodeProps_multiplePath_1"]').contains(
-            '/sites/npmTestSite/home/testGetNodeProps/pagecontent',
+            '/sites/javascriptTestSite/home/testGetNodeProps/pagecontent',
         )
         cy.get('div[data-testid="getNodeProps_multiplePath_2"]').contains(
-            '/sites/npmTestSite/home/testGetNodeProps/header',
+            '/sites/javascriptTestSite/home/testGetNodeProps/header',
         )
 
         cy.logout()
@@ -145,8 +145,8 @@ describe('getNodeProps function test', () => {
 
     it('Verify property values from getNodeProps (Types and safety)', function () {
         cy.login()
-        cy.visit('/jahia/page-composer/default/en/sites/npmTestSite/home/testGetNodeProps.html')
-        cy.visit('/cms/render/default/en/sites/npmTestSite/home/testGetNodeProps.html')
+        cy.visit('/jahia/page-composer/default/en/sites/javascriptTestSite/home/testGetNodeProps.html')
+        cy.visit('/cms/render/default/en/sites/javascriptTestSite/home/testGetNodeProps.html')
 
         cy.get('div[data-testid="getNodeProps_propNotSet"]').should('be.empty')
         cy.get('div[data-testid="getNodeProps_propNotExists"]').should('be.empty')

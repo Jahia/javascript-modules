@@ -14,7 +14,7 @@ export const TestBoundComponent = () => {
 };
 
 TestBoundComponent.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testBoundComponent",
+  nodeType: "javascriptExample:testBoundComponent",
   displayName: "test boundComponent",
   componentType: "view",
 });

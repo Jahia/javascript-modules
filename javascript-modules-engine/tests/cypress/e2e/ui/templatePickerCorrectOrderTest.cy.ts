@@ -4,7 +4,7 @@ import { JContent } from '@jahia/jcontent-cypress/dist/page-object/jcontent'
 describe('Template Picker Correct Order Test', () => {
     before('Create page', () => {
         addSimplePage(
-            '/sites/npmTestSite/home',
+            '/sites/javascriptTestSite/home',
             'TemplatePickerCorrectOrderTest',
             'TemplatePickerCorrectOrderTest',
             'en',
@@ -28,7 +28,7 @@ describe('Template Picker Correct Order Test', () => {
             ' testCustom',
         ]
         cy.login()
-        const jContent = JContent.visit('npmTestSite', 'en', 'pages/home').switchToPageBuilder()
+        const jContent = JContent.visit('javascriptTestSite', 'en', 'pages/home').switchToPageBuilder()
         jContent.getCreatePage()
         cy.get('[id="select-jmix:hasTemplateNode_j:templateName"]').click()
         let i = 0

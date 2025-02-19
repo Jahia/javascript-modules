@@ -33,7 +33,7 @@ export const TestI18n = () => {
 };
 
 TestI18n.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testI18n",
+  nodeType: "javascriptExample:testI18n",
   name: "default",
   displayName: "test i18n",
   componentType: "view",

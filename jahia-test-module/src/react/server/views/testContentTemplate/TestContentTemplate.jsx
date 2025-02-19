@@ -47,7 +47,7 @@ export const TestContentTemplate = () => {
 };
 
 TestContentTemplate.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testContentTemplate",
+  nodeType: "javascriptExample:testContentTemplate",
   // React views and templates may avoid using properties.default=true by using a 'default' name value.
   name: "default",
   componentType: "template",

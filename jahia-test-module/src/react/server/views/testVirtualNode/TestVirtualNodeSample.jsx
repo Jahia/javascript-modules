@@ -12,6 +12,6 @@ export const TestVirtualNodeSample = () => {
 };
 
 TestVirtualNodeSample.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testVirtualNodeSample",
+  nodeType: "javascriptExample:testVirtualNodeSample",
   componentType: "view",
 });

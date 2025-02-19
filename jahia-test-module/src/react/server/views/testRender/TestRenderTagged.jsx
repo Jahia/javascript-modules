@@ -6,7 +6,7 @@ export const TestRenderTagged = () => {
 };
 
 TestRenderTagged.jahiaComponent = defineJahiaComponent({
-  nodeType: "npmExample:testRender",
+  nodeType: "javascriptExample:testRender",
   name: "tagged",
   displayName: "test Render (tagged react)",
   componentType: "view",
