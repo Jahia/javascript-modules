@@ -68,7 +68,7 @@ const buildHierarchy = (nodes, rootPath) => {
   return root;
 };
 
-const SampleHydratedMenu = ({ staticMenu /** @type {NavigationItem} */, rootPath }) => {
+export default function SampleHydratedMenu({ staticMenu /** @type {NavigationItem} */, rootPath }) {
   const [menu, setMenu] = useState(staticMenu);
   const [hydrated, setHydrated] = useState(false);
 
@@ -117,6 +117,4 @@ const SampleHydratedMenu = ({ staticMenu /** @type {NavigationItem} */, rootPath
       {menu && <MenuRoot navigationItem={menu} />}
     </div>
   );
-};
-
-export default SampleHydratedMenu;
+}

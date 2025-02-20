@@ -1,4 +1,4 @@
-import SampleI18n from "../../../../client/SampleI18n";
+import SampleI18n from "$client/components/SampleI18n";
 import {
   defineJahiaComponent,
   HydrateInBrowser,

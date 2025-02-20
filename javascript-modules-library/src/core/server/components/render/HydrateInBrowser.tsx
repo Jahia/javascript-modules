@@ -1,4 +1,3 @@
-import React from "react";
 import InBrowser from "./internal/InBrowser.js";
 
 /**
@@ -39,5 +38,5 @@ export function HydrateInBrowser<T>({
   child: React.ComponentType<T>;
   props?: T & React.JSX.IntrinsicAttributes;
 }>): React.JSX.Element {
-  return <InBrowser preRender child={Child} props={props as never} dataKey="data-reacthydrate" />;
+  return <InBrowser ssr child={Child} props={props as never} />;
 }

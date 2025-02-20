@@ -16,21 +16,15 @@
   "scripts": {
     "build": "run build:production",
     "build:development": "run types:copy && tsc && node generate-index.cjs",
-    "build:production": "run build:development && run minify",
+    "build:production": "run build:development",
     "clean": "rm -rf dist",
     "lint": "yarn run --top-level lint",
-    "minify": "node minify.cjs",
     "types:copy": "mkdir -p dist/types && ncp target/types dist/types"
   },
   "dependencies": {
-    "dotenv": "^16.4.7",
-    "prop-types": "^15.8.1"
+    "dotenv": "^16.4.7"
   },
   "devDependencies": {
-    "@babel/cli": "^7.23.4",
-    "@babel/core": "^7.23.7",
-    "@babel/preset-env": "^7.23.8",
-    "@babel/preset-react": "^7.23.3",
     "@types/react": "^19.0.8",
     "babel-loader": "^9.1.3",
     "babel-plugin-transform-react-jsx": "^6.24.1",
@@ -38,7 +32,6 @@
     "i18next": "^23.10.1",
     "ncp": "^2.0.0",
     "react-i18next": "^15.4.0",
-    "terser": "^5.36.0",
     "typescript": "^5.7.3"
   },
   "peerDependencies": {

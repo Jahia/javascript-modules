@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const SampleRenderInBrowserReact = ({ path }) => {
+export default function SampleRenderInBrowserReact({ path }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [counter, setCounter] = useState(3);
 
@@ -29,6 +29,4 @@ const SampleRenderInBrowserReact = ({ path }) => {
       </p>
     </div>
   );
-};
-
-export default SampleRenderInBrowserReact;
+}

@@ -3,12 +3,19 @@ import { addSimplePage } from '../../utils/Utils'
 
 describe('Verify client side component are rehydrated as expected', () => {
     before('Create test contents', () => {
-        addSimplePage('/sites/javascriptTestSite/home', 'testHydrateInBrowser', 'Test HydrateInBrowser', 'en', 'simple', [
-            {
-                name: 'pagecontent',
-                primaryNodeType: 'jnt:contentList',
-            },
-        ]).then(() => {
+        addSimplePage(
+            '/sites/javascriptTestSite/home',
+            'testHydrateInBrowser',
+            'Test HydrateInBrowser',
+            'en',
+            'simple',
+            [
+                {
+                    name: 'pagecontent',
+                    primaryNodeType: 'jnt:contentList',
+                },
+            ],
+        ).then(() => {
             addNode({
                 parentPathOrId: '/sites/javascriptTestSite/home/testHydrateInBrowser/pagecontent',
                 name: 'test',
@@ -19,11 +26,15 @@ describe('Verify client side component are rehydrated as expected', () => {
     })
 
     beforeEach('Login and visit', () => cy.login())
-    ;['default', 'live'].forEach((workspace) => {
+    for (const workspace of ['default', 'live']) {
         it(`${workspace}: Check that components is hydrated correctly`, () => {
             cy.visit(`/cms/render/${workspace}/en/sites/javascriptTestSite/home/testHydrateInBrowser.html`)
             cy.get('p[data-testid="count"]').should('exist')
             cy.get('p[data-testid="count"]').should('contain', 'Count: 9')
+
+            // Wait for the component to be declared as hydrated to avoid flakiness
+            cy.get('[data-hydrated="true"]').should('exist')
+
             cy.get('button[data-testid="count-button"]').click()
             cy.get('button[data-testid="count-button"]').click()
             cy.get('p[data-testid="count"]').should('contain', 'Count: 11')
@@ -37,7 +48,7 @@ describe('Verify client side component are rehydrated as expected', () => {
             cy.get('span[data-testid="counter"]').should('not.contain', '0')
             cy.get('span[data-testid="counter"]').should('contain', '0')
         })
-    })
+    }
 
     afterEach('Logout', () => cy.logout())
 })

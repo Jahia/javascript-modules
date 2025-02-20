@@ -1,4 +1,3 @@
-import React from "react";
 import InBrowser from "./internal/InBrowser.js";
 
 /**
@@ -34,7 +33,5 @@ export function RenderInBrowser<T>({
   child: React.ComponentType<T>;
   props?: T & React.JSX.IntrinsicAttributes;
 }>): React.JSX.Element {
-  return (
-    <InBrowser preRender={false} child={Child} props={props as never} dataKey="data-reactrender" />
-  );
+  return <InBrowser child={Child} props={props as never} />;
 }
