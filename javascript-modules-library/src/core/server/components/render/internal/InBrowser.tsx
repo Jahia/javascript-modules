@@ -59,6 +59,13 @@ function InBrowser<T>({
     currentResource,
   );
 
+  /** JS entry point to the client bundle loader. */
+  const entry = buildUrl(
+    { value: `/modules/${bundleKey}/javascript/client/index.js` },
+    renderContext,
+    currentResource,
+  );
+
   return (
     <>
       {/* The import map must come first in the page so that all imports are resolved correctly */}
@@ -80,6 +87,7 @@ function InBrowser<T>({
           {JSON.stringify({
             name: Child.name,
             lang: language,
+            entry,
             bundle: bundleKey,
             props: props || {},
           })}
