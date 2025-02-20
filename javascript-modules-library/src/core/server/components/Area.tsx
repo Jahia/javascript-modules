@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 import { useServerContext } from "../hooks/useServerContext.js";
-import { server } from "@jahia/javascript-modules-library-private";
+import server from "virtual:jahia-server";
 
 /**
  * Generates an area in which editors may insert content objects.

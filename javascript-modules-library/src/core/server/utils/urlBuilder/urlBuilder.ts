@@ -1,6 +1,6 @@
 import type { RenderContext, Resource } from "org.jahia.services.render";
 import { getNodeFromPathOrId } from "../jcr/getNodeFromPathOrId.js";
-import { server } from "@jahia/javascript-modules-library-private";
+import server from "virtual:jahia-server";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 
 const absoluteUrlRegExp = /^(?:[a-z+]+:)?\/\//i;
