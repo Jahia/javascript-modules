@@ -14,10 +14,10 @@ export function HydrateInBrowser<T>(
     child: React.ComponentType<T>;
     /**
      * The React component props, these props will be serialized/deserialized to be usable server
-     * and client side. The serialization and deserialization is done using JSON.stringify server
-     * side and JSON.parse in the browser. Please make sure that the props are serializable.
+     * and client side. The serialization is done using
+     * [devalue](https://www.npmjs.com/package/devalue) allowing most standard JS types, including
+     * `Set` and `Map`.
      */
-    // TODO: Consider "devalue" to allow serialization of a wider range of objects
     props: T & React.JSX.IntrinsicAttributes;
   }>,
 ): React.JSX.Element;

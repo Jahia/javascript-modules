@@ -38,7 +38,7 @@ const plugins = [
     preventAssignment: true,
   }),
   typescript(),
-  sbom(),
+  sbom({ specVersion: "1.4" }),
   // Only minify in production
   buildEnv === "production" && terser(),
 ];

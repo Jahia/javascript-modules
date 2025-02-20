@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function SampleHydrateInBrowserReact({ initialValue }) {
+export default function SampleHydrateInBrowserReact({ initialValue, set }) {
   const [count, setCount] = useState(initialValue);
 
   const handleClick = () => {
@@ -14,6 +14,7 @@ export default function SampleHydrateInBrowserReact({ initialValue }) {
       <button data-testid="count-button" onClick={handleClick}>
         Increment
       </button>
+      <p data-testid="set">Set: {[...set].join(", ")}</p>
     </div>
   );
 }

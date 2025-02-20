@@ -3,6 +3,7 @@ import { AddResources } from "../../AddResources.js";
 import { I18nextProvider } from "react-i18next";
 import i18n from "i18next";
 import { buildUrl } from "../../../utils/urlBuilder/urlBuilder.js";
+import * as devalue from "devalue";
 
 /**
  * Import map to allow bare identifiers (e.g. `import { useState } from "react"`) to be imported
@@ -31,9 +32,8 @@ const getClientI18nStoreScript = (bundleKey: string, lang: string) => {
   if (i18nResourceBundle) {
     const filteredI18nStore = { [lang]: i18nResourceBundle };
 
-    // TODO: prevent accidental XSS with </script> in the JSON
     return /* HTML */ `<script type="application/json" data-i18n-store="${bundleKey}">
-      ${JSON.stringify(filteredI18nStore)}
+      ${devalue.stringify(filteredI18nStore)}
     </script>`;
   }
 };
@@ -84,12 +84,12 @@ function InBrowser<T>({
 
       <div>
         <script type="application/json" data-hydration-mode={ssr ? "hydrate" : "render"}>
-          {JSON.stringify({
+          {devalue.stringify({
             name: Child.name,
             lang: language,
             entry,
             bundle: bundleKey,
-            props: props || {},
+            props: props ?? {},
           })}
         </script>
         {ssr && (

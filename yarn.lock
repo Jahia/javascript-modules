@@ -1809,6 +1809,7 @@ __metadata:
     "@types/react": "npm:^19.0.8"
     babel-loader: "npm:^9.1.3"
     babel-plugin-transform-react-jsx: "npm:^6.24.1"
+    devalue: "npm:^5.1.1"
     dotenv: "npm:^16.4.7"
     graphql: "npm:^16.10.0"
     i18next: "npm:^23.10.1"
@@ -3498,6 +3499,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"devalue@npm:^5.1.1":
+  version: 5.1.1
+  resolution: "devalue@npm:5.1.1"
+  checksum: 10c0/f6717a856fd54216959abd341cb189e47a9b37d72d8419e055ae77567ff4ed0fb683b1ffb6a71067f645adae5991bffabe6468a3e2385937bff49273e71c1f51
+  languageName: node
+  linkType: hard
+
 "devlop@npm:^1.0.0":
   version: 1.1.0
   resolution: "devlop@npm:1.1.0"
@@ -4793,6 +4801,7 @@ __metadata:
     "@rollup/plugin-typescript": "npm:^12.1.2"
     "@types/react-dom": "npm:^19.0.4"
     babel-loader: "npm:^8.2.3"
+    devalue: "npm:^5.1.1"
     fast-text-encoding: "npm:^1.0.6"
     i18next: "npm:23.10.1"
     react: "npm:^19.0.0"
