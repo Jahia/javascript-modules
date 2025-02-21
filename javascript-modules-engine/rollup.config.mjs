@@ -30,7 +30,10 @@ const sharedLibs = {
 /** Common Rollup plugins to all builds. */
 const plugins = [
   commonJs(),
-  nodeResolve(),
+  nodeResolve({
+    // The library exposes JS code under an inaccessible import to prevent bundling by clients
+    exportConditions: ["jahia-import"],
+  }),
   replace({
     values: {
       "process.env.NODE_ENV": JSON.stringify(buildEnv),

@@ -4,7 +4,7 @@
     "module": "esnext",
     "allowJs": true,
     "checkJs": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "strict": true,
@@ -15,9 +15,10 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "lib": ["esnext", "dom"],
-    "outDir": "dist",
+    // Output JS code to an inaccessible directory, so that clients can't import it directly
+    "outDir": "internal-dist",
     "declaration": true,
-    "declarationDir": "dist/types",
+    "declarationDir": "dist",
     "baseUrl": ".",
     "paths": {
       "*": ["target/types/*"]
