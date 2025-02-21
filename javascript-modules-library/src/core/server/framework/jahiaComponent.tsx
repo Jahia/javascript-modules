@@ -1,9 +1,8 @@
-import type Lib from "@jahia/javascript-modules-library-private";
-import { server } from "@jahia/javascript-modules-library-private";
-import { useServerContext } from "../hooks/useServerContext.js";
 import type { JCRValueWrapper } from "org.jahia.services.content";
 import type { Bundle } from "org.osgi.framework";
 import type { JSX } from "react";
+import server from "virtual:jahia-server";
+import { type ServerContext, useServerContext } from "../hooks/useServerContext.js";
 
 declare const bundle: Bundle;
 
@@ -33,7 +32,7 @@ export interface JahiaComponent {
  * @param definitions The definitions of the component
  * @param Component The component to register
  */
-export const jahiaComponent = <T extends (props: never, context: Lib.ServerContext) => JSX.Element>(
+export const jahiaComponent = <T extends (props: never, context: ServerContext) => JSX.Element>(
   { id, ...definitions }: JahiaComponent,
   Component: T,
 ): T => {
@@ -56,7 +55,7 @@ export const jahiaComponent = <T extends (props: never, context: Lib.ServerConte
 };
 
 /** Wraps `Component` to retrieve props from the JCR layer and pass them as usual component props. */
-const wrap = (Component: (props: never, context: Lib.ServerContext) => JSX.Element) => () => {
+const wrap = (Component: (props: never, context: ServerContext) => JSX.Element) => () => {
   // Retrieve the current context
   const context = useServerContext();
   const session = context.currentNode.getSession();

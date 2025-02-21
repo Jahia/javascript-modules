@@ -1,4 +1,4 @@
-import { server } from "@jahia/javascript-modules-library-private";
+import server from "virtual:jahia-server";
 import ReactDOMServer from "react-dom/server.edge";
 import { createStyleRegistry, StyleRegistry } from "styled-jsx";
 import { ServerContextProvider } from "@jahia/javascript-modules-library";

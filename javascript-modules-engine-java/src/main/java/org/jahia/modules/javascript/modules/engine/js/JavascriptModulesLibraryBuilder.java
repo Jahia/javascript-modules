@@ -1,6 +1,5 @@
 package org.jahia.modules.javascript.modules.engine.js;
 
-import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyObject;
 import org.jahia.modules.javascript.modules.engine.js.injector.OSGiServiceInjector;
 import org.jahia.modules.javascript.modules.engine.js.server.*;
@@ -13,19 +12,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Global JS injected into runtime, responsible for exposing server JAVA backend to the JS runtime
+ * Global JS injected into runtime, responsible for exposing server JAVA backend
+ * to the JS runtime
  * But also for exposing shared libraries to the JS runtime
- * And finally can be enriched by the externalized js library to provide mirroring of the JAVA backend and ensure auto-completion.
+ * And finally can be enriched by the externalized js library to provide
+ * mirroring of the JAVA backend and ensure auto-completion.
  */
 public class JavascriptModulesLibraryBuilder {
     private static final Logger logger = LoggerFactory.getLogger(JavascriptModulesLibraryBuilder.class);
 
-    private ProxyObject exports = ProxyObject.fromMap(new HashMap<>());
+    private final ProxyObject server;
 
     private Map<String, Object> sharedLibraries = new HashMap<>();
 
     public JavascriptModulesLibraryBuilder(ContextProvider contextProvider) {
-
         Map<String, Object> server = new HashMap<>();
         server.put("config", new ConfigHelper(contextProvider));
         server.put("registry", new RegistryHelper(contextProvider));
@@ -41,18 +41,11 @@ public class JavascriptModulesLibraryBuilder {
                 logger.error("Cannot inject services for {} helper", entry.getKey(), e);
             }
         }
-        exports.putMember("server", Value.asValue(ProxyObject.fromMap(server)));
+        this.server = ProxyObject.fromMap(server);
     }
 
-    public void addToLibrary(String name, Object value) {
-        // server is reserved for JAVA backend
-        if (!"server".equals(name)) {
-            exports.putMember(name, Value.asValue(value));
-        }
-    }
-
-    public ProxyObject getLibrary() {
-        return exports;
+    public ProxyObject getServer() {
+        return server;
     }
 
     public void addSharedLibrary(String name, Object value) {

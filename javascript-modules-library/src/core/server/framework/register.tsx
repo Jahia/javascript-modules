@@ -1,6 +1,6 @@
-import { server } from "@jahia/javascript-modules-library-private";
+import server from "virtual:jahia-server";
 import type { Bundle } from "org.osgi.framework";
-import { JahiaComponent } from "./jahiaComponent";
+import type { JahiaComponent } from "./jahiaComponent";
 
 /** This is provided by Jahia runtime */
 declare const bundle: Bundle;

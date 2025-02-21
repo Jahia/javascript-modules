@@ -34,7 +34,7 @@ export default defineConfig(({ isSsrBuild }) => {
               ...buildStore(serverStore),
               // This is only available on the server, attempting to import it
               // on the client will throw an error
-              "@jahia/javascript-modules-library": "javascriptModulesLibraryBuilder.getLibrary()",
+              "@jahia/javascript-modules-library": serverStore("@jahia/javascript-modules-library"),
             },
           },
         },

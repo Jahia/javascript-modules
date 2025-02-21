@@ -1,4 +1,4 @@
-import { server } from "@jahia/javascript-modules-library-private";
+import server from "virtual:jahia-server";
 import { useServerContext } from "../../hooks/useServerContext.js";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 

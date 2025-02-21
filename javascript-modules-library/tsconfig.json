@@ -20,10 +20,6 @@
     "declarationDir": "dist/types",
     "baseUrl": ".",
     "paths": {
-      "@jahia/javascript-modules-library-private": [
-        "target/types/@jahia/javascript-modules-library-private.d.ts"
-      ],
-      "@jahia/javascript-modules-library": ["target/types/index.d.ts"],
       "*": ["target/types/*"]
     }
   },

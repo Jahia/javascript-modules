@@ -63,4 +63,18 @@ export default defineConfig([
     },
     plugins,
   },
+  // Build the server-side script
+  // It takes care of rendering JSX components on the server
+  {
+    input: "src/javascript/index.ts",
+    output: {
+      file: "src/main/resources/META-INF/js/main.js",
+      format: "iife",
+      globals: {
+        "virtual:jahia-server": "javascriptModulesLibraryBuilder.getServer()",
+      },
+    },
+    external: ["virtual:jahia-server"],
+    plugins,
+  },
 ]);
