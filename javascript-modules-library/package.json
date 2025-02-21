@@ -4,8 +4,11 @@
   "repository": "git@github.com:Jahia/javascript-modules.git",
   "license": "MIT",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/types/index.d.ts",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "jahia-import": "./internal-dist/index.js",
+    "import": "./dist/index.js"
+  },
   "bin": {
     "jahia-deploy": "bin/jahia-deploy.mjs"
   },
@@ -14,33 +17,27 @@
     "dist"
   ],
   "scripts": {
-    "build": "run build:production",
-    "build:development": "run types:copy && tsc && node generate-index.cjs",
-    "build:production": "run build:development",
+    "build": "tsc && node post-build.js",
     "clean": "rm -rf dist",
-    "lint": "yarn run --top-level lint",
-    "types:copy": "mkdir -p dist/types && ncp target/types dist/types"
+    "lint": "yarn run --top-level lint"
   },
   "dependencies": {
     "dotenv": "^16.4.7"
   },
   "devDependencies": {
     "@types/react": "^19.0.8",
-    "babel-loader": "^9.1.3",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
     "devalue": "^5.1.1",
     "graphql": "^16.10.0",
     "i18next": "^23.10.1",
-    "ncp": "^2.0.0",
     "react-i18next": "^15.4.0",
     "typescript": "^5.7.3"
   },
   "peerDependencies": {
-    "i18next": ">=23.0.0 <23.11.0",
+    "i18next": "^23.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-i18next": "^15.4.0",
-    "styled-jsx": ">=5.0.0 <5.2.0"
+    "styled-jsx": "^5.0.0"
   },
   "peerDependenciesMeta": {
     "i18next": {
