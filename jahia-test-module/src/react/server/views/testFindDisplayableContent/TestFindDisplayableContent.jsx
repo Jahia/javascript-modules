@@ -8,8 +8,6 @@ jahiaComponent(
     componentType: "view",
   },
   (_, { renderContext, currentResource }) => {
-    console.log("renderContext", renderContext);
-
     let displayableNodePath = "";
     const targetNodeRef = currentResource.getNode().hasProperty("target")
       ? currentResource.getNode().getProperty("target").getValue().getNode()

@@ -37,7 +37,3 @@ TestLegacyRegistrationAdvanced.jahiaComponent = defineJahiaComponent({
     myProp: "my value",
   },
 });
-console.log(
-  "TestLegacyRegistrationAdvanced.jahiaComponent",
-  TestLegacyRegistrationAdvanced.jahiaComponent,
-);

@@ -3,7 +3,7 @@ import { server } from "@jahia/javascript-modules-library-private";
 import { useServerContext } from "../hooks/useServerContext.js";
 import type { JCRValueWrapper } from "org.jahia.services.content";
 import type { Bundle } from "org.osgi.framework";
-import { JSX } from "react";
+import type { JSX } from "react";
 
 declare const bundle: Bundle;
 
@@ -51,7 +51,7 @@ export const jahiaComponent = <T extends (props: never, context: Lib.ServerConte
   const reactView = server.registry.get("view", "react");
   server.registry.add("view", id, reactView, options);
 
-  console.log(`Registered Jahia component: ${id}`);
+  console.debug(`Registered Jahia component: ${id}`);
   return Component;
 };
 
@@ -107,12 +107,11 @@ const wrap = (Component: (props: never, context: Lib.ServerContext) => JSX.Eleme
         ? property.getValues().map((value) => unwrapper(value))
         : unwrapper(property.getValue());
     },
-    ownKeys(): ArrayLike<string | symbol> {
+    ownKeys() {
       const propertiesIterator = context.currentNode.getProperties();
       const keys = [];
       while (propertiesIterator.hasNext()) {
         const property = propertiesIterator.nextProperty();
-        console.log("property ", property);
         keys.push(property.getName());
       }
       return keys;
