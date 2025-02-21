@@ -2,7 +2,6 @@ import {
   AddContentButtons,
   getChildNodes,
   jahiaComponent,
-  useServerContext,
 } from "@jahia/javascript-modules-library";
 
 const PrintChildren = ({ children, title, testid }) => (
@@ -28,8 +27,7 @@ jahiaComponent(
     displayName: "test getChildNodes",
     componentType: "view",
   },
-  () => {
-    const { currentNode } = useServerContext();
+  (_, { currentNode }) => {
     const allChildren = getChildNodes(currentNode, -1);
     const filteredChildren = getChildNodes(currentNode, -1, 0, (child) => {
       return child.getName().includes("filtered");

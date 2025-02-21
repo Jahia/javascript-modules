@@ -1,10 +1,4 @@
-import {
-  getChildNodes,
-  getNodeProps,
-  jahiaComponent,
-  Render,
-  useServerContext,
-} from "@jahia/javascript-modules-library";
+import { getChildNodes, jahiaComponent, Render } from "@jahia/javascript-modules-library";
 
 jahiaComponent(
   {
@@ -58,9 +52,7 @@ jahiaComponent(
     displayName: "Simple Text",
     componentType: "view",
   },
-  () => {
-    const { currentNode } = useServerContext();
-    const props = getNodeProps(currentNode, ["text"]);
-    return <div className="simple-text">{props.text}</div>;
+  ({ text }) => {
+    return <div className="simple-text">{text}</div>;
   },
 );

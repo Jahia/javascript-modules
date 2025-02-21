@@ -22,6 +22,7 @@ export * from "./testIsNodeType/TestIsNodeType";
 export * from "./testJCRQuery/TestJCRQuery";
 export * from "./testLegacyRegistration/TestLegacyRegistration";
 export * from "./testLocale/TestLocale";
+export * from "./testProxyProps/TestProxyProps";
 export * from "./testReactClientSide/TestReactClientSide";
 export * from "./testReactVersion/TestReactVersion";
 export * from "./testReactViewRegistration/TestReactViewRegistration";

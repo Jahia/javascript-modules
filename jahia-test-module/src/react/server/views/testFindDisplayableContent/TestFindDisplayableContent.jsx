@@ -1,4 +1,4 @@
-import { jahiaComponent, server, useServerContext } from "@jahia/javascript-modules-library";
+import { jahiaComponent, server } from "@jahia/javascript-modules-library";
 
 jahiaComponent(
   {
@@ -7,8 +7,7 @@ jahiaComponent(
     displayName: "test jFindDisplayableContent",
     componentType: "view",
   },
-  (_, { renderContext }) => {
-    const { currentResource } = useServerContext();
+  (_, { renderContext, currentResource }) => {
     console.log("renderContext", renderContext);
 
     let displayableNodePath = "";

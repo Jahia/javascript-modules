@@ -1,4 +1,4 @@
-import { getNodeProps, jahiaComponent } from "@jahia/javascript-modules-library";
+import { jahiaComponent } from "@jahia/javascript-modules-library";
 
 jahiaComponent(
   {
@@ -7,42 +7,39 @@ jahiaComponent(
     displayName: "test getNodeProps",
     componentType: "view",
   },
-  (_, { currentNode }) => {
-    const props = getNodeProps(currentNode, [
-      "propNotSet",
-      "propNotExists",
-      "smallText",
-      "textarea",
-      "choicelist",
-      "long",
-      "double",
-      "boolean",
-      "weakreference",
-      "bigtext",
-      "date",
-      "decimal",
-      "uri",
-      "name",
-      "path",
-      "password",
-    ]);
-    const multipleProps = getNodeProps(currentNode, [
-      "multipleSmallText",
-      "multipleTextarea",
-      "multipleChoicelist",
-      "multipleLong",
-      "multipleDouble",
-      "multipleBoolean",
-      "multipleWeakreference",
-      "multipleBigtext",
-      "multipleDate",
-      "multipleDecimal",
-      "multipleUri",
-      "multipleName",
-      "multiplePath",
-      "multiplePassword",
-    ]);
-
+  ({
+    // single value props"
+    propNotSet,
+    propNotExists,
+    smallText,
+    textarea,
+    choicelist,
+    long,
+    double,
+    boolean,
+    weakreference,
+    bigtext,
+    date,
+    decimal,
+    uri,
+    name,
+    path,
+    // multiple value props:
+    multipleSmallText,
+    multipleTextarea,
+    multipleChoicelist,
+    multipleLong,
+    multipleDouble,
+    multipleBoolean,
+    multipleWeakreference,
+    multipleBigtext,
+    multipleDate,
+    multipleDecimal,
+    multipleUri,
+    multipleName,
+    multiplePath,
+    ...restProps
+  }) => {
     const printMultiValuedProp = (selector, values, richText = false, ref = false) => {
       return (
         values &&
@@ -70,89 +67,80 @@ jahiaComponent(
     return (
       <>
         <h3>getNodeProps usages (single)</h3>
-        <div data-testid="getNodeProps_smallText">{props.smallText}</div>
-        <div data-testid="getNodeProps_textarea">{props.textarea}</div>
-        <div data-testid="getNodeProps_choicelist">{props.choicelist}</div>
-        <div data-testid="getNodeProps_long">{props.long}</div>
-        <div data-testid="getNodeProps_double">{props.double}</div>
-        <div data-testid="getNodeProps_boolean">{props.boolean.toString()}</div>
-        <div data-testid="getNodeProps_weakreference">{props.weakreference.getPath()}</div>
+        <div data-testid="getNodeProps_smallText">{smallText}</div>
+        <div data-testid="getNodeProps_textarea">{textarea}</div>
+        <div data-testid="getNodeProps_choicelist">{choicelist}</div>
+        <div data-testid="getNodeProps_long">{long}</div>
+        <div data-testid="getNodeProps_double">{double}</div>
+        <div data-testid="getNodeProps_boolean">{boolean.toString()}</div>
+        <div data-testid="getNodeProps_weakreference">{weakreference.getPath()}</div>
         <div
           data-testid="getNodeProps_bigtext"
           dangerouslySetInnerHTML={{
-            __html: props.bigtext,
+            __html: bigtext,
           }}
         />
-        <div data-testid="getNodeProps_date">{props.date}</div>
-        <div data-testid="getNodeProps_decimal">{props.decimal}</div>
-        <div data-testid="getNodeProps_uri">{props.uri}</div>
-        <div data-testid="getNodeProps_name">{props.name}</div>
-        <div data-testid="getNodeProps_path">{props.path}</div>
+        <div data-testid="getNodeProps_date">{date}</div>
+        <div data-testid="getNodeProps_decimal">{decimal}</div>
+        <div data-testid="getNodeProps_uri">{uri}</div>
+        <div data-testid="getNodeProps_name">{name}</div>
+        <div data-testid="getNodeProps_path">{path}</div>
 
         <h3>getNodeProps usages (multiple)</h3>
         <div data-testid="getNodeProps_multipleSmallText">
-          {printMultiValuedProp("getNodeProps_multipleSmallText", multipleProps.multipleSmallText)}
+          {printMultiValuedProp("getNodeProps_multipleSmallText", multipleSmallText)}
         </div>
         <div data-testid="getNodeProps_multipleTextarea">
-          {printMultiValuedProp("getNodeProps_multipleTextarea", multipleProps.multipleTextarea)}
+          {printMultiValuedProp("getNodeProps_multipleTextarea", multipleTextarea)}
         </div>
         <div data-testid="getNodeProps_multipleChoicelist">
-          {printMultiValuedProp(
-            "getNodeProps_multipleChoicelist",
-            multipleProps.multipleChoicelist,
-          )}
+          {printMultiValuedProp("getNodeProps_multipleChoicelist", multipleChoicelist)}
         </div>
         <div data-testid="getNodeProps_multipleLong">
-          {printMultiValuedProp("getNodeProps_multipleLong", multipleProps.multipleLong)}
+          {printMultiValuedProp("getNodeProps_multipleLong", multipleLong)}
         </div>
         <div data-testid="getNodeProps_multipleDouble">
-          {printMultiValuedProp("getNodeProps_multipleDouble", multipleProps.multipleDouble)}
+          {printMultiValuedProp("getNodeProps_multipleDouble", multipleDouble)}
         </div>
         <div data-testid="getNodeProps_multipleBoolean">
-          {printMultiValuedProp("getNodeProps_multipleBoolean", multipleProps.multipleBoolean)}
+          {printMultiValuedProp("getNodeProps_multipleBoolean", multipleBoolean)}
         </div>
         <div data-testid="getNodeProps_multipleWeakreference">
           {printMultiValuedProp(
             "getNodeProps_multipleWeakreference",
-            multipleProps.multipleWeakreference,
+            multipleWeakreference,
             false,
             true,
           )}
         </div>
         <div data-testid="getNodeProps_multipleBigtext">
-          {printMultiValuedProp(
-            "getNodeProps_multipleBigtext",
-            multipleProps.multipleBigtext,
-            true,
-          )}
+          {printMultiValuedProp("getNodeProps_multipleBigtext", multipleBigtext, true)}
         </div>
         <div data-testid="getNodeProps_multipleDate">
-          {printMultiValuedProp("getNodeProps_multipleDate", multipleProps.multipleDate)}
+          {printMultiValuedProp("getNodeProps_multipleDate", multipleDate)}
         </div>
         <div data-testid="getNodeProps_multipleDecimal">
-          {printMultiValuedProp("getNodeProps_multipleDecimal", multipleProps.multipleDecimal)}
+          {printMultiValuedProp("getNodeProps_multipleDecimal", multipleDecimal)}
         </div>
         <div data-testid="getNodeProps_multipleUri">
-          {printMultiValuedProp("getNodeProps_multipleUri", multipleProps.multipleUri)}
+          {printMultiValuedProp("getNodeProps_multipleUri", multipleUri)}
         </div>
         <div data-testid="getNodeProps_multipleName">
-          {printMultiValuedProp("getNodeProps_multipleName", multipleProps.multipleName)}
+          {printMultiValuedProp("getNodeProps_multipleName", multipleName)}
         </div>
         <div data-testid="getNodeProps_multiplePath">
-          {printMultiValuedProp("getNodeProps_multiplePath", multipleProps.multiplePath)}
+          {printMultiValuedProp("getNodeProps_multiplePath", multiplePath)}
         </div>
 
         <h3>getNodeProps usages (typing and safety tests)</h3>
-        <div data-testid="getNodeProps_propNotSet">{props.propNotSet}</div>
-        <div data-testid="getNodeProps_propNotExists">{props.propNotExists}</div>
+        <div data-testid="getNodeProps_propNotSet">{propNotSet}</div>
+        <div data-testid="getNodeProps_propNotExists">{propNotExists}</div>
         <div data-testid="getNodeProps_checkBooleanType">
-          {(typeof props.boolean === "boolean").toString()}
+          {(typeof boolean === "boolean").toString()}
         </div>
-        <div data-testid="getNodeProps_checkLongType">
-          {(typeof props.long === "number").toString()}
-        </div>
+        <div data-testid="getNodeProps_checkLongType">{(typeof long === "number").toString()}</div>
         <div data-testid="getNodeProps_checkDoubleType">
-          {(typeof props.double === "number").toString()}
+          {(typeof double === "number").toString()}
         </div>
       </>
     );

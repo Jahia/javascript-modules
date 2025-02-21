@@ -1,9 +1,4 @@
-import {
-  getNodesByJCRQuery,
-  jahiaComponent,
-  server,
-  useServerContext,
-} from "@jahia/javascript-modules-library";
+import { getNodesByJCRQuery, jahiaComponent, server } from "@jahia/javascript-modules-library";
 
 const PrintQueryResults = ({ title, testid, nodes }) => (
   <>
@@ -27,8 +22,7 @@ jahiaComponent(
     displayName: "Test JCR query",
     componentType: "view",
   },
-  () => {
-    const { currentNode, renderContext } = useServerContext();
+  (_, { currentNode, renderContext }) => {
     const currentSiteKey = currentNode.getResolveSite().getSiteKey();
     const eventsPath = `/sites/${currentSiteKey}/contents/events`;
     const query = `SELECT *
