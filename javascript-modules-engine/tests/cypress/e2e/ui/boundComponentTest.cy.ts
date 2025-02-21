@@ -135,7 +135,10 @@ describe('Check on bound components', () => {
         })
         // Retest preview that should now be correct
         cy.visit('/cms/render/default/en/sites/javascriptTestSite/home/testBoundComponent.html')
-        cy.get('[data-testid="boundComponent_path"]').should('contain', '/javascriptTestSite/home/testBoundComponent/events')
+        cy.get('[data-testid="boundComponent_path"]').should(
+            'contain',
+            '/javascriptTestSite/home/testBoundComponent/events',
+        )
         // Retest live that should still not be correct, since we didn't publish the changes
         cy.visit('/sites/javascriptTestSite/home/testBoundComponent.html', { failOnStatusCode: false })
         cy.get('[data-testid="boundComponent_path"]').should('contain', 'null')
@@ -143,7 +146,10 @@ describe('Check on bound components', () => {
         // Publish the changes, and retest live that should be correct
         publishAndWaitJobEnding('/sites/javascriptTestSite/home/testBoundComponent')
         cy.visit('/sites/javascriptTestSite/home/testBoundComponent.html', { failOnStatusCode: false })
-        cy.get('[data-testid="boundComponent_path"]').should('contain', '/javascriptTestSite/home/testBoundComponent/events')
+        cy.get('[data-testid="boundComponent_path"]').should(
+            'contain',
+            '/javascriptTestSite/home/testBoundComponent/events',
+        )
         cy.logout()
     })
 })

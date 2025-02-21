@@ -1,12 +1,18 @@
 import SampleI18n from "$client/components/SampleI18n";
 import {
-  defineJahiaComponent,
   HydrateInBrowser,
+  jahiaComponent,
   RenderInBrowser,
 } from "@jahia/javascript-modules-library";
 
-export const TestI18n = () => {
-  return (
+jahiaComponent(
+  {
+    nodeType: "javascriptExample:testI18n",
+    name: "default",
+    displayName: "test i18n",
+    componentType: "view",
+  },
+  () => (
     <>
       <h3>Test i18n: full server side</h3>
       <div data-testid="i18n-server-side">
@@ -29,12 +35,5 @@ export const TestI18n = () => {
         />
       </div>
     </>
-  );
-};
-
-TestI18n.jahiaComponent = defineJahiaComponent({
-  nodeType: "javascriptExample:testI18n",
-  name: "default",
-  displayName: "test i18n",
-  componentType: "view",
-});
+  ),
+);

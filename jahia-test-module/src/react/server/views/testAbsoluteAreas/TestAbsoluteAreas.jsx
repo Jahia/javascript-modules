@@ -1,7 +1,13 @@
-import { AbsoluteArea, defineJahiaComponent } from "@jahia/javascript-modules-library";
+import { AbsoluteArea, jahiaComponent } from "@jahia/javascript-modules-library";
 
-export const TestAbsoluteAreas = () => {
-  return (
+jahiaComponent(
+  {
+    nodeType: "javascriptExample:testAbsoluteAreas",
+    name: "default",
+    displayName: "Test Absolute Areas (react)",
+    componentType: "view",
+  },
+  () => (
     <>
       <h2>React JAbsoluteArea test component</h2>
 
@@ -77,12 +83,5 @@ export const TestAbsoluteAreas = () => {
         />
       </div>
     </>
-  );
-};
-
-TestAbsoluteAreas.jahiaComponent = defineJahiaComponent({
-  nodeType: "javascriptExample:testAbsoluteAreas",
-  name: "default",
-  displayName: "Test Absolute Areas (react)",
-  componentType: "view",
-});
+  ),
+);

@@ -95,7 +95,9 @@ describe('getNodeProps function test', () => {
         cy.get('div[data-testid="getNodeProps_decimal"]').contains('4535353.55665775')
         cy.get('div[data-testid="getNodeProps_uri"]').contains('https://www.jahia.com')
         cy.get('div[data-testid="getNodeProps_name"]').contains('nameValue')
-        cy.get('div[data-testid="getNodeProps_path"]').contains('/sites/javascriptTestSite/home/testGetNodeProps/pagecontent')
+        cy.get('div[data-testid="getNodeProps_path"]').contains(
+            '/sites/javascriptTestSite/home/testGetNodeProps/pagecontent',
+        )
 
         cy.logout()
     })

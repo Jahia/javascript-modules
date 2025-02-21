@@ -28,7 +28,9 @@ describe('Check that Javascript module settings (UI extensions, rules, configs) 
 
     it('Ensure Content editor UI extension is correctly registered', function () {
         cy.login()
-        const jcontent = new JContentPageBuilder(JContent.visit('javascriptTestSite', 'en', 'pages/home/testModuleSettings'))
+        const jcontent = new JContentPageBuilder(
+            JContent.visit('javascriptTestSite', 'en', 'pages/home/testModuleSettings'),
+        )
         jcontent.getModule('/sites/javascriptTestSite/home/testModuleSettings/pagecontent').get().scrollIntoView()
         jcontent
             .getModule('/sites/javascriptTestSite/home/testModuleSettings/pagecontent/testContentEditorExtension')

@@ -1,13 +1,14 @@
-import {
-  AddResources,
-  Area,
-  defineJahiaComponent,
-  Render,
-} from "@jahia/javascript-modules-library";
+import { AddResources, Area, jahiaComponent, Render } from "@jahia/javascript-modules-library";
 import { footer, header, login, navMenu } from "./pageComponents";
 
-export const PageBoundComponent = () => {
-  return (
+jahiaComponent(
+  {
+    nodeType: "jnt:page",
+    name: "boundComponent",
+    displayName: "Bound component page",
+    componentType: "template",
+  },
+  () => (
     <html lang="en">
       <head>
         <AddResources type={"css"} resources={"styles.css"} />
@@ -47,12 +48,5 @@ export const PageBoundComponent = () => {
         </div>
       </body>
     </html>
-  );
-};
-
-PageBoundComponent.jahiaComponent = defineJahiaComponent({
-  nodeType: "jnt:page",
-  name: "boundComponent",
-  displayName: "Bound component page",
-  componentType: "template",
-});
+  ),
+);

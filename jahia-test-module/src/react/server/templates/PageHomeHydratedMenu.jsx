@@ -1,13 +1,14 @@
-import {
-  AddResources,
-  Render,
-  Area,
-  defineJahiaComponent,
-} from "@jahia/javascript-modules-library";
-import { footer, header, login, hydratedNavMenu } from "./pageComponents";
+import { AddResources, Area, jahiaComponent, Render } from "@jahia/javascript-modules-library";
+import { footer, header, hydratedNavMenu, login } from "./pageComponents";
 
-export const PageHomeHydratedMenu = () => {
-  return (
+jahiaComponent(
+  {
+    nodeType: "jnt:page",
+    name: "homeHydratedMenu",
+    displayName: "Home page with hydrated menu",
+    componentType: "template",
+  },
+  (_, { renderContext }) => (
     <html lang="en">
       <head>
         <AddResources type={"css"} resources={"styles.css"} />
@@ -38,12 +39,5 @@ export const PageHomeHydratedMenu = () => {
         </div>
       </body>
     </html>
-  );
-};
-
-PageHomeHydratedMenu.jahiaComponent = defineJahiaComponent({
-  nodeType: "jnt:page",
-  name: "homeHydratedMenu",
-  displayName: "Home page with hydrated menu",
-  componentType: "template",
-});
+  ),
+);

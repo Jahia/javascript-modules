@@ -1,15 +1,14 @@
-import { defineJahiaComponent } from "@jahia/javascript-modules-library";
+import { jahiaComponent } from "@jahia/javascript-modules-library";
 
-export const TestContentTemplateOtherView = () => {
-  return (
+jahiaComponent(
+  {
+    nodeType: "javascriptExample:testContentTemplate",
+    componentType: "view",
+    name: "other",
+  },
+  () => (
     <>
       <h2>Just an other normal view</h2>
     </>
-  );
-};
-
-TestContentTemplateOtherView.jahiaComponent = defineJahiaComponent({
-  nodeType: "javascriptExample:testContentTemplate",
-  componentType: "view",
-  name: "other",
-});
+  ),
+);

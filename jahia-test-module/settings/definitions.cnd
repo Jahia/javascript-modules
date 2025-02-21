@@ -50,6 +50,16 @@
 [javascriptExample:testAreaColumns] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
  + * (jmix:droppableContent) = jmix:droppableContent
 
+[javascriptExample:testLegacyRegistrationMinimal] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
+
+[javascriptExample:testLegacyRegistrationAdvanced] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
+
+[javascriptExample:testProxyProps] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
+    - myFirstProp (string)
+    - mySecondProp (string)
+    - myThirdProp (string)
+    - myFourthProp (string)
+
 [javascriptExample:testReactViewRegistration] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
 
 [javascriptExample:testJCRQuery] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title

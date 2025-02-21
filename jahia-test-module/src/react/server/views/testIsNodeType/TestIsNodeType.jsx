@@ -1,25 +1,25 @@
-import { defineJahiaComponent, useServerContext } from "@jahia/javascript-modules-library";
+import { jahiaComponent } from "@jahia/javascript-modules-library";
 
-export const TestIsNodeType = () => {
-  const { currentNode } = useServerContext();
-  return (
-    <>
-      <h3>Current node type is testIsNodeType</h3>
-      <div data-testid="currentNode_isNodeType">
-        {currentNode.isNodeType("javascriptExample:testIsNodeType") ? "true" : "false"}
-      </div>
+jahiaComponent(
+  {
+    nodeType: "javascriptExample:testIsNodeType",
+    name: "default",
+    displayName: "test is node type",
+    componentType: "view",
+  },
+  (_, { currentNode }) => {
+    return (
+      <>
+        <h3>Current node type is testIsNodeType</h3>
+        <div data-testid="currentNode_isNodeType">
+          {currentNode.isNodeType("javascriptExample:testIsNodeType") ? "true" : "false"}
+        </div>
 
-      <h3>Current node type is not jnt:page</h3>
-      <div data-testid="currentNode_isNotNodeType">
-        {currentNode.isNodeType("jnt:page") ? "true" : "false"}
-      </div>
-    </>
-  );
-};
-
-TestIsNodeType.jahiaComponent = defineJahiaComponent({
-  nodeType: "javascriptExample:testIsNodeType",
-  name: "default",
-  displayName: "test is node type",
-  componentType: "view",
-});
+        <h3>Current node type is not jnt:page</h3>
+        <div data-testid="currentNode_isNotNodeType">
+          {currentNode.isNodeType("jnt:page") ? "true" : "false"}
+        </div>
+      </>
+    );
+  },
+);
