@@ -42,6 +42,7 @@
         <module>javascript-modules-engine</module>
         <module>javascript-modules-engine-java</module>
         <module>javascript-modules-library</module>
+        <module>vite-plugin</module>
     </modules>
 
     <properties>
