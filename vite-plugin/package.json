@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.13.5",
+    "javascript-modules-engine": "workspace:^",
     "pkgroll": "^2.11.0",
     "vite": "^6.1.1"
   },

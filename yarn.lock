@@ -529,6 +529,7 @@ __metadata:
   resolution: "@jahia/vite-plugin@workspace:vite-plugin"
   dependencies:
     "@types/node": "npm:^22.13.5"
+    javascript-modules-engine: "workspace:^"
     pkgroll: "npm:^2.11.0"
     vite: "npm:^6.1.1"
   peerDependencies:
@@ -2672,7 +2673,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"javascript-modules-engine@workspace:javascript-modules-engine":
+"javascript-modules-engine@workspace:^, javascript-modules-engine@workspace:javascript-modules-engine":
   version: 0.0.0-use.local
   resolution: "javascript-modules-engine@workspace:javascript-modules-engine"
   dependencies:

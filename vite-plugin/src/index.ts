@@ -1,5 +1,9 @@
 import { resolve } from "node:path";
 import type { Plugin } from "vite";
+import sharedLibs from "javascript-modules-engine/shared-libs.mjs";
+
+// These libraries are provided by Jahia and should not be bundled
+const external = Object.keys(sharedLibs);
 
 export default function jahia(): Plugin {
   return {
@@ -21,7 +25,6 @@ export default function jahia(): Plugin {
           client: {
             build: {
               lib: {
-                name: "example",
                 // Single entry point for the client, all other files must be imported in this one
                 entry: "src/client/index.js",
                 formats: ["es"],
@@ -38,7 +41,11 @@ export default function jahia(): Plugin {
           ssr: {
             build: {
               lib: {
-                name: "example",
+                /**
+                 * Necessary for IIFE format but not used; it's the name given to the global
+                 * variable that will be created by the IIFE.
+                 */
+                name: "serverBundle",
                 entry: "src/index.js",
                 // Output the styles in a single, separate file: styles.css
                 cssFileName: "styles",
@@ -49,14 +56,18 @@ export default function jahia(): Plugin {
                 output: {
                   dir: "javascript/server",
                   // Replace the imports of external libraries with the globals
-                  globals: {
-                    ...buildStore(serverStore),
-                    // This is only available on the server, attempting to import it
-                    // on the client will throw an error
-                    "@jahia/javascript-modules-library": serverStore(
+                  globals: Object.fromEntries(
+                    [
+                      ...external,
+                      // This is only available on the server, attempting to import it
+                      // on the client will throw an error
                       "@jahia/javascript-modules-library",
-                    ),
-                  },
+                    ].map((lib) => [
+                      lib,
+                      // This is how a shared library is imported in the server bundle
+                      `javascriptModulesLibraryBuilder.getSharedLibrary(${JSON.stringify(lib)})`,
+                    ]),
+                  ),
                 },
                 external: [...external, "@jahia/javascript-modules-library"],
               },
@@ -67,16 +78,3 @@ export default function jahia(): Plugin {
     },
   };
 }
-
-// Configuration utils, you probably don't need to touch these
-
-// These libraries are provided by Jahia and should not be bundled
-const external = ["i18next", "react-i18next", "react", "react/jsx-runtime"];
-
-// This is the way to access shared libraries server-side
-const serverStore = (/** @type {string} */ lib) =>
-  `javascriptModulesLibraryBuilder.getSharedLibrary(${JSON.stringify(lib)})`;
-
-/** Creates a bare import to external library mapping. */
-const buildStore = (/** @type {(lib: string) => string} */ store) =>
-  Object.fromEntries(external.map((lib) => [lib, store(lib)]));
