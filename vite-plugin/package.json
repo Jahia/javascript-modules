@@ -1,7 +1,11 @@
 {
   "name": "@jahia/vite-plugin",
   "version": "0.5.0-SNAPSHOT",
-  "repository": "git@github.com:Jahia/javascript-modules.git",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Jahia/javascript-modules.git",
+    "directory": "vite-plugin"
+  },
   "license": "MIT",
   "type": "module",
   "exports": {

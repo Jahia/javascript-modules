@@ -10,13 +10,6 @@
     <packaging>pom</packaging>
     <description>Vite plugin to produce a Jahia-compatible JavaScript Module.</description>
 
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>javascript-modules-engine-java</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
     <build>
         <plugins>
             <plugin>
