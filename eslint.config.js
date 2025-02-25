@@ -10,7 +10,7 @@ import pluginCypress from "eslint-plugin-cypress/flat";
 export default tseslint.config(
   {
     languageOptions: {
-      globals: { ...globals.browser, ...globals.node },
+      globals: { ...globals.browser, ...globals.jest, ...globals.node },
     },
   },
 
