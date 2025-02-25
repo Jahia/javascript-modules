@@ -1,4 +1,4 @@
-import { resolve } from "node:path";
+import path from "node:path";
 import type { PluginOption } from "vite";
 import sharedLibs from "javascript-modules-engine/shared-libs.mjs";
 import type { Plugin } from "rollup";
@@ -22,43 +22,94 @@ function buildSuccessPlugin(callback: () => void | Promise<void>): Plugin {
 
 export default function jahia(
   options: {
+    /** Options for the client-side loader. */
+    client?: {
+      /**
+       * Entrypoint for the client-side loader.
+       *
+       * @default "./src/client/index.js"
+       */
+      input?: string;
+      /**
+       * Where to put the built client-side loader.
+       *
+       * @default "./javascript/client/index.js"
+       */
+      output?: string;
+    };
+
+    /** Options for the server-side bundle. */
+    server?: {
+      /**
+       * Entrypoint for the server-side bundle.
+       *
+       * @default "./src/index.js"
+       */
+      input?: string;
+      /** Where to put the built server-side bundle. */
+      output?: {
+        /**
+         * Directory where to put the built server-side bundle.
+         *
+         * @default "./javascript/server"
+         */
+        dir?: string;
+        /**
+         * Base name for the built server-side bundle.
+         *
+         * Will be appended with '.js' for the JavaScript output and '.css' for the CSS output.
+         *
+         * @default "index"
+         */
+        fileName?: string;
+      };
+    };
+
     /**
      * Function to execute when the build is complete in watch mode. Can be used to automatically
      * deploy your module to a local Jahia instance.
+     *
+     * @default undefined
      */
     watchCallback?: () => void | Promise<void>;
   } = {},
 ): PluginOption {
   return {
     name: "@jahia/vite-plugin",
+    /**
+     * Configuration hook.
+     *
+     * Updating the configuration can be done both by mutation or by merging. We use both methods to
+     * offer the best experience for the user.
+     *
+     * @see https://vite.dev/guide/api-plugin.html#config
+     */
     config(config) {
+      // Mutate the configuration to set base settings if they are not already set
+      // Build all environments https://vite.dev/guide/api-environment-frameworks.html#environments-during-build
+      config.builder ??= {};
+
+      // Enable the modern JSX runtime
+      config.esbuild ??= { jsx: "automatic" };
+
+      config.resolve ??= {};
+      config.resolve.alias ??= { $client: path.resolve("./src/client") };
+
       return {
-        /**
-         * Build all environments during the build process.
-         *
-         * @see https://vite.dev/guide/api-environment-frameworks.html#environments-during-build
-         */
-        builder: {
-          sharedConfigBuild: true,
-          sharedPlugins: true,
-        },
-        resolve: {
-          // Alias the client folder to the server folder
-          alias: { $client: resolve("./src/client") },
-        },
-        esbuild: { jsx: "automatic" },
         environments: {
           client: {
             build: {
               lib: {
                 // Single entry point for the client, all other files must be imported in this one
-                entry: "src/client/index.js",
+                entry: options.client?.input ?? "./src/client/index.js",
                 formats: ["es"],
               },
               rollupOptions: {
                 output: {
-                  dir: "javascript/client",
-                  entryFileNames: "index.js",
+                  dir: path.dirname(options.client?.output ?? "./javascript/client/index.js"),
+                  entryFileNames: path.basename(
+                    options.client?.output ?? "./javascript/client/index.js",
+                  ),
                 },
                 external,
               },
@@ -72,15 +123,15 @@ export default function jahia(
                  * variable that will be created by the IIFE.
                  */
                 name: "serverBundle",
-                entry: "src/index.js",
-                // Output the styles in a single, separate file: styles.css
-                cssFileName: "styles",
+                entry: options.server?.input ?? "./src/index.js",
+                fileName: options.server?.output?.fileName ?? "index",
                 // Bundle the old way, as an IIFE, to replace libs with globals
                 formats: ["iife"],
               },
               rollupOptions: {
                 output: {
-                  dir: "javascript/server",
+                  dir: options.server?.output?.dir ?? "./javascript/server",
+                  entryFileNames: `${options.server?.output?.fileName ?? "index"}.js`,
                   // Replace the imports of external libraries with the globals
                   globals: Object.fromEntries(
                     [
