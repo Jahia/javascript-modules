@@ -1,6 +1,7 @@
 # Directory Structure
 
-In this directory, you can directly put: 
+In this directory, you can directly put:
+
 - **Rule files** (`*.drl`, `*.dsl`)
 - **URL rewrite XML files**
 - **import.xml** file
@@ -10,6 +11,7 @@ In this directory, you can directly put:
 ## Configurations Directory
 
 In the `configurations` directory, you can put:
+
 - **OSGi configuration files** (`*.cfg`, `*.yml`)
 
 ## Content Editor Forms Directory

@@ -12,20 +12,20 @@ You can find the documentation on how to use this module on the [Jahia Academy](
 
 ## Run
 
-1) Enable Corepack if needed : 
+1. Enable Corepack if needed :
 
 `enable corepack`
 
-2) Install the dependencies :
+2. Install the dependencies :
 
-``yarn``
+`yarn`
 
-3) Build and run the project :
+3. Build and run the project :
 
-``yarn watch``
+`yarn watch`
 
 ## How to upgrade yarn version to latest stable
 
-This command will upgrade yarn  to the latest stable release and update the yarn installer in .yarn/releases
+This command will upgrade yarn to the latest stable release and update the yarn installer in .yarn/releases
 
-``yarn set version stable``
+`yarn set version stable`
