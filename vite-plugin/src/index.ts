@@ -94,9 +94,6 @@ export default function jahia(
       // Enable the modern JSX runtime
       config.esbuild ??= { jsx: "automatic" };
 
-      config.resolve ??= {};
-      config.resolve.alias ??= { $client: path.resolve("./src/client") };
-
       return {
         environments: {
           client: {
