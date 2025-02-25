@@ -500,6 +500,7 @@ __metadata:
     dotenv: "npm:^16.4.7"
     graphql: "npm:^16.10.0"
     i18next: "npm:^23.10.1"
+    publint: "npm:^0.3.6"
     react-i18next: "npm:^15.4.0"
     typescript: "npm:^5.7.3"
   peerDependencies:
@@ -531,6 +532,7 @@ __metadata:
     "@rollup/plugin-multi-entry": "npm:^6.0.1"
     "@types/node": "npm:^22.13.5"
     pkgroll: "npm:^2.11.0"
+    publint: "npm:^0.3.6"
     rollup: "npm:^4.34.8"
     vite: "npm:^6.1.1"
   peerDependencies:
@@ -687,6 +689,13 @@ __metadata:
   version: 0.1.1
   resolution: "@pkgr/core@npm:0.1.1"
   checksum: 10c0/3f7536bc7f57320ab2cf96f8973664bef624710c403357429fbf680a5c3b4843c1dbd389bb43daa6b1f6f1f007bb082f5abcb76bb2b5dc9f421647743b71d3d8
+  languageName: node
+  linkType: hard
+
+"@publint/pack@npm:^0.1.1":
+  version: 0.1.1
+  resolution: "@publint/pack@npm:0.1.1"
+  checksum: 10c0/a76fb86b3d30b52662b20a1f0cc3015467e95a22998f0c2c7ac3397d2c972e44ee9e6903e334dfcae3e47a3cd4e82ffae40841d405075b48813c24b3ae70dc8d
   languageName: node
   linkType: hard
 
@@ -2742,6 +2751,7 @@ __metadata:
     "@rollup/plugin-replace": "npm:^6.0.2"
     "@rollup/plugin-terser": "npm:^0.4.4"
     "@rollup/plugin-typescript": "npm:^12.1.2"
+    "@types/node": "npm:^22.13.5"
     "@types/react-dom": "npm:^19.0.4"
     devalue: "npm:^5.1.1"
     fast-text-encoding: "npm:^1.0.6"
@@ -3347,6 +3357,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mri@npm:^1.1.0":
+  version: 1.2.0
+  resolution: "mri@npm:1.2.0"
+  checksum: 10c0/a3d32379c2554cf7351db6237ddc18dc9e54e4214953f3da105b97dc3babe0deb3ffe99cf409b38ea47cc29f9430561ba6b53b24ab8f9ce97a4b50409e4a50e7
+  languageName: node
+  linkType: hard
+
 "ms@npm:^2.1.3":
   version: 2.1.3
   resolution: "ms@npm:2.1.3"
@@ -3528,6 +3545,13 @@ __metadata:
   dependencies:
     aggregate-error: "npm:^3.0.0"
   checksum: 10c0/592c05bd6262c466ce269ff172bb8de7c6975afca9b50c975135b974e9bdaafbfe80e61aaaf5be6d1200ba08b30ead04b88cfa7e25ff1e3b93ab28c9f62a2c75
+  languageName: node
+  linkType: hard
+
+"package-manager-detector@npm:^0.2.9":
+  version: 0.2.9
+  resolution: "package-manager-detector@npm:0.2.9"
+  checksum: 10c0/5fe1e80743fd110954f1904be4be32f34fc46c17b05e9e47a81e2f5777e474366cb570ed3b697a5ae8290860b53ac4b309898b24919dc1ddeb6d4097429113e1
   languageName: node
   linkType: hard
 
@@ -3730,6 +3754,20 @@ __metadata:
     err-code: "npm:^2.0.2"
     retry: "npm:^0.12.0"
   checksum: 10c0/9c7045a1a2928094b5b9b15336dcd2a7b1c052f674550df63cc3f36cd44028e5080448175b6f6ca32b642de81150f5e7b1a98b728f15cb069f2dd60ac2616b96
+  languageName: node
+  linkType: hard
+
+"publint@npm:^0.3.6":
+  version: 0.3.6
+  resolution: "publint@npm:0.3.6"
+  dependencies:
+    "@publint/pack": "npm:^0.1.1"
+    package-manager-detector: "npm:^0.2.9"
+    picocolors: "npm:^1.1.1"
+    sade: "npm:^1.8.1"
+  bin:
+    publint: src/cli.js
+  checksum: 10c0/8788c20e80931a49633d5fec02d7ff3e50a19a0a9d879205d35d9a6585097ec3cf8b435b97dc5c31e258fcffe1cec5812b11eae53b19fd3a449c29672ece1111
   languageName: node
   linkType: hard
 
@@ -4011,6 +4049,15 @@ __metadata:
   dependencies:
     queue-microtask: "npm:^1.2.2"
   checksum: 10c0/200b5ab25b5b8b7113f9901bfe3afc347e19bb7475b267d55ad0eb86a62a46d77510cb0f232507c9e5d497ebda569a08a9867d0d14f57a82ad5564d991588b39
+  languageName: node
+  linkType: hard
+
+"sade@npm:^1.8.1":
+  version: 1.8.1
+  resolution: "sade@npm:1.8.1"
+  dependencies:
+    mri: "npm:^1.1.0"
+  checksum: 10c0/da8a3a5d667ad5ce3bf6d4f054bbb9f711103e5df21003c5a5c1a8a77ce12b640ed4017dd423b13c2307ea7e645adee7c2ae3afe8051b9db16a6f6d3da3f90b1
   languageName: node
   linkType: hard
 

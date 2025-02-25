@@ -4,6 +4,7 @@ import nodeResolve from "@rollup/plugin-node-resolve";
 import replace from "@rollup/plugin-replace";
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "rollup";
 import sbom from "rollup-plugin-sbom";
 import sharedLibs from "./shared-libs.mjs";
@@ -15,13 +16,14 @@ import sharedLibs from "./shared-libs.mjs";
  */
 const buildEnv = process.env.BUILD || "development";
 
-/** Common Rollup plugins to all builds. */
+/**
+ * Rollup plugins common to all builds.
+ *
+ * @type {import("rollup").InputPluginOption[]}
+ */
 const plugins = [
   commonJs(),
-  nodeResolve({
-    // The library exposes JS code under an inaccessible import to prevent bundling by clients
-    exportConditions: ["jahia-import"],
-  }),
+  nodeResolve(),
   replace({
     values: {
       "process.env.NODE_ENV": JSON.stringify(buildEnv),
@@ -66,6 +68,29 @@ export default defineConfig([
       },
     },
     external: ["virtual:jahia-server"],
-    plugins,
+    plugins: [
+      {
+        /**
+         * Custom plugin to resolve "@jahia/javascript-modules-library" correctly.
+         *
+         * We intentionally don't ship the actual code of the library to prevent misuse by end
+         * developers, but on our end we need to resolve it to the real dist files, outputted in the
+         * `internal-dist` directory.
+         */
+        name: "resolve-library",
+        resolveId(id) {
+          if (id === "@jahia/javascript-modules-library") {
+            return fileURLToPath(
+              new URL(
+                // Resolve `../internal-dist/index.js` from `lib/dist/index.js`
+                "../internal-dist/index.js",
+                import.meta.resolve("@jahia/javascript-modules-library"),
+              ),
+            );
+          }
+        },
+      },
+      ...plugins,
+    ],
   },
 ]);
