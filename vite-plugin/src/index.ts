@@ -33,6 +33,8 @@ export default function jahia(
       /**
        * Where to put the built client-side loader.
        *
+       * /!\ This path is currently hard-coded in the engine loader, it cannot be changed yet.
+       *
        * @default "./javascript/client/index.js"
        */
       output?: string;

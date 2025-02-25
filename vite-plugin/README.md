@@ -15,6 +15,23 @@ import jahia from "@jahia/vite-plugin";
 export default defineConfig({
   plugins: [
     jahia({
+      // Client options
+      client: {
+        input: "./src/client/index.js",
+        // /!\ This path is currently hard-coded in the engine loader,
+        // it cannot be changed yet.
+        output: "./javascript/client/index.js",
+      },
+
+      // Server options
+      server: {
+        input: "./src/server/index.js",
+        output: {
+          dir: "./javascript/server",
+          fileName: "index", // Will produce index.js and index.css
+        },
+      },
+
       // This function is called every time a build succeeds in watch mode
       watchCallback() {
         spawnSync("yarn", ["watch:callback"], { stdio: "inherit" });

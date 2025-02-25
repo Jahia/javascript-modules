@@ -6,7 +6,6 @@
   "author": "Jahia Solutions Group SA",
   "scripts": {
     "build": "vite build && run pack",
-    "build:production": "run build",
     "deploy": "jahia-deploy",
     "lint": "yarn run --top-level lint",
     "pack": "mkdir -p dist && yarn pack --out dist/package.tgz"
