@@ -9,8 +9,6 @@ import * as v from "valibot";
  * in case something goes wrong.
  */
 const schema = v.object({
-  /** Component name */
-  name: v.string(),
   /** Bundle key; module name */
   bundle: v.string(),
   /** JS entry point, import it to get the load function */
@@ -48,11 +46,10 @@ const ComponentWrapper = ({
  * care of importing the component from the module bundle.
  */
 const load = async (element: HTMLElement) => {
-  const { entry, bundle, lang, name, props } = v.parse(schema, devalue.parse(element.textContent));
+  const { entry, bundle, lang, props } = v.parse(schema, devalue.parse(element.textContent));
   const hydrate = element.dataset.hydrationMode === "hydrate";
 
-  const { default: load } = await import(entry);
-  const Component = await load(name);
+  const { default: Component } = await import(entry);
 
   return {
     hydrate,

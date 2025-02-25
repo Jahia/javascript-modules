@@ -61,7 +61,8 @@ function InBrowser<T>({
 
   /** JS entry point to the client bundle loader. */
   const entry = buildUrl(
-    { value: `/modules/${bundleKey}/javascript/client/index.js` },
+    // @ts-expect-error __filename is added by a vite plugin
+    { value: `/modules/${bundleKey}/${Child.__filename}.js` },
     renderContext,
     currentResource,
   );
@@ -85,7 +86,6 @@ function InBrowser<T>({
       <div>
         <script type="application/json" data-hydration-mode={ssr ? "hydrate" : "render"}>
           {devalue.stringify({
-            name: Child.name,
             lang: language,
             entry,
             bundle: bundleKey,
