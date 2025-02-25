@@ -1,0 +1,60 @@
+{
+  "name": "$$MODULE_NAME$$",
+  "version": "0.1.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build:development": "webpack --mode=development && run pack",
+    "build:production": "webpack && run pack",
+    "build": "run build:production",
+    "pack": "mkdir -p dist/build && cd dist/build && yarn pack --out package.tgz && mv package.tgz ..",
+    "clean": "rm -rf dist/",
+    "deploy": "jahia-deploy",
+    "watch": "webpack --mode=development --watch",
+    "lint": "eslint --ext js,jsx .",
+    "test": "yarn lint"
+  },
+  "jahia": {
+    "snapshot": true,
+    "module-dependencies": "default",
+    "module-type": "$$MODULE_TYPE$$",
+    "module-type-comment": "Use templatesSet in the module type to declare a template set",
+    "server": "main.js",
+    "static-resources": "/icons,/images,/javascript,/locales"
+  },
+  "dependencies": {
+    "@jahia/javascript-modules-library": "0.x || ^1.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
+    "@babel/preset-react": "^7.16.0",
+    "@jahia/eslint-config": "^2.1.2",
+    "babel-loader": "^8.2.3",
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
+    "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^10.0.0",
+    "dotenv-cli": "^4.0.0",
+    "eslint": "^8.43.0",
+    "eslint-plugin-jest": "latest",
+    "eslint-plugin-react": "latest",
+    "eslint-plugin-react-hooks": "latest",
+    "extra-watch-webpack-plugin": "^1.0.3",
+    "i18next": "23.10.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-i18next": "14.1.0",
+    "styled-jsx": "5.1.2",
+    "terser-webpack-plugin": "^5.3.10",
+    "typescript": "^5.3.3",
+    "webpack": "^5.64.4",
+    "webpack-cli": "^4.9.1",
+    "webpack-shell-plugin-next": "^2.3.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "yarn": ">=4.0.0"
+  },
+  "packageManager": "yarn@4.3.1"
+}
