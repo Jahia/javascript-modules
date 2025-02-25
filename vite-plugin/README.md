@@ -25,7 +25,8 @@ export default defineConfig({
 
       // Server options
       server: {
-        input: "./src/server/index.js",
+        // You can use a glob pattern to match multiple files
+        input: "./src/server/index.{js,ts}",
         output: {
           dir: "./javascript/server",
           fileName: "index", // Will produce index.js and index.css

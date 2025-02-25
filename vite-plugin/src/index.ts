@@ -1,7 +1,8 @@
-import path from "node:path";
-import type { PluginOption } from "vite";
+import multiEntry from "@rollup/plugin-multi-entry";
 import sharedLibs from "javascript-modules-engine/shared-libs.mjs";
+import path from "node:path";
 import type { Plugin } from "rollup";
+import type { PluginOption } from "vite";
 
 // These libraries are provided by Jahia and should not be bundled
 const external = Object.keys(sharedLibs);
@@ -45,7 +46,10 @@ export default function jahia(
       /**
        * Entrypoint for the server-side bundle.
        *
-       * @default "./src/index.js"
+       * [Glob patterns are
+       * supported.](https://www.npmjs.com/package/@rollup/plugin-multi-entry#supported-input-types)
+       *
+       * @default "./src/index.{js,ts}"
        */
       input?: string;
       /** Where to put the built server-side bundle. */
@@ -122,7 +126,7 @@ export default function jahia(
                  * variable that will be created by the IIFE.
                  */
                 name: "serverBundle",
-                entry: options.server?.input ?? "./src/index.js",
+                entry: options.server?.input ?? "./src/index.{js,ts}",
                 fileName: options.server?.output?.fileName ?? "index",
                 // Bundle the old way, as an IIFE, to replace libs with globals
                 formats: ["iife"],
@@ -130,7 +134,6 @@ export default function jahia(
               rollupOptions: {
                 output: {
                   dir: options.server?.output?.dir ?? "./javascript/server",
-                  entryFileNames: `${options.server?.output?.fileName ?? "index"}.js`,
                   // Replace the imports of external libraries with the globals
                   globals: Object.fromEntries(
                     [
@@ -146,11 +149,16 @@ export default function jahia(
                   ),
                 },
                 external: [...external, "@jahia/javascript-modules-library"],
-                plugins:
+                plugins: [
+                  multiEntry({
+                    exports: false,
+                    entryFileName: `${options.server?.output?.fileName ?? "index"}.js`,
+                  }),
                   // Only add the callback plugin in watch mode
                   config.build?.watch &&
-                  options.watchCallback &&
-                  buildSuccessPlugin(options.watchCallback),
+                    options.watchCallback &&
+                    buildSuccessPlugin(options.watchCallback),
+                ],
               },
             },
           },

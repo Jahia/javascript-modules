@@ -1,7 +1,12 @@
-import { defineJahiaComponent, server, useServerContext } from "@jahia/javascript-modules-library";
+import {
+  defineJahiaComponent,
+  registerJahiaComponents,
+  server,
+  useServerContext,
+} from "@jahia/javascript-modules-library";
 
 // Use the legacy (deprecated) registration method to register a view component with minimal configuration
-export const TestLegacyRegistrationMinimal = () => (
+const TestLegacyRegistrationMinimal = () => (
   <div data-testid="legacyRegistrationMinimal">
     javascriptExample:testLegacyRegistrationMinimal view component
   </div>
@@ -14,7 +19,7 @@ TestLegacyRegistrationMinimal.jahiaComponent = defineJahiaComponent({
 });
 
 // Use the legacy (deprecated) registration method to register a view component with advanced configuration
-export const TestLegacyRegistrationAdvanced = () => {
+const TestLegacyRegistrationAdvanced = () => {
   const { currentResource } = useServerContext();
   const myProp = currentResource.getNode().getPropertyAsString("myProp");
   const testRegistryName = server.registry.get("view", "legacyRegistrationAdvancedIdentifier").name;
@@ -36,4 +41,9 @@ TestLegacyRegistrationAdvanced.jahiaComponent = defineJahiaComponent({
   properties: {
     myProp: "my value",
   },
+});
+
+registerJahiaComponents({
+  TestLegacyRegistrationMinimal,
+  TestLegacyRegistrationAdvanced,
 });
