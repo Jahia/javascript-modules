@@ -66,16 +66,8 @@ export const insertFilename = (root: string, prefix: string): Plugin => {
               arguments: [
                 {
                   // Original function
+                  ...node.declaration,
                   type: "FunctionExpression",
-                  id: node.declaration.id,
-                  body: node.declaration.body,
-                  params: node.declaration.params,
-                  async: node.declaration.async,
-                  generator: node.declaration.generator,
-                  leadingComments: node.declaration.leadingComments,
-                  trailingComments: node.declaration.trailingComments,
-                  range: node.declaration.range,
-                  loc: node.declaration.loc,
                 },
                 { type: "Literal", value: "__filename" },
                 {
