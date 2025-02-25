@@ -1,9 +1,11 @@
 import multiEntry from "@rollup/plugin-multi-entry";
 import sharedLibs from "javascript-modules-engine/shared-libs.mjs";
-import path from "node:path";
 import type { Plugin } from "rollup";
 import type { PluginOption } from "vite";
 import { insertFilename } from "./insert-filename.js";
+import { globSync } from "tinyglobby";
+import { addExtension } from "@rollup/pluginutils";
+import { extname } from "node:path";
 
 // These libraries are provided by Jahia and should not be bundled
 const external = Object.keys(sharedLibs);
@@ -26,18 +28,28 @@ export default function jahia(
   options: {
     /** Options for the client-side loader. */
     client?: {
+      /** Entrypoint for the client-side bundle. */
+      input?: {
+        /**
+         * Parent directory of the client-side code.
+         *
+         * @default "./src/client/"
+         */
+        dir?: string;
+        /**
+         * Glob pattern(s) used to find all client-side code in `dir`.
+         *
+         * See [tinyglobby](https://www.npmjs.com/package/tinyglobby) for supported patterns.
+         *
+         * @default "**‍/*.jsx"
+         */
+        glob?: string | string[];
+      };
       /**
-       * Entrypoint for the client-side loader.
+       * Where to put the client-side bundle. It is a directory that will have the same structure as
+       * the source directory.
        *
-       * @default "./src/client/index.js"
-       */
-      input?: string;
-      /**
-       * Where to put the built client-side loader.
-       *
-       * /!\ This path is currently hard-coded in the engine loader, it cannot be changed yet.
-       *
-       * @default "./javascript/client/index.js"
+       * @default "./javascript/client/"
        */
       output?: string;
     };
@@ -58,7 +70,7 @@ export default function jahia(
         /**
          * Directory where to put the built server-side bundle.
          *
-         * @default "./javascript/server"
+         * @default "./javascript/server/"
          */
         dir?: string;
         /**
@@ -105,15 +117,22 @@ export default function jahia(
             build: {
               lib: {
                 // Single entry point for the client, all other files must be imported in this one
-                entry: options.client?.input ?? "./src/client/index.js",
+                entry: globSync(options.client?.input?.glob ?? "**/*.jsx", {
+                  cwd: options.client?.input?.dir ?? "./src/client/",
+                  absolute: true,
+                }),
                 formats: ["es"],
               },
               rollupOptions: {
                 output: {
-                  dir: path.dirname(options.client?.output ?? "./javascript/client/index.js"),
-                  entryFileNames: path.basename(
-                    options.client?.output ?? "./javascript/client/index.js",
-                  ),
+                  dir: options.client?.output ?? "./javascript/client/",
+                  entryFileNames: ({ facadeModuleId, name }) =>
+                    facadeModuleId
+                      ? // Keep the original extension, add .js after it
+                        addExtension(name, extname(facadeModuleId)) + ".js"
+                      : addExtension(name),
+                  preserveModules: true,
+                  preserveModulesRoot: options.client?.input?.dir ?? "./src/client/",
                 },
                 external,
               },
@@ -134,7 +153,7 @@ export default function jahia(
               },
               rollupOptions: {
                 output: {
-                  dir: options.server?.output?.dir ?? "./javascript/server",
+                  dir: options.server?.output?.dir ?? "./javascript/server/",
                   // Replace the imports of external libraries with the globals
                   globals: Object.fromEntries(
                     [
@@ -159,7 +178,11 @@ export default function jahia(
                   config.build?.watch &&
                     options.watchCallback &&
                     buildSuccessPlugin(options.watchCallback),
-                  insertFilename(),
+                  // Insert filenames in client-side components
+                  insertFilename(
+                    options.client?.input?.dir ?? "./src/client/",
+                    options.client?.output ?? "./javascript/client/",
+                  ),
                 ],
               },
             },
