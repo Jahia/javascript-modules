@@ -530,7 +530,6 @@ __metadata:
   dependencies:
     "@rollup/plugin-multi-entry": "npm:^6.0.1"
     "@types/node": "npm:^22.13.5"
-    javascript-modules-engine: "workspace:^"
     pkgroll: "npm:^2.11.0"
     rollup: "npm:^4.34.8"
     vite: "npm:^6.1.1"
@@ -2733,7 +2732,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"javascript-modules-engine@workspace:^, javascript-modules-engine@workspace:javascript-modules-engine":
+"javascript-modules-engine@workspace:javascript-modules-engine":
   version: 0.0.0-use.local
   resolution: "javascript-modules-engine@workspace:javascript-modules-engine"
   dependencies:

@@ -20,7 +20,6 @@
   },
   "devDependencies": {
     "@types/node": "^22.13.5",
-    "javascript-modules-engine": "workspace:^",
     "pkgroll": "^2.11.0",
     "rollup": "^4.34.8",
     "vite": "^6.1.1"

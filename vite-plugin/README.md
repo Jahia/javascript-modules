@@ -11,6 +11,7 @@ Using our project creation CLI should set you up correctly. It will ship with go
 ```js
 import { defineConfig } from "vite";
 import jahia from "@jahia/vite-plugin";
+import { spawnSync } from "node:child_process";
 
 export default defineConfig({
   plugins: [
