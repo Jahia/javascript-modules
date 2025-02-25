@@ -3,6 +3,7 @@ import sharedLibs from "javascript-modules-engine/shared-libs.mjs";
 import path from "node:path";
 import type { Plugin } from "rollup";
 import type { PluginOption } from "vite";
+import { insertFilename } from "./insert-filename.js";
 
 // These libraries are provided by Jahia and should not be bundled
 const external = Object.keys(sharedLibs);
@@ -158,6 +159,7 @@ export default function jahia(
                   config.build?.watch &&
                     options.watchCallback &&
                     buildSuccessPlugin(options.watchCallback),
+                  insertFilename(),
                 ],
               },
             },

@@ -16,9 +16,12 @@
     "build": "pkgroll"
   },
   "dependencies": {
-    "@rollup/plugin-multi-entry": "^6.0.1"
+    "@rollup/plugin-multi-entry": "^6.0.1",
+    "esrap": "^1.4.5",
+    "zimmerframe": "^1.1.2"
   },
   "devDependencies": {
+    "@types/estree": "^1.0.6",
     "@types/node": "^22.13.5",
     "pkgroll": "^2.11.0",
     "rollup": "^4.34.8",
