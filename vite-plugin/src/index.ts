@@ -1,11 +1,12 @@
 import multiEntry from "@rollup/plugin-multi-entry";
+import { addExtension } from "@rollup/pluginutils";
 import sharedLibs from "javascript-modules-engine/shared-libs.mjs";
+import { extname } from "node:path";
+import { styleText } from "node:util";
 import type { Plugin } from "rollup";
+import { globSync } from "tinyglobby";
 import type { PluginOption } from "vite";
 import { insertFilename } from "./insert-filename.js";
-import { globSync } from "tinyglobby";
-import { addExtension } from "@rollup/pluginutils";
-import { extname } from "node:path";
 
 // These libraries are provided by Jahia and should not be bundled
 const external = Object.keys(sharedLibs);
@@ -95,6 +96,7 @@ export default function jahia(
 ): PluginOption {
   return {
     name: "@jahia/vite-plugin",
+
     /**
      * Configuration hook.
      *
@@ -129,12 +131,26 @@ export default function jahia(
                   entryFileNames: ({ facadeModuleId, name }) =>
                     facadeModuleId
                       ? // Keep the original extension, add .js after it
-                        addExtension(name, extname(facadeModuleId)) + ".js"
+                        `${addExtension(name, extname(facadeModuleId))}.js`
                       : addExtension(name),
                   preserveModules: true,
                   preserveModulesRoot: options.client?.input?.dir ?? "./src/client/",
                 },
                 external,
+                plugins: [
+                  {
+                    name: "forbid-library",
+                    resolveId(id) {
+                      this.debug(id);
+                      console.log(id);
+                      if (id === "@jahia/javascript-modules-library") {
+                        throw new Error(
+                          `You cannot import '@jahia/javascript-modules-library' in the client bundle`,
+                        );
+                      }
+                    },
+                  },
+                ],
               },
             },
           },
@@ -189,6 +205,16 @@ export default function jahia(
           },
         },
       };
+    },
+
+    // Needed to run before Vite's default resolver
+    enforce: "pre",
+    resolveId(id, importer) {
+      if (this.environment.name === "client" && id === "@jahia/javascript-modules-library") {
+        this.error(
+          `\n\tCannot import @jahia/javascript-modules-library in the client bundle\n\tin ${importer}\n\t${styleText("bgRedBright", "This module is only available on the server.")}`,
+        );
+      }
     },
   };
 }
