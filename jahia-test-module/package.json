@@ -5,14 +5,14 @@
   "license": "MIT",
   "author": "Jahia Solutions Group SA",
   "scripts": {
-    "build": "yarn vite build && yarn vite build --ssr && run pack",
-    "build:production": "yarn vite build && yarn vite build --ssr && run pack",
+    "build": "vite build && run pack",
     "deploy": "jahia-deploy",
     "lint": "yarn run --top-level lint",
     "pack": "mkdir -p dist && yarn pack --out dist/package.tgz"
   },
   "devDependencies": {
     "@jahia/javascript-modules-library": "workspace:^",
+    "@jahia/vite-plugin": "workspace:^",
     "@types/react": "^19.0.0",
     "i18next": "^23.10.1",
     "react-i18next": "^15.4.0",

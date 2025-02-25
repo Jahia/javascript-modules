@@ -5,7 +5,8 @@
   "workspaces": [
     "javascript-modules-engine",
     "jahia-test-module",
-    "javascript-modules-library"
+    "javascript-modules-library",
+    "vite-plugin"
   ],
   "scripts": {
     "format": "prettier --write --list-different $INIT_CWD",

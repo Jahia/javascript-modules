@@ -1,0 +1,30 @@
+{
+  "name": "@jahia/vite-plugin",
+  "version": "0.5.0-SNAPSHOT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Jahia/javascript-modules.git",
+    "directory": "vite-plugin"
+  },
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "pkgroll"
+  },
+  "dependencies": {
+    "@rollup/plugin-multi-entry": "^6.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.5",
+    "pkgroll": "^2.11.0",
+    "rollup": "^4.34.8",
+    "vite": "^6.1.1"
+  },
+  "peerDependencies": {
+    "vite": ">=6.0.0"
+  }
+}

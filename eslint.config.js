@@ -10,14 +10,7 @@ import pluginCypress from "eslint-plugin-cypress/flat";
 export default tseslint.config(
   {
     languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-        // Webpack-specific globals
-        __webpack_public_path__: "writable",
-        __webpack_init_sharing__: "readonly",
-        __webpack_share_scopes__: "readonly",
-      },
+      globals: { ...globals.browser, ...globals.node },
     },
   },
 
