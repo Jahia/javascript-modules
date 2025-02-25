@@ -1,5 +1,5 @@
 import { HydrateInBrowser, jahiaComponent, server } from "@jahia/javascript-modules-library";
-import SampleHydratedMenu from "$client/components/SampleHydratedMenu";
+import SampleHydratedMenu from "$client/menu components/SampleHydratedMenu";
 import { buildNode } from "../../../../helpers/menu";
 import { useBaseNode } from "../../../../hooks/useBaseNode";
 
