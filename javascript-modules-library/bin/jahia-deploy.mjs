@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import dotenv from "dotenv";
 import { execSync } from "node:child_process";
 import path from "node:path";
