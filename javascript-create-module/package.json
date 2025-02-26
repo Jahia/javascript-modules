@@ -1,21 +1,31 @@
 {
-  "name": "@jahia/create-module",
-  "version": "0.0.1",
-  "license": "MIT",
-  "type": "module",
-  "bin": "./index.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Jahia/javascript-create-module.git"
-  },
+  "name": "@jahia/javascript-create-module",
+  "version": "0.6.0-SNAPSHOT",
   "keywords": [
     "template"
   ],
-  "author": "Jahia <support@jahia.com>",
+  "homepage": "https://github.com/Jahia/javascript-modules/javascript-create-module",
   "bugs": {
-    "url": "https://github.com/Jahia/javascript-create-module/issues"
+    "url": "https://github.com/Jahia/javascript-modules/issues"
   },
-  "homepage": "https://github.com/Jahia/javascript-create-module#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com:Jahia/javascript-modules.git",
+    "directory": "javascript-create-module"
+  },
+  "license": "MIT",
+  "author": "Jahia <support@jahia.com>",
+  "type": "module",
+  "bin": "./index.js",
+  "scripts": {
+    "lint": "yarn run --top-level lint",
+    "test": "jest tests/",
+    "build": "mkdir -p dist && yarn pack --out dist/package.tgz && publint",
+    "posttest": "yarn lint"
+  },
+  "jest": {
+    "testTimeout": 60000
+  },
   "dependencies": {
     "camelcase": "^8.0.0",
     "path": "^0.12.7",
@@ -32,19 +42,11 @@
     "eslint-plugin-react-hooks": "latest",
     "jest": "^29.7.0",
     "jest-each": "^29.7.0",
+    "publint": "^0.3.6",
     "tar": "^7.4.3"
-  },
-  "scripts": {
-    "lint": "eslint .",
-    "posttest": "yarn lint",
-    "test": "jest tests/"
   },
   "engines": {
     "node": ">=18.0.0",
     "yarn": ">=4.0.0"
-  },
-  "jest": {
-    "testTimeout": 60000
-  },
-  "packageManager": "yarn@4.3.1"
+  }
 }

@@ -1,12 +1,13 @@
 # Javascript Module template create-module project
 
-This project provides an Javascript module starter project template to quickly get up and running to create Jahia Javascript modules
+This project provides a Javascript module starter project template to quickly get up and running to create Jahia Javascript modules
 
 ## Usage
 
     npx @jahia/create-module@latest project-name [module-type] [namespace-definitions]
 
-where 
+where
+
 - `project-name` (mandatory) can be anything you want to call your project
 - `module-type` (optional) Can be one of:
   - `templatesSet`: A collection of templates and components. A template set is required when creating a website.

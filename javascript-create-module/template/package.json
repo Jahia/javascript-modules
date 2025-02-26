@@ -1,26 +1,18 @@
 {
   "name": "$$MODULE_NAME$$",
   "version": "0.1.0",
-  "main": "index.js",
   "license": "MIT",
+  "main": "index.js",
   "scripts": {
+    "build": "run build:production",
     "build:development": "webpack --mode=development && run pack",
     "build:production": "webpack && run pack",
-    "build": "run build:production",
-    "pack": "mkdir -p dist/build && cd dist/build && yarn pack --out package.tgz && mv package.tgz ..",
     "clean": "rm -rf dist/",
     "deploy": "jahia-deploy",
-    "watch": "webpack --mode=development --watch",
     "lint": "eslint --ext js,jsx .",
-    "test": "yarn lint"
-  },
-  "jahia": {
-    "snapshot": true,
-    "module-dependencies": "default",
-    "module-type": "$$MODULE_TYPE$$",
-    "module-type-comment": "Use templatesSet in the module type to declare a template set",
-    "server": "main.js",
-    "static-resources": "/icons,/images,/javascript,/locales"
+    "pack": "mkdir -p dist/build && cd dist/build && yarn pack --out package.tgz && mv package.tgz ..",
+    "test": "yarn lint",
+    "watch": "webpack --mode=development --watch"
   },
   "dependencies": {
     "@jahia/javascript-modules-library": "0.x || ^1.0.0"
@@ -52,9 +44,17 @@
     "webpack-cli": "^4.9.1",
     "webpack-shell-plugin-next": "^2.3.1"
   },
+  "packageManager": "yarn@4.3.1",
   "engines": {
     "node": ">=18.0.0",
     "yarn": ">=4.0.0"
   },
-  "packageManager": "yarn@4.3.1"
+  "jahia": {
+    "snapshot": true,
+    "module-dependencies": "default",
+    "module-type": "$$MODULE_TYPE$$",
+    "module-type-comment": "Use templatesSet in the module type to declare a template set",
+    "server": "main.js",
+    "static-resources": "/icons,/images,/javascript,/locales"
+  }
 }

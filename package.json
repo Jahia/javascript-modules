@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "workspaces": [
+    "javascript-create-module",
     "javascript-modules-engine",
     "jahia-test-module",
     "javascript-modules-library",

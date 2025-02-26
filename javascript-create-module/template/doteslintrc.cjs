@@ -1,30 +1,28 @@
 module.exports = {
-    root: true,
-    env: {
-        browser: true,
-        es2021: true
+  root: true,
+  env: {
+    browser: true,
+    es2021: true,
+  },
+  extends: "@jahia",
+  overrides: [
+    {
+      env: {
+        node: true,
+      },
+      files: [".eslintrc.{js,cjs}"],
+      parserOptions: {
+        sourceType: "script",
+      },
     },
-    extends: '@jahia',
-    overrides: [
-        {
-            env: {
-                node: true
-            },
-            files: [
-                '.eslintrc.{js,cjs}'
-            ],
-            parserOptions: {
-                sourceType: 'script'
-            }
-        }
-    ],
-    parserOptions: {
-        requireConfigFile: false,
-        ecmaVersion: 'latest',
-        sourceType: 'module'
-    },
-    ignorePatterns: ['dist', 'css', 'javascript'],
-    rules: {
-        'react/prop-types': 'off'
-    }
+  ],
+  parserOptions: {
+    requireConfigFile: false,
+    ecmaVersion: "latest",
+    sourceType: "module",
+  },
+  ignorePatterns: ["dist", "css", "javascript"],
+  rules: {
+    "react/prop-types": "off",
+  },
 };
