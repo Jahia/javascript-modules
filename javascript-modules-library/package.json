@@ -1,6 +1,6 @@
 {
   "name": "@jahia/javascript-modules-library",
-  "version": "0.5.1",
+  "version": "0.6.0-SNAPSHOT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com:Jahia/javascript-modules.git",
