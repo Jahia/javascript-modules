@@ -1,0 +1,10 @@
+.env
+.eslintrc.cjs
+.idea
+*.tgz
+.yarn
+.vscode
+webpack.config.js
+README.md
+settings/README.md
+src
