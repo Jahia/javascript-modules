@@ -3,7 +3,7 @@
     <parent>
         <artifactId>javascript-modules</artifactId>
         <groupId>org.jahia.modules</groupId>
-        <version>0.6.0-SNAPSHOT</version>
+        <version>0.5.1</version>
     </parent>
     <artifactId>vite-plugin</artifactId>
     <name>Vite plugin for Jahia</name>
