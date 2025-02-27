@@ -3,127 +3,129 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import * as tar from "tar";
-import each from "jest-each";
+import { test, before, after } from "node:test";
+import assert from "assert";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 let tempFolder;
 
-beforeAll(() => {
+before(() => {
   // Create a temporary directory
   tempFolder = fs.mkdtempSync(os.tmpdir());
   console.log("Using temp folder ", tempFolder);
 });
 
-afterAll(() => {
+after(() => {
   // Remove the temporary directory
   fs.rmSync(tempFolder, { recursive: true, force: true });
   console.log(`Temp folder ${tempFolder} removed.`);
 });
 
-describe("npx @jahia/create-module", () => {
-  each([
-    ["test-project", "testProject", "templatesSet"],
-    ["otherSampleProject", "otherSampleProject", "module"],
-    ["foo", "foo", ""],
-  ]).it(
-    "Project creation using archetype ('%s'/'%s' with moduleType '%s')",
-    async (projectName, projectNameSanitized, moduleType) => {
-      // Create a temporary directory
-      const tempDir = fs.mkdtempSync(path.join(tempFolder, projectNameSanitized));
-      console.log("tempDir", tempDir);
+const testCases = [
+  ["test-project", "testProject", "templatesSet"],
+  ["otherSampleProject", "otherSampleProject", "module"],
+  ["foo", "foo", ""],
+];
 
-      const parentFolder = path.dirname(__dirname);
-      const indexFile = path.join(parentFolder, "index.js");
-      const isTemplatesSet = moduleType === "templatesSet";
+testCases.forEach(([projectName, projectNameSanitized, moduleType]) => {
+  test(`Project creation using archetype ('${projectName}'/'${projectNameSanitized}' with moduleType '${moduleType}')`, async () => {
+    // Create a temporary directory
+    const tempDir = fs.mkdtempSync(path.join(tempFolder, projectNameSanitized));
+    console.log("tempDir", tempDir);
 
-      // Create a new test-project from within the temp directory
-      process.chdir(tempDir);
-      console.log(execSync(`node ${indexFile} ${projectName} ${moduleType}`).toString());
-      const projectPath = path.join(tempDir, projectName);
-      expect(fs.existsSync(projectPath)).toBe(true);
+    const parentFolder = path.dirname(__dirname);
+    const indexFile = path.join(parentFolder, "index.js");
+    const isTemplatesSet = moduleType === "templatesSet";
 
-      // TODO check the replacement of the markers in the files
+    // Create a new test-project from within the temp directory
+    process.chdir(tempDir);
+    console.log(execSync(`node ${indexFile} ${projectName} ${moduleType}`).toString());
+    const projectPath = path.join(tempDir, projectName);
+    assert(fs.existsSync(projectPath), true);
 
-      // Validate the generated project structure
-      const expectedFiles = [
-        // Make sure the dot files have been renamed
-        ".env",
-        ".gitignore",
-        ".prettierignore",
-        "eslint.config.js",
-        // Make sure the renaming with MODULE_NAME is correct
-        `settings/resources/${projectName}.properties`,
-        `settings/resources/${projectName}_fr.properties`,
-        `settings/content-types-icons/${projectNameSanitized}_simpleContent.png`,
-        // Make sure the static and config folders exist
-        "static/css",
-        "static/images",
-        "static/javascript",
-        "settings/configurations",
-        "settings/content-editor-forms/forms",
-        "settings/content-editor-forms/fieldsets",
-        "yarn.lock",
-      ];
-      if (moduleType === "templatesSet") {
-        // This file should only exist for templates set
-        expectedFiles.push("settings/template-thumbnail.png");
-      }
+    // TODO check the replacement of the markers in the files
 
-      expectedFiles.forEach((file) => {
-        console.log(`Testing that ${file} exists...`);
-        expect(fs.existsSync(path.join(projectPath, file))).toBe(true);
+    // Validate the generated project structure
+    const expectedFiles = [
+      // Make sure the dot files have been renamed
+      ".env",
+      ".gitignore",
+      ".prettierignore",
+      "eslint.config.js",
+      // Make sure the renaming with MODULE_NAME is correct
+      `settings/resources/${projectName}.properties`,
+      `settings/resources/${projectName}_fr.properties`,
+      `settings/content-types-icons/${projectNameSanitized}_simpleContent.png`,
+      // Make sure the static and config folders exist
+      "static/css",
+      "static/images",
+      "static/javascript",
+      "settings/configurations",
+      "settings/content-editor-forms/forms",
+      "settings/content-editor-forms/fieldsets",
+      "yarn.lock",
+    ];
+    if (moduleType === "templatesSet") {
+      // This file should only exist for templates set
+      expectedFiles.push("settings/template-thumbnail.png");
+    }
+
+    expectedFiles.forEach((file) => {
+      console.log(`Testing that ${file} exists...`);
+      assert(fs.existsSync(path.join(projectPath, file)), true);
+    });
+
+    // Install & build the project
+    process.chdir(projectPath);
+    // YARN_ENABLE_IMMUTABLE_INSTALLS=false is used as the yarn.lock file gets updated
+    // Without this flag, the following error is encountered: "The lockfile would have been created by this install, which is explicitly forbidden."
+    console.log(execSync("YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn install").toString());
+    console.log(execSync("yarn build").toString());
+
+    // Make sure the tgz file is created in the dist/ folder
+    const tgzFilePath = path.join(projectPath, "dist", "package.tgz");
+    assert(fs.existsSync(tgzFilePath), true);
+
+    // Check the contents of the tgz file
+    const expectedFilesInArchive = [
+      "dist/client/index.jsx.js",
+      "dist/server/index.js",
+      `settings/content-types-icons/${projectNameSanitized}_simpleContent.png`,
+      "settings/locales/de.json",
+      "settings/locales/en.json",
+      "settings/locales/fr.json",
+      `settings/resources/${projectName}.properties`,
+      `settings/resources/${projectName}_fr.properties`,
+      "settings/definitions.cnd",
+      "settings/import.xml",
+      "settings/README.md",
+      isTemplatesSet && "settings/template-thumbnail.png",
+      "static/css/styles.css",
+      "package.json",
+      "README.md",
+    ].filter(Boolean);
+
+    const entries = [];
+    await tar
+      .list({
+        file: tgzFilePath,
+        onReadEntry: (entry) => {
+          entries.push(entry.path);
+        },
+      })
+      .then(() => {
+        expectedFilesInArchive.forEach((file) => {
+          console.log(`Testing that ${file} exists in the archive...`);
+          assert(entries.includes(`package/${file}`), true);
+        });
+        assert(entries.length, expectedFilesInArchive.length);
       });
 
-      // Install & build the project
-      process.chdir(projectPath);
-      // YARN_ENABLE_IMMUTABLE_INSTALLS=false is used as the yarn.lock file gets updated
-      // Without this flag, the following error is encountered: "The lockfile would have been created by this install, which is explicitly forbidden."
-      console.log(execSync("YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn install").toString());
-      console.log(execSync("yarn build").toString());
-
-      // Make sure the tgz file is created in the dist/ folder
-      const tgzFilePath = path.join(projectPath, "dist", "package.tgz");
-      expect(fs.existsSync(tgzFilePath)).toBe(true);
-
-      // Check the contents of the tgz file
-      const expectedFilesInArchive = [
-        "dist/client/index.jsx.js",
-        "dist/server/index.js",
-        `settings/content-types-icons/${projectNameSanitized}_simpleContent.png`,
-        "settings/locales/de.json",
-        "settings/locales/en.json",
-        "settings/locales/fr.json",
-        `settings/resources/${projectName}.properties`,
-        `settings/resources/${projectName}_fr.properties`,
-        "settings/definitions.cnd",
-        "settings/import.xml",
-        "settings/README.md",
-        isTemplatesSet && "settings/template-thumbnail.png",
-        "static/css/styles.css",
-        "package.json",
-        "README.md",
-      ].filter(Boolean);
-
-      const entries = [];
-      await tar
-        .list({
-          file: tgzFilePath,
-          onReadEntry: (entry) => {
-            entries.push(entry.path);
-          },
-        })
-        .then(() => {
-          expectedFilesInArchive.forEach((file) => {
-            console.log(`Testing that ${file} exists in the archive...`);
-            expect(entries.includes(`package/${file}`)).toBe(true);
-          });
-          expect(entries.length).toBe(expectedFilesInArchive.length);
-        });
-
-      // Make sure the package.json contains the dependency @jahia/javascript-modules-library
-      const packageJson = JSON.parse(
-        fs.readFileSync(path.join(projectPath, "package.json"), "utf8"),
-      );
-      expect(packageJson.dependencies["@jahia/javascript-modules-library"]).toBeDefined();
-    },
-  );
+    // Make sure the package.json contains the dependency @jahia/javascript-modules-library
+    const packageJson = JSON.parse(fs.readFileSync(path.join(projectPath, "package.json"), "utf8"));
+    assert(packageJson.devDependencies["@jahia/javascript-modules-library"], true);
+  });
 });

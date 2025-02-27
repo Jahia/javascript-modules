@@ -19,12 +19,9 @@
   "bin": "./index.js",
   "scripts": {
     "lint": "yarn run --top-level lint",
-    "test": "jest tests/",
+    "test": "node --test",
     "build": "mkdir -p dist && yarn pack --out dist/package.tgz && publint",
     "posttest": "yarn lint"
-  },
-  "jest": {
-    "testTimeout": 60000
   },
   "dependencies": {
     "camelcase": "^8.0.0",
@@ -40,8 +37,6 @@
     "eslint-plugin-jest": "latest",
     "eslint-plugin-react": "latest",
     "eslint-plugin-react-hooks": "latest",
-    "jest": "^29.7.0",
-    "jest-each": "^29.7.0",
     "publint": "^0.3.6",
     "tar": "^7.4.3"
   },

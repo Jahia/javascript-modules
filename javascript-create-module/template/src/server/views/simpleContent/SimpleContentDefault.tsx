@@ -10,7 +10,7 @@ jahiaComponent(
   },
   ({ title }) => (
     <div>
-      <h2>Test:{title}</h2>
+      <h2>{title}</h2>
     </div>
   ),
 );
