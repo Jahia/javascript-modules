@@ -94,6 +94,21 @@ export default function jahia(
     watchCallback?: () => void | Promise<void>;
   } = {},
 ): PluginOption {
+  const clientEntries = globSync(options.client?.input?.glob ?? "**/*.jsx", {
+    cwd: options.client?.input?.dir ?? "./src/client/",
+    absolute: true,
+  });
+
+  if (clientEntries.length === 0) {
+    console.warn(
+      `${styleText("yellowBright", "[@jahia/vite-plugin] Skipping client build because there are no entry files...")}
+ • If this is the intended behavior, you can safely ignore this message
+ • Otherwise, ensure that your client files are properly configured in the plugin options
+   Client base directory: ${styleText("cyanBright", options.client?.input?.dir ?? "./src/client/ (default value)")}
+   Client glob pattern:   ${styleText("cyanBright", String(options.client?.input?.glob ?? "**/*.jsx (default value)"))}`,
+    );
+  }
+
   return {
     name: "@jahia/vite-plugin",
 
@@ -108,7 +123,7 @@ export default function jahia(
     config(config) {
       // Mutate the configuration to set base settings if they are not already set
       // Build all environments https://vite.dev/guide/api-environment-frameworks.html#environments-during-build
-      config.builder ??= {};
+      config.builder ??= { sharedConfigBuild: true };
 
       // Enable the modern JSX runtime
       config.esbuild ??= { jsx: "automatic" };
@@ -119,10 +134,7 @@ export default function jahia(
             build: {
               lib: {
                 // Single entry point for the client, all other files must be imported in this one
-                entry: globSync(options.client?.input?.glob ?? "**/*.jsx", {
-                  cwd: options.client?.input?.dir ?? "./src/client/",
-                  absolute: true,
-                }),
+                entry: clientEntries,
                 formats: ["es"],
               },
               rollupOptions: {
@@ -205,6 +217,11 @@ export default function jahia(
           },
         },
       };
+    },
+
+    configResolved(config) {
+      // If there are no client entries, remove the client environment to prevent a build error
+      if (clientEntries.length === 0) delete config.environments.client;
     },
 
     // Needed to run before Vite's default resolver
