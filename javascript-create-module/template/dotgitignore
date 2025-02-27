@@ -1,5 +1,7 @@
 # Intellij
 .idea
+!.idea/jsLinters/**
+!.idea/prettier.xml
 *.iml
 *.ipr
 

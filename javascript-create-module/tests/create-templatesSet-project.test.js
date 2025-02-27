@@ -54,6 +54,10 @@ testCases.forEach(([projectName, projectNameSanitized, moduleType]) => {
       ".env",
       ".gitignore",
       ".prettierignore",
+      ".idea",
+      ".idea/jsLinters/eslint.xml",
+      ".idea/prettier.xml",
+      ".vscode",
       "eslint.config.js",
       // Make sure the renaming with MODULE_NAME is correct
       `settings/resources/${projectName}.properties`,

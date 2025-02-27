@@ -95,6 +95,8 @@ try {
 fs.renameSync(path.join(projectDir, "dotgitignore"), path.join(projectDir, ".gitignore"));
 fs.renameSync(path.join(projectDir, "dotprettierignore"), path.join(projectDir, ".prettierignore"));
 fs.renameSync(path.join(projectDir, "dotenv"), path.join(projectDir, ".env"));
+fs.renameSync(path.join(projectDir, "dotidea"), path.join(projectDir, ".idea"));
+fs.renameSync(path.join(projectDir, "dotvscode"), path.join(projectDir, ".vscode"));
 
 // Rename the resource file to use the project name
 fs.renameSync(
