@@ -7,6 +7,11 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
 
+    # Disable the workflow for doc-only changes
+    # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#example-excluding-paths
+    paths-ignore:
+      - "docs/**"
+
 jobs:
   static-analysis:
     name: Static Analysis (linting, vulns)
