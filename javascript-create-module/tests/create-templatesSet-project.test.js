@@ -46,10 +46,10 @@ describe("npx @jahia/create-module", () => {
       // Validate the generated project structure
       const expectedFiles = [
         // Make sure the dot files have been renamed
-        ".gitignore",
-        ".npmignore",
         ".env",
-        ".eslintrc.cjs",
+        ".gitignore",
+        ".prettierignore",
+        "eslint.config.js",
         // Make sure the renaming with MODULE_NAME is correct
         `settings/resources/${projectName}.properties`,
         `settings/resources/${projectName}_fr.properties`,
@@ -86,8 +86,8 @@ describe("npx @jahia/create-module", () => {
 
       // Check the contents of the tgz file
       const expectedFilesInArchive = [
-        "javascript/client/remote.js",
-        "javascript/client/remote.js.map",
+        "dist/client/index.jsx.js",
+        "dist/server/index.js",
         `settings/content-types-icons/${projectNameSanitized}_simpleContent.png`,
         "settings/locales/de.json",
         "settings/locales/en.json",
@@ -99,9 +99,8 @@ describe("npx @jahia/create-module", () => {
         "settings/README.md",
         isTemplatesSet && "settings/template-thumbnail.png",
         "static/css/styles.css",
-        "main.js",
-        "main.js.map",
         "package.json",
+        "README.md",
       ].filter(Boolean);
 
       const entries = [];

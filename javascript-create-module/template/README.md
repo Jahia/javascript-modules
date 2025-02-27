@@ -10,22 +10,25 @@ If you don't use default configuration for the Docker container name or for Jahi
 
 You can find the documentation on how to use this module on the [Jahia Academy](https://academy.jahia.com/get-started/developers/templating) templating tutorial.
 
-## Run
+## Prerequisites
 
-1. Enable Corepack if needed :
+Yarn is required to build the project.
 
-`enable corepack`
+Please follow the instructions at [Node.js Downloads](https://nodejs.org/en/download) to install Node.js and Yarn. In the dropdown menus, make sure to select Yarn (the _with_) and your operating system (the _for_).
 
-2. Install the dependencies :
+## Development
 
-`yarn`
+1. To compile and package the project:
+```
+yarn build
+```
 
-3. Build and run the project :
+2. To deploy the generated package to your Jahia instance (configured in your [`.env`](.env)):
+```
+yarn deploy
+```
 
-`yarn watch`
-
-## How to upgrade yarn version to latest stable
-
-This command will upgrade yarn to the latest stable release and update the yarn installer in .yarn/releases
-
-`yarn set version stable`
+3. Alternatively, to deploy during development using watch mode:
+```
+yarn watch
+```

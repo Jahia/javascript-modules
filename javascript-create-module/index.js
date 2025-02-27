@@ -93,9 +93,8 @@ try {
 // the dotfiles after we have copied them over to the
 // new project directory.
 fs.renameSync(path.join(projectDir, "dotgitignore"), path.join(projectDir, ".gitignore"));
-fs.renameSync(path.join(projectDir, "dotnpmignore"), path.join(projectDir, ".npmignore"));
+fs.renameSync(path.join(projectDir, "dotprettierignore"), path.join(projectDir, ".prettierignore"));
 fs.renameSync(path.join(projectDir, "dotenv"), path.join(projectDir, ".env"));
-fs.renameSync(path.join(projectDir, "doteslintrc.cjs"), path.join(projectDir, ".eslintrc.cjs"));
 
 // Rename the resource file to use the project name
 fs.renameSync(
