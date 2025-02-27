@@ -92,9 +92,11 @@ try {
 // up by the starter template repository). We can rename
 // the dotfiles after we have copied them over to the
 // new project directory.
+fs.renameSync(path.join(projectDir, "dotenv"), path.join(projectDir, ".env"));
 fs.renameSync(path.join(projectDir, "dotgitignore"), path.join(projectDir, ".gitignore"));
 fs.renameSync(path.join(projectDir, "dotprettierignore"), path.join(projectDir, ".prettierignore"));
-fs.renameSync(path.join(projectDir, "dotenv"), path.join(projectDir, ".env"));
+fs.renameSync(path.join(projectDir, "dotyarnrc.yml"), path.join(projectDir, ".yarnrc.yml"));
+fs.renameSync(path.join(projectDir, "dotgithub"), path.join(projectDir, ".github"));
 fs.renameSync(path.join(projectDir, "dotidea"), path.join(projectDir, ".idea"));
 fs.renameSync(path.join(projectDir, "dotvscode"), path.join(projectDir, ".vscode"));
 
