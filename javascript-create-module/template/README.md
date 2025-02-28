@@ -10,22 +10,30 @@ If you don't use default configuration for the Docker container name or for Jahi
 
 You can find the documentation on how to use this module on the [Jahia Academy](https://academy.jahia.com/get-started/developers/templating) templating tutorial.
 
-## Run
+## Prerequisites
 
-1. Enable Corepack if needed :
+Yarn is required to build the project.
 
-`enable corepack`
+Please follow the instructions at [Node.js Downloads](https://nodejs.org/en/download) to install Node.js and Yarn. In the dropdown menus, make sure to select Yarn (the _with_) and your operating system (the _for_).
 
-2. Install the dependencies :
+Note: If you are using a Windows machine, you need to run your `yarn` commands in PowerShell (not cmd.exe!). It comes preinstalled on modern Windows versions. In case this is not the case on your machine, [please see Microsoft documentation](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.5).
 
-`yarn`
+## Development
 
-3. Build and run the project :
+1. To compile and package the project:
 
-`yarn watch`
+```
+yarn build
+```
 
-## How to upgrade yarn version to latest stable
+2. To deploy the generated package to your Jahia instance (configured in your [`.env`](.env)):
 
-This command will upgrade yarn to the latest stable release and update the yarn installer in .yarn/releases
+```
+yarn deploy
+```
 
-`yarn set version stable`
+3. Alternatively, to deploy during development using watch mode:
+
+```
+yarn watch
+```
