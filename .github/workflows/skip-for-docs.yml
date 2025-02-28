@@ -1,0 +1,33 @@
+# A way to merge documentation changes without running the tests
+name: On Docs Change (PR)
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths:
+      - "docs/**"
+
+jobs:
+  static-analysis:
+    name: Static Analysis (linting, vulns)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+  build:
+    name: Build Module
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+  sonar-analysis:
+    name: Sonar Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+  integration-tests-standalone:
+    name: Integration Tests (Standalone)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
