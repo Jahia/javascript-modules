@@ -44,7 +44,7 @@ docker run --name jahia-dev -p 8080:8080 -p 9229:9229 -e JPDA=true -d jahia/jahi
 # Upgrade the JavaScript Modules engine to the latest version
 curl http://root:root1234@localhost:8080/modules/api/provisioning \
   --header 'Content-Type: application/json' \
-  --data '[{"installOrUpgradeBundle":"mvn:org.jahia.modules/javascript-modules-engine/0.5.1","autoStart":true}]'
+  --data '[{"installOrUpgradeBundle":"mvn:org.jahia.modules/javascript-modules-engine,"autoStart":true}]'
 ```
 
 To display logs in real-time you can either use the Docker Desktop app or run `docker logs -fn1 jahia-dev` in a new terminal.
