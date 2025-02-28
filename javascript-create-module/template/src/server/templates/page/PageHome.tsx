@@ -6,6 +6,7 @@ import {
   useUrlBuilder,
 } from "@jahia/javascript-modules-library";
 import { useTranslation } from "react-i18next";
+import "modern-normalize/modern-normalize.css";
 
 jahiaComponent(
   {
@@ -22,6 +23,10 @@ jahiaComponent(
     return (
       <html lang={lang}>
         <head>
+          <AddResources
+            type="css"
+            resources={buildStaticUrl({ assetPath: "../dist/server/index.css" })}
+          />
           <AddResources type="css" resources={buildStaticUrl({ assetPath: "css/styles.css" })} />
           <title>Home</title>
         </head>

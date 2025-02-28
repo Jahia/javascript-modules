@@ -16,19 +16,24 @@ Yarn is required to build the project.
 
 Please follow the instructions at [Node.js Downloads](https://nodejs.org/en/download) to install Node.js and Yarn. In the dropdown menus, make sure to select Yarn (the _with_) and your operating system (the _for_).
 
+Note: If you are using a Windows machine, you also need to install PowerShell to run the scripts in `package.json` (which use `mkdir`, `rm`, etc.). You can download it from [PowerShell GitHub](https://github.com/PowerShell/PowerShell).
+
 ## Development
 
 1. To compile and package the project:
+
 ```
 yarn build
 ```
 
 2. To deploy the generated package to your Jahia instance (configured in your [`.env`](.env)):
+
 ```
 yarn deploy
 ```
 
 3. Alternatively, to deploy during development using watch mode:
+
 ```
 yarn watch
 ```
