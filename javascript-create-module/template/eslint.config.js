@@ -9,7 +9,7 @@ import eslintReact from "@eslint-react/eslint-plugin";
 export default tseslint.config(
   {
     languageOptions: {
-      globals: { ...globals.browser, ...globals.jest },
+      globals: { ...globals.browser, ...globals.node },
     },
   },
 
