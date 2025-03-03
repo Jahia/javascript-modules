@@ -1,11 +1,11 @@
-import { execSync } from "child_process";
-import fs from "fs";
-import os from "os";
-import path from "path";
+import { execSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import * as tar from "tar";
 import { test, before, after } from "node:test";
-import assert from "assert";
-import { fileURLToPath } from "url";
+import assert from "node:assert/strict";
+import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,7 +30,7 @@ const testCases = [
   ["foo", "foo", ""],
 ];
 
-testCases.forEach(([projectName, projectNameSanitized, moduleType]) => {
+for (const [projectName, projectNameSanitized, moduleType] of testCases) {
   test(`Project creation using archetype ('${projectName}'/'${projectNameSanitized}' with moduleType '${moduleType}')`, async () => {
     // Create a temporary directory
     const tempDir = fs.mkdtempSync(path.join(tempFolder, projectNameSanitized));
@@ -44,7 +44,7 @@ testCases.forEach(([projectName, projectNameSanitized, moduleType]) => {
     process.chdir(tempDir);
     console.log(execSync(`node ${indexFile} ${projectName} ${moduleType}`).toString());
     const projectPath = path.join(tempDir, projectName);
-    assert(fs.existsSync(projectPath), true);
+    assert(fs.existsSync(projectPath));
 
     // TODO check the replacement of the markers in the files
 
@@ -78,10 +78,10 @@ testCases.forEach(([projectName, projectNameSanitized, moduleType]) => {
       expectedFiles.push("settings/template-thumbnail.png");
     }
 
-    expectedFiles.forEach((file) => {
+    for (const file of expectedFiles) {
       console.log(`Testing that ${file} exists...`);
-      assert(fs.existsSync(path.join(projectPath, file)), true);
-    });
+      assert(fs.existsSync(path.join(projectPath, file)));
+    }
 
     // Install & build the project
     process.chdir(projectPath);
@@ -92,12 +92,13 @@ testCases.forEach(([projectName, projectNameSanitized, moduleType]) => {
 
     // Make sure the tgz file is created in the dist/ folder
     const tgzFilePath = path.join(projectPath, "dist", "package.tgz");
-    assert(fs.existsSync(tgzFilePath), true);
+    assert(fs.existsSync(tgzFilePath));
 
     // Check the contents of the tgz file
     const expectedFilesInArchive = [
       "dist/client/index.jsx.js",
       "dist/server/index.js",
+      "dist/server/style.css", // TODO: It should be index.css, not style.css
       `settings/content-types-icons/${projectNameSanitized}_simpleContent.png`,
       "settings/locales/de.json",
       "settings/locales/en.json",
@@ -114,23 +115,23 @@ testCases.forEach(([projectName, projectNameSanitized, moduleType]) => {
     ].filter(Boolean);
 
     const entries = [];
-    await tar
-      .list({
-        file: tgzFilePath,
-        onReadEntry: (entry) => {
-          entries.push(entry.path);
-        },
-      })
-      .then(() => {
-        expectedFilesInArchive.forEach((file) => {
-          console.log(`Testing that ${file} exists in the archive...`);
-          assert(entries.includes(`package/${file}`), true);
-        });
-        assert(entries.length, expectedFilesInArchive.length);
-      });
+    tar.list({
+      file: tgzFilePath,
+      sync: true,
+      onReadEntry: (entry) => {
+        // This is the only way to get the list of files, this lib is nuts
+        entries.push(entry.path);
+      },
+    });
+
+    for (const file of expectedFilesInArchive) {
+      console.log(`Testing that ${file} exists in the archive...`);
+      assert(entries.includes(`package/${file}`), file);
+    }
+    assert.equal(entries.length, expectedFilesInArchive.length);
 
     // Make sure the package.json contains the dependency @jahia/javascript-modules-library
     const packageJson = JSON.parse(fs.readFileSync(path.join(projectPath, "package.json"), "utf8"));
-    assert(packageJson.devDependencies["@jahia/javascript-modules-library"], true);
+    assert(packageJson.devDependencies["@jahia/javascript-modules-library"]);
   });
-});
+}

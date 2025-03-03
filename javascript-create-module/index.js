@@ -2,9 +2,9 @@
 
 // Usage: npx @jahia/create-module@latest module-name [namespace]
 
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { replaceInFileSync } from "replace-in-file";
 import camelCase from "camelcase";
 
@@ -20,12 +20,12 @@ if (!projectName) {
 
     npx @jahia/create-module@latest project-name [module-type] [namespace-definitions]
 
-where 
+where
 - \x1B[1mproject-name\x1B[0m (mandatory) can be anything you want to call your project
 - \x1B[1mmodule-type\x1B[0m (optional) Can be one of:
   - \x1B[3mtemplatesSet\x1B[0m A collection of templates and components. A template set is required when creating a website.
-  - \x1B[3mmodule\x1B[0m sStandard Jahia module. This is the default value. 
-  - \x1B[3msystem\x1B[0m Critical module for the whole platform . 
+  - \x1B[3mmodule\x1B[0m sStandard Jahia module. This is the default value.
+  - \x1B[3msystem\x1B[0m Critical module for the whole platform .
 - \x1B[1mnamespace-definitions\x1B[0m (optional) The namespace used for content definitions. Default is the project name in camel case.
 `);
   process.exit(9);
