@@ -20,7 +20,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && node post-build.js && mkdir -p dist && yarn pack --out dist/package.tgz && publint",
+    "build": "tsc && node post-build.js && yarn pack --out dist/package.tgz && publint",
     "clean": "rm -rf dist",
     "lint": "yarn run --top-level lint"
   },
