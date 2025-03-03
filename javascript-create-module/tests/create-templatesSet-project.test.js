@@ -44,7 +44,7 @@ testCases.forEach(([projectName, projectNameSanitized, moduleType]) => {
     process.chdir(tempDir);
     console.log(execSync(`node ${indexFile} ${projectName} ${moduleType}`).toString());
     const projectPath = path.join(tempDir, projectName);
-    assert(fs.existsSync(projectPath), true);
+    assert(fs.existsSync(projectPath));
 
     // TODO check the replacement of the markers in the files
 
@@ -80,7 +80,7 @@ testCases.forEach(([projectName, projectNameSanitized, moduleType]) => {
 
     expectedFiles.forEach((file) => {
       console.log(`Testing that ${file} exists...`);
-      assert(fs.existsSync(path.join(projectPath, file)), true);
+      assert(fs.existsSync(path.join(projectPath, file)));
     });
 
     // Install & build the project
@@ -92,12 +92,13 @@ testCases.forEach(([projectName, projectNameSanitized, moduleType]) => {
 
     // Make sure the tgz file is created in the dist/ folder
     const tgzFilePath = path.join(projectPath, "dist", "package.tgz");
-    assert(fs.existsSync(tgzFilePath), true);
+    assert(fs.existsSync(tgzFilePath));
 
     // Check the contents of the tgz file
     const expectedFilesInArchive = [
       "dist/client/index.jsx.js",
       "dist/server/index.js",
+      "dist/server/style.css", // TODO: It should be index.css, not style.css
       `settings/content-types-icons/${projectNameSanitized}_simpleContent.png`,
       "settings/locales/de.json",
       "settings/locales/en.json",
@@ -124,13 +125,13 @@ testCases.forEach(([projectName, projectNameSanitized, moduleType]) => {
       .then(() => {
         expectedFilesInArchive.forEach((file) => {
           console.log(`Testing that ${file} exists in the archive...`);
-          assert(entries.includes(`package/${file}`), true);
+          assert(entries.includes(`package/${file}`), `package/${file}`);
         });
-        assert(entries.length, expectedFilesInArchive.length);
+        assert.equal(entries.length, expectedFilesInArchive.length);
       });
 
     // Make sure the package.json contains the dependency @jahia/javascript-modules-library
     const packageJson = JSON.parse(fs.readFileSync(path.join(projectPath, "package.json"), "utf8"));
-    assert(packageJson.devDependencies["@jahia/javascript-modules-library"], true);
+    assert(packageJson.devDependencies["@jahia/javascript-modules-library"]);
   });
 });
