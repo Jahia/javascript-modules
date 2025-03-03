@@ -12,13 +12,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Show help if no argument is provided
-const [
-  ,
-  ,
-  projectName,
-  moduleType = "module",
-  namespace = camelCase(projectName || ""),
-] = process.argv;
+const [, , projectName, moduleType = "module", namespace = camelCase(projectName || "")] =
+  process.argv;
 
 if (!projectName) {
   console.log(`\x1B[1m## Usage\x1B[0m

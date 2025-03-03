@@ -17,6 +17,10 @@
   "author": "Jahia <support@jahia.com>",
   "type": "module",
   "bin": "./index.js",
+  "files": [
+    "index.js",
+    "template"
+  ],
   "scripts": {
     "build": "yarn pack --out dist/package.tgz && publint",
     "lint": "yarn run --top-level lint",
