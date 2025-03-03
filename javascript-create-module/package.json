@@ -4,6 +4,10 @@
   "keywords": [
     "template"
   ],
+  "files": [
+    "index.js",
+    "template"
+  ],
   "homepage": "https://github.com/Jahia/javascript-modules/javascript-create-module",
   "bugs": {
     "url": "https://github.com/Jahia/javascript-modules/issues"
