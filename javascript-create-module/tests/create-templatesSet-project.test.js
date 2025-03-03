@@ -1,11 +1,11 @@
-import { execSync } from "child_process";
-import fs from "fs";
-import os from "os";
-import path from "path";
+import { execSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import * as tar from "tar";
 import { test, before, after } from "node:test";
-import assert from "assert";
-import { fileURLToPath } from "url";
+import assert from "node:assert/strict";
+import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,7 +30,7 @@ const testCases = [
   ["foo", "foo", ""],
 ];
 
-testCases.forEach(([projectName, projectNameSanitized, moduleType]) => {
+for (const [projectName, projectNameSanitized, moduleType] of testCases) {
   test(`Project creation using archetype ('${projectName}'/'${projectNameSanitized}' with moduleType '${moduleType}')`, async () => {
     // Create a temporary directory
     const tempDir = fs.mkdtempSync(path.join(tempFolder, projectNameSanitized));
@@ -78,10 +78,10 @@ testCases.forEach(([projectName, projectNameSanitized, moduleType]) => {
       expectedFiles.push("settings/template-thumbnail.png");
     }
 
-    expectedFiles.forEach((file) => {
+    for (const file of expectedFiles) {
       console.log(`Testing that ${file} exists...`);
       assert(fs.existsSync(path.join(projectPath, file)));
-    });
+    }
 
     // Install & build the project
     process.chdir(projectPath);
@@ -115,23 +115,23 @@ testCases.forEach(([projectName, projectNameSanitized, moduleType]) => {
     ].filter(Boolean);
 
     const entries = [];
-    await tar
-      .list({
-        file: tgzFilePath,
-        onReadEntry: (entry) => {
-          entries.push(entry.path);
-        },
-      })
-      .then(() => {
-        expectedFilesInArchive.forEach((file) => {
-          console.log(`Testing that ${file} exists in the archive...`);
-          assert(entries.includes(`package/${file}`), `package/${file}`);
-        });
-        assert.equal(entries.length, expectedFilesInArchive.length);
-      });
+    tar.list({
+      file: tgzFilePath,
+      sync: true,
+      onReadEntry: (entry) => {
+        // This is the only way to get the list of files, this lib is nuts
+        entries.push(entry.path);
+      },
+    });
+
+    for (const file of expectedFilesInArchive) {
+      console.log(`Testing that ${file} exists in the archive...`);
+      assert(entries.includes(`package/${file}`), file);
+    }
+    assert.equal(entries.length, expectedFilesInArchive.length);
 
     // Make sure the package.json contains the dependency @jahia/javascript-modules-library
     const packageJson = JSON.parse(fs.readFileSync(path.join(projectPath, "package.json"), "utf8"));
     assert(packageJson.devDependencies["@jahia/javascript-modules-library"]);
   });
-});
+}
