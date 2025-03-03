@@ -30,11 +30,10 @@
                 <executions>
                     <!-- Executions bound on the "initialize" phase (executed in order of declaration): -->
                     <execution>
-                        <id>install node, yarn and npm</id>
+                        <id>install node and yarn</id>
                         <phase>initialize</phase>
                         <goals>
                             <goal>install-node-and-yarn</goal>
-                            <goal>install-node-and-npm</goal>
                         </goals>
                     </execution>
                     <execution>
