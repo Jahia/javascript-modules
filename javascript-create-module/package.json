@@ -22,7 +22,7 @@
     "template"
   ],
   "scripts": {
-    "build": "mkdir -p dist && yarn pack --out dist/package.tgz && publint",
+    "build": "yarn pack --out dist/package.tgz && publint",
     "lint": "yarn run --top-level lint",
     "test": "node --test",
     "posttest": "yarn lint"

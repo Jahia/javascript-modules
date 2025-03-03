@@ -8,7 +8,7 @@
     "build": "vite build && run pack",
     "deploy": "jahia-deploy",
     "lint": "yarn run --top-level lint",
-    "pack": "mkdir -p dist && yarn pack --out dist/package.tgz"
+    "pack": "yarn pack --out dist/package.tgz"
   },
   "devDependencies": {
     "@jahia/javascript-modules-library": "workspace:^",
