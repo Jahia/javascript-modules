@@ -20,6 +20,9 @@
     "watch": "vite build --watch",
     "watch:callback": "run package && run deploy"
   },
+  "dependencies": {
+    "modern-normalize": "^3.0.1"
+  },
   "devDependencies": {
     "@eslint-react/eslint-plugin": "^1.26.2",
     "@eslint/compat": "^1.2.6",
@@ -51,8 +54,5 @@
     "module-type-comment": "Use templatesSet in the module type to declare a template set",
     "server": "dist/server/index.js",
     "static-resources": "/icons,/images,/javascript,/locales"
-  },
-  "dependencies": {
-    "modern-normalize": "^3.0.1"
   }
 }
