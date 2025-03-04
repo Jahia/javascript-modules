@@ -36,6 +36,7 @@
     "react-i18next": "^15.4.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.24.0",
+    "typescript-plugin-css-modules": "^5.1.0",
     "vite": "^6.1.0"
   },
   "packageManager": "yarn@4.7.0",
@@ -49,6 +50,6 @@
     "module-type": "templatesSet",
     "module-type-comment": "Use templatesSet in the module type to declare a template set",
     "server": "dist/server/index.js",
-    "static-resources": "/icons,/images,/javascript,/locales"
+    "static-resources": "/icons,/images,/dist,/locales"
   }
 }

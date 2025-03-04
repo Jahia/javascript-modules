@@ -1,0 +1,3 @@
+[$MODULE:helloWorld] > $MODULE:component, jnt:content
+ - name (string) = 'World' i18n
+ + * ($MODULE:helloCard) = $MODULE:helloCard

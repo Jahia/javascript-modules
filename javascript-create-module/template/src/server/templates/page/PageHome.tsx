@@ -1,4 +1,3 @@
-import React from "react";
 import {
   AddResources,
   Area,
@@ -16,26 +15,24 @@ jahiaComponent(
     componentType: "template",
   },
 
-  (_, { currentResource }) => {
+  (_, { currentResource, renderContext }) => {
     const { t } = useTranslation();
     const { buildStaticUrl } = useUrlBuilder();
     const lang = currentResource.getLocale().getLanguage();
+    const editMode = renderContext.isEditMode();
     return (
       <html lang={lang}>
         <head>
           <AddResources
             type="css"
-            resources={buildStaticUrl({ assetPath: "../dist/server/index.css" })}
+            resources={buildStaticUrl({ assetPath: "../dist/server/style.css" })}
           />
-          <AddResources type="css" resources={buildStaticUrl({ assetPath: "css/styles.css" })} />
           <title>Home</title>
         </head>
         <body>
-          <main>
-            {/* Using i18next defined in locales */}
-            <h1>{t("homeTitle")}</h1>
-            <Area name="pagecontent" />
-          </main>
+          {/* Using i18next defined in locales */}
+          {editMode && <div>This is PageBuilder</div>}
+          <Area name="pagecontent" />
         </body>
       </html>
     );

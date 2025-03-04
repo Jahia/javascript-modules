@@ -5,6 +5,7 @@
     "esModuleInterop": true,
     "jsx": "preserve",
     "lib": ["esnext", "dom"],
+    "module": "esnext",
     "moduleResolution": "bundler",
     "noEmit": true,
     "resolveJsonModule": true,

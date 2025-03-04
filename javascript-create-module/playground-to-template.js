@@ -3,6 +3,7 @@ import path from "node:path";
 
 /** Input directory. */
 const input = "playground";
+const ignore = /^(\.yarn|dist|node_modules|yarn\.lock)/;
 
 /** Resolves a file path relative to the template directory. */
 const resolveTemplate = (/** @type {string} */ path) =>
@@ -20,10 +21,11 @@ for (const entry of fs.readdirSync(input, { recursive: true, withFileTypes: true
   // Skip directories, only create directories when there are files inside
   if (entry.isDirectory()) continue;
 
+  const name = path.join(path.relative(input, entry.parentPath), entry.name);
+  if (ignore.test(name)) continue;
+
   const from = path.join(entry.parentPath, entry.name);
-  const to = resolveTemplate(
-    templatify(renameDot(path.join(path.relative(input, entry.parentPath), entry.name))),
-  );
+  const to = resolveTemplate(templatify(renameDot(name)));
 
   // Ensure the parent directory exists
   fs.mkdirSync(new URL(".", to), { recursive: true });
