@@ -1,10 +1,12 @@
 import {
   AddContentButtons,
   getChildNodes,
+  HydrateInBrowser,
   jahiaComponent,
   Render,
 } from "@jahia/javascript-modules-library";
 import classes from "./component.module.css";
+import SampleClientComponent from "$client/SampleClientComponent.jsx";
 
 jahiaComponent(
   {
@@ -49,6 +51,9 @@ jahiaComponent(
           )}
         </div>
         <p>
+          <HydrateInBrowser child={SampleClientComponent} />
+        </p>
+        <p>
           Welcome to Jahia! You successfully created a new JavaScript Module and a Jahia Website
           built with it. Here are a few things you can do now:
         </p>
@@ -72,7 +77,7 @@ jahiaComponent(
             xmlns="http://www.w3.org/2000/svg"
             width="70"
             height="100"
-            viewBox="0 25 70 65"
+            viewBox="0 3 70 105"
             aria-hidden="true"
           >
             <g stroke-linecap="round">
