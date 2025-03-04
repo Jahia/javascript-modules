@@ -236,7 +236,12 @@ public class JavascriptProtocolConnection extends URLConnection {
 
     private static String getVersionWithSnapshotSuffix(Map<String, Object> properties, Map<String, Object> jahiaProps, String snapshotSuffix) {
         Object snapshotModeObj = jahiaProps.getOrDefault("snapshot", false);
-        return properties.get("version") + (Boolean.parseBoolean(String.valueOf(snapshotModeObj)) ? snapshotSuffix : "");
+        String version = (String) properties.get("version");
+        if (version.endsWith("-SNAPSHOT")) {
+            version = version.substring(0, version.length() - "-SNAPSHOT".length());
+            snapshotModeObj = true;
+        }
+        return version + (Boolean.parseBoolean(String.valueOf(snapshotModeObj)) ? snapshotSuffix : "");
     }
 
     private void setIfPresent(Map<String, Object> inputProperties, String propertyName, Properties instructions, String instructionName) {
