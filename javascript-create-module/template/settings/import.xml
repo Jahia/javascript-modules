@@ -16,7 +16,7 @@
           jcr:primaryType="jnt:translation"
           jcr:title="Home"
           />
-        <pagecontent
+        <contents
           jcr:mixinTypes="jmix:isAreaList"
           jcr:primaryType="jnt:contentList"
           >
@@ -35,7 +35,7 @@
                 />
             </hellocard>
           </helloworld>
-        </pagecontent>
+        </contents>
       </home>
     </$MODULE>
   </modules>

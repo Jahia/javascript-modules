@@ -5,7 +5,10 @@ import { spawnSync } from "node:child_process";
 
 export default defineConfig({
   resolve: {
-    alias: { $client: path.resolve("./src/client") },
+    alias: {
+      $client: path.resolve("./src/client"),
+      $server: path.resolve("./src/server"),
+    },
   },
   plugins: [
     jahia({
