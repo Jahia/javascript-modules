@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <content xmlns:j="http://www.jahia.org/jahia/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0">
     <modules jcr:primaryType="jnt:modules">
-        <jahia-javascript-module-example>
+        <javascript-module-engines-test-module>
             <home j:isHomePage="true"
                 j:templateName="home"
                 jcr:primaryType="jnt:page">
@@ -28,6 +28,6 @@
                               jcr:title="Page 3"/>
                 </page3>
             </home>
-        </jahia-javascript-module-example>
+        </javascript-module-engines-test-module>
     </modules>
 </content>

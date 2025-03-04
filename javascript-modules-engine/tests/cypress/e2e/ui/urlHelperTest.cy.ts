@@ -83,7 +83,7 @@ describe('Test on url helper', () => {
                 dataTestId: 'image_static_resource',
                 tag: 'img',
                 attribute: 'src',
-                expectedURL: '/modules/jahia-javascript-module-example/static/images/goat.jpg',
+                expectedURL: '/modules/javascript-module-engines-test-module/static/images/goat.jpg',
             },
             {
                 dataTestId: 'content_link',
@@ -172,7 +172,7 @@ describe('Test on url helper', () => {
                 dataTestId: 'image_static_resource',
                 tag: 'img',
                 attribute: 'src',
-                expectedURL: '/modules/jahia-javascript-module-example/static/images/goat.jpg',
+                expectedURL: '/modules/javascript-module-engines-test-module/static/images/goat.jpg',
             },
             {
                 dataTestId: 'content_link',
@@ -271,7 +271,7 @@ describe('Test on url helper', () => {
                 dataTestId: 'image_static_resource',
                 tag: 'img',
                 attribute: 'src',
-                expectedURL: '/modules/jahia-javascript-module-example/static/images/goat.jpg',
+                expectedURL: '/modules/javascript-module-engines-test-module/static/images/goat.jpg',
             },
             {
                 dataTestId: 'content_link',
@@ -355,7 +355,7 @@ describe('Test on url helper', () => {
                 dataTestId: 'image_static_resource',
                 tag: 'img',
                 attribute: 'src',
-                expectedURL: '/modules/jahia-javascript-module-example/static/images/goat.jpg',
+                expectedURL: '/modules/javascript-module-engines-test-module/static/images/goat.jpg',
             },
             { dataTestId: 'content_link', tag: 'a', attribute: 'href', expectedURL: '/vanityUrlTest' },
             {

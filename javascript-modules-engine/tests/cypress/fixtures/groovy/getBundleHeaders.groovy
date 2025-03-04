@@ -1,7 +1,7 @@
 import org.osgi.framework.*
 import org.jahia.osgi.*
 
-Bundle testBundle = BundleUtils.getBundleBySymbolicName("BUNDLE_SYMBOLIC_NAME", "BUNDLE_VERSION")
+Bundle testBundle = BundleUtils.getBundleBySymbolicName("BUNDLE_SYMBOLIC_NAME", null)
 
 Dictionary<String,String> headers = testBundle.getHeaders()
 Enumeration<String> keyIter = headers.keys()
