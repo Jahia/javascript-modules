@@ -1,0 +1,3 @@
+[$MODULE:helloCard] > $MODULE:component, jnt:content
+ - title (string) i18n
+ - description (string) i18n

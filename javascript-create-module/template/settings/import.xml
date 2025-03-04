@@ -1,13 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<content xmlns:j="http://www.jahia.org/jahia/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0">
-    <modules jcr:primaryType="jnt:modules">
-        <$$MODULE_NAME$$>
-            <home j:isHomePage="true" j:templateName="home" jcr:primaryType="jnt:page">
-                <j:translation_en jcr:language="en"
-                              jcr:mixinTypes="mix:title"
-                              jcr:primaryType="jnt:translation"
-                              jcr:title="Home"/>
-            </home>
-        </$$MODULE_NAME$$>
-    </modules>
+<content
+  xmlns:j="http://www.jahia.org/jahia/1.0"
+  xmlns:jcr="http://www.jcp.org/jcr/1.0"
+  >
+  <modules jcr:primaryType="jnt:modules">
+    <$MODULE>
+      <home
+        j:isHomePage="true"
+        j:templateName="home"
+        jcr:primaryType="jnt:page"
+        >
+        <j:translation_en
+          jcr:language="en"
+          jcr:mixinTypes="mix:title"
+          jcr:primaryType="jnt:translation"
+          jcr:title="Home"
+          />
+        <contents
+          jcr:mixinTypes="jmix:isAreaList"
+          jcr:primaryType="jnt:contentList"
+          >
+          <helloworld jcr:primaryType="$MODULE:helloWorld">
+            <j:translation_en
+              jcr:language="en"
+              jcr:primaryType="jnt:translation"
+              name="World"
+              />
+            <hellocard jcr:primaryType="$MODULE:helloCard">
+              <j:translation_en
+                jcr:language="en"
+                jcr:primaryType="jnt:translation"
+                title="title"
+                description="desc"
+                />
+            </hellocard>
+          </helloworld>
+        </contents>
+      </home>
+    </$MODULE>
+  </modules>
 </content>
