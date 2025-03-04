@@ -11,7 +11,7 @@
     <description>Test module for Javascript Module Engine</description>
 
     <dependencies>
-        <!-- the dependencies towards other modules of the mono-repo listed in the package.json should be listed here as well -->
+        <!-- the dependencies towards other modules of the mono-repo listed in the package.json should be listed here as well (so the Maven Reactor can determine the build order of the modules) -->
         <!-- TODO create/use a Maven plugin to convert the package.json dependencies into Maven dependencies -->
         <dependency>
             <groupId>org.jahia.modules</groupId>

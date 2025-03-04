@@ -1,10 +1,11 @@
 {
   "name": "javascript-module-engines-test-module",
-  "private": true,
   "version": "0.6.0-SNAPSHOT",
+  "private": true,
   "description": "Test module for Javascript Module Engine",
   "license": "MIT",
   "author": "Jahia Solutions Group SA",
+  "type": "module",
   "scripts": {
     "build": "vite build && run pack",
     "deploy": "jahia-deploy",
