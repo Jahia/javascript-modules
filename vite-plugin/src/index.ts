@@ -122,13 +122,15 @@ export default function jahia(
      */
     config(config) {
       // Mutate the configuration to set base settings if they are not already set
-      // Build all environments https://vite.dev/guide/api-environment-frameworks.html#environments-during-build
-      config.builder ??= { sharedConfigBuild: true };
-
       // Enable the modern JSX runtime
       config.esbuild ??= { jsx: "automatic" };
 
       return {
+        // Build all environments https://vite.dev/guide/api-environment-frameworks.html#environments-during-build
+        builder: { sharedConfigBuild: true },
+        // Enforce bundling of all dependencies
+        ssr: { noExternal: true },
+        // Define the environments (client and ssr)
         environments: {
           client: {
             build: {
