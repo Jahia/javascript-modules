@@ -11,7 +11,7 @@ describe('Check that the Javascript module has been transformed properly and has
             expect(result).to.contain('Bundle-Name: javascript-module-engines-test-module (javascript module)')
             expect(result).to.contain('Bundle-SymbolicName: javascript-module-engines-test-module')
             expect(result).to.contain('Bundle-Vendor: Jahia Solutions Group SA')
-            expect(result).to.not.be.empty
+            expect(result).to.contain('Bundle-Version: ')
             // TODO to enable once javascript-modules-engine >= 0.4.0 is included in jahia-pack
             // expect(result).to.contain('Jahia-Depends: default,legacy-default-components,javascript-modules-engine')
             expect(result).to.contain('Jahia-Module-Type: templatesSet')
