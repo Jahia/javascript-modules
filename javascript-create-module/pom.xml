@@ -90,13 +90,13 @@
                         <executions>
                             <!-- Keep the package.json in sync with the maven version -->
                             <execution>
-                                <id>bump-version</id>
+                                <id>sync-version</id>
                                 <phase>process-resources</phase>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>node sync-version.js ${project.version}</arguments>
+                                    <arguments>node ../.m2/sync-version.js ${project.version}</arguments>
                                 </configuration>
                             </execution>
                         </executions>
