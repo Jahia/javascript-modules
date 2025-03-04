@@ -1,12 +1,10 @@
 {
-  "name": "$$MODULE_NAME$$",
-  "version": "0.1.0",
-  "license": "MIT",
+  "name": "$MODULE",
+  "version": "0.0.1",
   "type": "module",
-  "main": "dist/server/index.js",
   "files": [
-    "dist/client/**/*",
-    "dist/server/**/*",
+    "dist",
+    "src",
     "settings",
     "static"
   ],
@@ -35,8 +33,6 @@
     "globals": "^15.15.0",
     "i18next": "^23.10.1",
     "prettier": "^3.5.1",
-    "prettier-plugin-jsdoc": "^1.3.2",
-    "prettier-plugin-packagejson": "^2.5.8",
     "react-i18next": "^15.4.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.24.0",
@@ -44,13 +40,13 @@
   },
   "packageManager": "yarn@4.7.0",
   "engines": {
-    "node": ">=18.0.0",
+    "node": ">=22.0.0",
     "yarn": ">=4.0.0"
   },
   "jahia": {
     "snapshot": true,
     "module-dependencies": "default",
-    "module-type": "$$MODULE_TYPE$$",
+    "module-type": "templatesSet",
     "module-type-comment": "Use templatesSet in the module type to declare a template set",
     "server": "dist/server/index.js",
     "static-resources": "/icons,/images,/javascript,/locales"

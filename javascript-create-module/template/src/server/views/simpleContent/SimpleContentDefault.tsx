@@ -4,7 +4,7 @@ import { jahiaComponent } from "@jahia/javascript-modules-library";
 jahiaComponent(
   {
     name: "default",
-    nodeType: "$$MODULE_NAMESPACE$$:simpleContent",
+    nodeType: "$MODULE:simpleContent",
     displayName: "Simple Content (default)",
     componentType: "view",
   },
