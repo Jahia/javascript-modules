@@ -11,7 +11,7 @@ try {
 
   const nodeVersion = Number(process.versions.node.split(".")[0]);
 
-  if (nodeVersion < 220) {
+  if (nodeVersion < 22) {
     console.warn(
       `You are using ${styleText("redBright", `Node.js ${process.versions.node}`)} which is not officially supported.
 Please upgrade to ${styleText("greenBright", "Node.js 22 or later")} if you encounter any issues.
@@ -89,7 +89,8 @@ Next steps:
     `${styleText("bgRedBright", "Something went wrong")}
 
 If you believe this is a bug, please report it at:
-  ${styleText("underline", "https://github.com/Jahia/javascript-modules/issues")}`,
+  ${styleText("underline", "https://github.com/Jahia/javascript-modules/issues")}
+`,
     error,
   );
 }
