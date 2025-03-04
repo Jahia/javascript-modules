@@ -5,12 +5,10 @@
         <groupId>org.jahia.modules</groupId>
         <version>0.6.0-SNAPSHOT</version>
     </parent>
-    <!-- TODO rename? -->
-    <groupId>org.example.modules.javascript</groupId>
-    <artifactId>jahia-javascript-module-example</artifactId>
-    <name>@jahia/javascript-module-example</name>
+    <groupId>org.jahia.test</groupId>
+    <artifactId>javascript-module-engines-test-module</artifactId>
     <packaging>pom</packaging>
-    <description>Javascript module test</description>
+    <description>Test module for Javascript Module Engine</description>
 
     <dependencies>
         <!-- the dependencies towards other modules of the mono-repo listed in the package.json should be listed here as well -->

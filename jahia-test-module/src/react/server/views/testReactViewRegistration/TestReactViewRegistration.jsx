@@ -11,7 +11,7 @@ jahiaComponent(
   () => {
     const testAreasName = server.registry.get(
       "view",
-      "jahia-javascript-module-example_view_javascriptExample:testAreas_default",
+      "javascript-module-engines-test-module_view_javascriptExample:testAreas_default",
     ).name;
     const testRegistryName = server.registry.get(
       "view",

@@ -40,7 +40,9 @@ describe('Check that components of a module are correctly registered', () => {
                         (superType) => superType.name === 'javascriptExampleMix:javascriptExampleComponent',
                     ).length,
                 ).to.eq(1)
-                expect(simpleType.icon).to.eq('/modules/jahia-javascript-module-example/icons/javascriptExample_test')
+                expect(simpleType.icon).to.eq(
+                    '/modules/javascript-module-engines-test-module/icons/javascriptExample_test',
+                )
             })
         cy.logout()
     })

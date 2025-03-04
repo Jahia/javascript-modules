@@ -26,7 +26,7 @@ describe('Test i18n', () => {
     before('Create test site/contents', () => {
         createSite('javascriptI18NTestSite', {
             languages: 'en,fr_LU,fr,de',
-            templateSet: 'jahia-javascript-module-example',
+            templateSet: 'javascript-module-engines-test-module',
             locale: 'en',
             serverName: 'localhost',
         })
