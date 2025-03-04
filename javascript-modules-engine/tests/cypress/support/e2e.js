@@ -46,7 +46,7 @@ Cypress.on('uncaught:exception', () => {
 before('Create test site', () => {
     createSite('javascriptTestSite', {
         languages: 'en',
-        templateSet: 'jahia-javascript-module-example',
+        templateSet: 'javascript-module-engines-test-module',
         locale: 'en',
         serverName: 'localhost',
     })

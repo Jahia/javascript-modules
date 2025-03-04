@@ -59,8 +59,8 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.example.modules.javascript</groupId>
-                <artifactId>jahia-javascript-module-example</artifactId>
+                <groupId>org.jahia.test</groupId>
+                <artifactId>javascript-module-engines-test-module</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
             </dependency>

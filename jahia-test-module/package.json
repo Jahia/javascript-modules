@@ -1,7 +1,8 @@
 {
-  "name": "@jahia/javascript-module-example",
-  "version": "1.0.0",
-  "description": "Javascript module test",
+  "name": "javascript-module-engines-test-module",
+  "private": true,
+  "version": "0.6.0-SNAPSHOT",
+  "description": "Test module for Javascript Module Engine",
   "license": "MIT",
   "author": "Jahia Solutions Group SA",
   "type": "module",
@@ -26,7 +27,7 @@
   },
   "jahia": {
     "maven": {
-      "groupId": "org.example.modules.javascript",
+      "groupId": "org.jahia.test",
       "distributionManagement": {
         "repository": {
           "id": "jahia-releases",
