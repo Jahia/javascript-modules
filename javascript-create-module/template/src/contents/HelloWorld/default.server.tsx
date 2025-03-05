@@ -29,7 +29,7 @@ jahiaComponent(
             />
           </h2>
           {renderContext.isEditMode() && (
-            <div className={classes.addContent} style={{ alignItems: "center" }}>
+            <div className={classes.hint} style={{ alignItems: "center" }}>
               <LeftArrow /> {t("0U2mp51dWjqWXje4x-eUV")}
             </div>
           )}
@@ -61,7 +61,7 @@ jahiaComponent(
         </p>
       </section>
       {renderContext.isEditMode() && (
-        <div className={classes.addContent} style={{ marginLeft: "calc(50% - 0.5rem)" }}>
+        <div className={classes.hint} style={{ marginLeft: "calc(50% - 0.5rem)" }}>
           <BottomArrow /> {t("89D3xFLMZmCAencaqw68C")}
         </div>
       )}

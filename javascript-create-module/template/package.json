@@ -52,7 +52,6 @@
     "snapshot": true,
     "module-dependencies": "default",
     "module-type": "templatesSet",
-    "module-type-comment": "Use templatesSet in the module type to declare a template set",
     "server": "dist/server/index.js",
     "static-resources": "/static,/dist,/locales,/images,/icons"
   }
