@@ -1,15 +1,15 @@
 import {
   AddContentButtons,
-  getChildNodes,
   HydrateInBrowser,
-  jahiaComponent,
   Render,
+  getChildNodes,
+  jahiaComponent,
 } from "@jahia/javascript-modules-library";
-import classes from "./component.module.css";
-import SampleClientComponent from "./Celebrate.client.jsx";
-import { BottomArrow, LeftArrow } from "./arrows.jsx";
-import { Trans } from "react-i18next";
 import { t } from "i18next";
+import { Trans } from "react-i18next";
+import Celebrate from "./Celebrate.client.jsx";
+import { BottomArrow, LeftArrow } from "./arrows.jsx";
+import classes from "./component.module.css";
 
 jahiaComponent(
   {
@@ -52,7 +52,7 @@ jahiaComponent(
           />
         </p>
         <p>{t("OfBsezopuIko8aJ6X3kpw")}</p>
-        <HydrateInBrowser child={SampleClientComponent} />
+        <HydrateInBrowser child={Celebrate} />
         <p>
           <Trans
             i18nKey="nr31fYHB-RqO06BCl4rYO"

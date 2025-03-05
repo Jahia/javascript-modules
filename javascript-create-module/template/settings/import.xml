@@ -22,7 +22,7 @@
           jcr:primaryType="jnt:translation"
           jcr:title="Accueil"
           />
-        <contents
+        <main
           jcr:mixinTypes="jmix:isAreaList"
           jcr:primaryType="jnt:contentList"
           >
@@ -98,7 +98,7 @@
                 />
             </create-content>
           </hello-world>
-        </contents>
+        </main>
       </home>
     </$MODULE>
   </modules>

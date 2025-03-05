@@ -10,7 +10,7 @@ jahiaComponent(
   },
   ({ "jcr:title": title }) => (
     <Layout title={title}>
-      <Area name="contents" />
+      <Area name="main" />
     </Layout>
   ),
 );

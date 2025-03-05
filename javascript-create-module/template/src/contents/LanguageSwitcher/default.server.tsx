@@ -1,7 +1,7 @@
 import { buildUrl, jahiaComponent } from "@jahia/javascript-modules-library";
+import { t } from "i18next";
 import { Fragment } from "react";
 import classes from "./component.module.css";
-import { t } from "i18next";
 
 jahiaComponent(
   {

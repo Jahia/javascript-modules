@@ -1,7 +1,7 @@
 import clsx from "clsx";
+import { t } from "i18next";
 import { useEffect, useState } from "react";
 import classes from "./component.module.css";
-import { t } from "i18next";
 
 export default function () {
   const [confetti, setConfetti] = useState<typeof import("canvas-confetti")>();
