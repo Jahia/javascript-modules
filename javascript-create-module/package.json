@@ -28,12 +28,10 @@
     "test": "node --test"
   },
   "dependencies": {
-    "camelcase": "^8.0.0",
-    "replace-in-file": "^8.2.0"
+    "camelcase": "^8.0.0"
   },
   "devDependencies": {
-    "publint": "^0.3.6",
-    "tar": "^7.4.3"
+    "publint": "^0.3.6"
   },
   "engines": {
     "node": ">=22.0.0"
