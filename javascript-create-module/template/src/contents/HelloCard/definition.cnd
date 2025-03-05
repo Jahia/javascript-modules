@@ -1,0 +1,3 @@
+[$MODULE:HelloCard] > $MODULE:component, jnt:content
+ - illustration (string, choicelist) < code, coffee, interface, read, write mandatory
+ - title (string) i18n mandatory

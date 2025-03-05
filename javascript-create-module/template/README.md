@@ -1,4 +1,4 @@
-# $$MODULE_NAME$$
+# Jahia Javascript Module
 
 A simple Jahia Javascript module created using the Javascript module starter project template
 
