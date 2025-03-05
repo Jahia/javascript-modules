@@ -15,7 +15,8 @@
     "format": "prettier --write --list-different .",
     "lint": "eslint .",
     "package": "yarn pack --out dist/package.tgz",
-    "watch": "vite build --watch",
+    "dev": "vite build --watch",
+    "watch": "run dev",
     "watch:callback": "run package && run deploy"
   },
   "dependencies": {
