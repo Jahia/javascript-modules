@@ -4,6 +4,7 @@
   "description": "Javascript module test",
   "license": "MIT",
   "author": "Jahia Solutions Group SA",
+  "type": "module",
   "scripts": {
     "build": "vite build && run pack",
     "deploy": "jahia-deploy",
