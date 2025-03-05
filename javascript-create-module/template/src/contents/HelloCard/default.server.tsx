@@ -6,13 +6,12 @@ jahiaComponent(
     nodeType: "$MODULE:HelloCard",
     componentType: "view",
   },
-  ({ illustration, title, description }) => {
+  ({ illustration, title }) => {
     const { buildStaticUrl } = useUrlBuilder();
     return (
       <article className={classes.card}>
         <img src={buildStaticUrl({ assetPath: `illustrations/${illustration}.svg` })} alt="" />
-        <h3>{title}</h3>
-        <p>{description}</p>
+        <p>{title}</p>
       </article>
     );
   },

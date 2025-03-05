@@ -97,21 +97,6 @@
                 title="Créer du contenu"
                 />
             </create-content>
-            <enjoy-a-cup-of-coffe
-              jcr:primaryType="$MODULE:HelloCard"
-              illustration="coffee"
-              >
-              <j:translation_en
-                jcr:language="en"
-                jcr:primaryType="jnt:translation"
-                title="Enjoy a cup of coffee"
-                />
-              <j:translation_fr
-                jcr:language="fr"
-                jcr:primaryType="jnt:translation"
-                title="Profiter d'un bon café"
-                />
-            </enjoy-a-cup-of-coffe>
           </hello-world>
         </contents>
       </home>

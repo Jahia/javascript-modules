@@ -1,3 +1,3 @@
 [$MODULE:HelloCard] > $MODULE:component, jnt:content
- - illustration (string, choicelist) < code, coffee, interface, read, write mandatory
- - title (string) i18n mandatory
+ - illustration (string, choicelist[resourceBundle]) mandatory < code, coffee, interface, read, write
+ - title (string) i18n mandatory primary

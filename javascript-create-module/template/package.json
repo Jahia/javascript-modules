@@ -53,6 +53,6 @@
     "module-type": "templatesSet",
     "module-type-comment": "Use templatesSet in the module type to declare a template set",
     "server": "dist/server/index.js",
-    "static-resources": "/static,/dist,/locales"
+    "static-resources": "/static,/dist,/locales,/images,/icons"
   }
 }

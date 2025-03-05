@@ -1,29 +1,40 @@
 /* Used by default.server.tsx */
 .section {
   max-inline-size: 1000px;
-  margin-inline: auto;
+  margin: 1rem auto;
   padding-inline: 1rem;
+  overflow: hidden;
 }
 
-.brush {
-  background: linear-gradient(90deg in hsl, #a0ffff88, #d1a2ff88) bottom left / 100% 50% no-repeat;
-  padding: 0.1rem;
+.header {
+  display: flex;
+  align-items: center;
+  margin-block: 1rem;
+
+  h2 {
+    margin: 0;
+    font-size: 2rem;
+  }
+
+  mark {
+    background: linear-gradient(90deg in hsl, #a0ffff88, #d1a2ff88) bottom left / 100% 50% no-repeat;
+    padding: 0.1rem;
+  }
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
 }
 
-.card {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 0.5rem;
-  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+.attribution {
+  color: #666;
+  font-size: 0.8em;
+  margin-block-end: 2rem;
 }
 
-.addContent {
+.add-content {
   display: inline-flex;
   gap: 0.5rem;
   font-size: 0.8em;

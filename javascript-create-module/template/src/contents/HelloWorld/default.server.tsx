@@ -20,12 +20,12 @@ jahiaComponent(
   ({ name }: { name: string }, { renderContext, currentNode }) => (
     <>
       <section className={classes.section}>
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <header className={classes.header}>
           <h2>
             <Trans
               i18nKey="Mbvdf2LrCB5sW9PUFXO48"
               values={{ name }}
-              components={{ mark: <mark className={classes.brush} /> }}
+              components={{ mark: <mark /> }}
             />
           </h2>
           {renderContext.isEditMode() && (
@@ -33,7 +33,7 @@ jahiaComponent(
               <LeftArrow /> {t("0U2mp51dWjqWXje4x-eUV")}
             </div>
           )}
-        </div>
+        </header>
         <p>{t("7l9zetMbU4cKpL4NxSOtL")}</p>
         <div className={classes.grid}>
           {getChildNodes(currentNode, -1, 0, (node) => node.isNodeType("jnt:content")).map(
@@ -44,14 +44,13 @@ jahiaComponent(
           )}
           <AddContentButtons />
         </div>
-        <footer>
-          <p>
-            <Trans
-              i18nKey="8S0DVCRSnmQRKF9lZnNGj"
-              components={{ a: <a href="https://undraw.co/" /> }}
-            />
-          </p>
-        </footer>
+
+        <p className={classes.attribution}>
+          <Trans
+            i18nKey="8S0DVCRSnmQRKF9lZnNGj"
+            components={{ a: <a href="https://undraw.co/" /> }}
+          />
+        </p>
         <p>{t("OfBsezopuIko8aJ6X3kpw")}</p>
         <HydrateInBrowser child={SampleClientComponent} />
         <p>
