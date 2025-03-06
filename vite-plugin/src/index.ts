@@ -1,7 +1,6 @@
 import multiEntry from "@rollup/plugin-multi-entry";
-import { addExtension } from "@rollup/pluginutils";
 import sharedLibs from "javascript-modules-engine/shared-libs.mjs";
-import { extname } from "node:path";
+import path from "node:path";
 import { styleText } from "node:util";
 import type { Plugin } from "rollup";
 import { globSync } from "tinyglobby";
@@ -94,10 +93,8 @@ export default function jahia(
     watchCallback?: () => void | Promise<void>;
   } = {},
 ): PluginOption {
-  const clientEntries = globSync(options.client?.input?.glob ?? "**/*.jsx", {
-    cwd: options.client?.input?.dir ?? "./src/client/",
-    absolute: true,
-  });
+  const clientBaseDir = options.client?.input?.dir ?? "./src/client/";
+  const clientEntries = globSync(options.client?.input?.glob ?? "**/*.jsx", { cwd: clientBaseDir });
 
   if (clientEntries.length === 0) {
     console.warn(
@@ -135,20 +132,14 @@ export default function jahia(
           client: {
             build: {
               lib: {
-                // Single entry point for the client, all other files must be imported in this one
-                entry: clientEntries,
+                entry: Object.fromEntries(
+                  clientEntries.map((file) => [file, path.join(clientBaseDir, file)]),
+                ),
                 formats: ["es"],
               },
               rollupOptions: {
                 output: {
                   dir: options.client?.output ?? "./javascript/client/",
-                  entryFileNames: ({ facadeModuleId, name }) =>
-                    facadeModuleId
-                      ? // Keep the original extension, add .js after it
-                        `${addExtension(name, extname(facadeModuleId))}.js`
-                      : addExtension(name),
-                  preserveModules: true,
-                  preserveModulesRoot: options.client?.input?.dir ?? "./src/client/",
                 },
                 external,
                 plugins: [
@@ -199,6 +190,10 @@ export default function jahia(
                   ),
                 },
                 external: [...external, "@jahia/javascript-modules-library"],
+                treeshake: {
+                  // Manually mark useEffect as pure to have it removed from the SSR bundle
+                  manualPureFunctions: ["useEffect"],
+                },
                 plugins: [
                   multiEntry({
                     exports: false,
