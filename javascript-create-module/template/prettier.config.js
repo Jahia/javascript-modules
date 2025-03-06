@@ -5,5 +5,4 @@
 export default {
   quoteProps: "consistent",
   printWidth: 100,
-  plugins: ["prettier-plugin-jsdoc", "prettier-plugin-packagejson"],
 };
