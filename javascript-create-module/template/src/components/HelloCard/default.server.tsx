@@ -6,7 +6,7 @@ jahiaComponent(
     nodeType: "$MODULE:HelloCard",
     componentType: "view",
   },
-  ({ illustration, title }) => {
+  ({ illustration, title }: { illustration: string; title: string }) => {
     const { buildStaticUrl } = useUrlBuilder();
     return (
       <article className={classes.card}>
