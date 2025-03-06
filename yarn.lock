@@ -736,6 +736,7 @@ __metadata:
   resolution: "@jahia/vite-plugin@workspace:vite-plugin"
   dependencies:
     "@rollup/plugin-multi-entry": "npm:^6.0.1"
+    "@rollup/pluginutils": "npm:^5.1.4"
     "@types/estree": "npm:^1.0.6"
     "@types/node": "npm:^22.13.5"
     esrap: "npm:^1.4.5"
