@@ -23,7 +23,7 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
   const name = process.argv[2];
 
   if (!name) {
-    console.warn(
+    console.error(
       `No module name provided.
 
   Usage: npm init @jahia/module ${styleText("blueBright", "<module-name>")}
