@@ -3024,9 +3024,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "javascript-module-engines-test-module@workspace:jahia-test-module"
   dependencies:
+    "@eslint-react/eslint-plugin": "npm:^1.26.2"
+    "@eslint/compat": "npm:^1.2.6"
+    "@eslint/js": "npm:^9.20.0"
     "@jahia/javascript-modules-library": "workspace:^"
     "@jahia/vite-plugin": "workspace:^"
     "@types/react": "npm:^19.0.0"
+    eslint: "npm:^9.20.1"
     i18next: "npm:^23.10.1"
     react-i18next: "npm:^15.4.0"
     typescript: "npm:^5.7.3"
