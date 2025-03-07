@@ -34,9 +34,15 @@ export function HydrateInBrowser(
 export function HydrateInBrowser<T>({
   child: Child,
   props,
+  children,
 }: Readonly<{
   child: React.ComponentType<T>;
   props?: T & React.JSX.IntrinsicAttributes;
+  children?: React.ReactNode;
 }>): React.JSX.Element {
-  return <InBrowser ssr child={Child} props={props as never} />;
+  return (
+    <InBrowser ssr child={Child} props={props as never}>
+      {children}
+    </InBrowser>
+  );
 }
