@@ -13,7 +13,7 @@ export default defineConfig({
           // dir: "./src/client",
           glob: "**/*.tsx",
         },
-        output: "./dist/client",
+        output: "./dist/client/",
       },
       server: {
         input: "./src/react/server/**/*.{ts,tsx}",
