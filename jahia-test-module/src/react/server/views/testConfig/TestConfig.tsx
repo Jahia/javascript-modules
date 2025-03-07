@@ -52,7 +52,7 @@ jahiaComponent(
         <p data-testid="allConfigPIDs">allConfigPIDs={server.config.getConfigPids()}</p>
 
         <h3>OSGi Config Complex Values</h3>
-        {Object.keys(complexObject).map(function (key, i) {
+        {Object.keys(complexObject).map(function (key) {
           return (
             <div data-testid={`complexObject_${key}`} key={key}>
               {key}: {complexObject[key]}

@@ -70,7 +70,7 @@ const wrap = (Component: (props: never, context: ServerContext) => JSX.Element) 
     null, // 2: Binary, deprecated
     (value: JCRValueWrapper) => value.getLong(), // 3: Long
     (value: JCRValueWrapper) => value.getDouble(), // 4: Double
-    (value: JCRValueWrapper) => value.getString(), // 5: Date
+    (value: JCRValueWrapper) => value.getTime(), // 5: Date
     (value: JCRValueWrapper) => value.getBoolean(), // 6: Boolean
     (value: JCRValueWrapper) => value.getString(), // 7: Name
     (value: JCRValueWrapper) => value.getString(), // 8: Path

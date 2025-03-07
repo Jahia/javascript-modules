@@ -43,7 +43,7 @@ jahiaComponent(
 
       <h2>Non editable area </h2>
       <div data-testid="nonEditableArea">
-        <Area name="nonEditable" editable="false" />
+        <Area name="nonEditable" editable={false} />
       </div>
 
       <h2>Area as sub node </h2>

@@ -1,4 +1,4 @@
-import { buildUrl, jahiaComponent, server, useUrlBuilder } from "@jahia/javascript-modules-library";
+import { jahiaComponent, server, useUrlBuilder } from "@jahia/javascript-modules-library";
 
 jahiaComponent(
   {
@@ -126,7 +126,7 @@ jahiaComponent(
           </a>
         </div>
         <div data-testid="no_weakref">
-          <a href={buildUrl({ path: null })}>No weakref</a>
+          <a href={buildNodeUrl({ nodePath: "null" })}>No weakref</a>
         </div>
       </>
     );

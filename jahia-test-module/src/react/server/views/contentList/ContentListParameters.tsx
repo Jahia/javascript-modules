@@ -12,10 +12,10 @@ jahiaComponent(
       <>
         <h3>Parameter view {currentResource.getNode().getName()}</h3>
         <div data-testid="areaParam-string1">
-          stringParam1={currentResource.getModuleParams().get("stringParam1")}
+          stringParam1={currentResource.getModuleParams().get("stringParam1")!.toString()}
         </div>
         <div data-testid="areaParam-string2">
-          stringParam2={currentResource.getModuleParams().get("stringParam2")}
+          stringParam2={currentResource.getModuleParams().get("stringParam2")!.toString()}
         </div>
       </>
     );

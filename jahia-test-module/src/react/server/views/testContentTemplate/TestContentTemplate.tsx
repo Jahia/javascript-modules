@@ -1,5 +1,5 @@
 import { AddResources, Area, jahiaComponent, Render } from "@jahia/javascript-modules-library";
-import { footer, header, login, navMenu } from "../../templates/pageComponents";
+import { footer, header, login, navMenu } from "../../templates/pageComponents.js";
 
 jahiaComponent(
   {

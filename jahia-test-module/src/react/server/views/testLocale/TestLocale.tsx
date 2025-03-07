@@ -47,7 +47,7 @@ jahiaComponent(
         <div data-testid="renderContext_settingsDefaultLocale" test-shouldbeEn="true">
           {settingsDefaultLocale.toString()}
         </div>
-        <h3>User preffered language</h3>
+        <h3>User preferred language</h3>
         <div data-testid="renderContext_userLocale" test-shouldbeEn="true">
           {userLocale}
         </div>

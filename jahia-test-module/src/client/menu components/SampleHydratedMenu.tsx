@@ -1,18 +1,34 @@
 import { useEffect, useState } from "react";
 
-const MenuRoot = ({ navigationItem /** @type {NavigationItem} */ }) => {
+interface NavigationItem {
+  displayName: string;
+  url: string;
+  children: NavigationItem[] | null;
+}
+
+interface MenuRootProps {
+  navigationItem: NavigationItem;
+}
+
+const MenuRoot: React.FC<MenuRootProps> = ({ navigationItem }) => {
   return (
     <div className={"navBar"}>
       <ul className={`navmenu level_0`}>
         {navigationItem.children &&
-          navigationItem.children.map((child, i) => (
-            <MenuItem navigationItem={child} level={1} key={i} />
+          navigationItem.children.map((child) => (
+            <MenuItem navigationItem={child} level={1} key={child!.toString()} />
           ))}
       </ul>
     </div>
   );
 };
-const MenuItem = ({ navigationItem /** @type {NavigationItem} */, level }) => {
+
+interface MenuItemProps {
+  navigationItem: NavigationItem;
+  level: number;
+}
+
+const MenuItem: React.FC<MenuItemProps> = ({ navigationItem, level }) => {
   const hasChildren = navigationItem.children && navigationItem.children.length > 0;
   return (
     <li className={`${hasChildren ? "hasChildren" : "noChildren"}`}>
@@ -22,8 +38,8 @@ const MenuItem = ({ navigationItem /** @type {NavigationItem} */, level }) => {
       <div className={"navBar"}>
         <ul className={`inner-box level_${level}`}>
           {hasChildren &&
-            navigationItem.children.map((child, i) => (
-              <MenuItem navigationItem={child} level={level + 1} key={i} />
+            navigationItem.children!.map((child) => (
+              <MenuItem navigationItem={child} level={level + 1} key={child!.toString()} />
             ))}
         </ul>
       </div>
@@ -31,16 +47,18 @@ const MenuItem = ({ navigationItem /** @type {NavigationItem} */, level }) => {
   );
 };
 
-/**
- * Converts a flat list of nodes into a hierarchical structure.
- *
- * @param {Array} nodes - The flat list of nodes.
- * @param rootPath - The root path of the hierarchy.
- * @returns {NavigationItem} The root NavigationItem with its children.
- */
-const buildHierarchy = (nodes, rootPath) => {
-  const nodeMap = {};
-  let root = {
+interface Node {
+  path: string;
+  displayName: string;
+}
+
+interface BuildHierarchy {
+  (nodes: Node[], rootPath: string): NavigationItem;
+}
+
+const buildHierarchy: BuildHierarchy = (nodes, rootPath) => {
+  const nodeMap: { [key: string]: NavigationItem } = {};
+  const root: NavigationItem = {
     displayName: "root", // this is actually not rendered
     url: rootPath,
     children: [],
@@ -59,17 +77,22 @@ const buildHierarchy = (nodes, rootPath) => {
   nodes.forEach((node) => {
     const parentPath = node.path.substring(0, node.path.lastIndexOf("/"));
     if (nodeMap[parentPath]) {
-      nodeMap[parentPath].children.push(nodeMap[node.path]);
+      nodeMap[parentPath].children!.push(nodeMap[node.path]);
     } else {
-      root.children.push(nodeMap[node.path]);
+      root.children!.push(nodeMap[node.path]);
     }
   });
 
   return root;
 };
 
-export default function SampleHydratedMenu({ staticMenu /** @type {NavigationItem} */, rootPath }) {
-  const [menu, setMenu] = useState(staticMenu);
+interface SampleHydratedMenuProps {
+  staticMenu: NavigationItem;
+  rootPath: string;
+}
+
+const SampleHydratedMenu: React.FC<SampleHydratedMenuProps> = ({ staticMenu, rootPath }) => {
+  const [menu, setMenu] = useState<NavigationItem>(staticMenu);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -101,7 +124,7 @@ export default function SampleHydratedMenu({ staticMenu /** @type {NavigationIte
       });
 
       const data = await response.json();
-      const nodes = data?.data?.jcr?.nodeByPath?.descendants?.nodes || null;
+      const nodes: Node[] = data?.data?.jcr?.nodeByPath?.descendants?.nodes || null;
       if (nodes) {
         const hierarchicalMenu = buildHierarchy(nodes, rootPath);
         setMenu(hierarchicalMenu);
@@ -111,10 +134,13 @@ export default function SampleHydratedMenu({ staticMenu /** @type {NavigationIte
       .then(() => setHydrated(true))
       .catch((error) => console.error("Error fetching menu:", error));
   }, []);
+
   return (
     <div className={hydrated ? "hydrated" : "static"}>
       <h2>This React component is hydrated client side ({hydrated ? "Loaded" : "Loading..."})</h2>
       {menu && <MenuRoot navigationItem={menu} />}
     </div>
   );
-}
+};
+
+export default SampleHydratedMenu;

@@ -14,7 +14,7 @@ import type { JCRNodeWrapper } from "org.jahia.services.content";
  */
 export function getChildNodes(
   node: JCRNodeWrapper,
-  limit: number,
+  limit: number | undefined = undefined,
   offset = 0,
   filter: ((node: Node) => boolean) | undefined = undefined,
 ): Node[] {

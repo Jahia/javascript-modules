@@ -31,6 +31,7 @@ export { buildUrl, initUrlBuilder } from "./core/server/utils/urlBuilder/urlBuil
 
 // Navigation
 export { buildNavMenu } from "./nav/server/navBuilder/navBuilder.js";
+export type { MenuEntry } from "./nav/server/navBuilder/navBuilder.js";
 
 // Re-export Java helpers
 export { default as server } from "virtual:jahia-server";

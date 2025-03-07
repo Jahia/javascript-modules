@@ -28,6 +28,7 @@ const TestLegacyRegistrationAdvanced = () => {
     <div data-testid="legacyRegistrationAdvanced">
       javascriptExample:testLegacyRegistrationAdvanced view component
       <span data-testid="registryName">{testRegistryName}</span>
+      <span data-testid="myProp">{myProp}</span>
     </div>
   );
 };
