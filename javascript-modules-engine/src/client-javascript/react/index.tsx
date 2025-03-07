@@ -38,7 +38,12 @@ const ComponentWrapper = ({
   i18next.setDefaultNamespace(ns);
   i18next.changeLanguage(lang);
 
-  return <Component {...props} />;
+  return (
+    <Component {...props}>
+      {/* This div is an hydration border: hydration will stop here */}
+      <div dangerouslySetInnerHTML={{ __html: "" }} suppressHydrationWarning />
+    </Component>
+  );
 };
 
 /**
