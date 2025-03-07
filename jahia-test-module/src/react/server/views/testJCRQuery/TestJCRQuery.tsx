@@ -1,13 +1,22 @@
 import { getNodesByJCRQuery, jahiaComponent, server } from "@jahia/javascript-modules-library";
+import type { Node } from "javax.jcr";
 
-const PrintQueryResults = ({ title, testid, nodes }) => (
+const PrintQueryResults = ({
+  title,
+  testid,
+  nodes,
+}: {
+  title: string;
+  testid: string;
+  nodes: Node[];
+}) => (
   <>
     <h2>${title}</h2>
     <div data-testid={`getNodesByJCRQuery_${testid}`}>
       {nodes &&
         nodes.map(function (node, i) {
           return (
-            <div data-testid={`getNodesByJCRQuery_${testid}_${i + 1}`} key={i}>
+            <div data-testid={`getNodesByJCRQuery_${testid}_${i + 1}`} key={node.getPath()}>
               {node.getPath()}
             </div>
           );

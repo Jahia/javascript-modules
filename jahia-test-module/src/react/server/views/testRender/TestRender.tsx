@@ -1,5 +1,13 @@
 import { AddContentButtons, jahiaComponent, Render } from "@jahia/javascript-modules-library";
 
+const styles = `
+  .case {
+    padding: 10px;
+    margin: 10px;
+    border: 1px solid;
+  }
+`;
+
 jahiaComponent(
   {
     nodeType: "javascriptExample:testRender",
@@ -112,21 +120,8 @@ jahiaComponent(
           />
         </div>
         <hr />
-        <style jsx>{`
-          .case {
-            padding: 10px;
-            margin: 10px;
-            border: 1px solid;
-          }
-        `}</style>
+        <style>{styles}</style>
       </>
     );
   },
 );
-
-let css = `
-html {
-    line-height: 1.15;
-    -ms-text-size-adjust: 100%;
-    -webkit-text-size-adjust: 100%
-}`;

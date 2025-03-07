@@ -41,6 +41,7 @@ import org.jahia.taglibs.uicomponents.Functions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.jcr.RepositoryException;
 import javax.servlet.jsp.JspException;
@@ -108,7 +109,7 @@ public class RenderHelper {
      * @param contextSite the site in which to resolve the template
      * @return the first displayable {@link JCRNodeWrapper} found in the hierarchy
      */
-    public JCRNodeWrapper findDisplayableNode(JCRNodeWrapper node, RenderContext renderContext, JCRSiteNode contextSite) {
+    public JCRNodeWrapper findDisplayableNode(JCRNodeWrapper node, RenderContext renderContext, @Nullable JCRSiteNode contextSite) {
         return JCRContentUtils.findDisplayableNode(node, renderContext, contextSite);
     }
 

@@ -8,9 +8,25 @@ export default defineConfig({
   },
   plugins: [
     jahia({
+      client: {
+        input: {
+          // dir: "./src/client",
+          glob: "**/*.tsx",
+        },
+        output: "./dist/client",
+      },
       server: {
-        input: "./src/react/server/**/*.jsx",
+        input: "./src/react/server/**/*.{ts,tsx}",
+        output: {
+          dir: "./dist/server",
+          fileName: "index",
+        },
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      external: ["org.jahia.services.content"],
+    },
+  },
 });

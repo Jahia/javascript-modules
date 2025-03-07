@@ -8,7 +8,7 @@ jahiaComponent(
     displayName: "Home page with hydrated menu",
     componentType: "template",
   },
-  (_, { renderContext }) => (
+  () => (
     <html lang="en">
       <head>
         <AddResources type={"css"} resources={"styles.css"} />

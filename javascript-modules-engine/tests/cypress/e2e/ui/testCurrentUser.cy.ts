@@ -20,7 +20,7 @@ describe('Test current user', () => {
     it('should display the current user as root', () => {
         cy.login()
         cy.visit('/cms/render/default/en/sites/javascriptTestSite/home/testCurrentUser.html')
-        cy.get('div[data-testid="currentUser_name"]').should('exist').contains('root')
+        cy.get('div[data-testid="currentUser_username"]').should('exist').contains('root')
         cy.get('div[data-testid="currentUser_isRoot"]').should('exist').contains('true')
         cy.logout()
     })

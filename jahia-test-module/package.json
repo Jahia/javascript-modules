@@ -7,11 +7,21 @@
   "author": "Jahia Solutions Group SA",
   "type": "module",
   "scripts": {
-    "build": "vite build && run pack",
+    "build": "tsc --noEmit && vite build && run pack",
+    "clean": "rm -rf dist/",
     "deploy": "jahia-deploy",
-    "lint": "yarn run --top-level lint",
+    "format": "prettier --write --list-different .",
+    "lint": "eslint . --fix",
     "pack": "yarn pack --out dist/package.tgz"
   },
+  "files": [
+    "css",
+    "dist/client/*",
+    "dist/server/*",
+    "javascript",
+    "settings",
+    "static"
+  ],
   "devDependencies": {
     "@jahia/javascript-modules-library": "workspace:^",
     "@jahia/vite-plugin": "workspace:^",
@@ -42,7 +52,7 @@
     "module-dependencies": "default,legacy-default-components",
     "module-type": "templatesSet",
     "required-version": "8.2.0.0-SNAPSHOT",
-    "server": "javascript/server/index.js",
+    "server": "dist/server/index.js",
     "static-resources": "/css,/javascript,/icons"
   }
 }
