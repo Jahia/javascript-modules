@@ -672,20 +672,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@jahia/javascript-module-example@workspace:jahia-test-module":
-  version: 0.0.0-use.local
-  resolution: "@jahia/javascript-module-example@workspace:jahia-test-module"
-  dependencies:
-    "@jahia/javascript-modules-library": "workspace:^"
-    "@jahia/vite-plugin": "workspace:^"
-    "@types/react": "npm:^19.0.0"
-    i18next: "npm:^23.10.1"
-    react-i18next: "npm:^15.4.0"
-    typescript: "npm:^5.7.3"
-    vite: "npm:^6.1.0"
-  languageName: unknown
-  linkType: soft
-
 "@jahia/javascript-modules-library@workspace:^, @jahia/javascript-modules-library@workspace:javascript-modules-library":
   version: 0.0.0-use.local
   resolution: "@jahia/javascript-modules-library@workspace:javascript-modules-library"
@@ -3109,6 +3095,20 @@ __metadata:
   checksum: 10c0/f01d8f972d894cd7638bc338e9ef5ddb86f7b208ce177a36d718eac96ec86638a6efa17d0221b10073e64b45edc2ce15340db9380b1f5d5c5d000cbc517dc111
   languageName: node
   linkType: hard
+
+"javascript-module-engines-test-module@workspace:jahia-test-module":
+  version: 0.0.0-use.local
+  resolution: "javascript-module-engines-test-module@workspace:jahia-test-module"
+  dependencies:
+    "@jahia/javascript-modules-library": "workspace:^"
+    "@jahia/vite-plugin": "workspace:^"
+    "@types/react": "npm:^19.0.0"
+    i18next: "npm:^23.10.1"
+    react-i18next: "npm:^15.4.0"
+    typescript: "npm:^5.7.3"
+    vite: "npm:^6.1.0"
+  languageName: unknown
+  linkType: soft
 
 "javascript-modules-engine@workspace:javascript-modules-engine":
   version: 0.0.0-use.local
