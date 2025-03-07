@@ -12,7 +12,7 @@ jahiaComponent(
     return (
       <>
         <h3>Current user infos</h3>
-        <div data-testid="currentUser_name">{currentUser.getName()}</div>
+        <div data-testid="currentUser_username">{currentUser.getUsername()}</div>
         <div data-testid="currentUser_isRoot">{currentUser.isRoot() ? "true" : "false"}</div>
       </>
     );

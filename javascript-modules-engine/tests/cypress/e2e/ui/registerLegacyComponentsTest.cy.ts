@@ -53,6 +53,7 @@ describe('Verify that the legacy/deprecated registration behaves as expected', (
             cy.get('div[data-testid="legacyRegistrationAdvanced"] span[data-testid="registryName"]').contains(
                 'legacyRegistrationAdvancedName',
             )
+            cy.get('div[data-testid="legacyRegistrationAdvanced"] span[data-testid="myProp"]').contains('my value')
         })
     })
 })

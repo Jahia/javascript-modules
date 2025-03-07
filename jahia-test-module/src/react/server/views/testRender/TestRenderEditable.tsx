@@ -12,18 +12,18 @@ jahiaComponent(
       <>
         <div data-testid="react-render-editable-default">
           <h3>Render generates editable items by default</h3>
-          <div class="childs">
+          <div className="childs">
             {allChildren &&
-              allChildren.map(function (child, i) {
+              allChildren.map(function (child) {
                 return <Render path={child.getPath()} key={child.getIdentifier()} />;
               })}
           </div>
         </div>
         <div data-testid="react-render-editable">
           <h3>Render generates editable items when precised true</h3>
-          <div class="childs">
+          <div className="childs">
             {allChildren &&
-              allChildren.map(function (child, i) {
+              allChildren.map(function (child) {
                 return (
                   <Render path={child.getPath()} editable={true} key={child.getIdentifier()} />
                 );
@@ -32,9 +32,9 @@ jahiaComponent(
         </div>
         <div data-testid="react-render-not-editable">
           <h3>Render generates non editable items when precised false</h3>
-          <div class="childs">
+          <div className="childs">
             {allChildren &&
-              allChildren.map(function (child, i) {
+              allChildren.map(function (child) {
                 return (
                   <Render path={child.getPath()} editable={false} key={child.getIdentifier()} />
                 );

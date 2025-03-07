@@ -1,6 +1,12 @@
 import { useState } from "react";
 
-export default function SampleHydrateInBrowserReact({ initialValue, set }) {
+export default function SampleHydrateInBrowserReact({
+  initialValue,
+  set,
+}: {
+  initialValue: number;
+  set: Set<string>;
+}) {
   const [count, setCount] = useState(initialValue);
 
   const handleClick = () => {
@@ -11,7 +17,7 @@ export default function SampleHydrateInBrowserReact({ initialValue, set }) {
     <div>
       <h2>This React component is hydrated client side:</h2>
       <p data-testid="count">Count: {count}</p>
-      <button data-testid="count-button" onClick={handleClick}>
+      <button type="button" data-testid="count-button" onClick={handleClick}>
         Increment
       </button>
       <p data-testid="set">Set: {[...set].join(", ")}</p>

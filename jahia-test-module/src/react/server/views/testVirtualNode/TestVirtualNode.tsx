@@ -22,7 +22,7 @@ jahiaComponent(
         <h3>test virtual node</h3>
         <div data-testid="virtualNode">
           <div data-testid="virtualNode_aliasedUser">
-            {aliasedUser == null ? "" : aliasedUser.getName()}
+            {aliasedUser == null ? "" : aliasedUser.getUsername()}
           </div>
           <Render content={testVirtualNodeSample} />
         </div>

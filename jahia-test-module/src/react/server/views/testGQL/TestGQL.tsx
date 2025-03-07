@@ -24,11 +24,13 @@ jahiaComponent(
           style={{ padding: "10px", margin: "10px", border: "1px solid" }}
         >
           <ul>
-            {result.data.jcr.nodeByPath.properties.map((property) => (
-              <li data-testid={property.name}>
-                {property.name}={property.value}
-              </li>
-            ))}
+            {result.data.jcr.nodeByPath.properties.map(
+              (property: { name: string; value: string }) => (
+                <li key={property.name} data-testid={property.name}>
+                  {property.name}={property.value}
+                </li>
+              ),
+            )}
           </ul>
         </div>
         <hr />
