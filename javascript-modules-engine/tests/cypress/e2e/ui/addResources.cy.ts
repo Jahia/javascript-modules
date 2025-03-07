@@ -41,7 +41,7 @@ describe('Test on add resources component/helper', () => {
     it(`${pageName} : should contain a link tag in the head tag to load the CSS styles`, () => {
         cy.login()
         cy.visit(`/cms/render/default/en/sites/javascriptTestSite/home/${pageName}.html`)
-        cy.get('head link[href="/modules/jahia-javascript-module-example/css/styles.css"]').then(
+        cy.get('head link[href="/modules/javascript-module-engines-test-module/css/styles.css"]').then(
             ($link: JQuery<HTMLLinkElement>) => {
                 expect($link.attr('id')).to.match(/^staticAssetCSS/)
             },
@@ -52,7 +52,7 @@ describe('Test on add resources component/helper', () => {
     it(`${pageName} : should contain a script tag under the body tag`, () => {
         cy.login()
         cy.visit(`/cms/render/default/en/sites/javascriptTestSite/home/${pageName}.html`)
-        cy.get('body script[src="/modules/jahia-javascript-module-example/javascript/body-script.js"]')
+        cy.get('body script[src="/modules/javascript-module-engines-test-module/javascript/body-script.js"]')
             .should('exist')
             .then(($script: JQuery<HTMLScriptElement>) => {
                 expect($script.attr('id')).to.match(/^staticAssetJavascriptBODY/) // Replace with your specific string
@@ -70,7 +70,7 @@ describe('Test on add resources component/helper', () => {
     it(`${pageName} : should contain a script tag under the head tag`, () => {
         cy.login()
         cy.visit(`/cms/render/default/en/sites/javascriptTestSite/home/${pageName}.html`)
-        cy.get(`head script[src="${'/modules/jahia-javascript-module-example/javascript/head-script.js'}"]`)
+        cy.get(`head script[src="${'/modules/javascript-module-engines-test-module/javascript/head-script.js'}"]`)
             .should('exist')
             .then(($script: JQuery<HTMLScriptElement>) => {
                 expect($script.attr('id')).to.match(/^staticAssetJavascript/) // Replace with your specific string
