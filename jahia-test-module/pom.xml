@@ -3,7 +3,7 @@
     <parent>
         <artifactId>javascript-modules</artifactId>
         <groupId>org.jahia.modules</groupId>
-        <version>0.6.0-SNAPSHOT</version>
+        <version>0.5.5</version>
     </parent>
     <groupId>org.jahia.test</groupId>
     <artifactId>javascript-module-engines-test-module</artifactId>
@@ -116,7 +116,7 @@
                         </goals>
                         <configuration>
                             <target>
-                                <copy file="dist/package.tgz" tofile="${project.build.directory}/${project.build.finalName}.tgz"/>
+                                <copy file="dist/package.tgz" tofile="${project.build.directory}/${project.build.finalName}.tgz" />
                             </target>
                         </configuration>
                     </execution>
