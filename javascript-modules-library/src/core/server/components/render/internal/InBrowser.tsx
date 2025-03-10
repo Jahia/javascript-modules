@@ -94,12 +94,14 @@ function InBrowser<T>({
             props: props ?? {},
           })}
         </script>
-        {ssr && (
+        {ssr ? (
           <I18nextProvider i18n={i18n}>
             <Child {...props}>
               <div>{children}</div>
             </Child>
           </I18nextProvider>
+        ) : (
+          children
         )}
       </div>
 

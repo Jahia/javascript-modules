@@ -1,7 +1,7 @@
+import * as devalue from "devalue";
 import i18next from "i18next";
 import type { ComponentType } from "react";
-import { hydrateRoot, createRoot } from "react-dom/client";
-import * as devalue from "devalue";
+import { createRoot, hydrateRoot } from "react-dom/client";
 import * as v from "valibot";
 
 /**
@@ -31,7 +31,7 @@ const ComponentWrapper = ({
   /** Language string */
   lang: string;
   /** React component */
-  Component: ComponentType;
+  Component: ComponentType<{ children?: React.ReactNode }>;
   /** Props object for the app component */
   props: Record<string, unknown>;
 }) => {
@@ -68,8 +68,9 @@ const hydrateReactComponent = async (script: HTMLScriptElement) => {
 
   try {
     const { hydrate, component } = await load(script);
-    if (hydrate) hydrateRoot(script.parentElement, component);
-    else {
+    if (hydrate) {
+      hydrateRoot(script.parentElement, component);
+    } else {
       const root = createRoot(script.parentElement);
       root.render(component);
     }
@@ -77,7 +78,8 @@ const hydrateReactComponent = async (script: HTMLScriptElement) => {
     console.log(
       "javascript-modules-engine: React component",
       hydrate ? "hydrated" : "rendered",
-      script.nextElementSibling,
+      // Script is only kept when hydrating, not rendering
+      hydrate ? script.nextElementSibling : script.parentElement,
     );
   } catch (error) {
     console.error("Hydration failed for element", script, error);
