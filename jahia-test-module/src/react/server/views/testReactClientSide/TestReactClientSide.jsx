@@ -19,11 +19,15 @@ jahiaComponent(
         <HydrateInBrowser
           child={SampleHydrateInBrowserReact}
           props={{ initialValue: 9, set: new Set(["a", "b", "c"]) }}
-        />
+        >
+          <p data-testid="ssr-child">Server-side rendered</p>
+        </HydrateInBrowser>
         <RenderInBrowser
           child={SampleRenderInBrowserReact}
           props={{ path: currentResource.getNode().getPath() }}
-        />
+        >
+          <p data-testid="ssr-placeholder">Server-side placeholder</p>
+        </RenderInBrowser>
       </>
     );
   },
