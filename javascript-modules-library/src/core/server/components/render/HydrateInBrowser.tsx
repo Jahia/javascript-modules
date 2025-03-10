@@ -7,7 +7,29 @@ import InBrowser from "./internal/InBrowser.js";
  *
  * @returns The component to be hydrated in the browser
  */
-// Generic declaration
+export function HydrateInBrowser<T, U>(
+  props: Readonly<{
+    /** The React component. */
+    child: React.ComponentType<{children: U} & T>;
+    /**
+     * The React component props, these props will be serialized/deserialized to be usable server
+     * and client side. The serialization is done using
+     * [devalue](https://www.npmjs.com/package/devalue) allowing most standard JS types, including
+     * `Set` and `Map`.
+     */
+    props: Omit<T & React.JSX.IntrinsicAttributes, 'children'>;
+    children: U
+  }>,
+): React.JSX.Element;
+
+export function HydrateInBrowser<U>(
+  props: Readonly<{
+    /** The React component. */
+    child: React.ComponentType<{children: U}>;
+    children: U
+  }>,
+): React.JSX.Element;
+
 export function HydrateInBrowser<T>(
   props: Readonly<{
     /** The React component. */
@@ -34,9 +56,15 @@ export function HydrateInBrowser(
 export function HydrateInBrowser<T>({
   child: Child,
   props,
+  children,
 }: Readonly<{
   child: React.ComponentType<T>;
   props?: T & React.JSX.IntrinsicAttributes;
+  children?: React.ReactNode;
 }>): React.JSX.Element {
-  return <InBrowser ssr child={Child} props={props as never} />;
+  return (
+    <InBrowser ssr child={Child} props={props as never}>
+      {children}
+    </InBrowser>
+  );
 }
