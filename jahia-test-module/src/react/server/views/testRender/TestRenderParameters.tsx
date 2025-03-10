@@ -12,14 +12,14 @@ jahiaComponent(
       <>
         <h3>Parameter view {currentResource.getNode().getName()}</h3>
         <div data-testid="renderParam-string1">
-          stringParam={currentResource.getModuleParams().get("stringParam")!.toString()}
+          stringParam={currentResource.getModuleParams().get("stringParam")?.toString()}
         </div>
         <div data-testid="renderParam-string2">
-          stringParam2={currentResource.getModuleParams().get("stringParam2")!.toString()}
+          stringParam2={currentResource.getModuleParams().get("stringParam2")?.toString()}
         </div>
         <div data-testid="renderParam-notString-notSupported">
           objectParam not supported=
-          {currentResource.getModuleParams().get("objectParam")!.toString()}
+          {currentResource.getModuleParams().get("objectParam")?.toString()}
         </div>
       </>
     );

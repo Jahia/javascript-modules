@@ -50,7 +50,7 @@ jahiaComponent(
     boolean: boolean;
     weakreference: JCRNodeWrapper;
     bigtext: string;
-    date: Date;
+    date: string;
     decimal: number;
     uri: string;
     name: string;
@@ -81,7 +81,7 @@ jahiaComponent(
           if (richText) {
             return (
               <div
-                key={value.toString()}
+                key={value?.toString()}
                 data-testid={`${selector}_${i + 1}`}
                 dangerouslySetInnerHTML={{
                   __html: value,
@@ -90,7 +90,7 @@ jahiaComponent(
             );
           } else {
             return (
-              <div key={value.toString()} data-testid={`${selector}_${i + 1}`}>
+              <div key={value?.toString()} data-testid={`${selector}_${i + 1}`}>
                 {value.toString()}
               </div>
             );
@@ -127,7 +127,7 @@ jahiaComponent(
             __html: bigtext,
           }}
         />
-        <div data-testid="getNodeProps_date">{date.toString()}</div>
+        <div data-testid="getNodeProps_date">{date}</div>
         <div data-testid="getNodeProps_decimal">{decimal}</div>
         <div data-testid="getNodeProps_uri">{uri}</div>
         <div data-testid="getNodeProps_name">{name}</div>
