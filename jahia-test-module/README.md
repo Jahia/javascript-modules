@@ -65,7 +65,7 @@ Build the module using:
 yarn build
 ```
 
-Packing the module (It will generate javascript-module-engines-test-module-v1.0.0.tgz in the root of you project) :
+Packing the module (It will generate javascript-modules-engine-test-module-v1.0.0.tgz in the root of you project) :
 
 ```shell
 yarn pack
@@ -88,7 +88,7 @@ In Administration - Modules
 - Ensure you replace the X's in the version number of the bundle with the version number of the `.tgz` file that was created
 
 ```shell
-curl -s --user root:root1234 --form bundle=@javascript-module-engines-test-module-vX.X.X.tgz --form start=true http://localhost:8080/modules/api/bundles
+curl -s --user root:root1234 --form bundle=@javascript-modules-engine-test-module-vX.X.X.tgz --form start=true http://localhost:8080/modules/api/bundles
 ```
 
 ### Deploying via Script InstallBundle

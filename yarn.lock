@@ -3020,9 +3020,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"javascript-module-engines-test-module@workspace:jahia-test-module":
+"javascript-modules-engine-test-module@workspace:jahia-test-module":
   version: 0.0.0-use.local
-  resolution: "javascript-module-engines-test-module@workspace:jahia-test-module"
+  resolution: "javascript-modules-engine-test-module@workspace:jahia-test-module"
   dependencies:
     "@eslint-react/eslint-plugin": "npm:^1.26.2"
     "@eslint/compat": "npm:^1.2.6"

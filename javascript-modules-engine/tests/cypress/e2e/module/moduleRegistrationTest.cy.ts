@@ -41,7 +41,7 @@ describe('Check that components of a module are correctly registered', () => {
                     ).length,
                 ).to.eq(1)
                 expect(simpleType.icon).to.eq(
-                    '/modules/javascript-module-engines-test-module/icons/javascriptExample_test',
+                    '/modules/javascript-modules-engine-test-module/icons/javascriptExample_test',
                 )
             })
         cy.logout()
