@@ -15,15 +15,6 @@ const finalizeUrl = (url: string, renderContext: RenderContext) => {
   return url;
 };
 
-function appendParameters(url: string, parameters: Record<string, string>) {
-  const separator = url.includes("?") ? "&" : "?";
-  const URLParameters = Object.keys(parameters)
-    .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(parameters[key])}`)
-    .join("&");
-
-  return `${url}${separator}${URLParameters}`;
-}
-
 /** Initialize the registry with default url builders */
 export function initUrlBuilder(): void {
   server.registry.add("urlBuilder", "nt:file", {
@@ -165,7 +156,10 @@ export function buildUrl(
       props.parameters &&
       Object.prototype.toString.call(props.parameters) === "[object Object]"
     ) {
-      url = appendParameters(url, props.parameters);
+      const urlWithParams = new URL(url);
+      Object.entries(props.parameters).forEach(([key, value]) => {
+        urlWithParams.searchParams.set(key, value);
+      });
     }
 
     // Finalize URL (add context, encodeURL)
