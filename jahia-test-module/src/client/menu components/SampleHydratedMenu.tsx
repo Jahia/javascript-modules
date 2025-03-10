@@ -91,7 +91,7 @@ interface SampleHydratedMenuProps {
   rootPath: string;
 }
 
-export default function SampleHydratedMenu({ staticMenu, rootPath }: SampleHydratedMenuProps) {
+const SampleHydratedMenu: React.FC<SampleHydratedMenuProps> = ({ staticMenu, rootPath }) => {
   const [menu, setMenu] = useState<NavigationItem>(staticMenu);
   const [hydrated, setHydrated] = useState(false);
 
@@ -141,4 +141,6 @@ export default function SampleHydratedMenu({ staticMenu, rootPath }: SampleHydra
       {menu && <MenuRoot navigationItem={menu} />}
     </div>
   );
-}
+};
+
+export default SampleHydratedMenu;
