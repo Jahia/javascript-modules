@@ -52,9 +52,7 @@ interface Node {
   displayName: string;
 }
 
-interface BuildHierarchy {
-  (nodes: Node[], rootPath: string): NavigationItem;
-}
+type BuildHierarchy = (nodes: Node[], rootPath: string) => NavigationItem;
 
 const buildHierarchy: BuildHierarchy = (nodes, rootPath) => {
   const nodeMap: { [key: string]: NavigationItem } = {};
