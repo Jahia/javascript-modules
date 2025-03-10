@@ -1,9 +1,9 @@
 import { print } from "esrap";
 import type { Node } from "estree";
-import { Plugin } from "rollup";
+import type { Plugin } from "rollup";
 import { walk } from "zimmerframe";
 import { createFilter } from "@rollup/pluginutils";
-import path from "path";
+import path from "node:path";
 
 /**
  * This plugin adds a `__filename` property to all default exports.
@@ -44,7 +44,6 @@ export const insertFilename = (root: string, prefix: string): Plugin => {
       const ast = walk(this.parse(code) as Node, null, {
         // Only target `export default function`
         ExportDefaultDeclaration(node) {
-          if (node.declaration.type !== "FunctionDeclaration") return;
           return {
             // export default
             type: "ExportDefaultDeclaration",
@@ -64,11 +63,12 @@ export const insertFilename = (root: string, prefix: string): Plugin => {
                 property: { type: "Identifier", name: "defineProperty" },
               },
               arguments: [
-                {
-                  // Original function
-                  ...node.declaration,
-                  type: "FunctionExpression",
-                },
+                // Convert function and class declarations to expressions, keep others as is
+                node.declaration.type === "FunctionDeclaration"
+                  ? { ...node.declaration, type: "FunctionExpression" }
+                  : node.declaration.type === "ClassDeclaration"
+                    ? { ...node.declaration, type: "ClassExpression" }
+                    : node.declaration,
                 { type: "Literal", value: "__filename" },
                 {
                   // { value: id, enumerable: false }

@@ -12,14 +12,10 @@ const external = Object.keys(sharedLibs);
 
 /** Plugin to execute a callback when a build succeeds. */
 function buildSuccessPlugin(callback: () => void | Promise<void>): Plugin {
-  let succeeded = true;
   return {
     name: "build-success-callback",
-    buildEnd(error) {
-      succeeded = !error;
-    },
-    async closeBundle() {
-      if (succeeded) await callback();
+    async closeBundle(error) {
+      if (!error) await callback();
     },
   };
 }
