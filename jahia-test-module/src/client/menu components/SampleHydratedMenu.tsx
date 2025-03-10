@@ -16,7 +16,7 @@ const MenuRoot: React.FC<MenuRootProps> = ({ navigationItem }) => {
       <ul className={`navmenu level_0`}>
         {navigationItem.children &&
           navigationItem.children.map((child) => (
-            <MenuItem navigationItem={child} level={1} key={child!.toString()} />
+            <MenuItem navigationItem={child} level={1} key={child.url} />
           ))}
       </ul>
     </div>
@@ -39,7 +39,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ navigationItem, level }) => {
         <ul className={`inner-box level_${level}`}>
           {hasChildren &&
             navigationItem.children!.map((child) => (
-              <MenuItem navigationItem={child} level={level + 1} key={child!.toString()} />
+              <MenuItem navigationItem={child} level={level + 1} key={child.url} />
             ))}
         </ul>
       </div>
@@ -91,7 +91,7 @@ interface SampleHydratedMenuProps {
   rootPath: string;
 }
 
-const SampleHydratedMenu: React.FC<SampleHydratedMenuProps> = ({ staticMenu, rootPath }) => {
+export default function SampleHydratedMenu({ staticMenu, rootPath }: SampleHydratedMenuProps) {
   const [menu, setMenu] = useState<NavigationItem>(staticMenu);
   const [hydrated, setHydrated] = useState(false);
 
@@ -141,6 +141,4 @@ const SampleHydratedMenu: React.FC<SampleHydratedMenuProps> = ({ staticMenu, roo
       {menu && <MenuRoot navigationItem={menu} />}
     </div>
   );
-};
-
-export default SampleHydratedMenu;
+}

@@ -29,7 +29,7 @@ const NavMenuEntry = ({
                 first={i === 0}
                 last={i === menuEntry.children!.length - 1}
                 level={level}
-                key={childEntry!.toString()}
+                key={childEntry.node.getPath()}
               />
             );
           })}
@@ -74,7 +74,7 @@ jahiaComponent(
                 first={i === 0}
                 last={i === menu.length - 1}
                 level={0}
-                key={menuEntry!.toString()}
+                key={menuEntry.node.getPath()}
               />
             );
           })}
