@@ -25,7 +25,7 @@ interface UrlBuilderType {
    */
   buildNodeUrl(props: {
     /** The path of JCR node */
-    nodePath: string;
+    nodePath?: string;
     /** The extension to use to build the URL */
     extension?: string;
     /** The language to use to build the URL */

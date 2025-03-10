@@ -126,7 +126,7 @@ jahiaComponent(
           </a>
         </div>
         <div data-testid="no_weakref">
-          <a href={buildNodeUrl({ nodePath: "null" })}>No weakref</a>
+          <a href={buildNodeUrl({ nodePath: undefined })}>No weakref</a>
         </div>
       </>
     );

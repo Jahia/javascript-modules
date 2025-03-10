@@ -3,11 +3,11 @@ import { useState } from "react";
 export default function SampleHydrateInBrowserReact({
   initialValue,
   set,
-                                                        children
+  children,
 }: {
   initialValue: number;
   set: Set<string>;
-    children: React.ReactNode
+  children: React.ReactNode;
 }) {
   const [count, setCount] = useState(initialValue);
 
