@@ -102,7 +102,7 @@ const getBaseNode = (
   return mainResourceNode;
 };
 
-interface MenuEntry {
+export interface MenuEntry {
   /** The HTML rendered HTML menu entry */
   render: string;
   /** The node object for the menu entry */
@@ -250,7 +250,7 @@ const buildMenu = (
 export function buildNavMenu(
   maxDepth: number,
   base: string,
-  menuEntryView: string,
+  menuEntryView: string | undefined,
   startLevelValue: number,
   renderContext: RenderContext,
   currentResource: Resource,

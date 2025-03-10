@@ -1,8 +1,19 @@
 import { buildNavMenu, jahiaComponent } from "@jahia/javascript-modules-library";
-import { menuEntryCss } from "../../../../helpers/menuEntryCss";
+import type { MenuEntry } from "@jahia/javascript-modules-library";
+import { menuEntryCss } from "../../../../helpers/menuEntryCss.js";
 
-const NavMenuEntry = ({ menuEntry, fist, last, level }) => (
-  <li className={menuEntryCss(menuEntry, fist, last)}>
+const NavMenuEntry = ({
+  menuEntry,
+  first,
+  last,
+  level,
+}: {
+  menuEntry: MenuEntry;
+  first: boolean;
+  last: boolean;
+  level: number;
+}) => (
+  <li className={menuEntryCss(menuEntry, first, last)}>
     <div
       dangerouslySetInnerHTML={{
         __html: menuEntry.render,
@@ -16,9 +27,9 @@ const NavMenuEntry = ({ menuEntry, fist, last, level }) => (
               <NavMenuEntry
                 menuEntry={childEntry}
                 first={i === 0}
-                last={i === menuEntry.children.length - 1}
+                last={i === menuEntry.children!.length - 1}
                 level={level}
-                key={i}
+                key={childEntry.node.getPath()}
               />
             );
           })}
@@ -63,7 +74,7 @@ jahiaComponent(
                 first={i === 0}
                 last={i === menu.length - 1}
                 level={0}
-                key={i}
+                key={menuEntry.node.getPath()}
               />
             );
           })}

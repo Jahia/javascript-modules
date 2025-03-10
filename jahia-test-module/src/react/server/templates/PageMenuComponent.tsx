@@ -9,7 +9,5 @@ jahiaComponent(
       type: "menuItem",
     },
   },
-  (_, { currentResource }) => {
-    return currentResource.getNode().getPath();
-  },
+  (_, { currentResource }) => <>{currentResource.getNode().getPath()}</>,
 );

@@ -8,9 +8,21 @@ export default defineConfig({
   },
   plugins: [
     jahia({
+      client: {
+        input: {
+          glob: "**/*.tsx",
+        },
+        output: "./dist/client/",
+      },
       server: {
-        input: "./src/react/server/**/*.jsx",
+        input: "./src/react/server/**/*.{ts,tsx}",
+        output: {
+          dir: "./dist/server",
+        },
       },
     }),
   ],
+  build: {
+    sourcemap: true,
+  },
 });

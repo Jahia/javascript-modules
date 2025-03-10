@@ -28,6 +28,7 @@ const TestLegacyRegistrationAdvanced = () => {
     <div data-testid="legacyRegistrationAdvanced">
       javascriptExample:testLegacyRegistrationAdvanced view component
       <span data-testid="registryName">{testRegistryName}</span>
+      <span data-testid="myProp">{myProp}</span>
     </div>
   );
 };
@@ -38,9 +39,6 @@ TestLegacyRegistrationAdvanced.jahiaComponent = defineJahiaComponent({
   displayName: "Test Legacy registration Advanced",
   componentType: "view",
   nodeType: "javascriptExample:testLegacyRegistrationAdvanced",
-  properties: {
-    myProp: "my value",
-  },
 });
 
 registerJahiaComponents({

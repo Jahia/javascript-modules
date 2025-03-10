@@ -1,4 +1,5 @@
 import { jahiaComponent } from "@jahia/javascript-modules-library";
+import { JCRNodeWrapper } from "org.jahia.services.content";
 
 jahiaComponent(
   {
@@ -38,15 +39,49 @@ jahiaComponent(
     multipleUri,
     multipleName,
     multiplePath,
-    ...restProps
+  }: {
+    propNotSet: string;
+    propNotExists: string;
+    smallText: string;
+    textarea: string;
+    choicelist: string;
+    long: number;
+    double: number;
+    boolean: boolean;
+    weakreference: JCRNodeWrapper;
+    bigtext: string;
+    date: string;
+    decimal: number;
+    uri: string;
+    name: string;
+    path: string;
+    // multiple value props:
+    multipleSmallText: string[];
+    multipleTextarea: string[];
+    multipleChoicelist: string[];
+    multipleLong: number[];
+    multipleDouble: number[];
+    multipleBoolean: boolean[];
+    multipleWeakreference: JCRNodeWrapper[];
+    multipleBigtext: string[];
+    multipleDate: Date[];
+    multipleDecimal: number[];
+    multipleUri: string[];
+    multipleName: string[];
+    multiplePath: string[];
   }) => {
-    const printMultiValuedProp = (selector, values, richText = false, ref = false) => {
+    const printMultiValuedProp = (
+      selector: string,
+      values: string[] | number[] | boolean[] | Date[],
+      richText = false,
+    ) => {
       return (
         values &&
         values.map(function (value, i) {
           if (richText) {
             return (
               <div
+                key={value?.toString()}
                 data-testid={`${selector}_${i + 1}`}
                 dangerouslySetInnerHTML={{
                   __html: value,
@@ -55,11 +90,23 @@ jahiaComponent(
             );
           } else {
             return (
-              <div data-testid={`${selector}_${i + 1}`}>
-                {ref ? value.getPath() : value.toString()}
+              <div key={value?.toString()} data-testid={`${selector}_${i + 1}`}>
+                {value.toString()}
               </div>
             );
           }
+        })
+      );
+    };
+    const printMultiValuedRefsProp = (selector: string, values: JCRNodeWrapper[]) => {
+      return (
+        values &&
+        values.map(function (value, i) {
+          return (
+            <div key={value.getPath()} data-testid={`${selector}_${i + 1}`}>
+              {value.getPath()}
+            </div>
+          );
         })
       );
     };
@@ -106,12 +153,7 @@ jahiaComponent(
           {printMultiValuedProp("getNodeProps_multipleBoolean", multipleBoolean)}
         </div>
         <div data-testid="getNodeProps_multipleWeakreference">
-          {printMultiValuedProp(
-            "getNodeProps_multipleWeakreference",
-            multipleWeakreference,
-            false,
-            true,
-          )}
+          {printMultiValuedRefsProp("getNodeProps_multipleWeakreference", multipleWeakreference)}
         </div>
         <div data-testid="getNodeProps_multipleBigtext">
           {printMultiValuedProp("getNodeProps_multipleBigtext", multipleBigtext, true)}

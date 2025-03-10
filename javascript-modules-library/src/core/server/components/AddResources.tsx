@@ -28,7 +28,7 @@ export function AddResources(
      * The type of the resource. This could be 'javascript' for .js files, 'css' for .css files,
      * etc.
      */
-    type?: "javascript" | "css";
+    type?: "javascript" | "css" | "inline";
     /** The path to the resource file, relative to the module. */
     resources?: string;
     /** Inline HTML that markup will be considered as resource. */

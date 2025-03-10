@@ -17,6 +17,7 @@ declare module "virtual:jahia-server" {
   import type {
     ConfigHelper,
     GQLHelper,
+    JcrHelper,
     OSGiHelper,
     RegistryHelper,
     RenderHelper,
@@ -28,6 +29,8 @@ declare module "virtual:jahia-server" {
   const server: {
     /** This helper provides access to OSGi configuration */
     config: ConfigHelper;
+    /** This helper allows to perform JCR operations */
+    jcr: JcrHelper;
     /** This helper provides access Jahia's GraphQL API, to execute queries and mutations */
     gql: GQLHelper;
     /** This helper provides access to OSGi bundle for resource loading and service access */

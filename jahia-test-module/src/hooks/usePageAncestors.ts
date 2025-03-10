@@ -1,5 +1,5 @@
 import { useGQLQuery } from "@jahia/javascript-modules-library";
-export const usePageAncestors = (workspace, path, types) => {
+export const usePageAncestors = (workspace: string, path: string, types: string[]) => {
   const result = useGQLQuery({
     query: /* GraphQL */ `
       query ($workspace: Workspace!, $path: String!, $types: [String]!) {

@@ -16,5 +16,4 @@ node_modules/
 javascript-modules-engine/src/main/resources/javascript/
 javascript-modules-engine/src/main/resources/META-INF/js/
 javascript-modules-engine/tests/artifacts/
-jahia-test-module/javascript/*/
 javascript-modules-engine/tests/results/

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-export default function SampleRenderInBrowserReact({ path }) {
-  const [currentDate, setCurrentDate] = useState(new Date());
+export default function SampleRenderInBrowserReact({ path }: { path: string }) {
+  const [currentDate, setCurrentDate] = useState(() => getCurrentDateInitValue());
   const [counter, setCounter] = useState(3);
 
   const updateDate = () => {
@@ -9,9 +9,15 @@ export default function SampleRenderInBrowserReact({ path }) {
   };
 
   useEffect(() => {
-    counter > 0 && setTimeout(() => setCounter(counter - 1), 1000);
+    let timeoutID: NodeJS.Timeout;
+    if (counter > 0) {
+      timeoutID = setTimeout(() => setCounter(counter - 1), 1000);
+    }
     const timerID = setInterval(updateDate, 2000);
-    return () => clearInterval(timerID);
+    return () => {
+      clearTimeout(timeoutID);
+      clearInterval(timerID);
+    };
   }, [currentDate, counter]);
 
   return (
@@ -29,4 +35,8 @@ export default function SampleRenderInBrowserReact({ path }) {
       </p>
     </div>
   );
+}
+
+function getCurrentDateInitValue() {
+  return new Date();
 }
