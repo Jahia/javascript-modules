@@ -39,9 +39,6 @@ TestLegacyRegistrationAdvanced.jahiaComponent = defineJahiaComponent({
   displayName: "Test Legacy registration Advanced",
   componentType: "view",
   nodeType: "javascriptExample:testLegacyRegistrationAdvanced",
-  properties: {
-    myProp: "my value",
-  },
 });
 
 registerJahiaComponents({

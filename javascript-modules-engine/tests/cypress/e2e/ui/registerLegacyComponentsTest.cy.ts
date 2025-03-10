@@ -45,7 +45,10 @@ describe('Verify that the legacy/deprecated registration behaves as expected', (
             name: 'testLegacyRegistrationAdvanced',
             primaryNodeType: 'javascriptExample:testLegacyRegistrationAdvanced',
             mixins: ['jmix:renderable'],
-            properties: [{ name: 'j:view', value: 'legacyRegistrationAdvancedName' }],
+            properties: [
+                { name: 'j:view', value: 'legacyRegistrationAdvancedName' },
+                { name: 'myProp', value: 'my value' },
+            ],
         }).then(() => {
             publishAndWaitJobEnding('/sites/javascriptTestSite/home/testRegisterLegacyJahiaComponents')
             cy.visit(`/sites/javascriptTestSite/home/testRegisterLegacyJahiaComponents.html`)
