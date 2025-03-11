@@ -252,4 +252,6 @@ Once pushed to your Jahia instance, this should give you the following result:
 
 ![Our hero section with CTAs](hero-cta.png)
 
+You can add as many CTAs as you want to your hero section. This is why we haven't defined our CTA properties on `HeroSection` directly: it allows for more flexibility and reusability.
+
 Next: [The "About Us" Page](../3-the-about-us-page/)
