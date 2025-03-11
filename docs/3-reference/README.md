@@ -9,7 +9,7 @@ This section is meant to give an exhaustive overview of the features and concept
 - [Children and Area](./5-children-and-area/)
 - [Nav Builder](./6-nav-builder/)
 - [UI Extensions](./7-ui-extensions/)
-- [Single Folder Components and Resources](./8-single-folder-components-and-resources/)
+- [Single Directory Components and Resources](./8-single-folder-components-and-resources/)
 - [Java Interoperability](./9-java-interoperability/)
 - [SSR and Hydration](./A-ssr-and-hydration/)
 
