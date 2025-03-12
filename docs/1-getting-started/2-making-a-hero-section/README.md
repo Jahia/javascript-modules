@@ -117,6 +117,7 @@ Let's make this hero section look better by adding some CSS. We recommend [CSS M
 
   > h1 {
     font-size: 3rem;
+    line-height: 1;
   }
 }
 ```
@@ -128,8 +129,7 @@ import classes from "./component.module.css";
 
 // Add `className={classes.hero}` to the header element:
 <header className={classes.hero} style={{ backgroundImage: `url(${background.getUrl()})` }}>
-  <h1>{title}</h1>
-  <p>{subtitle}</p>
+  {/* ... */}
 </header>;
 ```
 
