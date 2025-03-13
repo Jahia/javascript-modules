@@ -4,7 +4,7 @@ In this section, we'll create a hero section for our website. A hero section is 
 
 ## Working With Editable Content
 
-At its core, Jahia is a content management system (CMS). This means that content is king: **all development work starts with content modeling**. Jahia is built on top of [Apache Jackrabbit](https://jackrabbit.apache.org/jcr/index.html), a tree-based content repository. **This means that content is stored in a tree structure**, and each node can have properties and child nodes. Nodes are defined by node types, which are similar to tables in a relational database. **Node definitions are stored in CND files**, which stands for "Content Node Definition".
+At its core, Jahia is a content management system (CMS). This means that content is king: **all development work starts with content modeling**. Jahia is built on top of [Apache Jackrabbit](https://jackrabbit.apache.org/jcr/index.html), a tree-based Java Content Repository (JCR, for short). **This means that content is stored in a tree structure**, and each node can have properties and child nodes. Nodes are defined by node types, which are similar to tables in a relational database. **Node definitions are stored in CND files**, which stands for "Content Node Definition".
 
 JavaScript modules are designed using the Single Directory Components (SDC) pattern. This means that each component is a folder containing all the resources needed to render it. The `src/components/` folder already contains some example components used to display a Hello World message. We'll create a new `HeroSection` component following the same pattern.
 
@@ -40,6 +40,9 @@ The following three lines define the properties of the `HeroSection` node type. 
 If you have a specific hero section design in mind, you can add more properties to the node definition. Don't add Call to Action (CTA) buttons or links yet, we'll cover that in a later step. You can find all the available property types and constraints in the [CND Reference](../../3-reference/1-cnd-format/).
 
 You can stop and restart `yarn dev` to push this definition to your Jahia instance. If all goes well, you should now have the `HeroSection` node type available in the content editor. Click **New content** and select **HeroSection** to create a new hero section:
+
+> [!WARNING]
+> Jahia will refuse your type definition if it contains a breaking change. During development, you can use the [Installed definitions browser](http://localhost:8080/modules/tools/definitionsBrowser.jsp) tool to remove your type definition and push a new one.
 
 ![Content insertion interface](create-hero-section.png)
 
@@ -253,5 +256,10 @@ Once pushed to your Jahia instance, this should give you the following result:
 ![Our hero section with CTAs](hero-cta.png)
 
 You can add as many CTAs as you want to your hero section. This is why we haven't defined our CTA properties on `HeroSection` directly: it allows for more flexibility and reusability.
+
+> [!TIP]
+> You can, at all times, take a look at your data tree with the [JCR repository browser](http://localhost:8080/modules/tools/jcrBrowser.jsp).
+> For instance, you should be able to find the content you created at the `sites/<site key>/home/main` path.
+> It can be useful to remove buggy nodes or to understand how your data is persisted.
 
 Next: [The "About Us" Page](../3-the-about-us-page/)

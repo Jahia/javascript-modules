@@ -126,7 +126,7 @@ After pushing these changes to your Jahia instance, you should see a smaller her
 Our page lacks a footer. Let's create a footer component and add it to the `singleColumn` template. It'll be a simple component with a copyright notice and a list of links, but you can make it as complex as you want.
 
 <details>
-<summary>`src/components/Footer/definition.cnd`</summary>
+<summary><code>src/components/Footer/definition.cnd</code></summary>
 
 ```cnd
 [hydrogen:Footer] > jnt:content, hydrogen:component orderable
@@ -138,7 +138,7 @@ Our page lacks a footer. Let's create a footer component and add it to the `sing
 </details>
 
 <details>
-<summary>`src/components/Footer/default.server.tsx`</summary>
+<summary><code>src/components/Footer/default.server.tsx</code></summary>
 
 ```tsx
 import {
@@ -184,7 +184,7 @@ jahiaComponent(
 </details>
 
 <details>
-<summary>`src/components/Footer/component.module.css`</summary>
+<summary><code>src/components/Footer/component.module.css</code></summary>
 
 ```css
 .footer {
@@ -232,3 +232,5 @@ Try adding a footer to your "About Us" page, and a few links to it. Once done, y
 ![Our "About Us" page with a footer](footer.png)
 
 If you create another page with **Single column**, you should be able to create a new Hero section, but the footer will be the same as the one on the "About Us" page.
+
+Next: [Making a Blog](../4-making-a-blog/)
