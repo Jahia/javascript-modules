@@ -7,23 +7,26 @@ So far we only considered contributing pages visually, directly in Page Builder.
 Let's start by creating a node type called `BlogPost`. We'll keep it concise but feel free to add more fields if you need them. Create a new file named `src/components/BlogPost/definition.cnd`:
 
 ```cnd
-[hydrogen:BlogPost] > jnt:content, hydrogen:component
- - title (string) i18n mandatory
+[hydrogen:BlogPost] > jnt:content, mix:title, jmix:mainResource, hydrogen:component
  - subtitle (string) i18n mandatory
  - authors (string) multiple
+ - cover (weakreference, picker[type='image']) mandatory < jmix:image
  - body (string, richtext) i18n mandatory
 ```
 
-You might notice the `multiple` keyword next to authors: its allows setting a list of strings instead of a single one.
+You might notice the `multiple` keyword next to authors: its allows setting a list of strings instead of a single one. `mix:title` is a mixin that adds a `jcr:title` field to the node type.
 
 Create a `types.ts` file in the same folder:
 
 ```ts
+import type { JCRNodeWrapper } from "org.jahia.services.content";
+
 export type Props = {
-  title: string;
-  subtitle: string;
-  authors: string[];
-  body: string;
+  "jcr:title": string;
+  "subtitle": string;
+  "authors": string[];
+  "cover": JCRNodeWrapper;
+  "body": string;
 };
 ```
 
@@ -43,8 +46,9 @@ jahiaComponent(
     nodeType: "hydrogen:BlogPost",
     displayName: "Blog Post",
   },
-  ({ title, subtitle, authors }: Props, { currentNode }) => (
+  ({ "jcr:title": title, subtitle, authors, cover }: Props, { currentNode }) => (
     <article className={classes.card}>
+      <img src={cover.getUrl()} alt="" />
       <h3>
         <a href={currentNode.getUrl()}> {title}</a>
       </h3>
@@ -62,7 +66,6 @@ jahiaComponent(
 ```css
 .card {
   margin-block: 1rem;
-  padding-inline: 1rem;
   box-shadow: 0 0 0.5rem 0 #0002;
   border-radius: 0.5rem;
   contain: paint;
@@ -74,6 +77,17 @@ jahiaComponent(
   &:focus-within {
     box-shadow: 0 0 1rem 0 #0004;
     transform: scale(1.02);
+  }
+
+  > img {
+    width: 100%;
+    max-height: 8rem;
+    object-fit: cover;
+  }
+
+  > h3,
+  > p {
+    margin: 1rem;
   }
 
   a {
@@ -103,8 +117,6 @@ Create a few blog posts in this folder:
 
 ![Blog post edition interface](new-blog-post.png)
 
-You can set a pretty URL in **Options > System > System name**.
-
 ## Listing Articles
 
 Let's get back to the **Pages** tab of the sidebar. Create a new page named "Blog" with a **Single column** layout. Create a Hero section on top of the page to introduce the list of articles.
@@ -127,7 +139,7 @@ You can also add a rich text above and below the list of articles to introduce a
 
 ![Preview of the Blog page](blog-page.png)
 
-[Cover image by RetroSupply on Unsplash.](https://unsplash.com/photos/vintage-teal-typewriter-beside-book-jLwVAUtLOAQ)
+[Cover image by RetroSupply on Unsplash](https://unsplash.com/photos/vintage-teal-typewriter-beside-book-jLwVAUtLOAQ), article images by [Belinda Fewings on Unsplash](https://unsplash.com/photos/3d-painting-of-welcome-6wAGwpsXHE0) and [Olga Tutunaru on Unsplash](https://unsplash.com/photos/white-book-page-on-white-textile-plbb7pkEjkQ).
 
 If you click on a blog post, you'll end up on a 404 error page. We'll take care of that in the next section. But for now...
 
@@ -144,16 +156,19 @@ It's not marked as `mandatory` because we can't add a mandatory field to an exis
 You also need to update the `types.ts` file:
 
 ```ts
+import type { JCRNodeWrapper } from "org.jahia.services.content";
+
 export type Props = {
-  title: string;
-  subtitle: string;
-  authors: string[];
-  body: string;
-  publicationDate?: string;
+  "jcr:title": string;
+  "subtitle": string;
+  "authors": string[];
+  "cover": JCRNodeWrapper;
+  "body": string;
+  "publicationDate": string;
 };
 ```
 
-`publicationDate` is a string because it's a date in the ISO 8601 format. As the native `Date` object does not properly handle time zones, it's easier to handle dates as strings.
+`publicationDate` is a string because it's a date in the ISO 8601 format. As the native `Date` object does not properly handle time zones, it's easier to handle dates as strings if your application requires time zone support.
 
 We can also update our JCR query to order the posts by publication date, and only show published posts:
 
@@ -183,6 +198,8 @@ Finally, it would be nice to display the publication date on the blog post card.
   )}
 </p>
 ```
+
+We used `currentResource.getLocale().toString()` to get the locale of the current resource. This is useful when you want to format dates or numbers according to the current locale. We forward this locale to [`Date.toLocaleDateString`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString) to format the publication date in a human-readable way.
 
 There are a lot of things to discover about JCR queries, as it allows you to query, filter, order and paginate contents in a tree-like structure. You can find more information in the [Jahia documentation](https://academy.jahia.com/documentation/jahia-cms/jahia-8.2/developer/leveraging-jahia-backend-capabilities/jcrsql2-query-cheat-sheet).
 
