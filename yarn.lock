@@ -4248,14 +4248,14 @@ __metadata:
   linkType: hard
 
 "rollup-plugin-sbom@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "rollup-plugin-sbom@npm:2.0.2"
+  version: 2.0.3
+  resolution: "rollup-plugin-sbom@npm:2.0.3"
   dependencies:
     "@cyclonedx/cyclonedx-library": "npm:7.1.0"
     normalize-package-data: "npm:7.0.0"
   peerDependencies:
     rollup: ^3 || ^4
-  checksum: 10c0/e2e39cd5cf22358f8c9294a21e80659516bdd2224b78d57aa52463dae5cb511e028ea30e615bd6310582b3672d636ec1cfa46d604bcdaeb387af35e6725a9828
+  checksum: 10c0/0f04e66d49943465e60d6a09ba0218fa2db97da368bf6245d97f3a0a3cc4feaef9b316b10e72d5bd9615b0d5dd19ef5067848a9f72e9049aa6a2c355377c301c
   languageName: node
   linkType: hard
 
