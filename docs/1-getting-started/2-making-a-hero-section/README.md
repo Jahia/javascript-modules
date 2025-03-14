@@ -64,7 +64,7 @@ This error message means that Jahia doesn't know how to render the `HeroSection`
 We can tell Jahia how to render our `HeroSection` node type by using the `jahiaComponent` function from the `@jahia/javascript-modules-library` package. In the `Hero/Section` folder, create a `default.server.tsx` file with the following content:
 
 ```tsx
-import { jahiaComponent } from "@jahia/javascript-modules-library";
+import { jahiaComponent, useUrlBuilder } from "@jahia/javascript-modules-library";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 
 /** Properties defined in ./definition.cnd */
@@ -81,16 +81,23 @@ jahiaComponent(
     nodeType: "hydrogen:HeroSection",
     displayName: "Hero Section",
   },
-  ({ title, subtitle, background }: Props) => (
-    <header style={{ backgroundImage: `url(${background.getUrl()})` }}>
-      <h1>{title}</h1>
-      <p>{subtitle}</p>
-    </header>
-  ),
+  ({ title, subtitle, background }: Props) => {
+    const { buildNodeUrl } = useUrlBuilder();
+    return (
+      <header
+        style={{ backgroundImage: `url(${buildNodeUrl({ nodePath: background.getPath() })})` }}
+      >
+        <h1>{title}</h1>
+        <p>{subtitle}</p>
+      </header>
+    );
+  },
 );
 ```
 
 This code tells Jahia how to render the `HeroSection` node type as a React component. Once pushed to your Jahia instance (you may need to rerun `yarn dev` for the bundler to pick up the new file), the error message should disappear, and the hero section should render correctly, albeit without any styling.
+
+`useUrlBuilder` and `buildNodeUrl` are helpers to transform a node path into a URL. We'll need this every time we want to reference a resource in the browser: for `<img />`, `<a />`, `background-image`, etc.
 
 We named this file `default.server.tsx` because it's the default view for this node type; the same node type can have multiple views, each with its own rendering logic.
 
@@ -131,7 +138,10 @@ Update `default.server.tsx` to reference your styles:
 import classes from "./component.module.css";
 
 // Add `className={classes.hero}` to the header element:
-<header className={classes.hero} style={{ backgroundImage: `url(${background.getUrl()})` }}>
+<header
+  className={classes.hero}
+  style={{ backgroundImage: `url(${buildNodeUrl({ nodePath: background.getPath() })})` }}
+>
   {/* ... */}
 </header>;
 ```
@@ -166,7 +176,7 @@ Create the following files to render the `HeroCallToAction` node type:
 <summary><code>src/components/Hero/CallToAction/default.server.tsx</code></summary>
 
 ```tsx
-import { jahiaComponent } from "@jahia/javascript-modules-library";
+import { jahiaComponent, useUrlBuilder } from "@jahia/javascript-modules-library";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 import classes from "./component.module.css";
 
@@ -185,6 +195,7 @@ jahiaComponent(
     displayName: "Call To Action",
   },
   (props: Props) => {
+    const { buildNodeUrl } = useUrlBuilder();
     switch (props["j:linkType"]) {
       case "external":
         return (
@@ -195,7 +206,10 @@ jahiaComponent(
 
       case "internal":
         return (
-          <a href={props["j:linknode"].getUrl()} className={classes.cta}>
+          <a
+            href={buildNodeUrl({ nodePath: props["j:linknode"].getPath() })}
+            className={classes.cta}
+          >
             {props.title}
           </a>
         );
@@ -238,7 +252,10 @@ jahiaComponent(
 We now have working CTA buttons, but we still need to add them to our hero section. Update `Hero/Section/default.server.tsx` to render the `HeroCallToAction` nodes:
 
 ```tsx
-<header className={classes.hero} style={{ backgroundImage: `url(${background.getUrl()})` }}>
+<header
+  className={classes.hero}
+  style={{ backgroundImage: `url(${buildNodeUrl({ nodePath: background.getPath() })})` }}
+>
   <h1>{title}</h1>
   <p>{subtitle}</p>
   <div style={{ display: "flex", gap: "1rem" }}>
