@@ -3058,7 +3058,7 @@ __metadata:
     react-i18next: "npm:^15.4.0"
     rollup: "npm:^4.35.0"
     rollup-plugin-sbom: "npm:^2.0.2"
-    styled-jsx: "npm:5.1.2"
+    styled-jsx: "npm:5.1.6"
     valibot: "npm:^1.0.0-rc.1"
   languageName: unknown
   linkType: soft
@@ -4670,19 +4670,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"styled-jsx@npm:5.1.2":
-  version: 5.1.2
-  resolution: "styled-jsx@npm:5.1.2"
+"styled-jsx@npm:5.1.6":
+  version: 5.1.6
+  resolution: "styled-jsx@npm:5.1.6"
   dependencies:
     client-only: "npm:0.0.1"
   peerDependencies:
-    react: ">= 16.8.0 || 17.x.x || ^18.0.0-0"
+    react: ">= 16.8.0 || 17.x.x || ^18.0.0-0 || ^19.0.0-0"
   peerDependenciesMeta:
     "@babel/core":
       optional: true
     babel-plugin-macros:
       optional: true
-  checksum: 10c0/4cfbedd28d4ccd0ad95e54734a39399713d182b34c39204ac48b0f748721900c7f208674b4e2a05565ec6a3cb9539c6fffddf6de228a3a073f602da1742eac6b
+  checksum: 10c0/ace50e7ea5ae5ae6a3b65a50994c51fca6ae7df9c7ecfd0104c36be0b4b3a9c5c1a2374d16e2a11e256d0b20be6d47256d768ecb4f91ab390f60752a075780f5
   languageName: node
   linkType: hard
 
