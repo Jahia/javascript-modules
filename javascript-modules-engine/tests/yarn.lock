@@ -178,11 +178,11 @@ __metadata:
   linkType: soft
 
 "@jahia/jcontent-cypress@npm:^3.0.0-tests.8":
-  version: 3.0.0-tests.8
-  resolution: "@jahia/jcontent-cypress@npm:3.0.0-tests.8"
+  version: 3.0.0-tests.10
+  resolution: "@jahia/jcontent-cypress@npm:3.0.0-tests.10"
   dependencies:
     cypress-real-events: "npm:^1.7.6"
-  checksum: 10c0/fded981a6bd34b497a7bb80072298c1b5c98f14d19d4532c449bb484c17d9ec924276e1b7e6f17ac941892547209572ab8cf0ac98b1c19c42ed6e2364d563476
+  checksum: 10c0/e5723e96f942a68e31d20344374cdbb837f11ec8cc2d63ee500f1447235b94aba73c963b32e7d82e4fccb73e53fbcab054031509ffe6169401dd93269347e683
   languageName: node
   linkType: hard
 
