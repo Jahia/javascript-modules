@@ -36,7 +36,7 @@ You can also create a simple view to render the blog post as a card:
 <summary><code>src/components/BlogPost/default.server.tsx</code></summary>
 
 ```tsx
-import { jahiaComponent } from "@jahia/javascript-modules-library";
+import { jahiaComponent, useUrlBuilder } from "@jahia/javascript-modules-library";
 import type { Props } from "./types.js";
 import classes from "./component.module.css";
 
@@ -46,16 +46,19 @@ jahiaComponent(
     nodeType: "hydrogen:BlogPost",
     displayName: "Blog Post",
   },
-  ({ "jcr:title": title, subtitle, authors, cover }: Props, { currentNode }) => (
-    <article className={classes.card}>
-      <img src={cover.getUrl()} alt="" />
-      <h3>
-        <a href={currentNode.getUrl()}> {title}</a>
-      </h3>
-      <p>{subtitle}</p>
-      {authors.length > 0 && <p>Written by {authors.join(", ")}</p>}
-    </article>
-  ),
+  ({ "jcr:title": title, subtitle, authors, cover }: Props, { currentNode }) => {
+    const { buildNodeUrl } = useUrlBuilder();
+    return (
+      <article className={classes.card}>
+        <img src={buildNodeUrl({ nodePath: cover.getPath() })} alt="" />
+        <h3>
+          <a href={buildNodeUrl({ nodePath: currentNode.getPath() })}> {title}</a>
+        </h3>
+        <p>{subtitle}</p>
+        {authors.length > 0 && <p>Written by {authors.join(", ")}</p>}
+      </article>
+    );
+  },
 );
 ```
 
