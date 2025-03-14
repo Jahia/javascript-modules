@@ -869,10 +869,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@publint/pack@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "@publint/pack@npm:0.1.1"
-  checksum: 10c0/a76fb86b3d30b52662b20a1f0cc3015467e95a22998f0c2c7ac3397d2c972e44ee9e6903e334dfcae3e47a3cd4e82ffae40841d405075b48813c24b3ae70dc8d
+"@publint/pack@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "@publint/pack@npm:0.1.2"
+  checksum: 10c0/4647158cd3a27816ecaf139327662d31820d61e89eb970b318fd0f7c30715baaedf27d294d31772f3a6ad71f84c42509b90328aa5b6301b706322eb7c35ddb3f
   languageName: node
   linkType: hard
 
@@ -4055,16 +4055,16 @@ __metadata:
   linkType: hard
 
 "publint@npm:^0.3.6":
-  version: 0.3.6
-  resolution: "publint@npm:0.3.6"
+  version: 0.3.9
+  resolution: "publint@npm:0.3.9"
   dependencies:
-    "@publint/pack": "npm:^0.1.1"
+    "@publint/pack": "npm:^0.1.2"
     package-manager-detector: "npm:^0.2.9"
     picocolors: "npm:^1.1.1"
     sade: "npm:^1.8.1"
   bin:
     publint: src/cli.js
-  checksum: 10c0/8788c20e80931a49633d5fec02d7ff3e50a19a0a9d879205d35d9a6585097ec3cf8b435b97dc5c31e258fcffe1cec5812b11eae53b19fd3a449c29672ece1111
+  checksum: 10c0/cb0d3b7a5509be4ffa77a61809bc2e8b79620b3be4c420dade8a722e085bb6a9280fce3e04f44b2b5cf8adeded376c1ad2eedd0e03c35829307a220d5926826f
   languageName: node
   linkType: hard
 
