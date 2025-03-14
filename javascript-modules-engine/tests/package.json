@@ -21,7 +21,7 @@
         "@jahia/jahia-reporter": "^1.0.30",
         "@jahia/jcontent-cypress": "^3.0.0-tests.8",
         "@types/node": "^18.11.18",
-        "cypress": "^12.17.0",
+        "cypress": "^14.0.0",
         "cypress-iframe": "^1.0.1",
         "cypress-multi-reporters": "^1.6.2",
         "cypress-slow-down": "^1.2.1",
