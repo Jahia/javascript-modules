@@ -4921,14 +4921,14 @@ __metadata:
   linkType: hard
 
 "valibot@npm:^1.0.0-rc.1":
-  version: 1.0.0-rc.1
-  resolution: "valibot@npm:1.0.0-rc.1"
+  version: 1.0.0-rc.4
+  resolution: "valibot@npm:1.0.0-rc.4"
   peerDependencies:
     typescript: ">=5"
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/a2d8a0a6e48f98f92178e9fff61d6f4386240ce3fbc44228c119131d043291fac28e62a657e6138d8ee9a1b1515e97c54bcca9b7098fa4226ee0cd5f4bf2607f
+  checksum: 10c0/72c6beb31f1d665ae7ccb00a25703f6d6a8edf4883569a24b1ff5e0a702fbc2499657aed7b1ae1eb5efd2405575354ed81d8558191fe6682e9fa481fbd6c4c9f
   languageName: node
   linkType: hard
 
