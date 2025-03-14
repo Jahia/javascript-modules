@@ -1,0 +1,28 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "labels": ["dependencies"],
+  "enabledManagers": ["npm"],
+  "ignorePaths": ["**/node_modules/**"],
+  "major": {
+    "dependencyDashboardApproval": true
+  },
+  "minor": {
+    "dependencyDashboardApproval": true
+  },
+  "patch": {
+    "automerge": true
+  },
+  "packageRules": [
+    {
+      "matchFileNames": ["javascript-modules-engine/tests/package.json"],
+      "matchPackagePatterns": [".*"],
+      "enabled": false
+    },
+    {
+      "matchFileNames": ["javascript-modules-engine/tests/package.json"],
+      "matchPackagePatterns": ["@jahia/.*"],
+      "enabled": true
+    }
+  ]
+}
