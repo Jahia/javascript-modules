@@ -4,6 +4,7 @@
   "labels": ["dependencies"],
   "enabledManagers": ["npm"],
   "ignorePaths": ["**/node_modules/**"],
+  "dependencyDashboard": true,
   "major": {
     "dependencyDashboardApproval": true
   },
@@ -12,17 +13,5 @@
   },
   "patch": {
     "automerge": true
-  },
-  "packageRules": [
-    {
-      "matchFileNames": ["javascript-modules-engine/tests/package.json"],
-      "matchPackagePatterns": [".*"],
-      "enabled": false
-    },
-    {
-      "matchFileNames": ["javascript-modules-engine/tests/package.json"],
-      "matchPackagePatterns": ["@jahia/.*"],
-      "enabled": true
-    }
-  ]
+  }
 }
