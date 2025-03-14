@@ -2548,27 +2548,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mkdirp@npm:~1.0.4":
-  version: 1.0.4
-  resolution: "mkdirp@npm:1.0.4"
+"mkdirp@npm:^3.0.0":
+  version: 3.0.1
+  resolution: "mkdirp@npm:3.0.1"
   bin:
-    mkdirp: bin/cmd.js
-  checksum: 10c0/46ea0f3ffa8bc6a5bc0c7081ffc3907777f0ed6516888d40a518c5111f8366d97d2678911ad1a6882bf592fa9de6c784fea32e1687bb94e1f4944170af48a5cf
+    mkdirp: dist/cjs/src/bin.js
+  checksum: 10c0/9f2b975e9246351f5e3a40dcfac99fcd0baa31fbfab615fe059fb11e51f10e4803c63de1f384c54d656e4db31d000e4767e9ef076a22e12a641357602e31d57d
   languageName: node
   linkType: hard
 
 "mocha-junit-reporter@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "mocha-junit-reporter@npm:2.2.0"
+  version: 2.2.1
+  resolution: "mocha-junit-reporter@npm:2.2.1"
   dependencies:
     debug: "npm:^4.3.4"
     md5: "npm:^2.3.0"
-    mkdirp: "npm:~1.0.4"
+    mkdirp: "npm:^3.0.0"
     strip-ansi: "npm:^6.0.1"
     xml: "npm:^1.0.1"
   peerDependencies:
     mocha: ">=2.2.5"
-  checksum: 10c0/9c9c191058bda77691797af5fc254f0cf1c26458a380642d29f5dd188c5e7f3186f361143201d319e6370cc5534c49c0a43225732213c7c3b8997a21abeaf08b
+  checksum: 10c0/365a7a3f2f442864e0b75fa5bda2f7b0594e3056dc8db440445c9eb9a2f2b00b70c0ec4220ade61f441eeeeee5fa2a76465fa58fb7f7f914c6e9cbd02d76fba2
   languageName: node
   linkType: hard
 
