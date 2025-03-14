@@ -18,7 +18,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-i18next": "^15.4.0",
-    "styled-jsx": "5.1.2",
+    "styled-jsx": "5.1.6",
     "valibot": "^1.0.0-rc.1"
   },
   "devDependencies": {
