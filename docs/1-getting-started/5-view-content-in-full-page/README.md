@@ -105,7 +105,7 @@ This code contains of lot of things. Here are the most notable parts:
 
 Wouldn't it be nice if at the end of the article we had a way to get back to the blog list? We can achieve this by building a URL to the blog list page.
 
-Let's introduce `useUrlBuilder`: it's a hook that creates URL builders, and URL builders are functions that create URLs to resources.
+Let's talk a bit more `useUrlBuilder` about: it's a hook that creates URL builders, and URL builders are functions that create URLs to resources. We have seen it previously to properly link images and pages.
 
 Update your `fullPage.server.tsx` file to include the following hook:
 
@@ -135,12 +135,19 @@ From this node, we can build a URL to the blog list page:
 // ...
 ```
 
-Appart from a node path, the `buildNodeUrl` helper takes other option parameters:
+Apart from a node path, the `buildNodeUrl` helper takes other option parameters:
 
 - `extension` is the file extension to append to the URL. It defaults to `.html` when not provided.
 - `language` is the language to use to build the URL. It defaults to the current language.
 - `mode` can be `edit`, `preview` or `live` to create URLs for different modes. It defaults to the current mode.
 - `parameters` is an object of key-value pairs to append as query parameters to the URL.
+
+In JCR, everything is a node, i.e. an entity of a tree designated by a path. The type of a node gives it a specific behavior:
+
+- A `jnt:content` node is a content node, like a Hero section or a blog post. It is rendered by a view.
+- A `jnt:page` node is a page node, the Home page or the About Us page. It is rendered by a template.
+- A `jnt:virtualsite` node is a site node, the root of a site.
+- A `jnt:file` node is a file node, like an image or a PDF. You can upload files to Jahia and reference them in your content.
 
 There is a lot more to learn about URL building, and it's the topic of the next section.
 
