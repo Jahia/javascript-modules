@@ -519,14 +519,14 @@ __metadata:
   linkType: hard
 
 "@eslint/compat@npm:^1.2.6":
-  version: 1.2.6
-  resolution: "@eslint/compat@npm:1.2.6"
+  version: 1.2.7
+  resolution: "@eslint/compat@npm:1.2.7"
   peerDependencies:
     eslint: ^9.10.0
   peerDependenciesMeta:
     eslint:
       optional: true
-  checksum: 10c0/e767b62f1e43a1b4e3f9f1ac64546f8bcdf4f3fb84c504d8f1b0ea31a71f1607bcd11288c86c77b8ddd3d0bba9a9513d7203d4e6d15b1b3a1cff7718dea61b40
+  checksum: 10c0/df89a0396750748c3748eb5fc582bd6cb89be6599d88ed1c5cc60ae0d13f77d4bf5fb30fabdb6c9ce16dda35745ef2e6417fa82548cde7d2b3fa5a896da02c8e
   languageName: node
   linkType: hard
 
@@ -869,10 +869,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@publint/pack@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "@publint/pack@npm:0.1.1"
-  checksum: 10c0/a76fb86b3d30b52662b20a1f0cc3015467e95a22998f0c2c7ac3397d2c972e44ee9e6903e334dfcae3e47a3cd4e82ffae40841d405075b48813c24b3ae70dc8d
+"@publint/pack@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "@publint/pack@npm:0.1.2"
+  checksum: 10c0/4647158cd3a27816ecaf139327662d31820d61e89eb970b318fd0f7c30715baaedf27d294d31772f3a6ad71f84c42509b90328aa5b6301b706322eb7c35ddb3f
   languageName: node
   linkType: hard
 
@@ -889,8 +889,8 @@ __metadata:
   linkType: hard
 
 "@rollup/plugin-commonjs@npm:^28.0.2":
-  version: 28.0.2
-  resolution: "@rollup/plugin-commonjs@npm:28.0.2"
+  version: 28.0.3
+  resolution: "@rollup/plugin-commonjs@npm:28.0.3"
   dependencies:
     "@rollup/pluginutils": "npm:^5.0.1"
     commondir: "npm:^1.0.1"
@@ -904,7 +904,7 @@ __metadata:
   peerDependenciesMeta:
     rollup:
       optional: true
-  checksum: 10c0/e90a443e63bfed567d5a4854960240d256818a0b3c69a45e95e196c40a755959406dabe4fbccb886eeb45d3445ddc8f966632563a7d590808be7eee8084384f1
+  checksum: 10c0/0dbc61a5a894cdf526c3f0a738243cf1b3f634d592db0f2b9cad8c5d8e4c3e645d9b7ac19761c07a8a475118cafa6cdef4746111019388dd6e962f7373878ea4
   languageName: node
   linkType: hard
 
@@ -972,8 +972,8 @@ __metadata:
   linkType: hard
 
 "@rollup/plugin-node-resolve@npm:^16.0.0":
-  version: 16.0.0
-  resolution: "@rollup/plugin-node-resolve@npm:16.0.0"
+  version: 16.0.1
+  resolution: "@rollup/plugin-node-resolve@npm:16.0.1"
   dependencies:
     "@rollup/pluginutils": "npm:^5.0.1"
     "@types/resolve": "npm:1.20.2"
@@ -985,7 +985,7 @@ __metadata:
   peerDependenciesMeta:
     rollup:
       optional: true
-  checksum: 10c0/b63deb6fc14b37070ccaffacc8c10c9720f28ce7632f4fe2ee77064c0c79bcc3fe060fb77160e673c9fd847307252f25a2983030bd54f1888324063c69ae1399
+  checksum: 10c0/54d33282321492fafec29b49c66dd1efd90c72a24f9d1569dcb57a72ab8de8a782810f39fdb917b96ec6a598c18f3416588b419bf7af331793a010de1fe28c60
   languageName: node
   linkType: hard
 
@@ -1240,11 +1240,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:^22.13.5":
-  version: 22.13.5
-  resolution: "@types/node@npm:22.13.5"
+  version: 22.13.10
+  resolution: "@types/node@npm:22.13.10"
   dependencies:
     undici-types: "npm:~6.20.0"
-  checksum: 10c0/a2e7ed7bb0690e439004779baedeb05159c5cc41ef6d81c7a6ebea5303fde4033669e1c0e41ff7453b45fd2fea8dbd55fddfcd052950c7fcae3167c970bca725
+  checksum: 10c0/a3865f9503d6f718002374f7b87efaadfae62faa499c1a33b12c527cfb9fd86f733e1a1b026b80c5a0e4a965701174bc3305595a7d36078aa1abcf09daa5dee9
   languageName: node
   linkType: hard
 
@@ -3020,13 +3020,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"javascript-module-engines-test-module@workspace:jahia-test-module":
+"javascript-modules-engine-test-module@workspace:jahia-test-module":
   version: 0.0.0-use.local
-  resolution: "javascript-module-engines-test-module@workspace:jahia-test-module"
+  resolution: "javascript-modules-engine-test-module@workspace:jahia-test-module"
   dependencies:
+    "@eslint-react/eslint-plugin": "npm:^1.26.2"
+    "@eslint/compat": "npm:^1.2.6"
+    "@eslint/js": "npm:^9.20.0"
     "@jahia/javascript-modules-library": "workspace:^"
     "@jahia/vite-plugin": "workspace:^"
     "@types/react": "npm:^19.0.0"
+    eslint: "npm:^9.20.1"
     i18next: "npm:^23.10.1"
     react-i18next: "npm:^15.4.0"
     typescript: "npm:^5.7.3"
@@ -3924,8 +3928,8 @@ __metadata:
   linkType: hard
 
 "pkgroll@npm:^2.11.0":
-  version: 2.11.0
-  resolution: "pkgroll@npm:2.11.0"
+  version: 2.11.2
+  resolution: "pkgroll@npm:2.11.2"
   dependencies:
     "@rollup/plugin-alias": "npm:^5.1.1"
     "@rollup/plugin-commonjs": "npm:^28.0.2"
@@ -3945,7 +3949,7 @@ __metadata:
       optional: true
   bin:
     pkgroll: dist/cli.mjs
-  checksum: 10c0/b6829520fe1cc460a2d0183fa76eef89621688abc72f2fcf19a739cbe74a21555b944dec1b805131befe2666291caad6f3ab68a9de6005f2b1550cceaf0e10d1
+  checksum: 10c0/367a468d98161eee0f503d8c8162b6d506cf7fccd66b0cea712d1ed6c260515fa720267585ce14346c077176f6d1caef9f105a871de4ada204c459534f3bc9e0
   languageName: node
   linkType: hard
 
@@ -4003,26 +4007,26 @@ __metadata:
   linkType: hard
 
 "prettier-plugin-packagejson@npm:^2.5.8":
-  version: 2.5.8
-  resolution: "prettier-plugin-packagejson@npm:2.5.8"
+  version: 2.5.10
+  resolution: "prettier-plugin-packagejson@npm:2.5.10"
   dependencies:
-    sort-package-json: "npm:2.14.0"
+    sort-package-json: "npm:2.15.1"
     synckit: "npm:0.9.2"
   peerDependencies:
     prettier: ">= 1.16.0"
   peerDependenciesMeta:
     prettier:
       optional: true
-  checksum: 10c0/2cf22957f045be08e902bb8fe1e1905bb26b985ba94eeee439d962aa64a1d6ef0ef74eb447eeefd050005811616b13c416fdc14ea8f89b4817203d7f07f9939f
+  checksum: 10c0/2bd772fe95a7633fe72cc852c499da6a8279c20e69d7ec71bc7c3cb58442a243aa80ca861dbc3b091210a9c155171afebe7ec92701c26da6edf991c1afeb699c
   languageName: node
   linkType: hard
 
 "prettier@npm:^3.5.1":
-  version: 3.5.1
-  resolution: "prettier@npm:3.5.1"
+  version: 3.5.3
+  resolution: "prettier@npm:3.5.3"
   bin:
     prettier: bin/prettier.cjs
-  checksum: 10c0/9f6f810eae455d6e4213845151a484a2338f2e0d6a8b84ee8e13a83af8a2421ef6c1e31e61e4b135671fb57b9541f6624648880cc2061ac803e243ac898c0123
+  checksum: 10c0/3880cb90b9dc0635819ab52ff571518c35bd7f15a6e80a2054c05dbc8a3aa6e74f135519e91197de63705bcb38388ded7e7230e2178432a1468005406238b877
   languageName: node
   linkType: hard
 
@@ -4051,16 +4055,16 @@ __metadata:
   linkType: hard
 
 "publint@npm:^0.3.6":
-  version: 0.3.6
-  resolution: "publint@npm:0.3.6"
+  version: 0.3.9
+  resolution: "publint@npm:0.3.9"
   dependencies:
-    "@publint/pack": "npm:^0.1.1"
+    "@publint/pack": "npm:^0.1.2"
     package-manager-detector: "npm:^0.2.9"
     picocolors: "npm:^1.1.1"
     sade: "npm:^1.8.1"
   bin:
     publint: src/cli.js
-  checksum: 10c0/8788c20e80931a49633d5fec02d7ff3e50a19a0a9d879205d35d9a6585097ec3cf8b435b97dc5c31e258fcffe1cec5812b11eae53b19fd3a449c29672ece1111
+  checksum: 10c0/cb0d3b7a5509be4ffa77a61809bc2e8b79620b3be4c420dade8a722e085bb6a9280fce3e04f44b2b5cf8adeded376c1ad2eedd0e03c35829307a220d5926826f
   languageName: node
   linkType: hard
 
@@ -4494,9 +4498,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sort-package-json@npm:2.14.0":
-  version: 2.14.0
-  resolution: "sort-package-json@npm:2.14.0"
+"sort-package-json@npm:2.15.1":
+  version: 2.15.1
+  resolution: "sort-package-json@npm:2.15.1"
   dependencies:
     detect-indent: "npm:^7.0.1"
     detect-newline: "npm:^4.0.0"
@@ -4508,7 +4512,7 @@ __metadata:
     tinyglobby: "npm:^0.2.9"
   bin:
     sort-package-json: cli.js
-  checksum: 10c0/bcc114a3b5e11d4539ba46dd4eeda6d6909202cb1a9526c230850f1edfdfcf8712e9479b71f98d8f6cb8554740294acdfcaae84461dcecd90592867e1ba90924
+  checksum: 10c0/a5dcbafde6f4629c34be9e750687b7c5566c5225dad0e887c558e6a794f7fe1d360003eec0bb4875fa74633e648260819623871e79ff64c1749acead3f2bb3c1
   languageName: node
   linkType: hard
 

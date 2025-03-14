@@ -15,7 +15,7 @@ import type { JCRSessionWrapper } from "org.jahia.services.content";
 export function getNodesByJCRQuery(
   session: JCRSessionWrapper,
   query: string,
-  limit: number,
+  limit: number | undefined = undefined,
   offset = 0,
 ): Node[] {
   const result: Node[] = [];

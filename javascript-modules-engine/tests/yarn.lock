@@ -98,9 +98,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jahia/cypress@npm:^4.1.0":
-  version: 4.1.0
-  resolution: "@jahia/cypress@npm:4.1.0"
+"@jahia/cypress@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "@jahia/cypress@npm:4.2.0"
   dependencies:
     "@apollo/client": "npm:^3.4.9"
     cypress-real-events: "npm:^1.11.0"
@@ -111,7 +111,7 @@ __metadata:
     ci.startup: ci.startup.sh
     env.debug: env.debug.sh
     env.run: env.run.sh
-  checksum: 10c0/a0646f5d3ee12da9cf2740a91e3b0ae301758846670b554a15d6e42ee9c8dd58598ee72b626a4c48266a451879f16becb368bf963b82cf2d0cf62334bddfe52f
+  checksum: 10c0/9cb0bd53fb9d58311ba80766c956ca42dbdf2a2c1aa71e2cef96b6efc69518a820ea50d8172a06b06d8eebd6fdf42058e018f9475c9c0bdc9a81312ff26be753
   languageName: node
   linkType: hard
 
@@ -157,7 +157,7 @@ __metadata:
   resolution: "@jahia/javascript-modules-engine-cypress@workspace:."
   dependencies:
     "@4tw/cypress-drag-drop": "npm:^2.2.1"
-    "@jahia/cypress": "npm:^4.1.0"
+    "@jahia/cypress": "npm:^4.2.0"
     "@jahia/jahia-reporter": "npm:^1.0.30"
     "@jahia/jcontent-cypress": "npm:^3.0.0-tests.8"
     "@types/node": "npm:^18.11.18"
@@ -178,11 +178,11 @@ __metadata:
   linkType: soft
 
 "@jahia/jcontent-cypress@npm:^3.0.0-tests.8":
-  version: 3.0.0-tests.8
-  resolution: "@jahia/jcontent-cypress@npm:3.0.0-tests.8"
+  version: 3.0.0-tests.10
+  resolution: "@jahia/jcontent-cypress@npm:3.0.0-tests.10"
   dependencies:
     cypress-real-events: "npm:^1.7.6"
-  checksum: 10c0/fded981a6bd34b497a7bb80072298c1b5c98f14d19d4532c449bb484c17d9ec924276e1b7e6f17ac941892547209572ab8cf0ac98b1c19c42ed6e2364d563476
+  checksum: 10c0/e5723e96f942a68e31d20344374cdbb837f11ec8cc2d63ee500f1447235b94aba73c963b32e7d82e4fccb73e53fbcab054031509ffe6169401dd93269347e683
   languageName: node
   linkType: hard
 
@@ -1147,14 +1147,14 @@ __metadata:
   linkType: hard
 
 "cypress-multi-reporters@npm:^1.6.2":
-  version: 1.6.3
-  resolution: "cypress-multi-reporters@npm:1.6.3"
+  version: 1.6.4
+  resolution: "cypress-multi-reporters@npm:1.6.4"
   dependencies:
     debug: "npm:^4.3.4"
     lodash: "npm:^4.17.21"
   peerDependencies:
     mocha: ">=3.1.2"
-  checksum: 10c0/33ad7aa985f9867eccf1c574f83a321a2e38052a64114850720594196cf03d0d46b03e4bd365b1f571bddd5cf263b4a2e9e361ad04b97d34a9d3b98b0fbe2905
+  checksum: 10c0/5872176582068d15273412090afc0a504920c34aadb5f0d2b9afcbbdc6c94cd16f97661751c1f7d177b915ccafc13fdc691908ebfc1c058e09728dceea9e8599
   languageName: node
   linkType: hard
 
@@ -2548,27 +2548,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mkdirp@npm:~1.0.4":
-  version: 1.0.4
-  resolution: "mkdirp@npm:1.0.4"
+"mkdirp@npm:^3.0.0":
+  version: 3.0.1
+  resolution: "mkdirp@npm:3.0.1"
   bin:
-    mkdirp: bin/cmd.js
-  checksum: 10c0/46ea0f3ffa8bc6a5bc0c7081ffc3907777f0ed6516888d40a518c5111f8366d97d2678911ad1a6882bf592fa9de6c784fea32e1687bb94e1f4944170af48a5cf
+    mkdirp: dist/cjs/src/bin.js
+  checksum: 10c0/9f2b975e9246351f5e3a40dcfac99fcd0baa31fbfab615fe059fb11e51f10e4803c63de1f384c54d656e4db31d000e4767e9ef076a22e12a641357602e31d57d
   languageName: node
   linkType: hard
 
 "mocha-junit-reporter@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "mocha-junit-reporter@npm:2.2.0"
+  version: 2.2.1
+  resolution: "mocha-junit-reporter@npm:2.2.1"
   dependencies:
     debug: "npm:^4.3.4"
     md5: "npm:^2.3.0"
-    mkdirp: "npm:~1.0.4"
+    mkdirp: "npm:^3.0.0"
     strip-ansi: "npm:^6.0.1"
     xml: "npm:^1.0.1"
   peerDependencies:
     mocha: ">=2.2.5"
-  checksum: 10c0/9c9c191058bda77691797af5fc254f0cf1c26458a380642d29f5dd188c5e7f3186f361143201d319e6370cc5534c49c0a43225732213c7c3b8997a21abeaf08b
+  checksum: 10c0/365a7a3f2f442864e0b75fa5bda2f7b0594e3056dc8db440445c9eb9a2f2b00b70c0ec4220ade61f441eeeeee5fa2a76465fa58fb7f7f914c6e9cbd02d76fba2
   languageName: node
   linkType: hard
 

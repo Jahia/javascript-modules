@@ -60,7 +60,7 @@
         <dependencies>
             <dependency>
                 <groupId>org.jahia.test</groupId>
-                <artifactId>javascript-module-engines-test-module</artifactId>
+                <artifactId>javascript-modules-engine-test-module</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
             </dependency>

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "labels": ["dependencies"],
+  "enabledManagers": ["npm"],
+  "ignorePaths": ["**/node_modules/**"],
+  "dependencyDashboard": true,
+  "major": {
+    "dependencyDashboardApproval": true
+  },
+  "minor": {
+    "dependencyDashboardApproval": true
+  },
+  "patch": {
+    "automerge": true
+  }
+}

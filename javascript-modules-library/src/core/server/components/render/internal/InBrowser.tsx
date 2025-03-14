@@ -42,10 +42,12 @@ function InBrowser<T>({
   child: Child,
   props,
   ssr,
+  children,
 }: Readonly<{
   child: React.ComponentType<T>;
   props: T & React.JSX.IntrinsicAttributes;
   ssr?: boolean;
+  children?: React.ReactNode;
 }>): React.JSX.Element {
   const { bundleKey, currentResource, renderContext } = useServerContext();
   const language = currentResource.getLocale().getLanguage();
@@ -92,10 +94,14 @@ function InBrowser<T>({
             props: props ?? {},
           })}
         </script>
-        {ssr && (
+        {ssr ? (
           <I18nextProvider i18n={i18n}>
-            <Child {...props} />
+            <Child {...props}>
+              <div>{children}</div>
+            </Child>
           </I18nextProvider>
+        ) : (
+          children
         )}
       </div>
 

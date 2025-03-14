@@ -17,6 +17,7 @@ export function RenderInBrowser<T>(
      * `Set` and `Map`.
      */
     props: T & React.JSX.IntrinsicAttributes;
+    children?: React.ReactNode;
   }>,
 ): React.JSX.Element;
 
@@ -24,15 +25,22 @@ export function RenderInBrowser(
   props: Readonly<{
     /** The React component */
     child: React.ComponentType;
+    children?: React.ReactNode;
   }>,
 ): React.JSX.Element;
 
 export function RenderInBrowser<T>({
   child: Child,
   props,
+  children,
 }: Readonly<{
   child: React.ComponentType<T>;
   props?: T & React.JSX.IntrinsicAttributes;
+  children?: React.ReactNode;
 }>): React.JSX.Element {
-  return <InBrowser child={Child} props={props as never} />;
+  return (
+    <InBrowser child={Child} props={props as never}>
+      {children}
+    </InBrowser>
+  );
 }

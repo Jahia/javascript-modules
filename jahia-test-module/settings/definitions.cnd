@@ -53,6 +53,7 @@
 [javascriptExample:testLegacyRegistrationMinimal] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
 
 [javascriptExample:testLegacyRegistrationAdvanced] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
+    - myProp (string)
 
 [javascriptExample:testProxyProps] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
     - myFirstProp (string)
