@@ -22,12 +22,14 @@ export { useUrlBuilder } from "./core/server/hooks/useUrlBuilder.js";
 
 // JCR utils
 export { getChildNodes } from "./core/server/utils/jcr/getChildNodes.js";
-export { getNodeFromPathOrId } from "./core/server/utils/jcr/getNodeFromPathOrId.js";
 export { getNodeProps } from "./core/server/utils/jcr/getNodeProps.js";
 export { getNodesByJCRQuery } from "./core/server/utils/jcr/getNodesByJCRQuery.js";
 
 // URL builder
 export { buildUrl, initUrlBuilder } from "./core/server/utils/urlBuilder/urlBuilder.js";
+
+// I18n
+export { getSiteLocales } from "./core/server/utils/i18n.js";
 
 // Navigation
 export { buildNavMenu } from "./nav/server/navBuilder/navBuilder.js";

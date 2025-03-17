@@ -1,5 +1,4 @@
 import type { RenderContext, Resource } from "org.jahia.services.render";
-import { getNodeFromPathOrId } from "../jcr/getNodeFromPathOrId.js";
 import server from "virtual:jahia-server";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 
@@ -127,7 +126,7 @@ export function buildUrl(
   if (props.path) {
     let jcrNode: JCRNodeWrapper | null;
     try {
-      jcrNode = getNodeFromPathOrId({ path: props.path }, currentResource.getNode().getSession());
+      jcrNode = currentResource.getNode().getSession().getNode(props.path);
     } catch {
       console.warn(`Unable to find node for path: ${props.path}\n Replacing by #`);
       return "#";
