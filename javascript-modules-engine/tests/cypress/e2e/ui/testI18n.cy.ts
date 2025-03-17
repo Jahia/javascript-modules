@@ -80,6 +80,8 @@ describe('Test i18n', () => {
                     true,
                 )
             })
+
+            cy.get('[data-testid="getSiteLocales"]').should('contain', 'de,en,fr,fr_LU')
         })
         cy.logout()
     })

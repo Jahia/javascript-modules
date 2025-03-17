@@ -1,5 +1,6 @@
 import SampleI18n from "$client/components/SampleI18n";
 import {
+  getSiteLocales,
   HydrateInBrowser,
   jahiaComponent,
   RenderInBrowser,
@@ -34,6 +35,9 @@ jahiaComponent(
           props={{ placeholder: "We are rendered client side !" }}
         />
       </div>
+
+      <h3>getSiteLocales()</h3>
+      <div data-testid="getSiteLocales">{Object.keys(getSiteLocales()).join(",")}</div>
     </>
   ),
 );
