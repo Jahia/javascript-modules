@@ -37,7 +37,11 @@ export function Area({
    * @default false
    */
   readOnly?: boolean;
-  /** Allow area to be stored as a subnode */
+  /**
+   * Allow area to be stored as a subnode
+   *
+   * @deprecated Use child node(s) and `<RenderChild(ren) />` instead
+   */
   areaAsSubNode?: boolean;
   /**
    * Content type to be used to create the area
