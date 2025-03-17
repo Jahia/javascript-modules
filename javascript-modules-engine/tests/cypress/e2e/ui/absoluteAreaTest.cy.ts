@@ -181,7 +181,7 @@ describe('Absolute Area test', () => {
         cy.login()
         cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         cy.iframe('#page-builder-frame-1').within(() => {
-            cy.get('div[data-testid="limitedAbsoluteAreaEdit"]').find('div[type="existingNode"]').should('exist')
+            cy.get('div[data-testid="limitedAbsoluteAreaEdit"]').find('div[type="existingNode"]').should('not.exist')
         })
         cy.logout()
     })
