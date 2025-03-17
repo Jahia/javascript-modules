@@ -8,6 +8,8 @@ export { AbsoluteArea } from "./core/server/components/AbsoluteArea.js";
 export { AddContentButtons } from "./core/server/components/AddContentButtons.js";
 export { AddResources } from "./core/server/components/AddResources.js";
 export { Area } from "./core/server/components/Area.js";
+export { RenderChild } from "./core/server/components/render/RenderChild.js";
+export { RenderChildren } from "./core/server/components/render/RenderChildren.js";
 
 // Declaration and registration
 export { defineJahiaComponent } from "./core/server/framework/defineJahiaComponent.js";

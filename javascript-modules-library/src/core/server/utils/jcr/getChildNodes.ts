@@ -16,9 +16,9 @@ export function getChildNodes(
   node: JCRNodeWrapper,
   limit: number | undefined = undefined,
   offset = 0,
-  filter: ((node: Node) => boolean) | undefined = undefined,
-): Node[] {
-  const result: Node[] = [];
+  filter: ((node: JCRNodeWrapper) => boolean) | undefined = undefined,
+): JCRNodeWrapper[] {
+  const result: JCRNodeWrapper[] = [];
 
   if (!node || !limit) {
     console.warn("Missing one or more mandatory parameters (node, limit) to getChildNodes");
@@ -32,15 +32,15 @@ export function getChildNodes(
 
     // Skip nodes until reaching the offset
     if (skipped < offset) {
-      if (!filter || filter(child)) {
+      if (!filter || filter(child as JCRNodeWrapper)) {
         skipped++;
       }
 
       continue;
     }
 
-    if (!filter || filter(child)) {
-      result.push(child);
+    if (!filter || filter(child as JCRNodeWrapper)) {
+      result.push(child as JCRNodeWrapper);
       if (limit > 0 && result.length >= limit) {
         break;
       }
