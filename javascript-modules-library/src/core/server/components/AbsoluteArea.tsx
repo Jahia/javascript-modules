@@ -65,7 +65,7 @@ export function AbsoluteArea({
             numberOfItems,
             subNodesView,
             path,
-            editable: readOnly !== false,
+            editable: readOnly !== true,
             level,
             areaType,
             limitedAbsoluteAreaEdit: readOnly === "children",
