@@ -1,4 +1,3 @@
-import type { Node } from "javax.jcr";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 
 /**
