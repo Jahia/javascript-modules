@@ -52,7 +52,7 @@ jahiaComponent(
 
       <h2>Non editable area </h2>
       <div data-testid="nonEditableArea">
-        <AbsoluteArea name="nonEditable" editable={false} level={1} />
+        <AbsoluteArea name="nonEditable" readOnly level={1} />
       </div>
 
       <h2>Absolute area level </h2>
@@ -67,7 +67,7 @@ jahiaComponent(
 
       <h2>Limited absolute area editing</h2>
       <div data-testid="limitedAbsoluteAreaEdit">
-        <AbsoluteArea name="pagecontent" limitedAbsoluteAreaEdit={false} />
+        <AbsoluteArea name="pagecontent" readOnly="children" />
       </div>
 
       <h2>Absolute Area parameters</h2>

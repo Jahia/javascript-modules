@@ -14,10 +14,9 @@ export function AbsoluteArea({
   numberOfItems,
   subNodesView,
   path,
-  editable = true,
+  readOnly = false,
   level,
   areaType = "jnt:contentList",
-  limitedAbsoluteAreaEdit,
   parameters,
 }: Readonly<{
   /** The name of the area. */
@@ -33,12 +32,15 @@ export function AbsoluteArea({
   /** Relative (to the current node) or absolute path to the node to include. */
   path?: string;
   /**
-   * Enables or disables edition of this content in edit mode. Mainly used for absolute or
-   * references.
+   * Makes the area read-only.
    *
-   * @default true
+   * - When set to `false` (default), the area is editable on all pages.
+   * - When set to `true`, the area is read-only on all pages.
+   * - When set to `"children"`, the area is read-only on all pages except the one containing its node.
+   *
+   * @default false
    */
-  editable?: boolean;
+  readOnly?: boolean | "children"
   /** Ancestor level for absolute area - 0 is Home page, 1 first sub-pages, ... */
   level?: number;
   /**
@@ -47,8 +49,6 @@ export function AbsoluteArea({
    * @default jnt:contentList
    */
   areaType?: string;
-  /** Is the absolute area editable everywhere or only on the page containing its node. */
-  limitedAbsoluteAreaEdit?: boolean;
   /** The parameters to pass to the absolute area */
   parameters?: Record<string, unknown>;
 }>): React.JSX.Element {
@@ -65,10 +65,10 @@ export function AbsoluteArea({
             numberOfItems,
             subNodesView,
             path,
-            editable,
+            editable: readOnly !== true,
             level,
             areaType,
-            limitedAbsoluteAreaEdit,
+            limitedAbsoluteAreaEdit: readOnly === "children",
             parameters,
           },
           renderContext,

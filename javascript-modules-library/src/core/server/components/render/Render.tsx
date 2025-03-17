@@ -11,7 +11,7 @@ export function Render({
   content,
   node,
   path,
-  editable = true,
+  readOnly = false,
   advanceRenderingConfig,
   templateType,
   view,
@@ -24,11 +24,11 @@ export function Render({
   /** The path to render */
   path?: string;
   /**
-   * If the content should be editable
+   * Makes the child read-only.
    *
-   * @default true
+   * @default false
    */
-  editable?: boolean;
+  readOnly?: boolean;
   /**
    * Specifies if we should render a node or simply include a view. Acceptable values are : none,
    * INCLUDE or OPTION
@@ -51,7 +51,7 @@ export function Render({
             content,
             node,
             path,
-            editable,
+            editable: !readOnly,
             advanceRenderingConfig,
             templateType,
             view,

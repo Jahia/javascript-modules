@@ -14,7 +14,7 @@ export function Area({
   numberOfItems,
   subNodesView,
   path,
-  editable = true,
+  readOnly = false,
   areaAsSubNode,
   areaType = "jnt:contentList",
   parameters,
@@ -32,12 +32,11 @@ export function Area({
   /** Relative (to the current node) or absolute path to the node to include. */
   path?: string;
   /**
-   * Enables or disables edition of this content in edit mode. Mainly used for absolute or
-   * references.
+   * Makes the area read-only.
    *
-   * @default true
+   * @default false
    */
-  editable?: boolean;
+  readOnly?: boolean;
   /** Allow area to be stored as a subnode */
   areaAsSubNode?: boolean;
   /**
@@ -62,7 +61,7 @@ export function Area({
             numberOfItems,
             subNodesView,
             path,
-            editable,
+            editable: !readOnly,
             areaAsSubNode,
             areaType,
             parameters,

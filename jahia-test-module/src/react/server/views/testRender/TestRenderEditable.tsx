@@ -25,7 +25,7 @@ jahiaComponent(
             {allChildren &&
               allChildren.map(function (child) {
                 return (
-                  <Render path={child.getPath()} editable={true} key={child.getIdentifier()} />
+                  <Render path={child.getPath()} key={child.getIdentifier()} />
                 );
               })}
           </div>
@@ -36,7 +36,7 @@ jahiaComponent(
             {allChildren &&
               allChildren.map(function (child) {
                 return (
-                  <Render path={child.getPath()} editable={false} key={child.getIdentifier()} />
+                  <Render path={child.getPath()} readOnly key={child.getIdentifier()} />
                 );
               })}
           </div>
