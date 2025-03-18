@@ -2,6 +2,7 @@ import {
   AddContentButtons,
   getChildNodes,
   jahiaComponent,
+  RenderChild,
   RenderChildren,
 } from "@jahia/javascript-modules-library";
 import type { Node } from "javax.jcr";
@@ -99,6 +100,11 @@ jahiaComponent(
         </div>
         <div data-testid="renderPaginatedChildren">
           <RenderChildren view="path" pagination={{ start: 1, count: 2 }} />
+        </div>
+
+        <h3>RenderChild</h3>
+        <div data-testid="renderChild">
+          <RenderChild name="child1" view="path" />
         </div>
       </>
     );

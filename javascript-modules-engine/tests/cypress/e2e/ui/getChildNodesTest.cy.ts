@@ -228,4 +228,16 @@ describe('getChildNodes function test', () => {
 
         cy.logout()
     })
+
+    it('Verify RenderChild', function () {
+        cy.login()
+
+        cy.visit('/cms/render/default/en/sites/javascriptTestSite/home/testGetChildNodes.html')
+
+        cy.get('div[data-testid="renderChild"]').contains(
+            `/sites/javascriptTestSite/home/testGetChildNodes/pagecontent/getChildNodesTest/child1`,
+        )
+
+        cy.logout()
+    })
 })
