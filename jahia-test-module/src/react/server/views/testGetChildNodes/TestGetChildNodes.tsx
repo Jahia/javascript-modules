@@ -2,6 +2,7 @@ import {
   AddContentButtons,
   getChildNodes,
   jahiaComponent,
+  RenderChildren,
 } from "@jahia/javascript-modules-library";
 import type { Node } from "javax.jcr";
 
@@ -88,7 +89,28 @@ jahiaComponent(
         />
         <PrintChildren title="Offset children" testid="offset" children={offsetChildren} />
         <AddContentButtons />
+
+        <h3>RenderChildren</h3>
+        <div data-testid="renderAllChildren">
+          <RenderChildren view="path" />
+        </div>
+        <div data-testid="renderFilteredChildren">
+          <RenderChildren view="path" filter={(node) => node.getName().includes("filtered")} />
+        </div>
+        <div data-testid="renderPaginatedChildren">
+          <RenderChildren view="path" pagination={{ start: 1, count: 2 }} />
+        </div>
       </>
     );
   },
+);
+
+jahiaComponent(
+  {
+    nodeType: "javascriptExample:testGetChildNodes",
+    name: "path",
+    displayName: "test getChildNodes",
+    componentType: "view",
+  },
+  (_, { currentNode }) => <div>{currentNode.getPath()}</div>,
 );

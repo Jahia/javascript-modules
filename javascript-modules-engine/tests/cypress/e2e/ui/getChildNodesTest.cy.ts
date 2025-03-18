@@ -202,4 +202,30 @@ describe('getChildNodes function test', () => {
 
         cy.logout()
     })
+
+    it('Verify RenderChildren', function () {
+        cy.login()
+
+        cy.visit('/cms/render/default/en/sites/javascriptTestSite/home/testGetChildNodes.html')
+
+        for (const child of ['child1', 'child2', 'filtered', 'filtered2', 'filtered3']) {
+            cy.get('div[data-testid="renderAllChildren"]').contains(
+                `/sites/javascriptTestSite/home/testGetChildNodes/pagecontent/getChildNodesTest/${child}`,
+            )
+        }
+
+        for (const child of ['filtered', 'filtered2', 'filtered3']) {
+            cy.get('div[data-testid="renderFilteredChildren"]').contains(
+                `/sites/javascriptTestSite/home/testGetChildNodes/pagecontent/getChildNodesTest/${child}`,
+            )
+        }
+
+        for (const child of ['child2', 'filtered']) {
+            cy.get('div[data-testid="renderPaginatedChildren"]').contains(
+                `/sites/javascriptTestSite/home/testGetChildNodes/pagecontent/getChildNodesTest/${child}`,
+            )
+        }
+
+        cy.logout()
+    })
 })
