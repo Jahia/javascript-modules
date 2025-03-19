@@ -36,11 +36,12 @@ export function AbsoluteArea({
    *
    * - When set to `false` (default), the area is editable on all pages.
    * - When set to `true`, the area is read-only on all pages.
-   * - When set to `"children"`, the area is read-only on all pages except the one containing its node.
+   * - When set to `"children"`, the area is read-only on all pages except the one containing its
+   *   node.
    *
    * @default false
    */
-  readOnly?: boolean | "children"
+  readOnly?: boolean | "children";
   /** Ancestor level for absolute area - 0 is Home page, 1 first sub-pages, ... */
   level?: number;
   /**

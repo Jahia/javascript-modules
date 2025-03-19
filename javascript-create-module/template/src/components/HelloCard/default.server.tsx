@@ -1,4 +1,4 @@
-import { jahiaComponent, useUrlBuilder } from "@jahia/javascript-modules-library";
+import { jahiaComponent, urlFromModuleFile } from "@jahia/javascript-modules-library";
 import classes from "./component.module.css";
 
 jahiaComponent(
@@ -7,10 +7,9 @@ jahiaComponent(
     componentType: "view",
   },
   ({ illustration, title }: { illustration: string; title: string }) => {
-    const { buildStaticUrl } = useUrlBuilder();
     return (
       <article className={classes.card}>
-        <img src={buildStaticUrl({ assetPath: `illustrations/${illustration}.svg` })} alt="" />
+        <img src={urlFromModuleFile(`static/illustrations/${illustration}.svg`)} alt="" />
         <p>{title}</p>
       </article>
     );

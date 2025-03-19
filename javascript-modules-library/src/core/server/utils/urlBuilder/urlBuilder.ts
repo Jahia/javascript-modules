@@ -1,176 +1,174 @@
-import type { RenderContext, Resource } from "org.jahia.services.render";
 import server from "virtual:jahia-server";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
+import type { RenderContext, Resource } from "org.jahia.services.render";
+import { useServerContext } from "../../hooks/useServerContext";
 
+// Regex that checks if the first word contains colon (http:, mail:, ftp: ..)
 const absoluteUrlRegExp = /^(?:[a-z+]+:)?\/\//i;
-
-const finalizeUrl = (url: string, renderContext: RenderContext) => {
-  if (!absoluteUrlRegExp.test(url)) {
-    url = url.startsWith("/") ? renderContext.getRequest().getContextPath() + url : url;
-    // @ts-expect-error The types are wrong here! TODO: Fix the types
-    return renderContext.getResponse().encodeURL(url);
-  }
-
-  return url;
-};
-
-function appendParameters(url: string, parameters: Record<string, string>) {
-  const separator = url.includes("?") ? "&" : "?";
-  const URLParameters = Object.keys(parameters)
-    .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(parameters[key])}`)
-    .join("&");
-
-  return `${url}${separator}${URLParameters}`;
-}
 
 /** Initialize the registry with default url builders */
 export function initUrlBuilder(): void {
   server.registry.add("urlBuilder", "nt:file", {
     priority: 1,
-    buildURL: ({
-      jcrNode,
-      mode,
-      currentResource,
-    }: {
-      jcrNode: JCRNodeWrapper;
-      mode: string;
-      currentResource: Resource;
-    }) => {
-      const workspace = mode
-        ? mode === "edit" || mode === "preview"
-          ? "default"
-          : "live"
-        : currentResource.getWorkspace();
-      return "/files/" + workspace + server.render.escapePath(jcrNode.getCanonicalPath());
+    buildURL: ({ node, mode }: { node: JCRNodeWrapper; mode: string }) => {
+      const workspace = mode === "edit" || mode === "preview" ? "default" : "live";
+      return `/files/${workspace}${server.render.escapePath(node.getCanonicalPath())}`;
     },
   });
   server.registry.add("urlBuilder", "*", {
     priority: 0,
     buildURL: ({
-      jcrNode,
+      node,
       mode,
       language,
       extension,
-      renderContext,
-      currentResource,
     }: {
-      jcrNode: JCRNodeWrapper;
+      node: JCRNodeWrapper;
       mode: string;
       language: string;
       extension: string;
-      renderContext: RenderContext;
-      currentResource: Resource;
     }) => {
       let workspace: string;
       let servletPath: string;
-      if (mode) {
-        switch (mode) {
-          case "edit":
-            servletPath = "/cms/edit";
-            workspace = "default";
-            break;
-          case "preview":
-            servletPath = "/cms/render";
-            workspace = "default";
-            break;
-          default:
-            servletPath = "/cms/render";
-            workspace = "live";
-            break;
-        }
-      } else {
-        servletPath = renderContext.getServletPath();
-        workspace = currentResource.getWorkspace();
+      switch (mode) {
+        case "edit":
+          servletPath = "/cms/edit";
+          workspace = "default";
+          break;
+        case "preview":
+          servletPath = "/cms/render";
+          workspace = "default";
+          break;
+        default:
+          servletPath = "/cms/render";
+          workspace = "live";
+          break;
       }
-
-      return (
-        servletPath +
-        "/" +
-        workspace +
-        "/" +
-        (language ? language : currentResource.getLocale().toString()) +
-        server.render.escapePath(jcrNode.getPath()) +
-        (extension ? extension : ".html")
-      );
+      return `${servletPath}/${workspace}/${language}${server.render.escapePath(node.getPath())}${extension ? extension : ".html"}`;
     },
   });
 }
 
 /**
- * Provide URL generation for contents/files If parameters are not valid, or if a node couldn't be
- * found, it will log an warning and return '#'
+ * Generate a Jahia url for the provided node.
  *
- * @param renderContext The current renderContext
- * @param currentResource The current resource
  * @returns The final URL
  */
-export function buildUrl(
-  props: {
-    /** The path of the resource to build the URL for */
-    value?: string;
-    /** The path of the resource to build the URL for */
-    path?: string;
-    /** The parameters to append to the URL */
+export function buildNodeUrl(
+  /** The node to build the URL for */
+  node: JCRNodeWrapper,
+  config: {
+    /** The querystring parameters to append to the URL */
     parameters?: Record<string, string>;
-    /** The mode to use to build the URL */
+    /**
+     * The mode to use to build the URL. Defines the mode or override the one provided by the
+     * renderContext.
+     */
     mode?: string;
-    /** The language to use to build the URL */
+    /**
+     * The language to use to build the URL. Defines the languages or overrides the one provided by
+     * the current resource
+     */
     language?: string;
-    /** The extension to use to build the URL */
+    /**
+     * The extension to use to build the URL. Defines the extension or overrides the one provided by
+     * the current resource
+     */
     extension?: string;
-  },
-  renderContext: RenderContext,
-  currentResource: Resource,
+  } = {},
+  context: {
+    /** Provided in react context, but you need to provide one otherwise. * */
+    renderContext?: RenderContext;
+    /** Provided in react context, you need to provide one otherwise. * */
+    currentResource?: Resource;
+  } = useServerContext(),
 ): string {
-  let url: string | undefined;
-  if (props.path) {
-    let jcrNode: JCRNodeWrapper | null;
-    try {
-      jcrNode = currentResource.getNode().getSession().getNode(props.path);
-    } catch {
-      console.warn(`Unable to find node for path: ${props.path}\n Replacing by #`);
-      return "#";
-    }
-
-    if (jcrNode) {
-      const urlBuilders = server.registry.find({ type: "urlBuilder" }, "priority");
-      for (const urlBuilder of urlBuilders) {
-        if (urlBuilder.key === "*" || jcrNode.isNodeType(urlBuilder.key)) {
-          url = urlBuilder.buildURL({
-            jcrNode,
-            mode: props.mode,
-            language: props.language,
-            extension: props.extension,
-            renderContext,
-            currentResource,
-          });
-          break;
-        }
-      }
-    }
-  } else if (props.value) {
-    url = props.value;
-  } else {
-    console.warn(
-      "Missing parameter to build url, please provide either a content path using 'path' parameter, " +
-        "or a prebuild valid url using 'value' parameter\n replacing by #",
+  // Use context values if not provided
+  const mode = config.mode ?? context.renderContext?.getMode();
+  const language = config.language ?? context.currentResource?.getLocale().toString();
+  const extension = config.extension ?? `.${context.currentResource?.getTemplateType()}`;
+  if (!mode || !language || !extension) {
+    throw new Error(
+      `Mode, language, and extension must not be empty, mode: ${mode}, language: ${language} extension: ${extension}`,
     );
-    return "#";
   }
-
-  if (url) {
-    // Handle parameters
-    if (
-      props.parameters &&
-      Object.prototype.toString.call(props.parameters) === "[object Object]"
-    ) {
-      url = appendParameters(url, props.parameters);
+  // Lookiup for the matching url build in the registry.
+  const urlBuilders = server.registry.find({ type: "urlBuilder" }, "priority");
+  for (const urlBuilder of urlBuilders) {
+    if (urlBuilder.key === "*" || node.isNodeType(urlBuilder.key)) {
+      return buildEndpointUrl(
+        urlBuilder.buildURL({ node, mode, language, extension, context }),
+        { parameters: config.parameters },
+        { renderContext: context.renderContext },
+      );
     }
-
-    // Finalize URL (add context, encodeURL)
-    return finalizeUrl(url, renderContext);
   }
+  // No build has been found
+  throw new Error(`Unable to build url for ${JSON.stringify(config)}, no registered builder found`);
+}
 
-  console.warn(`Unable to build url for: ${JSON.stringify(props)}\n Replacing by #`);
-  return "#";
+/**
+ * Build an url for a file in a module. Note that to be accessible, the folder that contains the
+ * file must be part of the jahia.static-resources in package.json
+ */
+export function buildModuleFileUrl(
+  /** Relative path of the file from the module's root (examples: css/my.css, images/myImage.webp) */
+  filePath: string,
+  config: {
+    /** Defines a custom module name to access its files */
+    moduleName?: string;
+    /** Querystring parameters to append to the URL */
+    parameters?: Record<string, string>;
+  } = {},
+  context: {
+    /** Provided in react context, you need to provide one (or the module name) otherwise. */
+    renderContext?: RenderContext;
+  } = useServerContext(),
+): string {
+  if (!context.renderContext && !config.moduleName) {
+    throw new Error(
+      `You cannot build a module asset url for ${filePath} outside of a RenderContext context`,
+    );
+  }
+  const moduleName = config.moduleName
+    ? `/modules/${config.moduleName}`
+    : context.renderContext?.getURLGenerator().getCurrentModule();
+  return buildEndpointUrl(
+    `${moduleName}/${filePath}`,
+    { parameters: config.parameters },
+    { renderContext: context.renderContext },
+  );
+}
+
+/** Build an url for any endpoint on the server (/cms/*, /graphql, ect). */
+export function buildEndpointUrl(
+  /** Endpoint to call */
+  endpoint: string,
+  config: {
+    /** Querystring parameters to append to the URL */
+    parameters?: Record<string, string>;
+  } = {},
+  context: {
+    /** Provided in react context, you need to provide one otherwise. */
+    renderContext?: RenderContext;
+  } = useServerContext(),
+): string {
+  let url = endpoint;
+  if (!absoluteUrlRegExp.test(url) && context.renderContext) {
+    url = url.startsWith("/") ? context.renderContext.getRequest().getContextPath() + url : url;
+    url = context.renderContext.getResponse().encodeURL(url);
+  }
+  // Handle parameters
+  if (!config.parameters) {
+    return url;
+  }
+  const separator = url.includes("?") ? "&" : "?";
+  const URLParameters = Object.keys(config.parameters)
+    .map(
+      (key) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(config.parameters ? config.parameters[key] : "")}`,
+    )
+    .join("&");
+
+  return `${url}${separator}${URLParameters}`;
 }

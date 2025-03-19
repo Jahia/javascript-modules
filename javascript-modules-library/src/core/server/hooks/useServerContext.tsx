@@ -1,6 +1,6 @@
 import { createContext, type ReactNode, use } from "react";
 import type { RenderContext, Resource } from "org.jahia.services.render";
-import type { JCRNodeWrapper } from "org.jahia.services.content";
+import type { JCRNodeWrapper, JCRSessionWrapper } from "org.jahia.services.content";
 
 /**
  * A context object that gives access to the underlying Jahia Java objects that are part of the
@@ -21,6 +21,8 @@ export interface ServerContext {
   currentNode: JCRNodeWrapper;
   /** The main JCR node being rendered, which is the root node of the current page */
   mainNode: JCRNodeWrapper;
+  /** The JCR Session of the current user in its current language * */
+  jcrSession: JCRSessionWrapper;
   /** The OSGi bundle key of the current module being rendered */
   bundleKey: string;
 }
@@ -33,7 +35,7 @@ const ServerContext = createContext<ServerContext>({} as never);
  * @returns The server context
  */
 export function useServerContext(): ServerContext {
-  return use(ServerContext);
+  return use<ServerContext>(ServerContext);
 }
 
 export function ServerContextProvider({
@@ -41,6 +43,7 @@ export function ServerContextProvider({
   currentResource,
   currentNode,
   mainNode,
+  jcrSession,
   bundleKey,
   children,
 }: ServerContext & { readonly children: ReactNode }): React.JSX.Element {
@@ -51,6 +54,7 @@ export function ServerContextProvider({
         currentResource,
         currentNode,
         mainNode,
+        jcrSession,
         bundleKey,
       }}
     >

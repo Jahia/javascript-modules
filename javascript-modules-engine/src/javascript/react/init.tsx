@@ -37,6 +37,7 @@ export default () => {
             currentResource={currentResource}
             currentNode={currentNode}
             mainNode={mainNode}
+            jcrSession={currentNode.getSession()}
             bundleKey={bundleKey}
           >
             <I18nextProvider i18n={i18n} />

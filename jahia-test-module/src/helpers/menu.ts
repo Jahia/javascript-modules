@@ -1,4 +1,4 @@
-import { buildUrl } from "@jahia/javascript-modules-library";
+import { buildNodeUrl } from "@jahia/javascript-modules-library";
 import { JCRNodeWrapper, JCRSessionWrapper } from "org.jahia.services.content";
 import type { RenderContext, Resource } from "org.jahia.services.render";
 
@@ -18,7 +18,7 @@ export const buildNode = (
 
   return {
     displayName: node.getI18N(currentResource.getLocale()).getProperty("jcr:title").getString(),
-    url: buildUrl({ path: node.getPath() }, renderContext, currentResource),
+    url: buildNodeUrl(node),
     children: node.getNodes().getSize()
       ? Array.from(node.getNodes())
           .filter((child: JCRNodeWrapper) => child.isNodeType("jnt:page"))

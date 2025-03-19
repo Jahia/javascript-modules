@@ -2,7 +2,7 @@ import {
   HydrateInBrowser,
   RenderChildren,
   jahiaComponent,
-  useUrlBuilder,
+  urlFromModuleFile,
 } from "@jahia/javascript-modules-library";
 import { t } from "i18next";
 import { Trans } from "react-i18next";
@@ -15,8 +15,7 @@ jahiaComponent(
     displayName: "Hello World Component",
     componentType: "view",
   },
-  ({ name }: { name: string }, { renderContext }) => {
-    const { buildStaticUrl } = useUrlBuilder();
+  ({ name }: { name: string }, { renderContext}) => {
     return (
       <>
         <section className={classes.section}>
@@ -31,7 +30,7 @@ jahiaComponent(
             {renderContext.isEditMode() && (
               <div className={classes.hint} style={{ alignItems: "center" }}>
                 <img
-                  src={buildStaticUrl({ assetPath: "arrows/left.svg" })}
+                  src={urlFromModuleFile("static/arrows/left.svg")}
                   alt="←"
                   width="80"
                   height="16"
@@ -62,12 +61,7 @@ jahiaComponent(
         </section>
         {renderContext.isEditMode() && (
           <div className={classes.hint} style={{ marginLeft: "calc(50% - 0.5rem)" }}>
-            <img
-              src={buildStaticUrl({ assetPath: "arrows/bottom.svg" })}
-              alt="↓"
-              width="70"
-              height="100"
-            />{" "}
+            <img src={urlFromModuleFile("arrows/bottom.svg")} alt="↓" width="70" height="100" />{" "}
             {t("89D3xFLMZmCAencaqw68C")}
           </div>
         )}
