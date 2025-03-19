@@ -33,7 +33,7 @@ This component renders a Jahia component out of a node or a JS object.
 <Render node={node} />
 
 // Render a JS object
-<Render content={{ nodeType: "ns:nodeType" }}}>
+<Render content={{ nodeType: "ns:nodeType" }}>
 ```
 
 ## Components
