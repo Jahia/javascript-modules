@@ -7,7 +7,8 @@ This tutorial will guide you through the setup of your development environment t
 We'll be running Jahia in a Docker container and using Node.js to build our project. Make sure you have the following installed:
 
 - Docker: [docs.docker.com/get-docker](https://docs.docker.com/get-docker/).
-- Node.js LTS: [nodejs.org/en/download](https://nodejs.org/en/download). Select **with Yarn** instead of **with npm**.
+- Node.js LTS: [nodejs.org/en/download](https://nodejs.org/en/download). Select **for [your platform]** and **with Yarn** instead of **with npm**. Keep the default installation method for your platform.
+- A code editor: we recommend [Visual Studio Code](https://code.visualstudio.com/).
 
 At this time of writing here are the versions we are using:
 
@@ -22,7 +23,7 @@ It might work with other versions but we can't guarantee it. If you encounter an
 
 ## Starting Jahia
 
-This step might be a bit long because you have to download about 1 GB of data, we'll start with it and let it run in the background while we set up the rest.
+This step might be a bit long because you have to download about 1 GB of data, we'll start with it and let it run in the background while we set up the rest. Make sure Docker Desktop is running and execute the following command:
 
 ```bash
 # Start Jahia
@@ -43,7 +44,7 @@ You can start this part while Jahia is downloading. We'll create a new project u
 npm init @jahia/module hydrogen
 ```
 
-Once your project is ready, the tool will suggest you to run a few commands to start it. You can run them all except the last one, `yarn build && yarn dev`.
+Once your project is ready, the tool will suggest you to run a few commands to start it. You can run them all except the last one, `yarn build && yarn dev`, because Jahia is not ready yet. Please note that git commands, while optional, are strongly recommended. If `code .` doesn't work, open your code editor and open the project folder manually.
 
 ## Project Structure
 
@@ -77,7 +78,7 @@ You project is fully configured to work out the box with VSCode and IntelliJ. If
 
 ## Creating a New Site
 
-At this point, your Jahia instance should be up and running. You can access it at [localhost:8080](http://localhost:8080). Because we use new technologies, please upgrade the JavaScript Modules engine to the latest version:
+At this point, your Jahia instance should be up and running. You can access it at [localhost:8080](http://localhost:8080). Because the fresh Jahia instance has plugins packaged with it, they might be outdated. We'll upgrade the JavaScript Modules engine to the latest version to make sure we have the latest features:
 
 ```bash
 # Upgrade the JavaScript Modules engine to the latest version
