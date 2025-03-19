@@ -2,6 +2,8 @@
 export { RenderInBrowser } from "./core/server/components/render/RenderInBrowser.js";
 export { HydrateInBrowser } from "./core/server/components/render/HydrateInBrowser.js";
 export { Render } from "./core/server/components/render/Render.js";
+export { RenderChild } from "./core/server/components/render/RenderChild.js";
+export { RenderChildren } from "./core/server/components/render/RenderChildren.js";
 
 // Components
 export { AbsoluteArea } from "./core/server/components/AbsoluteArea.js";

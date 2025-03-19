@@ -1,8 +1,6 @@
 import {
-  AddContentButtons,
   HydrateInBrowser,
-  Render,
-  getChildNodes,
+  RenderChildren,
   jahiaComponent,
   useUrlBuilder,
 } from "@jahia/javascript-modules-library";
@@ -17,7 +15,7 @@ jahiaComponent(
     displayName: "Hello World Component",
     componentType: "view",
   },
-  ({ name }: { name: string }, { renderContext, currentNode }) => {
+  ({ name }: { name: string }, { renderContext }) => {
     const { buildStaticUrl } = useUrlBuilder();
     return (
       <>
@@ -44,13 +42,7 @@ jahiaComponent(
           </header>
           <p>{t("7l9zetMbU4cKpL4NxSOtL")}</p>
           <div className={classes.grid}>
-            {getChildNodes(currentNode, -1, 0, (node) => node.isNodeType("jnt:content")).map(
-              (node) => (
-                // @ts-expect-error Fix the types
-                <Render key={node.getIdentifier()} node={node} />
-              ),
-            )}
-            <AddContentButtons />
+            <RenderChildren />
           </div>
 
           <p className={classes.attribution}>
