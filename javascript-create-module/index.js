@@ -82,7 +82,7 @@ Next steps:
     "# Commit all files",
   )}
   ${styleText("magentaBright", "code .")}  ${styleText("dim", "# Open the project in VSCode")}
-  ${styleText("magentaBright", "yarn dev")}  ${styleText("dim", "# Start the development server")}
+  ${styleText("magentaBright", "yarn build && yarn dev")}  ${styleText("dim", "# Build and start the dev mode")}
 `);
 } catch (error) {
   console.error(

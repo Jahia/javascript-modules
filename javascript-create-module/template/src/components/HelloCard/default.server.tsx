@@ -3,7 +3,7 @@ import classes from "./component.module.css";
 
 jahiaComponent(
   {
-    nodeType: "$MODULE:HelloCard",
+    nodeType: "$MODULE:helloCard",
     componentType: "view",
   },
   ({ illustration, title }: { illustration: string; title: string }) => {
