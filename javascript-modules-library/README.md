@@ -74,7 +74,7 @@ This component adds resources to the page, making sure they are loaded only once
 
 ### `jahiaComponent`
 
-This function is used to declare a new Jahia component. It takes a component definition as first argument, and a React component as second argument.
+This function is used to declare a Jahia component. It takes a component definition as first argument, and a React component as second argument.
 
 ```tsx
 jahiaComponent(
