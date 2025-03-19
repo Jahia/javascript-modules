@@ -6,7 +6,7 @@ This README assumes you have a working development environment with Node.js, Yar
 
 ## Scripts
 
-This module commes with some scripts to help you develop your module. You can run them with `yarn <script>`:
+This module comes with some scripts to help you develop your module. You can run them with `yarn <script>`:
 
 | Category     | Script                | Description                                                             |
 | ------------ | --------------------- | ----------------------------------------------------------------------- |
