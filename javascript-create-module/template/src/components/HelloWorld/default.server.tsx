@@ -11,7 +11,7 @@ import classes from "./component.module.css";
 
 jahiaComponent(
   {
-    nodeType: "$MODULE:HelloWorld",
+    nodeType: "$MODULE:helloWorld",
     displayName: "Hello World Component",
     componentType: "view",
   },
