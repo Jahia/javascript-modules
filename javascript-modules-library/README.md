@@ -36,6 +36,22 @@ This component renders a Jahia component out of a node or a JS object.
 <Render content={{ nodeType: "ns:nodeType" }}>
 ```
 
+### `RenderChild`
+
+This component renders a child node of the current node. It's a thin wrapper around `Render` and `AddContentButtons`.
+
+```tsx
+<RenderChild name="child" />
+```
+
+### `RenderChildren`
+
+This component renders all children of the current node. It's a thin wrapper around `Render`, `getChildNodes` and `AddContentButtons`.
+
+```tsx
+<RenderChildren />
+```
+
 ## Components
 
 ### `AbsoluteArea`
