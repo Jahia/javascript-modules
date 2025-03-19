@@ -1,1 +1,1 @@
-[$MODULE:LanguageSwitcher] > $MODULE:component, jnt:content
+[$MODULE:LanguageSwitcher] > jnt:content, $MODULEmix:component
