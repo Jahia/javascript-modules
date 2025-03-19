@@ -102,6 +102,7 @@ const getBaseNode = (
   return mainResourceNode;
 };
 
+/** @deprecated */
 export interface MenuEntry {
   /** The HTML rendered HTML menu entry */
   render: string;
@@ -239,6 +240,8 @@ const buildMenu = (
 /**
  * Build a navigation menu
  *
+ * @deprecated We recommend building your own navigation menu using the JCR API; it will be more
+ *   efficient and flexible.
  * @param maxDepth The maximum depth of the menu
  * @param base The base path of the menu
  * @param menuEntryView The view to use for each menu entry
