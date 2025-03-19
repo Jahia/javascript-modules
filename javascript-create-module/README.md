@@ -1,16 +1,15 @@
-# Javascript Module template create-module project
+# @jahia/create-module
 
-This project provides a Javascript module starter project template to quickly get up and running to create Jahia Javascript modules
+This CLI scaffolds a new Jahia JavaScript module.
 
 ## Usage
 
-    npx @jahia/create-module@latest project-name [module-type] [namespace-definitions]
+To create a new module, run:
 
-where
+```
+npm init @jahia/module <module-name>
+```
 
-- `project-name` (mandatory) can be anything you want to call your project
-- `module-type` (optional) Can be one of:
-  - `templatesSet`: A collection of templates and components. A template set is required when creating a website.
-  - `module`: Standard Jahia module. This is the default value.
-  - `system`: Critical module for the whole platform.
-- `namespace-definitions` (optional) The namespace used for content definitions. Default is the project name in camel case.
+It will create a new JavaScript Module in a directory named `module-name` in the current working directory.
+
+See the [Getting Started guide](https://github.com/Jahia/javascript-modules/tree/main/docs/1-getting-started/1-dev-environment#create-a-new-project) for more information.

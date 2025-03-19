@@ -2,11 +2,9 @@
 
 A Vite plugin to develop JavaScript Modules for the Jahia platform.
 
-This README will be updated soon.
-
 ## Installation
 
-Using our project creation CLI should set you up correctly. It will ship with good defaults to get you started, but your workflow might need more advanced settings. For that, the `jahia` Vite plugin can take an object of options:
+Using our [project creation CLI (@jahia/create-module)](https://www.npmjs.com/package/@jahia/create-module) should set you up correctly. It will ship with good defaults to get you started, but your workflow might need more advanced settings. For that, the `jahia` Vite plugin can take an object of options:
 
 ```js
 import { defineConfig } from "vite";
@@ -18,10 +16,14 @@ export default defineConfig({
     jahia({
       // Client options
       client: {
-        input: "./src/client/index.js",
-        // /!\ This path is currently hard-coded in the engine loader,
-        // it cannot be changed yet.
-        output: "./javascript/client/index.js",
+        input: {
+          // Parent directory of client-side code
+          dir: "./src/client",
+          // Glob pattern to match all client-side code in dir
+          glob: "**‍/*.jsx",
+        }
+        // Output directory for client-side code
+        output: "./javascript/client/",
       },
 
       // Server options
@@ -31,6 +33,7 @@ export default defineConfig({
         output: {
           dir: "./javascript/server",
           fileName: "index", // Will produce index.js and index.css
+          // A known bug causes the css file to be named style.css regardless of this setting
         },
       },
 
