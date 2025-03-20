@@ -23,8 +23,6 @@ That's a lot of new concepts! Let's break this node definition down:
 
 `> jnt:content, hydrogen:component` means that `HeroSection` extends `jnt:content` and `hydrogen:component`. `jnt:content` is the root node type of all user-created content, while `hydrogen:component` is a mixin, a reusable node fragment that can be added to other node types but cannot be instantiated on its own. You can find the definition for `hydrogen:component` in `settings/definitions.cnd`.
 
-`extends = jnt:content` means that `HeroSection` extends the `jnt:content` node type. This means that `HeroSection` inherits all properties and child nodes from `jnt:content`.
-
 The following three lines define the properties of the `HeroSection` node type. Each line follows the same pattern:
 
 - `title`, `subtitle` and `background` are the property names.
@@ -61,7 +59,7 @@ This error message means that Jahia doesn't know how to render the `HeroSection`
 
 ## Rendering Content
 
-We can tell Jahia how to render our `HeroSection` node type by using the `jahiaComponent` function from the `@jahia/javascript-modules-library` package. In the `Hero/Section` folder, create a `default.server.tsx` file with the following content:
+We must tell Jahia how to render our `HeroSection` node type using the `jahiaComponent` function from the `@jahia/javascript-modules-library` package. In the `Hero/Section` folder, create a `default.server.tsx` file with the following content:
 
 ```tsx
 import { jahiaComponent, useUrlBuilder } from "@jahia/javascript-modules-library";
@@ -152,7 +150,7 @@ Once saved and pushed to your Jahia instance, the hero section should look _much
 
 ## Call to Action
 
-Now that we have a hero section, let's add call to action (CTA) buttons to it. Create a new `Hero/CallToAction` directory containing a `definition.cnd` file with the following content:
+Now that we have a hero section, let's add call to action (CTA) buttons to it. Create a new `Hero/CallToAction` directory (in `src/compontents`) containing a `definition.cnd` file with the following content:
 
 ```cnd
 [hydrogen:HeroCallToAction] > jnt:content, hydrogen:component
@@ -249,7 +247,7 @@ jahiaComponent(
 
 </details>
 
-We now have working CTA buttons, but we still need to add them to our hero section. Update `Hero/Section/default.server.tsx` to render the `HeroCallToAction` nodes:
+We now have a working CTA button component, but we still need to add them to our hero section. Update `Hero/Section/default.server.tsx` to render the `HeroCallToAction` nodes:
 
 ```tsx
 <header
