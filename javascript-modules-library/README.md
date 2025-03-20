@@ -162,21 +162,6 @@ const {
 
 You do not need to use this hook when rendering a component with `jahiaComponent`, as the server context is passed as the second argument of the component function.
 
-### `useUrlBuilder`
-
-This hook provides URL building utilities.
-
-```tsx
-const {
-  /** Builds a static URL for an asset. */
-  buildStaticUrl,
-  /** Builds a URL for a JCR node. */
-  buildNodeUrl,
-  /** Builds an HTML fragment URL for a JCR node. */
-  buildHtmlFragmentUrl,
-} = useUrlBuilder();
-```
-
 ## JCR utils
 
 ### `getChildNodes`
@@ -205,12 +190,28 @@ const pages = getNodesByJCRQuery(session, "SELECT * FROM [jnt:page]", limit, off
 
 ## URL builder
 
-### `buildUrl`
+### `buildEndpointUrl`
 
-This function is used to build a URL.
+This function transforms a path to an endpoint into a full URL.
 
 ```tsx
-const url = buildUrl({ path: "/path/to/resource" }, renderContext, currentResource);
+const dashboard = buildEndpointUrl("/jahia/dashboard");
+```
+
+### `buildNodeUrl`
+
+This function transforms a JCR node into a full URL to the node.
+
+```tsx
+const home = buildNodeUrl(renderContext.getSite().getHome().getNode());
+```
+
+### `buildModuleFileUrl`
+
+This function transforms a path to a file in the module into a full URL.
+
+```tsx
+const styles = buildModuleFileUrl("dist/styles.css");
 ```
 
 ## Java server API

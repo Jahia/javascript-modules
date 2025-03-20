@@ -1,4 +1,10 @@
-import { jahiaComponent, server, useUrlBuilder } from "@jahia/javascript-modules-library";
+import {
+  jahiaComponent,
+  server,
+  buildEndpointUrl,
+  buildModuleFileUrl,
+  buildNodeUrl,
+} from "@jahia/javascript-modules-library";
 
 jahiaComponent(
   {
@@ -7,9 +13,7 @@ jahiaComponent(
     displayName: "test buildUrl",
     componentType: "view",
   },
-  (_, { currentResource, renderContext }) => {
-    const { buildNodeUrl, buildStaticUrl, buildHtmlFragmentUrl } = useUrlBuilder();
-
+  (_, { currentResource, renderContext, jcrSession }) => {
     const imageNodeRef = currentResource.getNode().hasProperty("image")
       ? currentResource.getNode().getProperty("image").getValue().getNode()
       : undefined;
@@ -30,29 +34,42 @@ jahiaComponent(
 
         {imageNodeRef && (
           <div data-testid="image_reference">
-            <img
-              height="150"
-              src={buildNodeUrl({ nodePath: imageNodeRef.getPath() })}
-              alt="image"
-            />
+            <img height="150" src={buildNodeUrl(imageNodeRef)} alt="image" />
           </div>
         )}
 
         <div data-testid="image_static_resource">
-          <img height="150" src={buildStaticUrl({ assetPath: "images/goat.jpg" })} alt="goat" />
+          <img height="150" src={buildModuleFileUrl("static/images/goat.jpg")} alt="goat" />
+        </div>
+
+        <div data-testid="image_static_resource_with_module_name">
+          <img
+            height="150"
+            src={buildModuleFileUrl("static/images/goat.jpg", {
+              moduleName: "javascript-modules-engine-test-module",
+            })}
+            alt="goat_module_name"
+          />
+        </div>
+
+        <div data-testid="image_static_resource_endpoint">
+          <img
+            height="150"
+            src={buildEndpointUrl(
+              "/modules/javascript-modules-engine-test-module/static/images/goat.jpg",
+            )}
+            alt="goat_endpoint"
+          />
         </div>
 
         {linkNodeRef && (
           <>
             <div data-testid="content_link">
-              <a href={buildNodeUrl({ nodePath: linkNodeRef.getPath() })}>
-                content link - current context
-              </a>
+              <a href={buildNodeUrl(linkNodeRef)}>content link - current context</a>
             </div>
             <div data-testid="content_link_mode_edit">
               <a
-                href={buildNodeUrl({
-                  nodePath: linkNodeRef.getPath(),
+                href={buildNodeUrl(linkNodeRef, {
                   mode: "edit",
                 })}
               >
@@ -61,8 +78,7 @@ jahiaComponent(
             </div>
             <div data-testid="content_link_mode_preview">
               <a
-                href={buildNodeUrl({
-                  nodePath: linkNodeRef.getPath(),
+                href={buildNodeUrl(linkNodeRef, {
                   mode: "preview",
                 })}
               >
@@ -71,8 +87,7 @@ jahiaComponent(
             </div>
             <div data-testid="content_link_mode_live">
               <a
-                href={buildNodeUrl({
-                  nodePath: linkNodeRef.getPath(),
+                href={buildNodeUrl(linkNodeRef, {
                   mode: "live",
                 })}
               >
@@ -81,8 +96,7 @@ jahiaComponent(
             </div>
             <div data-testid="content_link_language_fr">
               <a
-                href={buildNodeUrl({
-                  nodePath: linkNodeRef.getPath(),
+                href={buildNodeUrl(linkNodeRef, {
                   language: "fr",
                 })}
               >
@@ -91,8 +105,7 @@ jahiaComponent(
             </div>
             <div data-testid="content_link_parameters">
               <a
-                href={buildNodeUrl({
-                  nodePath: linkNodeRef.getPath(),
+                href={buildNodeUrl(linkNodeRef, {
                   parameters: { param1: "value1", param2: "value2" },
                 })}
               >
@@ -101,8 +114,7 @@ jahiaComponent(
             </div>
             <div data-testid="action_url">
               <a
-                href={buildNodeUrl({
-                  nodePath: linkNodeRef.getPath(),
+                href={buildNodeUrl(linkNodeRef, {
                   extension: ".myAction.do",
                 })}
               >
@@ -113,20 +125,15 @@ jahiaComponent(
         )}
         <div data-testid="fragment_link">
           <a
-            href={buildHtmlFragmentUrl({
-              nodePath: "/sites/javascriptTestSite/home/testUrl/pagecontent/test",
-            })}
+            href={buildNodeUrl(
+              jcrSession.getNode("/sites/javascriptTestSite/home/testUrl/pagecontent/test"),
+              {
+                extension: ".html.ajax",
+              },
+            )}
           >
             fragment link
           </a>
-        </div>
-        <div data-testid="path_not_exists">
-          <a href={buildNodeUrl({ nodePath: "/sites/mySiteNotExists/home" })}>
-            Using a path of node that does not exists
-          </a>
-        </div>
-        <div data-testid="no_weakref">
-          <a href={buildNodeUrl({ nodePath: undefined })}>No weakref</a>
         </div>
       </>
     );

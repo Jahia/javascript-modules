@@ -219,6 +219,7 @@
       "javax.servlet.http.HttpServletRequest.is.*",
       "javax.servlet.http.HttpServletResponse.get.*",
       "javax.servlet.http.HttpServletResponse.is.*",
+      "javax.servlet.http.HttpServletResponse.encode.*",
       "javax.servlet.http.HttpSession.getAttribute.*",
       "javax.servlet.http.HttpSession.getCreationTime",
       "javax.servlet.http.HttpSession.getId",

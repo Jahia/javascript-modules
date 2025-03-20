@@ -86,6 +86,18 @@ describe('Test on url helper', () => {
                 expectedURL: '/modules/javascript-modules-engine-test-module/static/images/goat.jpg',
             },
             {
+                dataTestId: 'image_static_resource_with_module_name',
+                tag: 'img',
+                attribute: 'src',
+                expectedURL: '/modules/javascript-modules-engine-test-module/static/images/goat.jpg',
+            },
+            {
+                dataTestId: 'image_static_resource_endpoint',
+                tag: 'img',
+                attribute: 'src',
+                expectedURL: '/modules/javascript-modules-engine-test-module/static/images/goat.jpg',
+            },
+            {
                 dataTestId: 'content_link',
                 tag: 'a',
                 attribute: 'href',
@@ -145,18 +157,6 @@ describe('Test on url helper', () => {
                 attribute: 'href',
                 expectedURL: '/cms/render/default/en/sites/javascriptTestSite/home/testUrl/pagecontent/test.html.ajax',
             },
-            {
-                dataTestId: 'path_not_exists',
-                tag: 'a',
-                attribute: 'href',
-                expectedURL: '#',
-            },
-            {
-                dataTestId: 'no_weakref',
-                tag: 'a',
-                attribute: 'href',
-                expectedURL: '#',
-            },
         ])
 
         // Check live workspace
@@ -170,6 +170,18 @@ describe('Test on url helper', () => {
             },
             {
                 dataTestId: 'image_static_resource',
+                tag: 'img',
+                attribute: 'src',
+                expectedURL: '/modules/javascript-modules-engine-test-module/static/images/goat.jpg',
+            },
+            {
+                dataTestId: 'image_static_resource_with_module_name',
+                tag: 'img',
+                attribute: 'src',
+                expectedURL: '/modules/javascript-modules-engine-test-module/static/images/goat.jpg',
+            },
+            {
+                dataTestId: 'image_static_resource_endpoint',
                 tag: 'img',
                 attribute: 'src',
                 expectedURL: '/modules/javascript-modules-engine-test-module/static/images/goat.jpg',
@@ -234,18 +246,6 @@ describe('Test on url helper', () => {
                 attribute: 'href',
                 expectedURL: '/sites/javascriptTestSite/home/testUrl/pagecontent/test.html.ajax',
             },
-            {
-                dataTestId: 'path_not_exists',
-                tag: 'a',
-                attribute: 'href',
-                expectedURL: '#',
-            },
-            {
-                dataTestId: 'no_weakref',
-                tag: 'a',
-                attribute: 'href',
-                expectedURL: '#',
-            },
         ])
 
         cy.logout()
@@ -269,6 +269,18 @@ describe('Test on url helper', () => {
             },
             {
                 dataTestId: 'image_static_resource',
+                tag: 'img',
+                attribute: 'src',
+                expectedURL: '/modules/javascript-modules-engine-test-module/static/images/goat.jpg',
+            },
+            {
+                dataTestId: 'image_static_resource_with_module_name',
+                tag: 'img',
+                attribute: 'src',
+                expectedURL: '/modules/javascript-modules-engine-test-module/static/images/goat.jpg',
+            },
+            {
+                dataTestId: 'image_static_resource_endpoint',
                 tag: 'img',
                 attribute: 'src',
                 expectedURL: '/modules/javascript-modules-engine-test-module/static/images/goat.jpg',
@@ -328,18 +340,6 @@ describe('Test on url helper', () => {
                 attribute: 'href',
                 expectedURL: '/cms/render/default/en/sites/javascriptTestSite/home/testUrl/pagecontent/test.html.ajax',
             },
-            {
-                dataTestId: 'path_not_exists',
-                tag: 'a',
-                attribute: 'href',
-                expectedURL: '#',
-            },
-            {
-                dataTestId: 'no_weakref',
-                tag: 'a',
-                attribute: 'href',
-                expectedURL: '#',
-            },
         ])
 
         // Check live workspace
@@ -353,6 +353,18 @@ describe('Test on url helper', () => {
             },
             {
                 dataTestId: 'image_static_resource',
+                tag: 'img',
+                attribute: 'src',
+                expectedURL: '/modules/javascript-modules-engine-test-module/static/images/goat.jpg',
+            },
+            {
+                dataTestId: 'image_static_resource_with_module_name',
+                tag: 'img',
+                attribute: 'src',
+                expectedURL: '/modules/javascript-modules-engine-test-module/static/images/goat.jpg',
+            },
+            {
+                dataTestId: 'image_static_resource_endpoint',
                 tag: 'img',
                 attribute: 'src',
                 expectedURL: '/modules/javascript-modules-engine-test-module/static/images/goat.jpg',
@@ -406,18 +418,6 @@ describe('Test on url helper', () => {
                 tag: 'a',
                 attribute: 'href',
                 expectedURL: '/sites/javascriptTestSite/home/testUrl/pagecontent/test.html.ajax',
-            },
-            {
-                dataTestId: 'path_not_exists',
-                tag: 'a',
-                attribute: 'href',
-                expectedURL: '#',
-            },
-            {
-                dataTestId: 'no_weakref',
-                tag: 'a',
-                attribute: 'href',
-                expectedURL: '#',
             },
         ])
 

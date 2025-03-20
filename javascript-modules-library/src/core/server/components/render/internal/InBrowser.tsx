@@ -2,8 +2,8 @@ import { useServerContext } from "../../../hooks/useServerContext.js";
 import { AddResources } from "../../AddResources.js";
 import { I18nextProvider } from "react-i18next";
 import i18n from "i18next";
-import { buildUrl } from "../../../utils/urlBuilder/urlBuilder.js";
 import * as devalue from "devalue";
+import { buildModuleFileUrl } from "../../../utils/urlBuilder/urlBuilder";
 
 /**
  * Import map to allow bare identifiers (e.g. `import { useState } from "react"`) to be imported
@@ -49,25 +49,17 @@ function InBrowser<T>({
   ssr?: boolean;
   children?: React.ReactNode;
 }>): React.JSX.Element {
-  const { bundleKey, currentResource, renderContext } = useServerContext();
+  const { bundleKey, currentResource } = useServerContext();
   const language = currentResource.getLocale().getLanguage();
 
   const i18nScript = getClientI18nStoreScript(bundleKey, language);
 
   /** Base path to all javascript-modules-engine resources. */
-  const engineBase = buildUrl(
-    { value: "/modules/javascript-modules-engine/javascript" },
-    renderContext,
-    currentResource,
-  );
+  const engineBase = buildModuleFileUrl("javascript", { moduleName: "javascript-modules-engine" });
 
   /** JS entry point to the client bundle loader. */
-  const entry = buildUrl(
-    // @ts-expect-error __filename is added by a vite plugin
-    { value: `/modules/${bundleKey}/${Child.__filename}.js` },
-    renderContext,
-    currentResource,
-  );
+  // @ts-expect-error __filename is added by a vite plugin
+  const entry = buildModuleFileUrl(`${Child.__filename}.js`);
 
   return (
     <>
