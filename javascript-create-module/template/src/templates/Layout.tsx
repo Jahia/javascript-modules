@@ -1,7 +1,7 @@
 import {
   AddResources,
+  buildModuleFileUrl,
   useServerContext,
-  urlFromModuleFile,
 } from "@jahia/javascript-modules-library";
 import type { ReactNode } from "react";
 
@@ -15,7 +15,7 @@ export const Layout = ({ title, children }: { title: string; children: ReactNode
   return (
     <html lang={lang}>
       <head>
-        <AddResources type="css" resources={urlFromModuleFile("dist/server/style.css")} />
+        <AddResources type="css" resources={buildModuleFileUrl("dist/server/style.css")} />
         <title>{title}</title>
       </head>
       <body>{children}</body>
