@@ -257,16 +257,14 @@ We now have a working CTA button component, but we still need to add them to our
   <h1>{title}</h1>
   <p>{subtitle}</p>
   <div style={{ display: "flex", gap: "1rem" }}>
-    {getChildNodes(currentNode, -1, 0, (node) => node.isNodeType("jnt:content")).map((node) => (
-      // @ts-expect-error Fix the types
-      <Render key={node.getIdentifier()} node={node} />
-    ))}
-    <AddContentButtons />
+    <RenderChildren />
   </div>
 </header>
 ```
 
-Once pushed to your Jahia instance, this should give you the following result:
+You'll need to import `RenderChildren` from the `@jahia/javascript-modules-library` for it to work.
+
+Once pushed to your Jahia instance, if you create a CTA button in your hero section, it should render correctly:
 
 ![Our hero section with CTAs](hero-cta.png)
 
