@@ -211,7 +211,7 @@ const home = buildNodeUrl(renderContext.getSite().getHome().getNode());
 This function transforms a path to a file in the module into a full URL.
 
 ```tsx
-const styles = buildModuleFileUrl("/dist/styles.css");
+const styles = buildModuleFileUrl("dist/styles.css");
 ```
 
 ## Java server API

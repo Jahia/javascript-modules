@@ -108,8 +108,10 @@ export function buildNodeUrl(
 }
 
 /**
- * Build an url for a file in a module. Note that to be accessible, the folder that contains the
- * file must be part of the jahia.static-resources in package.json
+ * Build a URL for a file in a module. Note that to be accessible, the folder that contains the file
+ * must be part of the jahia.static-resources in package.json.
+ *
+ * The URL must not be absolute (start with a / or a protocol).
  */
 export function buildModuleFileUrl(
   /** Relative path of the file from the module's root (examples: css/my.css, images/myImage.webp) */
