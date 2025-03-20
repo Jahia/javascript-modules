@@ -262,7 +262,7 @@ We now have a working CTA button component, but we still need to add them to our
 </header>
 ```
 
-You'll need to import `RenderChildren` from the `@jahia/javascript-modules-library` for it to work.
+You'll need to import `RenderChildren` from `@jahia/javascript-modules-library` for it to work.
 
 Once pushed to your Jahia instance, if you create a CTA button in your hero section, it should render correctly:
 

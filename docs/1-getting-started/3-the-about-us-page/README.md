@@ -39,7 +39,7 @@ Let's break this code down:
 - We define two `<Area>`s: `hero` and `main`. An area is an entry point for users to add content.
   The `hero` area is limited to one `HeroSection` component, and the `main` area can contain any component.
 
-Go ahead and create a new page on your site. Right click the left panel, under Home, select **+ New Page** and chose the **Single column** template. Give your page a title and save it.
+Go ahead and create a new page on your site. Right click the left panel, under Home, select **+ New Page** and chose the **Single column** template. Give your page a title and save it. If you don't see the **Single column** template, you may need to restart `yarn dev` for the new template to be picked up.
 
 !["About Us" page creation form](create-about-page.png)
 
