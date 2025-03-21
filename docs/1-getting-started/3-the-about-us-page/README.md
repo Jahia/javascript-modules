@@ -82,7 +82,7 @@ export interface Props {
 This way, we can import `Props` in multiple files without duplicating the type definition. Create a new file named `src/components/Hero/Section/small.server.tsx`:
 
 ```tsx
-import { jahiaComponent, useUrlBuilder } from "@jahia/javascript-modules-library";
+import { buildNodeUrl, jahiaComponent } from "@jahia/javascript-modules-library";
 import classes from "./component.module.css";
 import type { Props } from "./types.js";
 
@@ -93,18 +93,15 @@ jahiaComponent(
     displayName: "Small Hero Section",
     name: "small",
   },
-  ({ title, subtitle, background }: Props) => {
-    const { buildNodeUrl } = useUrlBuilder();
-    return (
-      <header
-        className={[classes.hero, classes.small].join(" ")}
-        style={{ backgroundImage: `url(${buildNodeUrl({ nodePath: background.getPath() })})` }}
-      >
-        <h1>{title}</h1>
-        <p>{subtitle}</p>
-      </header>
-    );
-  },
+  ({ title, subtitle, background }: Props) => (
+    <header
+      className={[classes.hero, classes.small].join(" ")}
+      style={{ backgroundImage: `url(${buildNodeUrl(background)})` }}
+    >
+      <h1>{title}</h1>
+      <p>{subtitle}</p>
+    </header>
+  ),
 );
 ```
 

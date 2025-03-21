@@ -9,12 +9,12 @@ Let's start by creating a node type called `BlogPost`. We'll keep it concise but
 ```cnd
 [hydrogen:BlogPost] > jnt:content, mix:title, jmix:mainResource, hydrogen:component
  - subtitle (string) i18n mandatory
- - authors (string) multiple
+ - authors (string) multiple autocreated
  - cover (weakreference, picker[type='image']) mandatory < jmix:image
  - body (string, richtext) i18n mandatory
 ```
 
-You might notice the `multiple` keyword next to authors: its allows setting a list of strings instead of a single one. `mix:title` is a mixin that adds a `jcr:title` field to the node type.
+You might notice the `multiple` keyword next to authors: its allows setting a list of strings instead of a single one. Next to `multiple` is `autocreated`: this keyword tells Jahia to create an empty array instead of storing `undefined` in the storage layer if the list is empty. `mix:title` is a mixin that adds a `jcr:title` field to the node type.
 
 Create a `types.ts` file in the same folder:
 
@@ -30,13 +30,13 @@ export type Props = {
 };
 ```
 
-You can also create a simple view to render the blog post as a card:
+Let's also create a simple view to render the blog post as a card:
 
 <details>
 <summary><code>src/components/BlogPost/default.server.tsx</code></summary>
 
 ```tsx
-import { jahiaComponent, useUrlBuilder } from "@jahia/javascript-modules-library";
+import { buildNodeUrl, jahiaComponent } from "@jahia/javascript-modules-library";
 import type { Props } from "./types.js";
 import classes from "./component.module.css";
 
@@ -47,12 +47,11 @@ jahiaComponent(
     displayName: "Blog Post",
   },
   ({ "jcr:title": title, subtitle, authors, cover }: Props, { currentNode }) => {
-    const { buildNodeUrl } = useUrlBuilder();
     return (
       <article className={classes.card}>
-        <img src={buildNodeUrl({ nodePath: cover.getPath() })} alt="" />
+        <img src={buildNodeUrl(cover)} alt="" />
         <h3>
-          <a href={buildNodeUrl({ nodePath: currentNode.getPath() })}> {title}</a>
+          <a href={buildNodeUrl(currentNode)}> {title}</a>
         </h3>
         <p>{subtitle}</p>
         {authors.length > 0 && <p>Written by {authors.join(", ")}</p>}

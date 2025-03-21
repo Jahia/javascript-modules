@@ -1,6 +1,9 @@
 # Setting Up Your Dev Environment
 
-This tutorial will guide you through the setup of your development environment to start a local Jahia instance and create a new project.
+This tutorial will guide you through the setup of your development environment to start a local Jahia instance and create a new project. We assume you have some familiarity with JavaScript and React, if that's not the case, we recommend you to follow a few tutorials to learn the basics:
+
+- JavaScript: [javascript.info](https://javascript.info/)
+- React: [react.dev/learn](https://react.dev/learn)
 
 ## Pre-Requisites
 

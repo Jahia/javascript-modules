@@ -62,7 +62,7 @@ This error message means that Jahia doesn't know how to render the `HeroSection`
 We must tell Jahia how to render our `HeroSection` node type using the `jahiaComponent` function from the `@jahia/javascript-modules-library` package. In the `Hero/Section` folder, create a `default.server.tsx` file with the following content:
 
 ```tsx
-import { jahiaComponent, useUrlBuilder } from "@jahia/javascript-modules-library";
+import { buildNodeUrl, jahiaComponent } from "@jahia/javascript-modules-library";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 
 /** Properties defined in ./definition.cnd */
@@ -79,23 +79,18 @@ jahiaComponent(
     nodeType: "hydrogen:HeroSection",
     displayName: "Hero Section",
   },
-  ({ title, subtitle, background }: Props) => {
-    const { buildNodeUrl } = useUrlBuilder();
-    return (
-      <header
-        style={{ backgroundImage: `url(${buildNodeUrl({ nodePath: background.getPath() })})` }}
-      >
-        <h1>{title}</h1>
-        <p>{subtitle}</p>
-      </header>
-    );
-  },
+  ({ title, subtitle, background }: Props) => (
+    <header style={{ backgroundImage: `url(${buildNodeUrl(background.getPath())})` }}>
+      <h1>{title}</h1>
+      <p>{subtitle}</p>
+    </header>
+  ),
 );
 ```
 
 This code tells Jahia how to render the `HeroSection` node type as a React component. Once pushed to your Jahia instance (you may need to rerun `yarn dev` for the bundler to pick up the new file), the error message should disappear, and the hero section should render correctly, albeit without any styling.
 
-`useUrlBuilder` and `buildNodeUrl` are helpers to transform a node path into a URL. We'll need this every time we want to reference a resource in the browser: for `<img />`, `<a />`, `background-image`, etc.
+`buildNodeUrl` is a helper to transform a node into a URL to its content. We'll need this every time we want to reference a resource in the browser: for `<img />`, `<a />`, `background-image`, etc.
 
 We named this file `default.server.tsx` because it's the default view for this node type; the same node type can have multiple views, each with its own rendering logic.
 
@@ -174,7 +169,7 @@ Create the following files to render the `HeroCallToAction` node type:
 <summary><code>src/components/Hero/CallToAction/default.server.tsx</code></summary>
 
 ```tsx
-import { jahiaComponent, useUrlBuilder } from "@jahia/javascript-modules-library";
+import { buildNodeUrl, jahiaComponent } from "@jahia/javascript-modules-library";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 import classes from "./component.module.css";
 
@@ -193,7 +188,6 @@ jahiaComponent(
     displayName: "Call To Action",
   },
   (props: Props) => {
-    const { buildNodeUrl } = useUrlBuilder();
     switch (props["j:linkType"]) {
       case "external":
         return (
@@ -204,10 +198,7 @@ jahiaComponent(
 
       case "internal":
         return (
-          <a
-            href={buildNodeUrl({ nodePath: props["j:linknode"].getPath() })}
-            className={classes.cta}
-          >
+          <a href={buildNodeUrl(props["j:linknode"])} className={classes.cta}>
             {props.title}
           </a>
         );
