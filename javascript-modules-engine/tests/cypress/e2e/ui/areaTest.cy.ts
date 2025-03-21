@@ -97,7 +97,7 @@ describe('Area test', () => {
         cy.login()
         cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         cy.iframe('#page-builder-frame-1').within(() => {
-            cy.get('div[data-testid="pathArea"]').find('div[type="area"]').should('exist')
+            cy.get('div[data-testid="parentArea"]').find('div[type="area"]').should('exist')
         })
         cy.logout()
     })

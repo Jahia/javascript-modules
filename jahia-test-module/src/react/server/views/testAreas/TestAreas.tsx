@@ -37,7 +37,7 @@ jahiaComponent(
       </div>
 
       <h2>Area with path</h2>
-      <div data-testid="pathArea">
+      <div data-testid="parentArea">
         <Area name={"basicArea/subLevel"} />
       </div>
 

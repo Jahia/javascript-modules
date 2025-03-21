@@ -52,13 +52,22 @@ describe('Absolute Area test', () => {
                 name: 'pagecontent',
                 primaryNodeType: 'jnt:contentList',
             },
-        ]).then(() => {
-            addNode({
-                parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/pagecontent`,
-                name: 'test',
-                primaryNodeType: 'javascriptExample:testAbsoluteAreas',
+        ])
+            .then(() => {
+                addNode({
+                    parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/pagecontent`,
+                    name: 'test',
+                    primaryNodeType: 'javascriptExample:testAbsoluteAreas',
+                })
             })
-        })
+            .then(() => {
+                addNode({
+                    parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/pagecontent/test`,
+                    // the content node is expected to exist in TestAbsolutArea
+                    name: 'basicArea',
+                    primaryNodeType: 'jnt:contentList',
+                })
+            })
     })
 
     it(`${pageName}: Basic Area test`, () => {

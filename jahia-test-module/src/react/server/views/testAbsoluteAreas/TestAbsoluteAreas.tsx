@@ -36,8 +36,8 @@ jahiaComponent(
         <AbsoluteArea name={"subNodesViewArea"} />
       </div>
 
-      <h2>Area with path</h2>
-      <div data-testid="pathArea">
+      <h2>Area with parent</h2>
+      <div data-testid="parentArea">
         <AbsoluteArea name={"subLevel"} parent={currentNode.getNode("basicArea")} />
       </div>
 
