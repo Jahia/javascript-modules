@@ -381,7 +381,7 @@ public class RenderHelper {
             areaAttr.remove("numberOfItems");
         }
         areaAttr.put("areaType", areaAttr.remove("nodeType"));
-        areaAttr.put("level", -1); // force the "path" parameter to be computed compared to root node of the site (ex: /sites/<my-site>)
+        areaAttr.put("level", -1); // force the "path" parameter to be computed against the root node of the site (ex: /sites/<my-site>)
 
         // Now we remove any null attribute to make sure they don't override default tag attributes
         areaAttr = cleanupNullValues(areaAttr);

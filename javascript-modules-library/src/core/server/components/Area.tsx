@@ -16,7 +16,7 @@ export function Area({
   numberOfItems,
   readOnly = false,
   areaType = "jnt:contentList",
-  nodeType,
+  nodeType = "jnt:contentList",
   parameters,
 }: Readonly<{
   /** The name of the area. */
