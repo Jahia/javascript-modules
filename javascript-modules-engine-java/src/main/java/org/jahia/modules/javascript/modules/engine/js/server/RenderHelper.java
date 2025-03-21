@@ -346,7 +346,7 @@ public class RenderHelper {
         // path handling
         String name = readMandatoryAttribute(attr, "name");
         JCRNodeWrapper parent = readMandatoryAttribute(attr, "parent");
-        String relativePath = calculateRelativePath(renderContext.getMainResource().getNodePath(), parent.getPath());
+        String relativePath = calculateRelativePath(renderContext.getSite().getPath(), parent.getPath());
         attr.put("path", relativePath + "/" + name);
         return internalRenderArea(attr, "absoluteArea", renderContext);
     }
@@ -380,6 +380,8 @@ public class RenderHelper {
             areaAttr.put("listLimit", areaAttr.get("numberOfItems"));
             areaAttr.remove("numberOfItems");
         }
+        areaAttr.put("areaType", areaAttr.remove("nodeType"));
+        areaAttr.put("level", -1); // force the "path" parameter to be computed compared to root node of the site (ex: /sites/<my-site>)
 
         // Now we remove any null attribute to make sure they don't override default tag attributes
         areaAttr = cleanupNullValues(areaAttr);

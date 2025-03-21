@@ -17,8 +17,8 @@ export function AbsoluteArea({
   allowedNodeTypes,
   numberOfItems,
   readOnly = false,
-  areaType = "jnt:contentList",
-  nodeType,
+  areaType,
+  nodeType = "jnt:contentList",
   parameters,
 }: Readonly<{
   /** The name of the area. */
@@ -60,7 +60,6 @@ export function AbsoluteArea({
    * Content node type to be used to create the area (if the node does not exist yet)
    *
    * @deprecated Use {@link #nodeType} instead
-   * @default jnt:contentList
    */
   areaType?: string;
   /**
