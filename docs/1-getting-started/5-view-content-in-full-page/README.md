@@ -8,11 +8,11 @@ Full page renders leverage another `jahiaComponent` type: `template`. A template
 
 Templates are a rather legacy feature in Jahia, dating back to the days when Jahia had a visual template builder. This distinction between view and templates makes less sense in a code editor, but it's still there. As a rule of thumb, we'll use views to render nodes and templates to create page structures.
 
-To implement this rule, we'll create a new file named `src/pages/mainResource.server.tsx` that will forward all full-page requests to a view of the same node named `fullPage`:
+The project template contains a file named `src/templates/MainResource/default.server.tsx` that will forward all full-page requests to a view of the same node named `fullPage`:
 
 ```tsx
 import { jahiaComponent, Render } from "@jahia/javascript-modules-library";
-import { Layout } from "./Layout.jsx";
+import { Layout } from "../Layout.jsx";
 
 jahiaComponent(
   {
@@ -44,7 +44,7 @@ jahiaComponent(
   },
   (
     { "jcr:title": title, subtitle, authors, publicationDate, cover, body }: Props,
-    { currentResource },
+    { currentResource, renderContext },
   ) => (
     <>
       <SmallHeroSection title={title} subtitle={subtitle} background={cover} />
@@ -71,7 +71,7 @@ jahiaComponent(
 );
 ```
 
-You can also update `component.module.css` to include a new class:
+You can also update `src/components/BlogPost/component.module.css` to include a new class:
 
 ```css
 .main {
@@ -105,18 +105,13 @@ This code contains of lot of things. Here are the most notable parts:
 
 Wouldn't it be nice if at the end of the article we had a way to get back to the blog list? We can achieve this by building a URL to the blog list page.
 
-Let's talk a bit more `useUrlBuilder` about: it's a hook that creates URL builders, and URL builders are functions that create URLs to resources. We have seen it previously to properly link images and pages.
-
-Update your `fullPage.server.tsx` file to include the following hook:
+Update your `src/components/BlogPost/fullPage.server.tsx` file to include the following hook:
 
 ```tsx
-import { useUrlBuilder } from "@jahia/javascript-modules-library";
-
-// In your component function:
-const { buildNodeUrl } = useUrlBuilder();
+import { buildNodeUrl } from "@jahia/javascript-modules-library";
 ```
 
-This `buildNodeUrl` will transform a reference to a JCR node into a fully resolved URL. The node in question is `renderContext.getSite().getNode("blog")`: it resolves to `/sites/<site key>/blog`, where `blog` is the page listing all blog posts. If you have a different structure, you can adjust the path accordingly.
+This `buildNodeUrl` function will transform a reference to a JCR node into a fully resolved URL. The node in question is `renderContext.getSite().getNode("blog")`: it resolves to `/sites/<site key>/blog`, where `blog` is the page listing all blog posts. If you have a different structure, you can adjust the path accordingly.
 
 From this node, we can build a URL to the blog list page:
 
@@ -126,7 +121,7 @@ From this node, we can build a URL to the blog list page:
   <p>
     <a
       // @ts-expect-error Java type aren't exposed this far
-      href={buildNodeUrl({ nodePath: renderContext.getSite().getNode("blog").getPath() })}
+      href={buildNodeUrl(renderContext.getSite().getNode("blog"))}
     >
       Back to blog home
     </a>
@@ -149,6 +144,6 @@ In JCR, everything is a node, i.e. an entity of a tree designated by a path. The
 - A `jnt:virtualsite` node is a site node, the root of a site.
 - A `jnt:file` node is a file node, like an image or a PDF. You can upload files to Jahia and reference them in your content.
 
-There is a lot more to learn about URL building, and it's the topic of the next section.
+There is a lot more to learn about URL building and JCR exploration, and it's the topic of the next section.
 
 Next: [Building a Navigation Bar](../6-building-a-nav-bar/)

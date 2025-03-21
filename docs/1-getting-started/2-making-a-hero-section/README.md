@@ -80,7 +80,7 @@ jahiaComponent(
     displayName: "Hero Section",
   },
   ({ title, subtitle, background }: Props) => (
-    <header style={{ backgroundImage: `url(${buildNodeUrl(background.getPath())})` }}>
+    <header style={{ backgroundImage: `url(${buildNodeUrl(background)})` }}>
       <h1>{title}</h1>
       <p>{subtitle}</p>
     </header>
@@ -131,10 +131,7 @@ Update `default.server.tsx` to reference your styles:
 import classes from "./component.module.css";
 
 // Add `className={classes.hero}` to the header element:
-<header
-  className={classes.hero}
-  style={{ backgroundImage: `url(${buildNodeUrl({ nodePath: background.getPath() })})` }}
->
+<header className={classes.hero} style={{ backgroundImage: `url(${buildNodeUrl(background)})` }}>
   {/* ... */}
 </header>;
 ```
@@ -241,10 +238,7 @@ jahiaComponent(
 We now have a working CTA button component, but we still need to add them to our hero section. Update `Hero/Section/default.server.tsx` to render the `HeroCallToAction` nodes:
 
 ```tsx
-<header
-  className={classes.hero}
-  style={{ backgroundImage: `url(${buildNodeUrl({ nodePath: background.getPath() })})` }}
->
+<header className={classes.hero} style={{ backgroundImage: `url(${buildNodeUrl(background)})` }}>
   <h1>{title}</h1>
   <p>{subtitle}</p>
   <div style={{ display: "flex", gap: "1rem" }}>

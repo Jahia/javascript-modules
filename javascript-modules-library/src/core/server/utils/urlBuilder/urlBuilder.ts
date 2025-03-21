@@ -64,7 +64,7 @@ export function buildNodeUrl(
      * The mode to use to build the URL. Defines the mode or override the one provided by the
      * renderContext.
      */
-    mode?: string;
+    mode?: "edit" | "preview" | "live";
     /**
      * The language to use to build the URL. Defines the languages or overrides the one provided by
      * the current resource

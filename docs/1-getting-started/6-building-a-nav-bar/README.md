@@ -46,8 +46,12 @@ Iterating over children can be done with the `getChildNodes` function. It takes 
 Create the file `src/components/NavBar/NavBar.server.tsx` with the following content:
 
 ```tsx
-import { getChildNodes, jahiaComponent, useUrlBuilder } from "@jahia/javascript-modules-library";
+import { buildNodeUrl, getChildNodes, jahiaComponent } from "@jahia/javascript-modules-library";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
+
+/** Get all child pages of a node. */
+const getChildPages = (node: JCRNodeWrapper) =>
+  getChildNodes(node, -1, 0, (node) => node.isNodeType("jnt:page"));
 
 jahiaComponent(
   {
@@ -55,35 +59,31 @@ jahiaComponent(
     nodeType: "hydrogen:NavBar",
     displayName: "NavBar",
   },
-  (_, { renderContext, mainNode }) => {
-    const getChildPages = (node: JCRNodeWrapper) =>
-      getChildNodes(node, -1, 0, (node) => node.isNodeType("jnt:page"));
-    const { buildNodeUrl } = useUrlBuilder();
-    const getUrl = (node: any) => buildNodeUrl({ nodePath: node.getPath() });
-
-    return (
-      <nav>
-        <ul>
-          {getChildPages(renderContext.getSite() as unknown as JCRNodeWrapper).map((page) => (
-            <li key={page.getPath()}>
-              <a href={getUrl(page)} aria-current={page === mainNode ? "page" : undefined}>
-                {page.getProperty("jcr:title").getString()}
-              </a>
-              <ul>
-                {getChildPages(page).map((page) => (
-                  <li key={page.getPath()}>
-                    <a href={getUrl(page)} aria-current={page === mainNode ? "page" : undefined}>
-                      {page.getProperty("jcr:title").getString()}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    );
-  },
+  (_, { renderContext, mainNode }) => (
+    <nav>
+      <ul>
+        {getChildPages(renderContext.getSite().getNode()).map((page) => (
+          <li key={page.getPath()}>
+            <a href={buildNodeUrl(page)} aria-current={page === mainNode ? "page" : undefined}>
+              {page.getProperty("jcr:title").getString()}
+            </a>
+            <ul>
+              {getChildPages(page).map((page) => (
+                <li key={page.getPath()}>
+                  <a
+                    href={buildNodeUrl(page)}
+                    aria-current={page === mainNode ? "page" : undefined}
+                  >
+                    {page.getProperty("jcr:title").getString()}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  ),
 );
 ```
 
