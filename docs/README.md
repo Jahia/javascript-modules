@@ -2,7 +2,7 @@
 
 Welcome to this documentation!
 
-We are pleased to have you here; we have been working on JavaScript Modules for Jahia for a while now and we are thrilled to share it with the world. If you are reading this, chances are you want to **build a website in React, with Jahia.** In case this assumption is wrong, here are some other resources that might be more relevant to you:
+We are pleased to have you here; we have been working on JavaScript Modules for Jahia for a while now and we are thrilled to share them with the world. If you are reading this, chances are you want to **build a website in React, with Jahia.** In case this assumption is wrong, here are some other resources that might be more relevant to you:
 
 - If you are a Java developer, we have [a similar tutorial for you, but with Java and JSP.](https://academy.jahia.com/tutorials-get-started/java-developers/running-the-docker-image)
 - If you are not a developer at all, we have [an Editors-Marketers getting started guide.](https://academy.jahia.com/tutorials-get-started/editorsmarketers/adding-a-new-page)
