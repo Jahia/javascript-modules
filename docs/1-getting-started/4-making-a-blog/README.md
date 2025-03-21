@@ -9,12 +9,12 @@ Let's start by creating a node type called `BlogPost`. We'll keep it concise but
 ```cnd
 [hydrogen:BlogPost] > jnt:content, mix:title, jmix:mainResource, hydrogen:component
  - subtitle (string) i18n mandatory
- - authors (string) multiple autocreated
+ - authors (string) multiple
  - cover (weakreference, picker[type='image']) mandatory < jmix:image
  - body (string, richtext) i18n mandatory
 ```
 
-You might notice the `multiple` keyword next to authors: its allows setting a list of strings instead of a single one. Next to `multiple` is `autocreated`: this keyword tells Jahia to create an empty array instead of storing `undefined` in the storage layer if the list is empty. `mix:title` is a mixin that adds a `jcr:title` field to the node type.
+You might notice the `multiple` keyword next to authors: its allows setting a list of strings instead of a single one. Because it is not marked as mandatory, it may be undefined: we will treat this case as an empty list. `mix:title` is a mixin that adds a `jcr:title` field to the node type.
 
 Create a `types.ts` file in the same folder:
 
@@ -24,7 +24,7 @@ import type { JCRNodeWrapper } from "org.jahia.services.content";
 export type Props = {
   "jcr:title": string;
   "subtitle": string;
-  "authors": string[];
+  "authors"?: string[];
   "cover": JCRNodeWrapper;
   "body": string;
 };
@@ -46,7 +46,7 @@ jahiaComponent(
     nodeType: "hydrogen:BlogPost",
     displayName: "Blog Post",
   },
-  ({ "jcr:title": title, subtitle, authors, cover }: Props, { currentNode }) => {
+  ({ "jcr:title": title, subtitle, authors = [], cover }: Props, { currentNode }) => {
     return (
       <article className={classes.card}>
         <img src={buildNodeUrl(cover)} alt="" />
@@ -163,7 +163,7 @@ import type { JCRNodeWrapper } from "org.jahia.services.content";
 export type Props = {
   "jcr:title": string;
   "subtitle": string;
-  "authors": string[];
+  "authors"?: string[];
   "cover": JCRNodeWrapper;
   "body": string;
   "publicationDate": string;
