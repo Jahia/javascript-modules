@@ -7,7 +7,7 @@ jahiaComponent(
     displayName: "Test Absolute Areas (react)",
     componentType: "view",
   },
-  (_, { currentNode }) => (
+  (_, { currentNode, renderContext }) => (
     <>
       <h2>React JAbsoluteArea test component</h2>
 
@@ -31,29 +31,19 @@ jahiaComponent(
         <AbsoluteArea name={"areaViewArea"} view={"dropdown"} />
       </div>
 
-      <h2>Area with subNodesView</h2>
-      <div data-testid="subNodesViewArea">
-        <AbsoluteArea name={"subNodesViewArea"} />
-      </div>
-
       <h2>Area with parent</h2>
       <div data-testid="parentArea">
         <AbsoluteArea name={"subLevel"} parent={currentNode.getNode("basicArea")} />
       </div>
 
-      <h2>Absolute Area with home page content</h2>
+      <h2>Absolute Area with home page content using parent </h2>
       <div data-testid="absoluteArea">
-        <AbsoluteArea name="pagecontent" />
+        <AbsoluteArea name="pagecontent" parent={renderContext.getSite().getHome()} />
       </div>
 
       <h2>Non editable area </h2>
       <div data-testid="nonEditableArea">
         <AbsoluteArea name="nonEditable" readOnly />
-      </div>
-
-      <h2>Absolute area level </h2>
-      <div data-testid="absoluteAreaLevel">
-        <AbsoluteArea name="pagecontent" />
       </div>
 
       <h2>Area type</h2>

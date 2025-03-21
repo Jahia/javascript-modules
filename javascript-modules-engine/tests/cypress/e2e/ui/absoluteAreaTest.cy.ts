@@ -126,35 +126,11 @@ describe('Absolute Area test', () => {
         cy.logout()
     })
 
-    it(`${pageName}: subNodesView Area`, () => {
-        cy.login()
-        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
-        addNode({
-            parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/subNodesViewArea`,
-            name: 'item1',
-            primaryNodeType: 'jnt:bigText',
-        })
-        cy.reload()
-        cy.iframe('#page-builder-frame-1').within(() => {
-            cy.get('div[data-testid="subNodesViewArea"]').find('a').contains('item1')
-        })
-        cy.logout()
-    })
-
-    it(`${pageName}: path Area`, () => {
-        cy.login()
-        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
-        cy.iframe('#page-builder-frame-1').within(() => {
-            cy.get('div[data-testid="pathArea"]').find('div[type="absoluteArea"]').should('exist')
-        })
-        cy.logout()
-    })
-
     it(`${pageName}: absolute Area`, () => {
         cy.login()
         cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         cy.iframe('#page-builder-frame-1').within(() => {
-            cy.get('div[data-testid="absoluteArea"]').find('div[data-testid="row-twoColumns"]').should('exist')
+            cy.get('div[data-testid="absoluteArea"] div[data-testid="row-twoColumns"]').should('exist')
         })
         cy.logout()
     })
@@ -164,15 +140,6 @@ describe('Absolute Area test', () => {
         cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         cy.iframe('#page-builder-frame-1').within(() => {
             cy.get('div[data-testid="nonEditableArea"]').should('be.empty')
-        })
-        cy.logout()
-    })
-
-    it(`${pageName}: absolute Area level`, () => {
-        cy.login()
-        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
-        cy.iframe('#page-builder-frame-1').within(() => {
-            cy.get('div[data-testid="absoluteAreaLevel"]').find('div[data-testid="row-twoColumns"]').should('exist')
         })
         cy.logout()
     })

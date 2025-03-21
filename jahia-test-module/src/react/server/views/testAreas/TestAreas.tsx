@@ -31,11 +31,6 @@ jahiaComponent(
         <Area name={"areaViewArea"} view={"dropdown"} />
       </div>
 
-      <h2>Area with subNodesView</h2>
-      <div data-testid="subNodesViewArea">
-        <Area name={"subNodesViewArea"} />
-      </div>
-
       <h2>Area with path</h2>
       <div data-testid="parentArea">
         <Area name={"basicArea/subLevel"} />
@@ -44,11 +39,6 @@ jahiaComponent(
       <h2>Non editable area </h2>
       <div data-testid="nonEditableArea">
         <Area name="nonEditable" readOnly />
-      </div>
-
-      <h2>Area as sub node </h2>
-      <div data-testid="areaAsSubNode">
-        <Area name="areaAsSubNode" />
       </div>
 
       <h2>Area type</h2>

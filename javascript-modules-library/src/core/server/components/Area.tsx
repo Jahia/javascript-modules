@@ -39,7 +39,7 @@ export function Area({
   /** The allowed types for the area. */
   allowedNodeTypes?: string[];
   /** The number of items to display in the area. */
-  numberOfItems?: number; // TODO see why not reflected in the editor
+  numberOfItems?: number;
 
   /**
    * Makes the area read-only.
