@@ -18,7 +18,7 @@ jahiaComponent(
 
       <h2>Area with allowed types</h2>
       <div data-testid="allowedTypesArea">
-        <Area name={"allowedTypesArea"} allowedTypes={["jnt:event", "jnt:bigText"]} />
+        <Area name={"allowedTypesArea"} allowedNodeTypes={["jnt:event", "jnt:bigText"]} />
       </div>
 
       <h2>Area with number of items</h2>
@@ -28,17 +28,12 @@ jahiaComponent(
 
       <h2>Area with areaView</h2>
       <div data-testid="areaViewArea">
-        <Area name={"areaViewArea"} areaView={"dropdown"} />
-      </div>
-
-      <h2>Area with subNodesView</h2>
-      <div data-testid="subNodesViewArea">
-        <Area name={"subNodesViewArea"} subNodesView={"link"} />
+        <Area name={"areaViewArea"} view={"dropdown"} />
       </div>
 
       <h2>Area with path</h2>
-      <div data-testid="pathArea">
-        <Area path={"basicArea/subLevel"} />
+      <div data-testid="parentArea">
+        <Area name={"basicArea/subLevel"} />
       </div>
 
       <h2>Non editable area </h2>
@@ -46,21 +41,16 @@ jahiaComponent(
         <Area name="nonEditable" readOnly />
       </div>
 
-      <h2>Area as sub node </h2>
-      <div data-testid="areaAsSubNode">
-        <Area name="areaAsSubNode" areaAsSubNode={true} />
-      </div>
-
       <h2>Area type</h2>
       <div data-testid="areaType">
-        <Area name="areaType" areaType="javascriptExample:testAreaColumns" />
+        <Area name="areaType" nodeType="javascriptExample:testAreaColumns" />
       </div>
 
       <h2>Area parameters</h2>
       <div data-testid="areaParameters">
         <Area
           name="areaParameters"
-          areaView="parameters"
+          view="parameters"
           parameters={{
             stringParam1: "stringValue1",
             stringParam2: "stringValue2",
