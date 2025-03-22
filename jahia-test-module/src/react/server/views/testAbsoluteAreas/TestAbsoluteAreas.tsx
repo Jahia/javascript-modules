@@ -33,12 +33,20 @@ jahiaComponent(
 
       <h2>Area with parent</h2>
       <div data-testid="parentArea">
-        <AbsoluteArea name={"subLevel"} parent={currentNode.getNode("basicArea")} />
+        <AbsoluteArea name="subLevel" parent={currentNode.getNode("basicArea")} />
       </div>
 
-      <h2>Absolute Area with home page content using parent </h2>
-      <div data-testid="absoluteArea">
+      <h2>Absolute Area with home page</h2>
+      <div data-testid="absoluteAreaHomePage">
         <AbsoluteArea name="pagecontent" parent={renderContext.getSite().getHome()} />
+      </div>
+
+      <h2>Absolute Area with custom page (sub-level)</h2>
+      <div data-testid="absoluteAreaCustomPage">
+        <AbsoluteArea
+          name="pagecontent"
+          parent={renderContext.getSite().getNode("custom/sub-level")}
+        />
       </div>
 
       <h2>Non editable area </h2>

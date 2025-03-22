@@ -68,6 +68,9 @@ describe('Absolute Area test', () => {
                     primaryNodeType: 'jnt:contentList',
                 })
             })
+        addSimplePage('/sites/javascriptTestSite', 'custom', 'Custom', 'en', 'simple').then(() =>
+            addSimplePage('/sites/javascriptTestSite/custom', 'sub-level', 'Sub level', 'en', 'simple'),
+        )
     })
 
     it(`${pageName}: Basic Area test`, () => {
@@ -126,11 +129,20 @@ describe('Absolute Area test', () => {
         cy.logout()
     })
 
-    it(`${pageName}: absolute Area`, () => {
+    it(`${pageName}: absolute Area home page`, () => {
         cy.login()
         cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         cy.iframe('#page-builder-frame-1').within(() => {
-            cy.get('div[data-testid="absoluteArea"] div[data-testid="row-twoColumns"]').should('exist')
+            cy.get('div[data-testid="absoluteAreaHomePage"] div[data-testid="row-twoColumns"]').should('exist')
+        })
+        cy.logout()
+    })
+
+    it(`${pageName}: absolute Area custom page (sub-level)`, () => {
+        cy.login()
+        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
+        cy.iframe('#page-builder-frame-1').within(() => {
+            cy.get('div[data-testid="absoluteAreaCustomPage"]').find('div[type="absoluteArea"]').should('be.visible')
         })
         cy.logout()
     })
