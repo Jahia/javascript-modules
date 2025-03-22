@@ -1,0 +1,236 @@
+# The "About Us" Page
+
+Our homepage is based on a "basic" layout: take a look at `src/pages/basic.server.tsx`. It's a single column layout defined by an `<Area>` without any constraints. If a user wants to place many Hero sections on the page, they can do it. Most websites have a slightly more controlled layout: a navbar, a title, a footer, optional sidebars, etc. In this section, we'll create a page layout that suits a typical "About Us" page.
+
+## Page Templates
+
+Pages are content nodes, like the `HeroSection` and `HeroCallToAction` nodes we created previously. Their type is `jnt:page`, and as for all content, you can tell Jahia how to render them.
+
+We'll create a single-column layout with a hero section on top. Create a file named `singleColumn.server.tsx` in `src/pages`:
+
+```tsx
+import { Area, jahiaComponent } from "@jahia/javascript-modules-library";
+import { Layout } from "./Layout.jsx";
+
+jahiaComponent(
+  {
+    componentType: "template",
+    nodeType: "jnt:page",
+    displayName: "Single column page template",
+    name: "singleColumn",
+  },
+  ({ "jcr:title": title }) => (
+    <Layout title={title}>
+      <Area name="hero" allowedTypes={["hydrogen:HeroSection"]} numberOfItems={1} />
+      <main style={{ maxWidth: "40rem", margin: "0 auto" }}>
+        <Area name="main" />
+      </main>
+    </Layout>
+  ),
+);
+```
+
+Instead of using `jahiaComponent` to define a view, we use `componentType: "template"`. A template is like a view but for a full-page resource.
+
+Let's break this code down:
+
+- The `Layout` component is a simple wrapper that adds `<head>` and `<body>` tags to the page.
+
+- We define two `<Area>`s: `hero` and `main`. An area is an entry point for users to add content.
+  The `hero` area is limited to one `HeroSection` component, and the `main` area can contain any component.
+
+Go ahead and create a new page on your site. Right click the left panel, under Home, select **+ New Page** and chose the **Single column** template. Give your page a title and save it. If you don't see the **Single column** template, you may need to restart `yarn dev` for the new template to be picked up.
+
+!["About Us" page creation form](create-about-page.png)
+
+You should now see an empty page with two insertion points: one named `hero` and the other named `main`.
+
+Create some content for your About Us page:
+
+![The "About Us" page with contents](about-us-big-hero.png)
+
+_[Picture by Nasa](https://unsplash.com/photos/photo-of-outer-space-Q1p7bh3SHj8), [text from Wikipedia](https://en.wikipedia.org/w/index.php?title=Hydrogen&oldid=1279844492)_
+
+Isn't it a bit weird to have CTA buttons on an "About Us" page? Fortunately, Jahia supports multiple views for the same node type.
+
+## Same Node, Different Views
+
+In `singleColumn.server.tsx`, replace the current `<Area name="hero">` with:
+
+```tsx
+<Area name="hero" allowedTypes={["hydrogen:HeroSection"]} numberOfItems={1} subNodesView="small" />
+```
+
+This additional property, `subNodesView`, defines the view that should be used when the user adds content to the `hero` area. We haven't created the `small` view yet, if you refresh your page right now you will see an error message instead:
+
+> No rendering set for node: herosection<br/>
+> Types: [hydrogen:HeroSection]
+
+Start by adding a file named `src/components/Hero/Section/types.ts` and move `Props` to it:
+
+```tsx
+import type { JCRNodeWrapper } from "org.jahia.services.content";
+
+/** Properties defined in ./definition.cnd */
+export interface Props {
+  title: string;
+  subtitle: string;
+  background: JCRNodeWrapper;
+}
+```
+
+This way, we can import `Props` in multiple files without duplicating the type definition. Create a new file named `src/components/Hero/Section/small.server.tsx`:
+
+```tsx
+import { buildNodeUrl, jahiaComponent } from "@jahia/javascript-modules-library";
+import classes from "./component.module.css";
+import type { Props } from "./types.js";
+
+jahiaComponent(
+  {
+    componentType: "view",
+    nodeType: "hydrogen:HeroSection",
+    displayName: "Small Hero Section",
+    name: "small",
+  },
+  ({ title, subtitle, background }: Props) => (
+    <header
+      className={[classes.hero, classes.small].join(" ")}
+      style={{ backgroundImage: `url(${buildNodeUrl(background)})` }}
+    >
+      <h1>{title}</h1>
+      <p>{subtitle}</p>
+    </header>
+  ),
+);
+```
+
+Finally, update `component.module.css` to include a new class:
+
+```css
+.small {
+  min-height: 25vh;
+}
+```
+
+You can also update `default.server.tsx` to include `Props` instead of defining it again.
+
+The difference between `small.server.tsx` and `default.server.tsx` is the fact that we declare the component with `name: "small"`. This registers a second view named small for the `HeroSection` node type. When `name` is not provided, the view is considered the default one.
+
+After pushing these changes to your Jahia instance, you should see a smaller hero section on your "About Us" page, without the possibility to add CTA buttons:
+
+!["About Us" page with a smaller hero section](about-us-small-hero.png)
+
+## A Common Footer
+
+Our page lacks a footer. Let's create a footer component and add it to the `singleColumn` template. It'll be a simple component with a copyright notice and a list of links, but you can make it as complex as you want.
+
+<details>
+<summary><code>src/components/Footer/definition.cnd</code></summary>
+
+```cnd
+[hydrogen:Footer] > jnt:content, hydrogen:component orderable
+ - notice (string) i18n mandatory
+ + * (jmix:link) = jmix:link
+
+```
+
+</details>
+
+<details>
+<summary><code>src/components/Footer/default.server.tsx</code></summary>
+
+```tsx
+import {
+  AddContentButtons,
+  getChildNodes,
+  jahiaComponent,
+  Render,
+} from "@jahia/javascript-modules-library";
+import classes from "./component.module.css";
+
+interface Props {
+  notice: string;
+}
+
+jahiaComponent(
+  {
+    componentType: "view",
+    nodeType: "hydrogen:Footer",
+    displayName: "Default Footer",
+  },
+  ({ notice }: Props, { renderContext, currentNode }) => {
+    return (
+      <footer className={classes.footer}>
+        {/* In edition mode, links are piled up to make edition easier */}
+        <nav style={{ flexDirection: renderContext.isEditMode() ? "column" : "row" }}>
+          {getChildNodes(currentNode, -1, 0, (node) => node.isNodeType("jnt:content")).map(
+            (node) => (
+              // @ts-expect-error Fix the types
+              <Render key={node.getIdentifier()} node={node} />
+            ),
+          )}
+          <AddContentButtons />
+        </nav>
+        <p>
+          © {new Date().getFullYear()} {notice}
+        </p>
+      </footer>
+    );
+  },
+);
+```
+
+</details>
+
+<details>
+<summary><code>src/components/Footer/component.module.css</code></summary>
+
+```css
+.footer {
+  padding: 4rem 1rem;
+  color: #fff;
+  background: linear-gradient(to bottom, #024, #000);
+
+  > nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-block: 1rem;
+  }
+
+  > p {
+    text-align: center;
+  }
+
+  a {
+    color: inherit;
+  }
+}
+```
+
+</details>
+
+To add this footer to our layout, but make sure it's always the same footer in all pages, we'll use `<AbsoluteArea>` instead of `<Area>`. Update `singleColumn.server.tsx`:
+
+```tsx
+<Layout title={title}>
+  {/* ... */}
+  <AbsoluteArea
+    name="footer"
+    allowedTypes={["hydrogen:Footer"]}
+    numberOfItems={1}
+    limitedAbsoluteAreaEdit={false}
+  />
+</Layout>
+```
+
+`<AbsoluteArea>` is a special area that will synchronize its content across all pages. It's useful for elements that should be the same everywhere, like a footer or a navbar.
+
+Try adding a footer to your "About Us" page, and a few links to it. Once done, you should see a footer at the bottom of your page:
+
+![Our "About Us" page with a footer](footer.png)
+
+If you create another page with **Single column**, you should be able to create a new Hero section, but the footer will be the same as the one on the "About Us" page.
+
+Next: [Making a Blog](../4-making-a-blog/)
