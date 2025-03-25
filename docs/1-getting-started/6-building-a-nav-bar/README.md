@@ -146,7 +146,7 @@ In `singleColumn.server.tsx`, add the following import:
 import { Render } from "@jahia/javascript-modules-library";
 ```
 
-Above the `<Area name="hero" />` line, add the following code:
+Above the `<Area name="header" nodeType="hydrogen:Header" />` line, add the following code:
 
 ```tsx
 <Render content={{ nodeType: "hydrogen:NavBar" }} />

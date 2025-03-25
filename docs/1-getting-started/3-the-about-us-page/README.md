@@ -21,7 +21,7 @@ jahiaComponent(
   },
   ({ "jcr:title": title }) => (
     <Layout title={title}>
-      <Area name="hero" allowedTypes={["hydrogen:HeroSection"]} numberOfItems={1} />
+      <Area name="header" nodeType="hydrogen:Header" />
       <main style={{ maxWidth: "40rem", margin: "0 auto" }}>
         <Area name="main" />
       </main>
@@ -36,8 +36,37 @@ Let's break this code down:
 
 - The `Layout` component is a simple wrapper that adds `<head>` and `<body>` tags to the page.
 
-- We define two `<Area>`s: `hero` and `main`. An area is an entry point for users to add content.
-  The `hero` area is limited to one `HeroSection` component, and the `main` area can contain any component.
+- We define two `<Area>`s: `header` and `main`. An area is an entry point for users to add content. By default, an area is of node type `jnt:contentList`, but since we want to make our header area more specific, we set `nodeType="hydrogen:Header"`.
+
+We need to define this new header node. We will make it simple to start with, our header will only contain a hero section.
+
+<details>
+<summary><code>src/components/Header/definition.cnd</code></summary>
+
+```cnd
+[hydrogen:Header] > jnt:content
+ + hero (hydrogen:HeroSection)
+```
+
+We don't extend `hydrogen:component` because we don't want to make this component available to users. It's a technical node that will contain a single `HeroSection`.
+
+</details>
+<details>
+<summary><code>src/components/Header/default.server.tsx</code></summary>
+
+```tsx
+import { jahiaComponent, RenderChild } from "@jahia/javascript-modules-library";
+
+jahiaComponent(
+  {
+    componentType: "view",
+    nodeType: "hydrogen:Header",
+  },
+  () => <RenderChild name="hero" />,
+);
+```
+
+</details>
 
 Go ahead and create a new page on your site. Right click the left panel, under Home, select **+ New Page** and chose the **Single column** template. Give your page a title and save it. If you don't see the **Single column** template, you may need to restart `yarn dev` for the new template to be picked up.
 
@@ -55,13 +84,13 @@ Isn't it a bit weird to have CTA buttons on an "About Us" page? Fortunately, Jah
 
 ## Same Node, Different Views
 
-In `singleColumn.server.tsx`, replace the current `<Area name="hero">` with:
+In `Header/default.server.tsx`, replace the current `<RenderChild name="hero" />` with:
 
 ```tsx
-<Area name="hero" allowedTypes={["hydrogen:HeroSection"]} numberOfItems={1} subNodesView="small" />
+<RenderChild name="hero" view="small" />
 ```
 
-This additional property, `subNodesView`, defines the view that should be used when the user adds content to the `hero` area. We haven't created the `small` view yet, if you refresh your page right now you will see an error message instead:
+This additional property, `view`, defines the view that should be used when Jahia renders the `HeroSection` component. We haven't created the `small` view yet, if you refresh your page right now you will see an error message instead:
 
 > No rendering set for node: herosection<br/>
 > Types: [hydrogen:HeroSection]
