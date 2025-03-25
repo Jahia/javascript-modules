@@ -4,10 +4,10 @@ So far we only considered contributing pages visually, directly in Page Builder.
 
 ## Blog Post Type
 
-Let's start by creating a node type called `BlogPost`. We'll keep it concise but feel free to add more fields if you need them. Create a new file named `src/components/BlogPost/definition.cnd`:
+Let's start by creating a node type called `blogPost`. We'll keep it concise but feel free to add more fields if you need them. Create a new file named `src/components/BlogPost/definition.cnd`:
 
 ```cnd
-[hydrogen:BlogPost] > jnt:content, mix:title, jmix:mainResource, hydrogen:component
+[hydrogen:blogPost] > jnt:content, mix:title, jmix:mainResource, hydrogenmix:component
  - subtitle (string) i18n mandatory
  - authors (string) multiple
  - cover (weakreference, picker[type='image']) mandatory < jmix:image
@@ -43,7 +43,7 @@ import classes from "./component.module.css";
 jahiaComponent(
   {
     componentType: "view",
-    nodeType: "hydrogen:BlogPost",
+    nodeType: "hydrogen:blogPost",
     displayName: "Blog Post",
   },
   ({ "jcr:title": title, subtitle, authors = [], cover }: Props, { currentNode }) => {
@@ -127,11 +127,11 @@ In the main area, add a new **Jahia - Queries > Content items using JCR Query** 
 
 ```sql
 SELECT *
-FROM [hydrogen:BlogPost] AS post
+FROM [hydrogen:blogPost] AS post
 WHERE ISDESCENDANTNODE(post, '/sites/hydrogen/contents/blog')
 ```
 
-JCR-SQL2 is a SQL-like language to query the JCR. This query selects all nodes of type `hydrogen:BlogPost` that are descendants of the `/sites/hydrogen/contents/blog` node. In this query, `hydrogen` is the site key, you might have set it to something else when creating your site.
+JCR-SQL2 is a SQL-like language to query the JCR. This query selects all nodes of type `hydrogen:blogPost` that are descendants of the `/sites/hydrogen/contents/blog` node. In this query, `hydrogen` is the site key, you might have set it to something else when creating your site.
 
 ![JCR query edition interface](jcr-query.png)
 
@@ -176,7 +176,7 @@ We can also update our JCR query to order the posts by publication date, and onl
 
 ```sql
 SELECT *
-FROM [hydrogen:BlogPost] AS post
+FROM [hydrogen:blogPost] AS post
 WHERE ISDESCENDANTNODE(post, '/sites/hydrogen/contents/blog')
   AND post.[publicationDate] IS NOT NULL
 ORDER BY post.[publicationDate] DESC

@@ -4,7 +4,7 @@ Our homepage is based on a "basic" layout: take a look at `src/pages/basic.serve
 
 ## Page Templates
 
-Pages are content nodes, like the `HeroSection` and `HeroCallToAction` nodes we created previously. Their type is `jnt:page`, and as for all content, you can tell Jahia how to render them.
+Pages are content nodes, like the `heroSection` and `heroCallToAction` nodes we created previously. Their type is `jnt:page`, and as for all content, you can tell Jahia how to render them.
 
 We'll create a single-column layout with a hero section on top. Create a file named `singleColumn.server.tsx` in `src/pages`:
 
@@ -21,7 +21,7 @@ jahiaComponent(
   },
   ({ "jcr:title": title }) => (
     <Layout title={title}>
-      <Area name="header" nodeType="hydrogen:Header" />
+      <Area name="header" nodeType="hydrogen:header" />
       <main style={{ maxWidth: "40rem", margin: "0 auto" }}>
         <Area name="main" />
       </main>
@@ -36,7 +36,7 @@ Let's break this code down:
 
 - The `Layout` component is a simple wrapper that adds `<head>` and `<body>` tags to the page.
 
-- We define two `<Area>`s: `header` and `main`. An area is an entry point for users to add content. By default, an area is of node type `jnt:contentList`, but since we want to make our header area more specific, we set `nodeType="hydrogen:Header"`.
+- We define two `<Area>`s: `header` and `main`. An area is an entry point for users to add content. By default, an area is of node type `jnt:contentList`, but since we want to make our header area more specific, we set `nodeType="hydrogen:header"`.
 
 We need to define this new header node. We will make it simple to start with, our header will only contain a hero section.
 
@@ -44,11 +44,11 @@ We need to define this new header node. We will make it simple to start with, ou
 <summary><code>src/components/Header/definition.cnd</code></summary>
 
 ```cnd
-[hydrogen:Header] > jnt:content
- + hero (hydrogen:HeroSection)
+[hydrogen:header] > jnt:content
+ + hero (hydrogen:heroSection)
 ```
 
-We don't extend `hydrogen:component` because we don't want to make this component available to users. It's a technical node that will contain a single `HeroSection`.
+We don't extend `hydrogenmix:component` because we don't want to make this component available to users. It's a technical node that will contain a single `heroSection`.
 
 </details>
 <details>
@@ -60,7 +60,7 @@ import { jahiaComponent, RenderChild } from "@jahia/javascript-modules-library";
 jahiaComponent(
   {
     componentType: "view",
-    nodeType: "hydrogen:Header",
+    nodeType: "hydrogen:header",
   },
   () => <RenderChild name="hero" />,
 );
@@ -90,10 +90,10 @@ In `Header/default.server.tsx`, replace the current `<RenderChild name="hero" />
 <RenderChild name="hero" view="small" />
 ```
 
-This additional property, `view`, defines the view that should be used when Jahia renders the `HeroSection` component. We haven't created the `small` view yet, if you refresh your page right now you will see an error message instead:
+This additional property, `view`, defines the view that should be used when Jahia renders the `heroSection` component. We haven't created the `small` view yet, if you refresh your page right now you will see an error message instead:
 
 > No rendering set for node: herosection<br/>
-> Types: [hydrogen:HeroSection]
+> Types: [hydrogen:heroSection]
 
 Start by adding a file named `src/components/Hero/Section/types.ts` and move `Props` to it:
 
@@ -118,7 +118,7 @@ import type { Props } from "./types.js";
 jahiaComponent(
   {
     componentType: "view",
-    nodeType: "hydrogen:HeroSection",
+    nodeType: "hydrogen:heroSection",
     displayName: "Small Hero Section",
     name: "small",
   },
@@ -144,7 +144,7 @@ Finally, update `component.module.css` to include a new class:
 
 You can also update `default.server.tsx` to include `Props` instead of defining it again.
 
-The difference between `small.server.tsx` and `default.server.tsx` is the fact that we declare the component with `name: "small"`. This registers a second view named small for the `HeroSection` node type. When `name` is not provided, the view is considered the default one.
+The difference between `small.server.tsx` and `default.server.tsx` is the fact that we declare the component with `name: "small"`. This registers a second view named small for the `heroSection` node type. When `name` is not provided, the view is considered the default one.
 
 After pushing these changes to your Jahia instance, you should see a smaller hero section on your "About Us" page, without the possibility to add CTA buttons:
 
@@ -158,7 +158,7 @@ Our page lacks a footer. Let's create a footer component and add it to the `sing
 <summary><code>src/components/Footer/definition.cnd</code></summary>
 
 ```cnd
-[hydrogen:Footer] > jnt:content, hydrogen:component orderable
+[hydrogen:footer] > jnt:content, hydrogenmix:component orderable
  - notice (string) i18n mandatory
  + * (jmix:link) = jmix:link
 
@@ -170,12 +170,7 @@ Our page lacks a footer. Let's create a footer component and add it to the `sing
 <summary><code>src/components/Footer/default.server.tsx</code></summary>
 
 ```tsx
-import {
-  AddContentButtons,
-  getChildNodes,
-  jahiaComponent,
-  Render,
-} from "@jahia/javascript-modules-library";
+import { jahiaComponent, RenderChildren } from "@jahia/javascript-modules-library";
 import classes from "./component.module.css";
 
 interface Props {
@@ -185,7 +180,7 @@ interface Props {
 jahiaComponent(
   {
     componentType: "view",
-    nodeType: "hydrogen:Footer",
+    nodeType: "hydrogen:footer",
     displayName: "Default Footer",
   },
   ({ notice }: Props, { renderContext, currentNode }) => {
@@ -193,13 +188,7 @@ jahiaComponent(
       <footer className={classes.footer}>
         {/* In edition mode, links are piled up to make edition easier */}
         <nav style={{ flexDirection: renderContext.isEditMode() ? "column" : "row" }}>
-          {getChildNodes(currentNode, -1, 0, (node) => node.isNodeType("jnt:content")).map(
-            (node) => (
-              // @ts-expect-error Fix the types
-              <Render key={node.getIdentifier()} node={node} />
-            ),
-          )}
-          <AddContentButtons />
+          <RenderChildren />
         </nav>
         <p>
           © {new Date().getFullYear()} {notice}
@@ -247,7 +236,7 @@ To add this footer to our layout, but make sure it's always the same footer in a
   {/* ... */}
   <AbsoluteArea
     name="footer"
-    allowedTypes={["hydrogen:Footer"]}
+    allowedTypes={["hydrogen:footer"]}
     numberOfItems={1}
     limitedAbsoluteAreaEdit={false}
   />

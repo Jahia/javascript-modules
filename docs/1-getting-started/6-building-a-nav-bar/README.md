@@ -10,10 +10,10 @@ Jahia supports creating pages in a tree structure. Each page can have child page
 
 Our goal now is to build a navigation bar that displays the first two levels of the page tree. The navigation bar should be dynamic and update automatically when the page tree changes.
 
-We'll create a new component called `NavBar` with a simple definition. Create the file `src/components/NavBar/defintion.cnd` with the following content:
+We'll create a new component called `navBar` with a simple definition. Create the file `src/components/NavBar/defintion.cnd` with the following content:
 
 ```cnd
-[hydrogen:NavBar] > hydrogen:component, jnt:content
+[hydrogen:navBar] > hydrogenmix:component, jnt:content
 ```
 
 It doesn't have any properties, but you can add some if you want to customize the navigation bar further.
@@ -56,7 +56,7 @@ const getChildPages = (node: JCRNodeWrapper) =>
 jahiaComponent(
   {
     componentType: "view",
-    nodeType: "hydrogen:NavBar",
+    nodeType: "hydrogen:navBar",
     displayName: "NavBar",
   },
   (_, { renderContext, mainNode }) => (
@@ -146,10 +146,10 @@ In `singleColumn.server.tsx`, add the following import:
 import { Render } from "@jahia/javascript-modules-library";
 ```
 
-Above the `<Area name="header" nodeType="hydrogen:Header" />` line, add the following code:
+Above the `<Area name="header" nodeType="hydrogen:header" />` line, add the following code:
 
 ```tsx
-<Render content={{ nodeType: "hydrogen:NavBar" }} />
+<Render content={{ nodeType: "hydrogen:navBar" }} />
 ```
 
 This code will render the `NavBar` component as a virtual node on every page using this template. Once pushed to Jahia, you can navigate to any page, and the navigation bar will be there:

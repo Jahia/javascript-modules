@@ -38,7 +38,7 @@ import { SmallHeroSection } from "../Hero/Section/small.server.jsx";
 jahiaComponent(
   {
     componentType: "view",
-    nodeType: "hydrogen:BlogPost",
+    nodeType: "hydrogen:blogPost",
     displayName: "Blog Post",
     name: "fullPage",
   },

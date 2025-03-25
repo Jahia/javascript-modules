@@ -11,7 +11,7 @@ JavaScript modules are designed using the Single Directory Components (SDC) patt
 Start by creating folders in `src/components/` called `Hero/Section/`. Inside this folder, create a `definition.cnd` file with the following content:
 
 ```cnd
-[hydrogen:HeroSection] > jnt:content, hydrogen:component
+[hydrogen:heroSection] > jnt:content, hydrogenmix:component
  - title (string) i18n mandatory
  - subtitle (string, textarea) i18n mandatory
  - background (weakreference, picker[type='image']) mandatory < jmix:image
@@ -19,11 +19,11 @@ Start by creating folders in `src/components/` called `Hero/Section/`. Inside th
 
 That's a lot of new concepts! Let's break this node definition down:
 
-`[hydrogen:HeroSection]` is the node type name. It's prefixed with `hydrogen`, a namespace, to avoid conflicts with other node types.
+`[hydrogen:heroSection]` is the node type name. It's prefixed with `hydrogen`, a namespace, to avoid conflicts with other node types.
 
-`> jnt:content, hydrogen:component` means that `HeroSection` extends `jnt:content` and `hydrogen:component`. `jnt:content` is the root node type of all user-created content, while `hydrogen:component` is a mixin, a reusable node fragment that can be added to other node types but cannot be instantiated on its own. You can find the definition for `hydrogen:component` in `settings/definitions.cnd`.
+`> jnt:content, hydrogenmix:component` means that `heroSection` extends `jnt:content` and `hydrogenmix:component`. `jnt:content` is the root node type of all user-created content, while `hydrogenmix:component` is a mixin, a reusable node fragment that can be added to other node types but cannot be instantiated on its own. You can find the definition for `hydrogenmix:component` in `settings/definitions.cnd`.
 
-The following three lines define the properties of the `HeroSection` node type. Each line follows the same pattern:
+The following three lines define the properties of the `heroSection` node type. Each line follows the same pattern:
 
 - `title`, `subtitle` and `background` are the property names.
 
@@ -37,7 +37,7 @@ The following three lines define the properties of the `HeroSection` node type. 
 
 If you have a specific hero section design in mind, you can add more properties to the node definition. Don't add Call to Action (CTA) buttons or links yet, we'll cover that in a later step. You can find all the available property types and constraints in the [CND Reference](../../3-reference/1-cnd-format/).
 
-You can stop and restart `yarn dev` to push this definition to your Jahia instance. If all goes well, you should now have the `HeroSection` node type available in the content editor. Click **New content** and select **HeroSection** to create a new hero section:
+You can stop and restart `yarn dev` to push this definition to your Jahia instance. If all goes well, you should now have the `heroSection` node type available in the content editor. Click **New content** and select **heroSection** to create a new hero section:
 
 > [!WARNING]
 > Jahia will refuse your type definition if it contains a breaking change. During development, you can use the [Installed definitions browser](http://localhost:8080/modules/tools/definitionsBrowser.jsp) tool to remove your type definition and push a new one.
@@ -53,13 +53,13 @@ _Picture by [Appolinary Kalashnikova on Unsplash](https://unsplash.com/photos/wi
 Click **Save** and see the new hero section in the content tree:
 
 > No rendering set for node: herosection<br>
-> Types: [hydrogen:HeroSection]
+> Types: [hydrogen:heroSection]
 
-This error message means that Jahia doesn't know how to render the `HeroSection` node type: we haven't implemented the rendering logic yet. We'll do that next.
+This error message means that Jahia doesn't know how to render the `heroSection` node type: we haven't implemented the rendering logic yet. We'll do that next.
 
 ## Rendering Content
 
-We must tell Jahia how to render our `HeroSection` node type using the `jahiaComponent` function from the `@jahia/javascript-modules-library` package. In the `Hero/Section` folder, create a `default.server.tsx` file with the following content:
+We must tell Jahia how to render our `heroSection` node type using the `jahiaComponent` function from the `@jahia/javascript-modules-library` package. In the `Hero/Section` folder, create a `default.server.tsx` file with the following content:
 
 ```tsx
 import { buildNodeUrl, jahiaComponent } from "@jahia/javascript-modules-library";
@@ -76,7 +76,7 @@ interface Props {
 jahiaComponent(
   {
     componentType: "view",
-    nodeType: "hydrogen:HeroSection",
+    nodeType: "hydrogen:heroSection",
     displayName: "Hero Section",
   },
   ({ title, subtitle, background }: Props) => (
@@ -88,7 +88,7 @@ jahiaComponent(
 );
 ```
 
-This code tells Jahia how to render the `HeroSection` node type as a React component. Once pushed to your Jahia instance (you may need to rerun `yarn dev` for the bundler to pick up the new file), the error message should disappear, and the hero section should render correctly, albeit without any styling.
+This code tells Jahia how to render the `heroSection` node type as a React component. Once pushed to your Jahia instance (you may need to rerun `yarn dev` for the bundler to pick up the new file), the error message should disappear, and the hero section should render correctly, albeit without any styling.
 
 `buildNodeUrl` is a helper to transform a node into a URL to its content. We'll need this every time we want to reference a resource in the browser: for `<img />`, `<a />`, `background-image`, etc.
 
@@ -145,7 +145,7 @@ Once saved and pushed to your Jahia instance, the hero section should look _much
 Now that we have a hero section, let's add call to action (CTA) buttons to it. Create a new `Hero/CallToAction` directory (in `src/compontents`) containing a `definition.cnd` file with the following content:
 
 ```cnd
-[hydrogen:HeroCallToAction] > jnt:content, hydrogen:component
+[hydrogen:heroCallToAction] > jnt:content, hydrogenmix:component
  - title (string) i18n mandatory
  - j:linkType (string, choicelist[linkTypeInitializer]) mandatory
 ```
@@ -155,12 +155,12 @@ While `title` is a common property, `j:linkType` is a property that has a specia
 Add the following line to the `Hero/Section/definition.cnd` file:
 
 ```cnd
- + * (hydrogen:HeroCallToAction) = hydrogen:HeroCallToAction
+ + * (hydrogen:heroCallToAction)
 ```
 
-Lines starting with a `+` define child nodes. As we said previously, nodes are stored in a tree structure, and each node can have child nodes. This line tells Jahia that a `HeroSection` node can have many `HeroCallToAction` child nodes.
+Lines starting with a `+` define child nodes. As we said previously, nodes are stored in a tree structure, and each node can have child nodes. This line tells Jahia that a `heroSection` node can have many `heroCallToAction` child nodes.
 
-Create the following files to render the `HeroCallToAction` node type:
+Create the following files to render the `heroCallToAction` node type:
 
 <details>
 <summary><code>src/components/Hero/CallToAction/default.server.tsx</code></summary>
@@ -181,7 +181,7 @@ type Props = {
 jahiaComponent(
   {
     componentType: "view",
-    nodeType: "hydrogen:HeroCallToAction",
+    nodeType: "hydrogen:heroCallToAction",
     displayName: "Call To Action",
   },
   (props: Props) => {
@@ -235,7 +235,7 @@ jahiaComponent(
 
 </details>
 
-We now have a working CTA button component, but we still need to add them to our hero section. Update `Hero/Section/default.server.tsx` to render the `HeroCallToAction` nodes:
+We now have a working CTA button component, but we still need to add them to our hero section. Update `Hero/Section/default.server.tsx` to render the `heroCallToAction` nodes:
 
 ```tsx
 <header className={classes.hero} style={{ backgroundImage: `url(${buildNodeUrl(background)})` }}>
@@ -253,7 +253,7 @@ Once pushed to your Jahia instance, if you create a CTA button in your hero sect
 
 ![Our hero section with CTAs](hero-cta.png)
 
-You can add as many CTAs as you want to your hero section. This is why we haven't defined our CTA properties on `HeroSection` directly: it allows for more flexibility and reusability.
+You can add as many CTAs as you want to your hero section. This is why we haven't defined our CTA properties on `heroSection` directly: it allows for more flexibility and reusability.
 
 > [!TIP]
 > You can, at all times, take a look at your data tree with the [JCR repository browser](http://localhost:8080/modules/tools/jcrBrowser.jsp).
