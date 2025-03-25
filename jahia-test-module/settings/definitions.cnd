@@ -133,6 +133,20 @@
  - propRichText (string, richtext)
  + * (jmix:droppableContent)
 
+[javascriptExampleMix:testPriorityViewMixin1] > javascriptExampleMix:javascriptExampleComponent, mix:title mixin
+[javascriptExample:testPriorityView1] > jnt:content, javascriptExampleMix:testPriorityViewMixin1
+
+[javascriptExampleMix:testPriorityViewMixin2] > javascriptExampleMix:javascriptExampleComponent, mix:title mixin
+[javascriptExample:testPriorityView2] > jnt:content, javascriptExampleMix:testPriorityViewMixin2
+
+[javascriptExampleMix:testPriorityViewMixin3] > javascriptExampleMix:javascriptExampleComponent, mix:title mixin
+[javascriptExample:testPriorityView3] > jnt:content, javascriptExampleMix:testPriorityViewMixin3
+
+[javascriptExampleMix:testPriorityViewMixin4] > javascriptExampleMix:javascriptExampleComponent, mix:title mixin
+[javascriptExample:testPriorityView4] > jnt:content, javascriptExampleMix:testPriorityViewMixin4
+
+[javascriptExampleMix:testPriorityTemplateMixin3] mixin
+
 [javascriptExample:testRender] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
  - prop1 (string)
  - prop2 (string)
