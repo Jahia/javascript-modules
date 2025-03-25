@@ -78,26 +78,11 @@ describe('Area test', () => {
         cy.logout()
     })
 
-    it(`${pageName}: subNodesView Area`, () => {
-        cy.login()
-        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
-        addNode({
-            parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/subNodesViewArea`,
-            name: 'item1',
-            primaryNodeType: 'jnt:bigText',
-        })
-        cy.reload()
-        cy.iframe('#page-builder-frame-1').within(() => {
-            cy.get('div[data-testid="subNodesViewArea"]').find('a').contains('item1')
-        })
-        cy.logout()
-    })
-
     it(`${pageName}: path Area`, () => {
         cy.login()
         cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         cy.iframe('#page-builder-frame-1').within(() => {
-            cy.get('div[data-testid="pathArea"]').find('div[type="area"]').should('exist')
+            cy.get('div[data-testid="parentArea"]').find('div[type="area"]').should('exist')
         })
         cy.logout()
     })
@@ -107,18 +92,6 @@ describe('Area test', () => {
         cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         cy.iframe('#page-builder-frame-1').within(() => {
             cy.get('div[data-testid="nonEditableArea"]').should('be.empty')
-        })
-        cy.logout()
-    })
-
-    it(`${pageName}: Area as sub node`, () => {
-        cy.login()
-        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
-        cy.iframe('#page-builder-frame-1').within(() => {
-            cy.get('div[data-testid="areaAsSubNode"]')
-                .find('div[type="area"]')
-                .should('have.attr', 'path')
-                .and('match', /\/pagecontent\/test\/areaAsSubNode$/)
         })
         cy.logout()
     })

@@ -56,10 +56,10 @@ This component renders all children of the current node. It's a thin wrapper aro
 
 ### `AbsoluteArea`
 
-This component creates an absolute area in the page. It's an area of user-contributable content that is synchronized between all pages where it is present.
+This component creates an absolute area in the page. It's an area of user-contributable content, child of the node of your choice.
 
 ```tsx
-<AbsoluteArea name="footer" />
+<AbsoluteArea name="footer" parent={renderContext.getSite().getHome()} />
 ```
 
 ### `Area`
