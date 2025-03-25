@@ -61,7 +61,12 @@ jahiaComponent(
         </section>
         {renderContext.isEditMode() && (
           <div className={classes.hint} style={{ marginLeft: "calc(50% - 0.5rem)" }}>
-            <img src={buildModuleFileUrl("arrows/bottom.svg")} alt="↓" width="70" height="100" />{" "}
+            <img
+              src={buildModuleFileUrl("static/arrows/down.svg")}
+              alt="↓"
+              width="70"
+              height="100"
+            />{" "}
             {t("89D3xFLMZmCAencaqw68C")}
           </div>
         )}

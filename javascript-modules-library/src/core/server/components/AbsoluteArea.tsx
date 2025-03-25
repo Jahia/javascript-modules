@@ -1,6 +1,7 @@
 import type React from "react";
 import { useServerContext } from "../hooks/useServerContext.js";
 import server from "virtual:jahia-server";
+import type { JCRNodeWrapper } from "org.jahia.services.content";
 
 /**
  * Generates an absolute area in which editors may insert content objects.
@@ -9,28 +10,41 @@ import server from "virtual:jahia-server";
  */
 export function AbsoluteArea({
   name,
+  parent,
   areaView,
+  view,
   allowedTypes,
+  allowedNodeTypes,
   numberOfItems,
-  subNodesView,
-  path,
   readOnly = false,
-  level,
   areaType = "jnt:contentList",
+  nodeType = "jnt:contentList",
   parameters,
 }: Readonly<{
   /** The name of the area. */
-  name?: string;
-  /** The view to use for the area. */
+  name: string;
+  /** Parent node where the area is stored in the JCR. The parent node must exist. */
+  parent: JCRNodeWrapper;
+
+  /**
+   * The view to use for the area.
+   *
+   * @deprecated Use {@link #view} instead
+   */
   areaView?: string;
-  /** The allowed types for the area. */
+  /** The view to use for the area. */
+  view?: string;
+  /**
+   * The allowed types for the area.
+   *
+   * @deprecated Use {@link #allowedNodeTypes} instead
+   */
   allowedTypes?: string[];
+  /** The allowed types for the area. */
+  allowedNodeTypes?: string[];
   /** The number of items to display in the area. */
   numberOfItems?: number;
-  /** The view to use for the subnodes. */
-  subNodesView?: string;
-  /** Relative (to the current node) or absolute path to the node to include. */
-  path?: string;
+
   /**
    * Makes the area read-only.
    *
@@ -42,15 +56,24 @@ export function AbsoluteArea({
    * @default false
    */
   readOnly?: boolean | "children";
-  /** Ancestor level for absolute area - 0 is Home page, 1 first sub-pages, ... */
-  level?: number;
   /**
-   * Content type to be used to create the area
+   * Content node type to be used to create the area (if the node does not exist yet)
    *
+   * @deprecated Use {@link #nodeType} instead
    * @default jnt:contentList
    */
   areaType?: string;
-  /** The parameters to pass to the absolute area */
+  /**
+   * Content node type to be used to create the area (if the node does not exist yet)
+   *
+   * @default jnt:contentList
+   */
+  nodeType?: string;
+  /**
+   * Map of custom parameters that can be passed to the backend engine for advanced logic.
+   *
+   * @deprecated Not recommended
+   */
   parameters?: Record<string, unknown>;
 }>): React.JSX.Element {
   const { renderContext } = useServerContext();
@@ -61,14 +84,12 @@ export function AbsoluteArea({
         __html: server.render.renderAbsoluteArea(
           {
             name,
-            areaView,
-            allowedTypes,
+            parent: parent,
+            view: view ? view : areaView,
+            allowedNodeTypes: allowedNodeTypes ?? allowedTypes,
             numberOfItems,
-            subNodesView,
-            path,
+            nodeType: nodeType ?? areaType,
             editable: readOnly !== true,
-            level,
-            areaType,
             limitedAbsoluteAreaEdit: readOnly === "children",
             parameters,
           },

@@ -19,7 +19,7 @@
         "@4tw/cypress-drag-drop": "^2.2.1",
         "@jahia/cypress": "^4.2.0",
         "@jahia/jahia-reporter": "^1.0.30",
-        "@jahia/jcontent-cypress": "^3.0.0-tests.8",
+        "@jahia/jcontent-cypress": "^3.3.0-tests.1",
         "@types/mocha": "^10.0.10",
         "@types/node": "^18.11.18",
         "cypress": "^14.0.0",

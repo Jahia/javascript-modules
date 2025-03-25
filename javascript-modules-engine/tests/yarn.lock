@@ -159,7 +159,7 @@ __metadata:
     "@4tw/cypress-drag-drop": "npm:^2.2.1"
     "@jahia/cypress": "npm:^4.2.0"
     "@jahia/jahia-reporter": "npm:^1.0.30"
-    "@jahia/jcontent-cypress": "npm:^3.0.0-tests.8"
+    "@jahia/jcontent-cypress": "npm:^3.3.0-tests.1"
     "@types/mocha": "npm:^10.0.10"
     "@types/node": "npm:^18.11.18"
     cypress: "npm:^14.0.0"
@@ -178,12 +178,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@jahia/jcontent-cypress@npm:^3.0.0-tests.8":
-  version: 3.0.0-tests.10
-  resolution: "@jahia/jcontent-cypress@npm:3.0.0-tests.10"
+"@jahia/jcontent-cypress@npm:^3.3.0-tests.1":
+  version: 3.3.0-tests.1
+  resolution: "@jahia/jcontent-cypress@npm:3.3.0-tests.1"
   dependencies:
     cypress-real-events: "npm:^1.7.6"
-  checksum: 10c0/e5723e96f942a68e31d20344374cdbb837f11ec8cc2d63ee500f1447235b94aba73c963b32e7d82e4fccb73e53fbcab054031509ffe6169401dd93269347e683
+  checksum: 10c0/2ac355a40b0f572ec45929d4d2c557f35d9b29cb9929b0ffb6ad3995f12e0e0e5f10d21da7f1a8542a463bde62aff30c5364983e5ef92aaba1ed4b75bb6602c3
   languageName: node
   linkType: hard
 

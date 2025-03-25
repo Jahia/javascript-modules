@@ -237,6 +237,7 @@
       "org.jahia.modules.javascript.modules.engine.js.server.OSGiHelper.*",
       "org.jahia.modules.javascript.modules.engine.js.server.RegistryHelper.*",
       "org.jahia.modules.javascript.modules.engine.js.server.RenderHelper.*",
+      "org.jahia.services.content.decorator.JCRNodeDecorator.getNode.*",
       "org.jahia.services.content.JCRCallback.*",
       "org.jahia.services.content.JCRItemWrapper.get.*",
       "org.jahia.services.content.JCRItemWrapper.is.*",
