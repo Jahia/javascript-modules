@@ -65,7 +65,7 @@ jahiaComponent(
         </header>
         <article dangerouslySetInnerHTML={{ __html: body }} />
       </main>
-      <AbsoluteArea name="footer" />
+      <AbsoluteArea name="footer" parent={renderContext.getSite()} nodeType="hydrogen:footer" />
     </>
   ),
 );
@@ -97,7 +97,7 @@ This code contains of lot of things. Here are the most notable parts:
 
 - We used [`dangerouslySetInnerHTML`](https://react.dev/reference/react-dom/components/common#dangerously-setting-the-inner-html) to render the body of the blog post. Because the body is a rich text field, we can't render it as a string, as it would display HTML tags as `<p>content</p>` instead of rendering the content as HTML. This is a security risk, as it allows for XSS attacks: that's why editing content is restricted to trusted users.
 
-- We used `<AbsoluteArea name="footer" />` in the view to render the footer. This will display the footer component at the bottom of all blog posts.
+- We used `<AbsoluteArea name="footer" parent={renderContext.getSite()} nodeType="hydrogen:footer" />` in the view to render the footer. This will display the footer component at the bottom of all blog posts.
 
 ![Article displayed in full page](full-page-article.png)
 

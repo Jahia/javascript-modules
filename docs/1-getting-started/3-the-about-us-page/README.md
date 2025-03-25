@@ -158,11 +158,12 @@ Our page lacks a footer. Let's create a footer component and add it to the `sing
 <summary><code>src/components/Footer/definition.cnd</code></summary>
 
 ```cnd
-[hydrogen:footer] > jnt:content, hydrogenmix:component orderable
- - notice (string) i18n mandatory
- + * (jmix:link) = jmix:link
-
+[hydrogen:footer] > jnt:content, hydrogen:component orderable
+ - notice (string) = '' i18n autocreated
+ + * (jmix:link)
 ```
+
+We use `autocreated` with an empty string as the default value so that Jahia can create the node without user input. We also use `orderable` to allow users to reorder the links.
 
 </details>
 
@@ -234,18 +235,13 @@ To add this footer to our layout, but make sure it's always the same footer in a
 ```tsx
 <Layout title={title}>
   {/* ... */}
-  <AbsoluteArea
-    name="footer"
-    allowedTypes={["hydrogen:footer"]}
-    numberOfItems={1}
-    limitedAbsoluteAreaEdit={false}
-  />
+  <AbsoluteArea name="footer" parent={renderContext.getSite()} nodeType="hydrogen:footer" />
 </Layout>
 ```
 
-`<AbsoluteArea>` is a special area that will synchronize its content across all pages. It's useful for elements that should be the same everywhere, like a footer or a navbar.
+`<AbsoluteArea>` is a special area that will synchronize its content across all pages. It's useful for elements that should be the same everywhere, like a footer or a navbar. To do so, we have to reference the same node for all pages. To make it easier, we set the parent to the site node. Make sure to retreive `renderContext` from the second argument of the render function.
 
-Try adding a footer to your "About Us" page, and a few links to it. Once done, you should see a footer at the bottom of your page:
+Try adding a few links to the footer that should be created at the end of the `singleColumn` template. You can also update the copyright notice with your company name. Once done, you should see a footer at the bottom of your page:
 
 ![Our "About Us" page with a footer](footer.png)
 
