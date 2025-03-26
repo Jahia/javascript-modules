@@ -77,7 +77,7 @@ function InBrowser<T>({
         inlineResource={/** HTML */ `<script type="module" src="${engineBase}/index.js"></script>`}
       />
 
-      <div>
+      <div style={{ display: "contents" }}>
         <script type="application/json" data-hydration-mode={ssr ? "hydrate" : "render"}>
           {devalue.stringify({
             lang: language,
@@ -89,7 +89,7 @@ function InBrowser<T>({
         {ssr ? (
           <I18nextProvider i18n={i18n}>
             <Child {...props}>
-              <div>{children}</div>
+              <div style={{ display: "contents" }}>{children}</div>
             </Child>
           </I18nextProvider>
         ) : (
