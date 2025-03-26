@@ -23,6 +23,7 @@ import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -35,6 +36,7 @@ public class JSView implements View, Comparable<View> {
     private Properties properties;
     private Properties defaultProperties;
     private final String path;
+    private final int priority;
 
     private final boolean isTemplate;
 
@@ -50,13 +52,14 @@ public class JSView implements View, Comparable<View> {
 
         // init some system info, like componentType: template or view
         String componentType = jsValues.containsKey("componentType") ? jsValues.get("componentType").toString() : null;
-        if((!"template".equals(componentType) && !"view".equals(componentType))) {
+        if ((!"template".equals(componentType) && !"view".equals(componentType))) {
             logger.warn("Unrecognized componentType '{}' for view '{}', will be considered as a view", componentType, this.getKey());
         }
         this.isTemplate = "template".equals(componentType);
 
         this.defaultProperties = new Properties();
-        this.path = bundle.getBundleId()+ "/" + bundle.getSymbolicName() + "/" + getRegistryKey();
+        this.path = bundle.getBundleId() + "/" + bundle.getSymbolicName() + "/" + getRegistryKey();
+        this.priority = (int) jsValues.getOrDefault("priority", 0);
     }
 
     public Map<String, Object> getRegistryInstance(ContextProvider contextProvider) {
@@ -98,6 +101,10 @@ public class JSView implements View, Comparable<View> {
     @Override
     public String getPath() {
         return path;
+    }
+
+    public int getPriority() {
+        return priority;
     }
 
     @Override
@@ -155,22 +162,24 @@ public class JSView implements View, Comparable<View> {
     }
 
     @Override
-    public int compareTo(View otherView) {
-        if (getModule() == null) {
-            if (otherView.getModule() != null) {
-                return 1;
-            } else {
-                return getKey().compareTo(otherView.getKey());
-            }
-        } else {
-            if (otherView.getModule() == null) {
-                return -1;
-            } else if (!getModule().equals(otherView.getModule())) {
-                return getModule().getName().compareTo(otherView.getModule().getName());
-            } else {
-                return getKey().compareTo(otherView.getKey());
+    public int compareTo(@Nonnull View otherView) {
+        if (otherView instanceof JSView) {
+            int priorityComparison = Integer.compare(((JSView) otherView).getPriority(), getPriority());
+            if (priorityComparison != 0) {
+                return priorityComparison;
             }
         }
+        if (getModule() == null) {
+            return otherView.getModule() != null ? 1 : getKey().compareTo(otherView.getKey());
+        }
+        if (otherView.getModule() == null) {
+            return -1;
+        }
+        int moduleComparison = getModule().getName().compareTo(otherView.getModule().getName());
+        if (moduleComparison != 0) {
+            return moduleComparison;
+        }
+        return getKey().compareTo(otherView.getKey());
     }
 
 }

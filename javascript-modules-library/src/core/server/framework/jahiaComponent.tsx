@@ -21,6 +21,13 @@ export interface JahiaComponent {
   componentType: "template" | "view";
   /** The content node type the component applies to. */
   nodeType: string;
+  /**
+   * The priority of the components in case multiple templates/views are applicable to a given
+   * resource. The component with the highest priority has precedence over the other components.
+   *
+   * @default 0
+   */
+  priority?: number;
   /** Properties to add on the component, optional. */
   properties?: Record<string, string>;
 }
@@ -39,12 +46,14 @@ export const jahiaComponent = <T extends (props: never, context: ServerContext) 
   const options = {
     name: "default",
     templateType: "html",
+    priority: 0,
     component: wrap(Component),
     ...definitions,
   };
 
   // If id is not provided, generate it using bundleSymbolicName, componentType, nodeType, and name
-  id ??= `${bundle.getSymbolicName()}_${options.componentType}_${options.nodeType}_${options.name}`;
+  // optionally, include the priority if different from the default value (to remain backward compatible)
+  id ??= `${bundle.getSymbolicName()}_${options.componentType}_${options.nodeType}_${options.name}${options.priority ? "_" + options.priority : ""}`;
 
   // Register view
   const reactView = server.registry.get("view", "react");

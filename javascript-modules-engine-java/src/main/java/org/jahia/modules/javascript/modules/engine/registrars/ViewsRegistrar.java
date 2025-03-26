@@ -139,7 +139,7 @@ public class ViewsRegistrar implements ScriptResolver, TemplateResolver, Registr
             // JS templates are just JS views, so we just read already resolved script for resource.
             Script script = resource.getScript(renderContext);
             if (script != null && script.getView() instanceof JSView && ((JSView) script.getView()).isTemplate()) {
-                Template template = new Template(script.getView().getKey(), null, null, resource.getResolvedTemplate(), 0);
+                Template template = new Template(script.getView().getKey(), null, null, resource.getResolvedTemplate(), ((JSView) script.getView()).getPriority());
                 template.setExternal(true);
                 return template;
             }
@@ -200,6 +200,7 @@ public class ViewsRegistrar implements ScriptResolver, TemplateResolver, Registr
                     boolean viewMatch = v.getKey().equals(template);
                     return templateMatch && viewMatch;
                 })
+                .sorted()
                 .findFirst()
                 .orElseThrow(() -> new TemplateNotFoundException(resource.getResolvedTemplate()));
     }
