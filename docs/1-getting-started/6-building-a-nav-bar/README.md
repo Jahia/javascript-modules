@@ -10,7 +10,7 @@ Jahia supports creating pages in a tree structure. Each page can have child page
 
 Our goal now is to build a navigation bar that displays the first two levels of the page tree. The navigation bar should be dynamic and update automatically when the page tree changes.
 
-We'll create a new component called `navBar` with a simple definition. Create the file `src/components/NavBar/defintion.cnd` with the following content:
+We'll create a new component called `navBar` with a simple definition. Create the file `src/components/NavBar/definition.cnd` with the following content:
 
 ```cnd
 [hydrogen:navBar] > hydrogenmix:component, jnt:content
@@ -43,14 +43,15 @@ To get all these pages, we'll start at the site level, `renderContext.getSite()`
 
 Iterating over children can be done with the `getChildNodes` function. It takes a node and a filtering function as arguments. The filtering function should return `true` if the node should be included in the result. We'll only keep nodes of type `jnt:page`.
 
-Create the file `src/components/NavBar/NavBar.server.tsx` with the following content:
+Create the file `src/components/NavBar/default.server.tsx` with the following content:
 
 ```tsx
 import { buildNodeUrl, getChildNodes, jahiaComponent } from "@jahia/javascript-modules-library";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
+import type { JCRSiteNode } from "org.jahia.services.content.decorator";
 
 /** Get all child pages of a node. */
-const getChildPages = (node: JCRNodeWrapper) =>
+const getChildPages = (node: JCRNodeWrapper | JCRSiteNode) =>
   getChildNodes(node, -1, 0, (node) => node.isNodeType("jnt:page"));
 
 jahiaComponent(
@@ -62,7 +63,7 @@ jahiaComponent(
   (_, { renderContext, mainNode }) => (
     <nav>
       <ul>
-        {getChildPages(renderContext.getSite().getNode()).map((page) => (
+        {getChildPages(renderContext.getSite()).map((page) => (
           <li key={page.getPath()}>
             <a href={buildNodeUrl(page)} aria-current={page === mainNode ? "page" : undefined}>
               {page.getProperty("jcr:title").getString()}
@@ -87,7 +88,7 @@ jahiaComponent(
 );
 ```
 
-We use `aria-current="page"` rather than a CSS class to indicate the current page to make the navigation bar accessible.
+We use [`aria-current="page"`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-current#page) rather than a CSS class to indicate the current page to make the navigation bar accessible.
 
 You can push your component to Jahia and see it in action by adding it to the Home page:
 
@@ -140,7 +141,7 @@ You'll need to add `import classes from "./component.module.css";` and `classNam
 
 If you navigate to another page than the Home page, the navigation bar will not be there. We could add an `<AbsoluteArea>` to the `singleColumn.server.tsx` template to share the navigation bar across all pages. However, since our navigation bar does not take any parameters, we can save our editors some time by rendering it as a virtual node.
 
-In `singleColumn.server.tsx`, add the following import:
+In `src/templates/Page/singleColumn.server.tsx`, add the following import:
 
 ```tsx
 import { Render } from "@jahia/javascript-modules-library";
