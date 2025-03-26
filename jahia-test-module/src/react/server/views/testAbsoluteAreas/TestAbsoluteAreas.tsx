@@ -45,6 +45,11 @@ jahiaComponent(
         <AbsoluteArea name="pagecontent" parent={renderContext.getSite().getHome()} />
       </div>
 
+      <h2>Absolute Area with site root node</h2>
+      <div data-testid="absoluteAreaSiteRoot">
+        <AbsoluteArea name="absoluteAreaSiteRootPagecontent" parent={renderContext.getSite()} />
+      </div>
+
       <h2>Absolute Area with custom page (sub-level)</h2>
       <div data-testid="absoluteAreaCustomPage">
         <AbsoluteArea
