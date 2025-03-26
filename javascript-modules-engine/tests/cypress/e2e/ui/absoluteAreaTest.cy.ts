@@ -134,6 +134,15 @@ describe('Absolute Area test', () => {
         cy.logout()
     })
 
+    it(`${pageName}: absolute Area site root`, () => {
+        cy.login()
+        cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
+        cy.iframe('#page-builder-frame-1').within(() => {
+            cy.get('div[data-testid="absoluteAreaCustomPage"]').find('div[type="absoluteArea"]').should('be.visible')
+        })
+        cy.logout()
+    })
+
     it(`${pageName}: absolute Area custom page (sub-level)`, () => {
         cy.login()
         cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
