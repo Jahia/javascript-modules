@@ -48,10 +48,9 @@ Create the file `src/components/NavBar/default.server.tsx` with the following co
 ```tsx
 import { buildNodeUrl, getChildNodes, jahiaComponent } from "@jahia/javascript-modules-library";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
-import type { JCRSiteNode } from "org.jahia.services.content.decorator";
 
 /** Get all child pages of a node. */
-const getChildPages = (node: JCRNodeWrapper | JCRSiteNode) =>
+const getChildPages = (node: JCRNodeWrapper) =>
   getChildNodes(node, -1, 0, (node) => node.isNodeType("jnt:page"));
 
 jahiaComponent(
