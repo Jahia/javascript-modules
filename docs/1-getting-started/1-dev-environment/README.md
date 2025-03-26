@@ -81,7 +81,7 @@ You project is fully configured to work out the box with VSCode and IntelliJ. If
 
 ## Creating a New Site
 
-At this point, your Jahia instance should be up and running. You can access it at [localhost:8080](http://localhost:8080). Because the fresh Jahia instance has plugins packaged with it, they might be outdated. We'll upgrade the JavaScript Modules engine to the latest version to make sure we have the latest features:
+At this point, your Jahia instance should be up and running. You can access it at [localhost:8080](http://localhost:8080). Because the fresh Jahia instance has modules packaged with it, they might be outdated. We'll upgrade the JavaScript Modules engine to the latest version to make sure we have the latest features:
 
 ```bash
 # Upgrade the JavaScript Modules engine to the latest version
@@ -89,6 +89,17 @@ curl http://root:root1234@localhost:8080/modules/api/provisioning \
   --header 'Content-Type: application/json' \
   --data '[{"installOrUpgradeBundle":"mvn:org.jahia.modules/javascript-modules-engine","autoStart":true}]'
 ```
+
+<details>
+<summary>For PowerShell (Windows) users</summary>
+
+```powershell
+curl http://root:root1234@localhost:8080/modules/api/provisioning `
+  --header 'Content-Type: application/json' `
+  --data '[{"installOrUpgradeBundle":"mvn:org.jahia.modules/javascript-modules-engine","autoStart":true}]'
+```
+
+</details>
 
 You can now run `yarn build && yarn dev` to push your project to Jahia, and create a new website with it:
 
