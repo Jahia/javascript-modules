@@ -121,7 +121,7 @@ Create a few blog posts in this folder:
 
 ## Listing Articles
 
-Let's get back to the **Pages** tab of the sidebar. Create a new page named "Blog" with a **Single column** layout. Create a Hero section on top of the page to introduce the list of articles.
+Let's get back to the **Pages** tab of the sidebar (above Content Folders). Create a new page named "Blog" with a **Single column** layout. Create a Hero section on top of the page to introduce the list of articles.
 
 In the main area, add a new **Jahia - Queries > Content items using JCR Query** component. The JCR is the tree-like database where all your content is stored, pages and content folders alike. We will use a JCR query to list all the blog posts. In the query field, enter:
 
@@ -182,9 +182,9 @@ WHERE ISDESCENDANTNODE(post, '/sites/hydrogen/contents/blog')
 ORDER BY post.[publicationDate] DESC
 ```
 
-As you can see, this query looks like a regular SQL query. The `DESC` keyword orders the posts by publication date in descending order, so the most recent posts are displayed first.
+As you can see, this query looks like a regular SQL query. The `DESC` keyword orders the posts by publication date in descending order, so the most recent posts are displayed first. Don't forget to update your posts with a publication date!
 
-Finally, it would be nice to display the publication date on the blog post card. Update the `default.server.tsx` file:
+Finally, it would be nice to display the publication date on the blog post card. Update the `src/components/BlogPost/default.server.tsx` file:
 
 ```tsx
 // Add `currentResource` to the second argument of the function
