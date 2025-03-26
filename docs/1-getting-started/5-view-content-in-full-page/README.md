@@ -119,12 +119,7 @@ From this node, we can build a URL to the blog list page:
 <article dangerouslySetInnerHTML={{ __html: body }} />
 <footer>
   <p>
-    <a
-      // @ts-expect-error Java type aren't exposed this far
-      href={buildNodeUrl(renderContext.getSite().getNode("blog"))}
-    >
-      Back to blog home
-    </a>
+    <a href={buildNodeUrl(renderContext.getSite().getNode("blog"))}>Back to blog home</a>
   </p>
 </footer>
 // ...
