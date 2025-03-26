@@ -37,18 +37,20 @@ The following three lines define the properties of the `heroSection` node type. 
 
 If you have a specific hero section design in mind, you can add more properties to the node definition. Don't add Call to Action (CTA) buttons or links yet, we'll cover that in a later step. You can find all the available property types and constraints in the [CND Reference](../../3-reference/1-cnd-format/).
 
-You can stop and restart `yarn dev` to push this definition to your Jahia instance. If all goes well, you should now have the `heroSection` node type available in the content editor. Click **New content** and select **heroSection** to create a new hero section:
+You can stop and restart `yarn dev` to push this definition to your Jahia instance. The file watcher only detects updates to existing files, not new files. If all goes well, you should now have the `heroSection` node type available in the content editor.
+
+Click **New content** and select **heroSection** to create a new hero section:
 
 > [!WARNING]
 > Jahia will refuse your type definition if it contains a breaking change. During development, you can use the [Installed definitions browser](http://localhost:8080/modules/tools/definitionsBrowser.jsp) tool to remove your type definition and push a new one.
 
 ![Content insertion interface](create-hero-section.png)
 
-Jahia created an edition interface with our node definition. It prompts the user for the properties we defined: a title, a subtitle, and a background image. The image picker allows the user to select an image from already uploaded images or upload a new one:
+Jahia created an edition interface with our node definition. It prompts the user for the properties we defined: a title, a subtitle, and a background image. The image picker allows the user to select an image from already uploaded images or to upload a new one:
 
 ![Hero section edition interface](edit-hero-section.png)
 
-_Picture by [Appolinary Kalashnikova on Unsplash](https://unsplash.com/photos/wind-turbine-surrounded-by-grass-WYGhTLym344)_
+_Picture by Appolinary Kalashnikova, formerly on Unsplash_
 
 Click **Save** and see the new hero section in the content tree:
 
@@ -89,6 +91,8 @@ jahiaComponent(
 ```
 
 This code tells Jahia how to render the `heroSection` node type as a React component. Once pushed to your Jahia instance (you may need to rerun `yarn dev` for the bundler to pick up the new file), the error message should disappear, and the hero section should render correctly, albeit without any styling.
+
+The file is named `default.server.tsx` because it's the `default` view for the Hero Section `server` component. We'll create non-default views later.
 
 `buildNodeUrl` is a helper to transform a node into a URL to its content. We'll need this every time we want to reference a resource in the browser: for `<img />`, `<a />`, `background-image`, etc.
 
@@ -235,7 +239,7 @@ jahiaComponent(
 
 </details>
 
-We now have a working CTA button component, but we still need to add them to our hero section. Update `Hero/Section/default.server.tsx` to render the `heroCallToAction` nodes:
+We now have a working CTA button component, but we still need to add it to our hero section. Update `Hero/Section/default.server.tsx` to render the `heroCallToAction` nodes:
 
 ```tsx
 <header className={classes.hero} style={{ backgroundImage: `url(${buildNodeUrl(background)})` }}>
