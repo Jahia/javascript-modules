@@ -1,22 +1,22 @@
 # The "About Us" Page
 
-Our homepage is based on a "basic" layout: take a look at `src/pages/basic.server.tsx`. It's a single column layout defined by an `<Area>` without any constraints. If a user wants to place many Hero sections on the page, they can do it. Most websites have a slightly more controlled layout: a navbar, a title, a footer, optional sidebars, etc. In this section, we'll create a page layout that suits a typical "About Us" page.
+Our homepage is based on a "basic" layout: take a look at `src/templates/Page/basic.server.tsx`. It's a single column layout defined by an `<Area>` without any constraints. If a user wants to place many Hero sections on the page, they can do it. Most websites have a slightly more controlled layout: a navbar, a title, a footer, optional sidebars, etc. In this section, we'll create a page layout that suits a typical "About Us" page.
 
 ## Page Templates
 
 Pages are content nodes, like the `heroSection` and `heroCallToAction` nodes we created previously. Their type is `jnt:page`, and as for all content, you can tell Jahia how to render them.
 
-We'll create a single-column layout with a hero section on top. Create a file named `singleColumn.server.tsx` in `src/pages`:
+We'll create a single-column layout with a hero section on top. Create a file named `singleColumn.server.tsx` in `src/templates/Page`:
 
 ```tsx
 import { Area, jahiaComponent } from "@jahia/javascript-modules-library";
-import { Layout } from "./Layout.jsx";
+import { Layout } from "../Layout.jsx";
 
 jahiaComponent(
   {
     componentType: "template",
     nodeType: "jnt:page",
-    displayName: "Single column page template",
+    displayName: "Single column",
     name: "singleColumn",
   },
   ({ "jcr:title": title }) => (
@@ -36,7 +36,7 @@ Let's break this code down:
 
 - The `Layout` component is a simple wrapper that adds `<head>` and `<body>` tags to the page.
 
-- We define two `<Area>`s: `header` and `main`. An area is an entry point for users to add content. By default, an area is of node type `jnt:contentList`, but since we want to make our header area more specific, we set `nodeType="hydrogen:header"`.
+- We define two `<Area>`s: `header` and `main`. An area is an entry point for editors to add content. By default, an area is of node type `jnt:contentList`, but since we want to make our header area more specific, we set `nodeType="hydrogen:header"`.
 
 We need to define this new header node. We will make it simple to start with, our header will only contain a hero section.
 
@@ -74,7 +74,7 @@ Go ahead and create a new page on your site. Right click the left panel, under H
 
 You should now see an empty page with two insertion points: one named `hero` and the other named `main`.
 
-Create some content for your About Us page:
+Create some content (use Jahia - Basic > Rich Text to write some text) for your About Us page:
 
 ![The "About Us" page with contents](about-us-big-hero.png)
 
@@ -134,7 +134,7 @@ jahiaComponent(
 );
 ```
 
-Finally, update `component.module.css` to include a new class:
+Finally, update `src/components/Hero/Section/component.module.css` to include a new class:
 
 ```css
 .small {
@@ -142,9 +142,9 @@ Finally, update `component.module.css` to include a new class:
 }
 ```
 
-You can also update `default.server.tsx` to include `Props` instead of defining it again.
+You can also update `src/components/Hero/Section/default.server.tsx` to include `Props` instead of defining it again.
 
-The difference between `small.server.tsx` and `default.server.tsx` is the fact that we declare the component with `name: "small"`. This registers a second view named small for the `heroSection` node type. When `name` is not provided, the view is considered the default one.
+The difference between `src/components/Hero/Section/small.server.tsx` and `src/components/Hero/Section/default.server.tsx` is the fact that we declare the component with `name: "small"`. This registers a second view named small for the `heroSection` node type. When `name` is not provided, the view is considered the default one.
 
 After pushing these changes to your Jahia instance, you should see a smaller hero section on your "About Us" page, without the possibility to add CTA buttons:
 
@@ -158,7 +158,7 @@ Our page lacks a footer. Let's create a footer component and add it to the `sing
 <summary><code>src/components/Footer/definition.cnd</code></summary>
 
 ```cnd
-[hydrogen:footer] > jnt:content, hydrogen:component orderable
+[hydrogen:footer] > jnt:content, hydrogenmix:component orderable
  - notice (string) = '' i18n autocreated
  + * (jmix:link)
 ```
@@ -184,7 +184,7 @@ jahiaComponent(
     nodeType: "hydrogen:footer",
     displayName: "Default Footer",
   },
-  ({ notice }: Props, { renderContext, currentNode }) => {
+  ({ notice }: Props, { renderContext }) => {
     return (
       <footer className={classes.footer}>
         {/* In edition mode, links are piled up to make edition easier */}
@@ -230,16 +230,32 @@ jahiaComponent(
 
 </details>
 
-To add this footer to our layout, but make sure it's always the same footer in all pages, we'll use `<AbsoluteArea>` instead of `<Area>`. Update `singleColumn.server.tsx`:
+To add this footer to our layout, but make sure it's always the same footer in all pages, we'll use `<AbsoluteArea>` instead of `<Area>`. Update `src/templates/Page/singleColumn.server.tsx`:
 
 ```tsx
-<Layout title={title}>
-  {/* ... */}
-  <AbsoluteArea name="footer" parent={renderContext.getSite()} nodeType="hydrogen:footer" />
-</Layout>
+import { AbsoluteArea, Area, jahiaComponent } from "@jahia/javascript-modules-library";
+import { Layout } from "../Layout.jsx";
+
+jahiaComponent(
+  {
+    componentType: "template",
+    nodeType: "jnt:page",
+    displayName: "Single column",
+    name: "singleColumn",
+  },
+  ({ "jcr:title": title }, { renderContext }) => (
+    <Layout title={title}>
+      <Area name="header" nodeType="hydrogen:header" />
+      <main style={{ maxWidth: "40rem", margin: "0 auto" }}>
+        <Area name="main" />
+      </main>
+      <AbsoluteArea name="footer" parent={renderContext.getSite()} nodeType="hydrogen:footer" />
+    </Layout>
+  ),
+);
 ```
 
-`<AbsoluteArea>` is a special area that will synchronize its content across all pages. It's useful for elements that should be the same everywhere, like a footer or a navbar. To do so, we have to reference the same node for all pages. To make it easier, we set the parent to the site node. Make sure to retreive `renderContext` from the second argument of the render function.
+`<AbsoluteArea>` is a special area that synchronizes its content across all pages. It's useful for elements that should be the same everywhere, like a footer or a navbar. To do so, we have to reference the same node for all pages. To make it easier, we set the parent to the site node. Make sure to retrieve `renderContext` from the second argument of the render function.
 
 Try adding a few links to the footer that should be created at the end of the `singleColumn` template. You can also update the copyright notice with your company name. Once done, you should see a footer at the bottom of your page:
 
