@@ -99,8 +99,8 @@ __metadata:
   linkType: hard
 
 "@jahia/cypress@npm:^4.2.0":
-  version: 4.2.0
-  resolution: "@jahia/cypress@npm:4.2.0"
+  version: 4.3.0
+  resolution: "@jahia/cypress@npm:4.3.0"
   dependencies:
     "@apollo/client": "npm:^3.4.9"
     cypress-real-events: "npm:^1.11.0"
@@ -111,7 +111,7 @@ __metadata:
     ci.startup: ci.startup.sh
     env.debug: env.debug.sh
     env.run: env.run.sh
-  checksum: 10c0/9cb0bd53fb9d58311ba80766c956ca42dbdf2a2c1aa71e2cef96b6efc69518a820ea50d8172a06b06d8eebd6fdf42058e018f9475c9c0bdc9a81312ff26be753
+  checksum: 10c0/58632025c9e65d64ddcf7716504848a591bab393f2e9c6b573268a14120d80ded7ad1e20a233df8d89c3b187ed2a3a84ee90af3f133d26d37c7d2f2ad091666b
   languageName: node
   linkType: hard
 
