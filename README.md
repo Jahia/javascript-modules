@@ -4,6 +4,8 @@
 
 # Javascript Modules
 
+You want to build a JavaScript Module? [Read the documentation 📖](docs/)
+
 This project is designed to support Javascript developers working with _Jahia_. It consists of two components:
 
 - [javascript-modules-engine](javascript-modules-engine/): a Java OSGi Bundle deployed on a _Jahia_ instance that enables the deployment and execution of Javascript modules.
