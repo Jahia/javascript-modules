@@ -51,7 +51,7 @@ jahiaComponent(
       <main className={classes.main}>
         <header>
           <p>
-            Written {authors.length > 0 && <>by {authors.join(", ")} </>}
+            Written {authors && authors.length > 0 && <>by {authors.join(", ")} </>}
             {publicationDate && (
               <>
                 on{" "}
