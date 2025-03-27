@@ -46,7 +46,7 @@ jahiaComponent(
     nodeType: "hydrogen:blogPost",
     displayName: "Blog Post",
   },
-  ({ "jcr:title": title, subtitle, authors = [], cover }: Props, { currentNode }) => {
+  ({ "jcr:title": title, subtitle, authors, cover }: Props, { currentNode }) => {
     return (
       <article className={classes.card}>
         <img src={buildNodeUrl(cover)} alt="" />
@@ -54,7 +54,7 @@ jahiaComponent(
           <a href={buildNodeUrl(currentNode)}> {title}</a>
         </h3>
         <p>{subtitle}</p>
-        {authors.length > 0 && <p>Written by {authors.join(", ")}</p>}
+        {authors && authors.length > 0 && <p>Written by {authors.join(", ")}</p>}
       </article>
     );
   },
@@ -189,7 +189,7 @@ Finally, it would be nice to display the publication date on the blog post card.
 ```tsx
 // Add `currentResource` to the second argument of the function
 <p>
-  Written {authors.length > 0 && <>by {authors.join(", ")} </>}
+  Written {authors && authors.length > 0 && <>by {authors.join(", ")} </>}
   {publicationDate && (
     <>
       on{" "}
