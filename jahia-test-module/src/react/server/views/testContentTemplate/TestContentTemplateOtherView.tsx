@@ -6,9 +6,5 @@ jahiaComponent(
     componentType: "view",
     name: "other",
   },
-  () => (
-    <>
-      <h2>Just an other normal view</h2>
-    </>
-  ),
+  () => <h2>Just an other normal view</h2>,
 );

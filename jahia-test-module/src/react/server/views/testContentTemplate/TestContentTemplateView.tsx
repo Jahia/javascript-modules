@@ -5,9 +5,5 @@ jahiaComponent(
     nodeType: "javascriptExample:testContentTemplate",
     componentType: "view",
   },
-  () => (
-    <>
-      <h2>Just a normal view</h2>
-    </>
-  ),
+  () => <h2>Just a normal view</h2>,
 );
