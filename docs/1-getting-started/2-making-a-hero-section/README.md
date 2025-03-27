@@ -50,7 +50,7 @@ Jahia created an edition interface with our node definition. It prompts the user
 
 ![Hero section edition interface](edit-hero-section.png)
 
-_Picture by Appolinary Kalashnikova, formerly on Unsplash_
+_Picture by [Appolinary Kalashnikova](https://unsplash.com/@appolinary_kalashnikova), formerly on [Unsplash](https://unsplash.com/)_
 
 Click **Save** and see the new hero section in the content tree:
 
