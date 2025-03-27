@@ -49,14 +49,14 @@ export function Area({
   readOnly?: boolean;
 
   /**
-   * Content node type to be used to create the area (if the node does not exist yet)
+   * Node type to be used to create the area (if the node does not exist yet)
    *
    * @deprecated Use {@link #nodeType} instead
    * @default jnt:contentList
    */
   areaType?: string;
   /**
-   * Content node type to be used to create the area (if the node does not exist yet)
+   * Node type to be used to create the area (if the node does not exist yet)
    *
    * @default jnt:contentList
    */

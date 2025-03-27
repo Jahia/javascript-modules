@@ -23,7 +23,10 @@ export function AbsoluteArea({
 }: Readonly<{
   /** The name of the area. */
   name: string;
-  /** Parent node where the area is stored in the JCR. The parent node must exist. */
+  /**
+   * Parent node where the area is stored in the JCR. Can be anywhere in the JCR. The parent node
+   * must exist.
+   */
   parent: JCRNodeWrapper;
 
   /**
@@ -57,14 +60,14 @@ export function AbsoluteArea({
    */
   readOnly?: boolean | "children";
   /**
-   * Content node type to be used to create the area (if the node does not exist yet)
+   * Node type to be used to create the area (if the node does not exist yet)
    *
    * @deprecated Use {@link #nodeType} instead
    * @default jnt:contentList
    */
   areaType?: string;
   /**
-   * Content node type to be used to create the area (if the node does not exist yet)
+   * Node type to be used to create the area (if the node does not exist yet)
    *
    * @default jnt:contentList
    */
