@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<content
+        xmlns:j="http://www.jahia.org/jahia/1.0"
+        xmlns:jcr="http://www.jcp.org/jcr/1.0"
+>
+    <modules jcr:primaryType="jnt:modules">
+        <javascript-modules-engine-test-module>
+            <home j:isHomePage="true"
+                  j:templateName="home"
+                  jcr:primaryType="jnt:page">
+                <j:translation_en jcr:language="en"
+                                  jcr:mixinTypes="mix:title"
+                                  jcr:primaryType="jnt:translation"
+                                  jcr:title="Home"/>
+                <page1 j:templateName="simple" jcr:primaryType="jnt:page">
+                    <j:translation_en jcr:language="en"
+                                      jcr:mixinTypes="mix:title"
+                                      jcr:primaryType="jnt:translation"
+                                      jcr:title="Page 1"/>
+                </page1>
+                <page2 j:templateName="simple" jcr:primaryType="jnt:page">
+                    <j:translation_en jcr:language="en"
+                                      jcr:mixinTypes="mix:title"
+                                      jcr:primaryType="jnt:translation"
+                                      jcr:title="Page 2"/>
+                </page2>
+                <page3 j:templateName="simple" jcr:primaryType="jnt:page">
+                    <j:translation_en jcr:language="en"
+                                      jcr:mixinTypes="mix:title"
+                                      jcr:primaryType="jnt:translation"
+                                      jcr:title="Page 3"/>
+                </page3>
+            </home>
+<!--            <files jcr:primaryType="jnt:folder">-->
+<!--                <blog-hero.avif jcr:mixinTypes="jmix:image"-->
+<!--                                jcr:primaryType="jnt:file">-->
+<!--                    <jcr:content jcr:mimeType="image/avif" jcr:primaryType="jnt:resource"/>-->
+<!--                </blog-hero.avif>-->
+<!--            </files>-->
+<!--            <contents jcr:primaryType="jnt:contentFolder"/>-->
+            <templates j:rootTemplatePath="/base" jcr:primaryType="jnt:templatesFolder">
+                <files jcr:primaryType="jnt:folder">
+                    <jnt_query.png j:height="16"
+                                   j:width="16"
+                                   jcr:mixinTypes="jmix:image"
+                                   jcr:primaryType="jnt:file">
+                        <jcr:content jcr:mimeType="image/png" jcr:primaryType="jnt:resource"/>
+                        <thumbnail jcr:mimeType="image/png" jcr:primaryType="jnt:resource"/>
+                        <thumbnail2 jcr:mimeType="image/png" jcr:primaryType="jnt:resource"/>
+                    </jnt_query.png>
+                </files>
+                <contents jcr:primaryType="jnt:contentFolder"/>
+            </templates>
+        </javascript-modules-engine-test-module>
+    </modules>
+</content>
