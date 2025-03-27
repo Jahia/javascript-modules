@@ -10,10 +10,6 @@ jahiaComponent(
   (_, { currentNode }) => {
     currentNode.getProperty("not_existing_property");
 
-    return (
-      <>
-        <p>This view is expected to crash</p>
-      </>
-    );
+    return <p>This view is expected to crash</p>;
   },
 );

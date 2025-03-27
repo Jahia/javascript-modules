@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, use } from "react";
+import { createContext, type ReactNode, use, type JSX, useMemo } from "react";
 import type { RenderContext, Resource } from "org.jahia.services.render";
 import type { JCRNodeWrapper, JCRSessionWrapper } from "org.jahia.services.content";
 
@@ -46,19 +46,17 @@ export function ServerContextProvider({
   jcrSession,
   bundleKey,
   children,
-}: ServerContext & { readonly children: ReactNode }): React.JSX.Element {
-  return (
-    <ServerContext
-      value={{
-        renderContext,
-        currentResource,
-        currentNode,
-        mainNode,
-        jcrSession,
-        bundleKey,
-      }}
-    >
-      {children}
-    </ServerContext>
+}: ServerContext & { readonly children: ReactNode }): JSX.Element {
+  const value = useMemo(
+    () => ({
+      renderContext,
+      currentResource,
+      currentNode,
+      mainNode,
+      jcrSession,
+      bundleKey,
+    }),
+    [renderContext, currentResource, currentNode, mainNode, jcrSession, bundleKey],
   );
+  return <ServerContext value={value}>{children}</ServerContext>;
 }
