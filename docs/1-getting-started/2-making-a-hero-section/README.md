@@ -19,7 +19,7 @@ Start by creating folders in `src/components/` called `Hero/Section/`. Inside th
 
 That's a lot of new concepts! Let's break this node definition down:
 
-`[hydrogen:heroSection]` is the node type name. It's prefixed with `hydrogen`, a namespace, to avoid conflicts with other node types.
+`[hydrogen:heroSection]` is the node type name. It's prefixed with `hydrogen`, a namespace, to avoid conflicts with other node types. If you're not using the name `hydrogen` for your module, check `settings/definitions.cnd` for the namespace you should use.
 
 `> jnt:content, hydrogenmix:component` means that `heroSection` extends `jnt:content` and `hydrogenmix:component`. `jnt:content` is the root node type of all user-created content, while `hydrogenmix:component` is a mixin, a reusable node fragment that can be added to other node types but cannot be instantiated on its own. You can find the definition for `hydrogenmix:component` in `settings/definitions.cnd`.
 
