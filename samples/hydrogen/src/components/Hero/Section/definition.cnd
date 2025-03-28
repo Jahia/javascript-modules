@@ -1,0 +1,5 @@
+[hydrogen:heroSection] > jnt:content, hydrogenmix:component
+ - title (string) i18n mandatory
+ - subtitle (string, textarea) i18n mandatory
+ - background (weakreference, picker[type='image']) mandatory < jmix:image
+ + * (hydrogen:heroCallToAction)

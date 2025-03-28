@@ -1,0 +1,119 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>javascript-modules</artifactId>
+        <groupId>org.jahia.modules</groupId>
+        <version>0.6.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+    <groupId>org.jahia.test</groupId>
+    <artifactId>javascript-modules-samples-hydrogen</artifactId>
+    <packaging>pom</packaging>
+    <description>Sample module for Javascript Modules using a fictional company: Hydrogen</description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <!-- equivalent of 'yarn clean' -->
+                            <directory>${project.basedir}/dist/</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <executions>
+                    <!-- Executions bound on the "initialize" phase (executed in order of declaration): -->
+                    <execution>
+                        <id>install node and yarn - Hydrogen</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>install-node-and-yarn</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>yarn install - Hydrogen</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                    </execution>
+                    <!-- Executions bound on the "process-sources" phase (executed in order of declaration): -->
+                    <execution>
+                        <id>yarn lint - Hydrogen</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>lint</arguments>
+                        </configuration>
+                    </execution>
+                    <!-- Executions bound on the "package" phase (executed in order of declaration): -->
+                    <execution>
+                        <id>yarn pack - Hydrogen</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>build</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!-- copy the dist/package.tgz to the target directory with the finalName of the Maven build in the target/ folder so it is found by the CI when looking for jars to install before running integration tests -->
+                        <id>copy-dist-package - Hydrogen</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy file="dist/package.tgz" tofile="${project.build.directory}/${project.build.finalName}.tgz" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <!-- Keep package.json version in sync -->
+            <id>release-prepare</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <executions>
+                            <!-- Keep the package.json in sync with the maven version -->
+                            <execution>
+                                <id>sync-version</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>node ../../.m2/sync-version.js ${project.version}</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
