@@ -141,7 +141,7 @@ You can also add a rich text above and below the list of articles to introduce a
 
 ![Preview of the Blog page](blog-page.png)
 
-[Cover image by RetroSupply on Unsplash](https://unsplash.com/photos/vintage-teal-typewriter-beside-book-jLwVAUtLOAQ), article images by [Belinda Fewings on Unsplash](https://unsplash.com/photos/3d-painting-of-welcome-6wAGwpsXHE0) and [Olga Tutunaru on Unsplash](https://unsplash.com/photos/white-book-page-on-white-textile-plbb7pkEjkQ).
+_[Cover image by RetroSupply on Unsplash](https://unsplash.com/photos/vintage-teal-typewriter-beside-book-jLwVAUtLOAQ), article images by [Belinda Fewings on Unsplash](https://unsplash.com/photos/3d-painting-of-welcome-6wAGwpsXHE0) and [Olga Tutunaru on Unsplash](https://unsplash.com/photos/white-book-page-on-white-textile-plbb7pkEjkQ)_
 
 If you click on a blog post, you'll end up on a 404 error page. We'll take care of that in the next section. But for now...
 

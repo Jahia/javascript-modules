@@ -62,7 +62,7 @@ The project you created has the following structure:
   - `content-types-icons/`: Icons for content types.
   - `locales/`: Translations for your code.
   - `resources/`: Translations used in Jahia interface.
-  - `definitions.cnd`: Root Content Node Definition file.
+  - `definitions.cnd`: Root Compact Node Definition file.
   - `import.xml`: Defines pages and contents to create when creating a new site.
   - `template-thumbnail.png`: Thumbnail for your module.
 - <mark>`src/`: Your code!</mark>

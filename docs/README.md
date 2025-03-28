@@ -20,6 +20,7 @@ The goal of this section is to help you create a Jahia website with React and Ja
 
 Start here: [Setting up your dev environment](./1-getting-started/1-dev-environment/)
 
+<!-- Hidden until available:
 ## Guides
 
 This section contains independent, self-contained guides that help you build specific features or solve specific problems. Each guide is a step-by-step tutorial that you can follow to achieve a specific goal.
@@ -36,12 +37,15 @@ This section contains independent, self-contained guides that help you build spe
 - [Using Web Components](./2-guides/A-using-web-components/)
 
 More guides are coming soon, and contributions are welcome!
+-->
 
 ## Reference
 
 This section is meant to give an exhaustive overview of the features and concepts of JavaScript Modules. It is a reference guide that you can use to look up specific information or deepen your understanding of a particular topic.
 
 - [CND format](./3-reference/1-cnd-format/)
+
+<!-- Hidden until available:
 - [Tools](./3-reference/2-tools/)
 - [JCR](./3-reference/3-jcr/)
 - [Mixins](./3-reference/4-mixins/)
@@ -51,3 +55,4 @@ This section is meant to give an exhaustive overview of the features and concept
 - [Single Directory Components and Resources](./3-reference/8-single-directory-components-and-resources/)
 - [Java Interoperability](./3-reference/9-java-interoperability/)
 - [SSR and Hydration](./3-reference/A-ssr-and-hydration/)
+-->
