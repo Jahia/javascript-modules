@@ -51,7 +51,7 @@ jahiaComponent(
       <article className={classes.card}>
         <img src={buildNodeUrl(cover)} alt="" />
         <h3>
-          <a href={buildNodeUrl(currentNode)}> {title}</a>
+          <a href={buildNodeUrl(currentNode)}>{title}</a>
         </h3>
         <p>{subtitle}</p>
         {authors && authors.length > 0 && <p>Written by {authors.join(", ")}</p>}
