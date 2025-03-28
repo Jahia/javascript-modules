@@ -1,0 +1,42 @@
+.card {
+  margin-block: 1rem;
+  box-shadow: 0 0 0.5rem 0 #0002;
+  border-radius: 0.5rem;
+  contain: paint;
+  transition:
+    transform 150ms,
+    box-shadow 150ms;
+
+  &:hover,
+  &:focus-within {
+    box-shadow: 0 0 1rem 0 #0004;
+    transform: scale(1.02);
+  }
+
+  > img {
+    width: 100%;
+    max-height: 8rem;
+    object-fit: cover;
+  }
+
+  > h3,
+  > p {
+    margin: 1rem;
+  }
+
+  a {
+    text-decoration: inherit;
+    color: inherit;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+    }
+  }
+}
+.main {
+  margin: 2rem auto;
+  padding-inline: 1rem;
+  max-width: 40rem;
+}

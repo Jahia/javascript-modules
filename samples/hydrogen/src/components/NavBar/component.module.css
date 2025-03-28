@@ -1,0 +1,34 @@
+.nav {
+  ul {
+    display: flex;
+    list-style: none;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+  }
+
+  li > a {
+    display: inline-block;
+    padding: 1rem;
+  }
+
+  li > ul {
+    flex-direction: column;
+    position: absolute;
+    background: #fff;
+    box-shadow: 0 0.5rem 0.5rem #0002;
+    transform-origin: top;
+    transform: scaleY(0);
+    transition: transform 150ms;
+    z-index: 1;
+  }
+
+  li:hover ul,
+  li:focus-within ul {
+    transform: scaleY(1);
+  }
+
+  [aria-current="page"] {
+    font-weight: bold;
+  }
+}
