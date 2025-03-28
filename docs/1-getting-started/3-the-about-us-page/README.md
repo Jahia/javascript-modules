@@ -78,7 +78,7 @@ Create some content (use Jahia - Basic > Rich Text to write some text) for your 
 
 ![The "About Us" page with contents](about-us-big-hero.png)
 
-_[Picture by Nasa](https://unsplash.com/photos/photo-of-outer-space-Q1p7bh3SHj8), [text from Wikipedia](https://en.wikipedia.org/w/index.php?title=Hydrogen&oldid=1279844492)_
+_[Picture by Nasa on Unsplash](https://unsplash.com/photos/photo-of-outer-space-Q1p7bh3SHj8), [text from Wikipedia](https://en.wikipedia.org/w/index.php?title=Hydrogen&oldid=1279844492)_
 
 Isn't it a bit weird to have CTA buttons on an "About Us" page? Fortunately, Jahia supports multiple views for the same node type.
 
