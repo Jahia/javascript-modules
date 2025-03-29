@@ -1,0 +1,6 @@
+[hydrogen:blogPost] > jnt:content, mix:title, jmix:mainResource, hydrogenmix:component
+ - subtitle (string) i18n mandatory
+ - authors (string) multiple
+ - cover (weakreference, picker[type='image']) mandatory < jmix:image
+ - body (string, richtext) i18n mandatory
+ - publicationDate (date)

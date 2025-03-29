@@ -1,0 +1,3 @@
+[hydrogen:heroCallToAction] > jnt:content, hydrogenmix:component
+ - title (string) i18n mandatory
+ - j:linkType (string, choicelist[linkTypeInitializer]) mandatory

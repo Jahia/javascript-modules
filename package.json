@@ -7,6 +7,7 @@
     "javascript-modules-engine",
     "jahia-test-module",
     "javascript-modules-library",
+    "samples/hydrogen",
     "vite-plugin"
   ],
   "scripts": {
