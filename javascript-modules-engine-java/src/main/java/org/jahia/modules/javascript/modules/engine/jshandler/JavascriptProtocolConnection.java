@@ -98,6 +98,8 @@ public class JavascriptProtocolConnection extends URLConnection {
                 // Copy file path (try to detect good path for file in the final package jar.)
                 if (packageRelativePath.equals("import.xml")) {
                     jos.putNextEntry(new ZipEntry("META-INF/" + packageRelativePath));
+                } if (packageRelativePath.equals("dist/import.zip")) {
+                    jos.putNextEntry(new ZipEntry("META-INF/" + packageRelativePath));
                 } else if (packageRelativePath.startsWith("settings/")) {
                     // Special mapping settings/content-editor-forms to META-INF/jahia-content-editor-forms
                     if (packageRelativePath.startsWith("settings/content-editor-forms/")) {

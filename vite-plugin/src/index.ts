@@ -6,6 +6,7 @@ import type { Plugin } from "rollup";
 import { globSync } from "tinyglobby";
 import type { PluginOption } from "vite";
 import { insertFilename } from "./insert-filename.js";
+import { createZipImportPlugin } from "./create-zip-import.js";
 
 // These libraries are provided by Jahia and should not be bundled
 const external = Object.keys(sharedLibs);
@@ -80,6 +81,27 @@ export default function jahia(
       };
     };
 
+    /** Options of Jahia settings. */
+    settings?: {
+      import?: {
+        input?: {
+          /**
+           * Directory where the import files to include are located.
+           *
+           * @default "./settings/import/"
+           */
+          dir?: string;
+        };
+        output?: {
+          /**
+           * Directory where to put the generated import.zip.
+           *
+           * @default "./dist/"
+           */
+          dir?: string;
+        };
+      };
+    };
     /**
      * Function to execute when the build is complete in watch mode. Can be used to automatically
      * deploy your module to a local Jahia instance.
@@ -203,6 +225,10 @@ export default function jahia(
                   insertFilename(
                     options.client?.input?.dir ?? "./src/client/",
                     options.client?.output ?? "./javascript/client/",
+                  ),
+                  createZipImportPlugin(
+                    options.settings?.import?.input?.dir ?? "./settings/import/",
+                    options.settings?.import?.output?.dir ?? "./dist/",
                   ),
                 ],
               },

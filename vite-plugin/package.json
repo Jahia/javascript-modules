@@ -21,6 +21,7 @@
   "dependencies": {
     "@rollup/plugin-multi-entry": "^6.0.1",
     "@rollup/pluginutils": "^5.1.4",
+    "archiver": "^7.0.1",
     "esrap": "^1.4.5",
     "tinyglobby": "^0.2.12",
     "zimmerframe": "^1.1.2"
