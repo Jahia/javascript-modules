@@ -16,6 +16,8 @@ services:
             - jahia:127.0.0.1
         networks:
             - stack
+        volumes:
+            - ./prepackaged-content:/var/jahia/prepackaged-content
     # Cypress container
     cypress:
         image: '${TESTS_IMAGE}'

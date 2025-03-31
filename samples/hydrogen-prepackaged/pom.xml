@@ -33,6 +33,8 @@
                             <descriptors>
                                 <descriptor>src/main/assembly/site.xml</descriptor>
                             </descriptors>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>site</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -46,27 +48,8 @@
                             <descriptors>
                                 <descriptor>src/main/assembly/prepackaged.xml</descriptor>
                             </descriptors>
+                            <finalName>hydrogen-prepackaged</finalName>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <!-- copy the prepackaged zip to the 'artifacts/' so it gets copied to the Jahia container by the CI -->
-                        <!-- this allows that zip file to be referenced in the provisioning file with "jar:file:/var/jahia/modules/hydrogen-prepackaged.zip!/site.zip" -->
-                        <id>copy-prepackaged-zip</id>
-                        <phase>package</phase>
-                        <configuration>
-                            <target>
-                            <mkdir dir="../../javascript-modules-engine/tests/artifacts" />
-                                <copy file="${project.build.directory}/${project.artifactId}-${project.version}.zip" tofile="../../javascript-modules-engine/tests/artifacts/hydrogen-prepackaged.zip"/>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>

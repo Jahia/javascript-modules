@@ -1,9 +1,6 @@
 import { defineConfig } from "vite";
 import jahia from "@jahia/vite-plugin";
 import { spawnSync } from "node:child_process";
-import archiver from "archiver";
-import fs from "fs";
-import path from "path";
 
 export default defineConfig({
   plugins: [

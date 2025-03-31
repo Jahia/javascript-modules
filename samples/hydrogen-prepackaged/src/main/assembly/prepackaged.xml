@@ -8,7 +8,7 @@
     <files>
         <file>
             <source>
-                target/${project.artifactId}-${project.version}-site.zip
+                target/site.zip
             </source>
             <destName>site.zip</destName>
             <outputDirectory>/</outputDirectory>
