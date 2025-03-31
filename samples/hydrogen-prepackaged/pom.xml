@@ -19,15 +19,6 @@
     </properties>
 
     <build>
-<!--        <resources>-->
-<!--            <resource>-->
-<!--                <directory>${project.build.directory}/classes/META-INF/prepackagedSites</directory>-->
-<!--                <includes>-->
-<!--                    <include>hydrogen.zip</include>-->
-<!--                </includes>-->
-<!--                <targetPath>META-INF/prepackagedSites</targetPath>-->
-<!--            </resource>-->
-<!--        </resources>-->
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -63,7 +54,8 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <!-- copy the prepackaged zip to the 'artifacts/' so it gets copied to Jahia by the CI -->
+                        <!-- copy the prepackaged zip to the 'artifacts/' so it gets copied to the Jahia container by the CI -->
+                        <!-- this allows that zip file to be referenced in the provisioning file with "jar:file:/var/jahia/modules/hydrogen-prepackaged.zip!/site.zip" -->
                         <id>copy-prepackaged-zip</id>
                         <phase>package</phase>
                         <configuration>
