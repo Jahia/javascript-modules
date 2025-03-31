@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>javascript-modules</artifactId>
+        <groupId>org.jahia.modules</groupId>
+        <version>0.7.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+    <artifactId>javascript-modules-samples-hydrogen-prepackaged</artifactId>
+    <description>Pre-packaged content of a sample module for Javascript Modules using a fictional company: Hydrogen</description>
+    <packaging>bundle</packaging>
+
+    <properties>
+        <jahia-module-type>system</jahia-module-type>
+        <jahia-depends>default,hydrogen</jahia-depends>
+        <jahia-module-signature>MCwCFEgkUu47FNo2vfpwOeqYH5EWFG9zAhQb1Om6sHPLxJL/utzHoP49B16HxA==</jahia-module-signature>
+    </properties>
+
+    <build>
+<!--        <resources>-->
+<!--            <resource>-->
+<!--                <directory>${project.build.directory}/classes/META-INF/prepackagedSites</directory>-->
+<!--                <includes>-->
+<!--                    <include>hydrogen.zip</include>-->
+<!--                </includes>-->
+<!--                <targetPath>META-INF/prepackagedSites</targetPath>-->
+<!--            </resource>-->
+<!--        </resources>-->
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate zip file for the site</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/site.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate zip file for the whole prepackaged content</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/prepackaged.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!-- copy the prepackaged zip to the 'artifacts/' so it gets copied to Jahia by the CI -->
+                        <id>copy-prepackaged-zip</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                            <mkdir dir="../../javascript-modules-engine/tests/artifacts" />
+                                <copy file="${project.build.directory}/${project.artifactId}-${project.version}.zip" tofile="../../javascript-modules-engine/tests/artifacts/hydrogen-prepackaged.zip"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

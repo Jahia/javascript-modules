@@ -45,6 +45,7 @@
         <module>javascript-modules-engine-java</module>
         <module>javascript-modules-library</module>
         <module>samples/hydrogen</module>
+        <module>samples/hydrogen-prepackaged</module>
         <module>vite-plugin</module>
     </modules>
 
