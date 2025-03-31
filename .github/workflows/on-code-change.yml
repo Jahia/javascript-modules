@@ -88,7 +88,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: "build-prepackaged-content"
-          path: "./prepackaged-content"
+          path: "./javascript-modules-engine/tests/prepackaged-content"
       - uses: jahia/jahia-modules-action/integration-tests@v2
         with:
           module_id: javascript-modules-engine
