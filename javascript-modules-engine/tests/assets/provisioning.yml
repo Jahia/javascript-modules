@@ -4,4 +4,3 @@
       - 'mvn:org.jahia.modules/event'
   autoStart: true
   uninstallPreviousVersion: true
-- importSite: "jar:file:/var/jahia/prepackaged-content/hydrogen-prepackaged.zip!/site.zip"
