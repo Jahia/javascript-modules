@@ -7,9 +7,7 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <files>
         <file>
-            <source>
-                target/site.zip
-            </source>
+            <source>target/site.zip</source>
             <destName>site.zip</destName>
             <outputDirectory>/</outputDirectory>
         </file>
