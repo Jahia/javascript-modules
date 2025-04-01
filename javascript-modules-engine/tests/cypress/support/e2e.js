@@ -73,25 +73,41 @@ before('Create test site', () => {
             ],
         })
     })
+})
 
-    // import and publish the tutorial sample site
-    cy.log('Creating sample site ' + siteKey + '...')
-    const locationOfSiteToImport = '../../artifacts/site.zip'
-    cy.runProvisioningScript(
-        {
-            fileContent: `- importSite: "${locationOfSiteToImport}"`,
-            type: 'application/yaml',
-        },
-        [{ fileName: locationOfSiteToImport }],
-    )
-    publishAndWaitJobEnding(`/sites/${siteKey}`, ['en'])
+before('Create test site', () => {
+    cy.task('unzipArtifact', {
+        artifactFilename: 'javascript-modules-samples-hydrogen-prepackaged-0.7.0-SNAPSHOT.jar',
+        filteredPath: 'META-INF/prepackagedSites/hydrogen-prepackaged.zip',
+    })
+        .then(() => {
+            return cy.task('unzipArtifact', {
+                artifactFilename: 'META-INF/prepackagedSites/hydrogen-prepackaged.zip',
+                filteredPath: 'site.zip',
+            })
+        })
+        .then(() => {
+            // import and publish the tutorial sample site
+            cy.log('Creating sample site ' + siteKey + '...')
+            const locationOfSiteToImport = '../../artifacts/site.zip'
+            cy.runProvisioningScript(
+                {
+                    fileContent: `- importSite: "${locationOfSiteToImport}"`,
+                    type: 'application/yaml',
+                },
+                [{ fileName: locationOfSiteToImport }],
+            )
+            publishAndWaitJobEnding(`/sites/${siteKey}`, ['en'])
+        })
 })
 
 after('Clean', () => {
     cy.visit('/start', { failOnStatusCode: false })
     deleteSite('javascriptTestSite')
     cy.logout()
+})
 
+after('Clean tutorial site', () => {
     // Delete the tutorial sample site
     deleteSite(siteKey)
 })
