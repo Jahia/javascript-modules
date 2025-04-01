@@ -17,6 +17,7 @@ services:
         networks:
             - stack
         volumes:
+            # Use a volume to efficiently install the prepackaged site from the Cypress container, by using a local file path to the archive in the manifest: importSite: "jar:file:/var/jahia/prepackaged-content/hydrogen-prepackaged.zip!/site.zip"
             - ./prepackaged-content:/var/jahia/prepackaged-content
     # Cypress container
     cypress:
