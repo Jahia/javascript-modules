@@ -8,6 +8,7 @@
         <version>0.7.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
+    <groupId>org.jahia.samples</groupId>
     <artifactId>javascript-modules-samples-hydrogen-prepackaged</artifactId>
     <description>Pre-packaged content of a sample module for Javascript Modules using a fictional company: Hydrogen</description>
     <packaging>bundle</packaging>
@@ -15,7 +16,6 @@
     <properties>
         <jahia-module-type>system</jahia-module-type>
         <jahia-depends>default,hydrogen</jahia-depends>
-        <jahia-module-signature>MCwCFEgkUu47FNo2vfpwOeqYH5EWFG9zAhQb1Om6sHPLxJL/utzHoP49B16HxA==</jahia-module-signature>
     </properties>
 
     <build>
