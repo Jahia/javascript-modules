@@ -20,6 +20,7 @@
 
     <build>
         <resources>
+            <!-- declare the generated prepackaged archive as a resource to include it in the final bundle jar -->
             <resource>
                 <directory>${project.build.directory}</directory>
                 <includes>
@@ -31,6 +32,9 @@
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
                 <executions>
                     <execution>
                         <id>generate zip file for the site</id>
@@ -39,7 +43,6 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <appendAssemblyId>false</appendAssemblyId>
                             <descriptors>
                                 <descriptor>src/main/assembly/site.xml</descriptor>
                             </descriptors>
@@ -54,13 +57,10 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <appendAssemblyId>false</appendAssemblyId>
                             <descriptors>
                                 <descriptor>src/main/assembly/prepackaged.xml</descriptor>
                             </descriptors>
                             <finalName>hydrogen-prepackaged</finalName>
-<!--                            <outputDirectory>${project.build.directory}/foo</outputDirectory>-->
-<!--                            <outputDirectory>${project.build.outputDirectory}/META-INF/prepackagedSites</outputDirectory>-->
                         </configuration>
                     </execution>
                 </executions>

@@ -14,7 +14,7 @@
     </files>
     <fileSets>
         <fileSet>
-            <directory>${project.basedir}/src/main/foo/prepackaged</directory>
+            <directory>${project.basedir}/src/main/assembled/prepackaged</directory>
             <outputDirectory>/</outputDirectory>
             <includes>
                 <include>**</include>
