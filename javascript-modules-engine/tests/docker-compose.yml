@@ -26,7 +26,6 @@ services:
             - jahia
         environment:
             - MANIFEST=${MANIFEST}
-            - IMPORT_SITE_URL=${IMPORT_SITE_URL}
             - SUPER_USER_PASSWORD=${SUPER_USER_PASSWORD}
             - JAHIA_URL=http://jahia:8080
             - NEXUS_USERNAME=${NEXUS_USERNAME}
