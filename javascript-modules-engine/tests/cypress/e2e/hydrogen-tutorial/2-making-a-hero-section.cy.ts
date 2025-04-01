@@ -1,10 +1,6 @@
-import { publishAndWaitJobEnding } from '@jahia/cypress'
 import { siteKey } from './data'
 
 describe('Validate the concepts of the tutorial: 2 - Making a Hero Section', () => {
-    beforeEach('Publish site', () => {
-        publishAndWaitJobEnding(`/sites/${siteKey}`, ['en'])
-    })
     it('buildNodeUrl should build a valid URL', () => {
         cy.visit(`/sites/${siteKey}/home.html`)
         // test buildNodeUrl works as intended for the background image:

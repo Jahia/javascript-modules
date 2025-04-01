@@ -1,11 +1,6 @@
-import { publishAndWaitJobEnding } from '@jahia/cypress'
 import { posts, siteKey } from './data'
 
 describe('Validate the concepts of the tutorial: 5 - View Content in Full Page', () => {
-    beforeEach('Publish site', () => {
-        publishAndWaitJobEnding('/sites/hydrogen', ['en'])
-    })
-
     posts.forEach(({ page, title, subTitle, details, extract }) => {
         it(`${page}.html: the hero section should be present on the blog post`, () => {
             cy.visit(`/sites/${siteKey}/contents/blog/${page}.html`)

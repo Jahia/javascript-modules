@@ -15,8 +15,9 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
-import { addNode, createSite, deleteSite } from '@jahia/cypress'
+import { addNode, createSite, deleteSite, publishAndWaitJobEnding } from '@jahia/cypress'
 import { addSimplePage } from '../utils/Utils'
+import { siteKey } from '../e2e/hydrogen-tutorial/data'
 
 require('cypress-terminal-report/src/installLogsCollector')({
     xhr: {
@@ -72,10 +73,25 @@ before('Create test site', () => {
             ],
         })
     })
+
+    // import and publish the tutorial sample site
+    cy.log('Creating sample site ' + siteKey + '...')
+    const locationOfSiteToImport = '../../artifacts/site.zip'
+    cy.runProvisioningScript(
+        {
+            fileContent: `- importSite: "${locationOfSiteToImport}"`,
+            type: 'application/yaml',
+        },
+        [{ fileName: locationOfSiteToImport }],
+    )
+    publishAndWaitJobEnding(`/sites/${siteKey}`, ['en'])
 })
 
 after('Clean', () => {
     cy.visit('/start', { failOnStatusCode: false })
     deleteSite('javascriptTestSite')
     cy.logout()
+
+    // Delete the tutorial sample site
+    deleteSite(siteKey)
 })

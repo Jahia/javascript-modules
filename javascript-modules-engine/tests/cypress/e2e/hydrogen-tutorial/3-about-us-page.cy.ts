@@ -1,10 +1,6 @@
-import { publishAndWaitJobEnding } from '@jahia/cypress'
 import { siteKey } from './data'
 
 describe('Validate the concepts of the tutorial: 3 - The "About Us" Page', () => {
-    beforeEach('Publish site', () => {
-        publishAndWaitJobEnding('/sites/hydrogen', ['en'])
-    })
     it('a node type can be rendered using different views', () => {
         cy.login()
         // on the home page, a new CTA can be added

@@ -1,11 +1,6 @@
-import { publishAndWaitJobEnding } from '@jahia/cypress'
 import { posts, siteKey } from './data'
 
 describe('Validate the concepts of the tutorial: 4 - Making a Blog', () => {
-    beforeEach('Publish site', () => {
-        publishAndWaitJobEnding('/sites/hydrogen', ['en'])
-    })
-
     it('the blog home page should only list published posts in the right order', () => {
         cy.visit(`/sites/${siteKey}/blog.html`)
         cy.get('body main article').should('have.length', posts.length)
