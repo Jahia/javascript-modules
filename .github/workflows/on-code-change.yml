@@ -44,12 +44,6 @@ jobs:
           mvn_settings_filepath: ".github/maven.settings.xml"
           nexus_username: ${{ secrets.NEXUS_USERNAME }}
           nexus_password: ${{ secrets.NEXUS_PASSWORD }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: "build-prepackaged-content"
-          path: |
-            ./samples/hydrogen-prepackaged/target/hydrogen-prepackaged.zip
-          retention-days: 1
 
   sonar-analysis:
     name: Sonar Analysis
@@ -82,13 +76,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "lts/*"
-      # Enable corepack, the Node-provided package manager
+      # Enable corepack, the Node-provided package manager manager
       - run: corepack enable
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: "build-prepackaged-content"
-          path: "./javascript-modules-engine/tests/prepackaged-content"
       - uses: jahia/jahia-modules-action/integration-tests@v2
         with:
           module_id: javascript-modules-engine
