@@ -30,6 +30,7 @@ services:
             - JAHIA_URL=http://jahia:8080
             - NEXUS_USERNAME=${NEXUS_USERNAME}
             - NEXUS_PASSWORD=${NEXUS_PASSWORD}
+            - CYPRESS_PREPACKAGED_SITE_URL=${CYPRESS_PREPACKAGED_SITE_URL}
         networks:
             - stack
 networks:

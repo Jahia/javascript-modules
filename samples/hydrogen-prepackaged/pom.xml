@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>javascript-modules</artifactId>
+        <groupId>org.jahia.modules</groupId>
+        <version>0.7.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+    <groupId>org.jahia.samples</groupId>
+    <artifactId>javascript-modules-samples-hydrogen-prepackaged</artifactId>
+    <description>Pre-packaged content of a sample module for Javascript Modules using a fictional company: Hydrogen</description>
+    <packaging>bundle</packaging>
+
+    <properties>
+        <jahia-module-type>system</jahia-module-type>
+        <jahia-depends>default,hydrogen</jahia-depends>
+    </properties>
+
+    <build>
+        <resources>
+            <!-- declare the generated prepackaged archive as a resource to include it in the final bundle jar -->
+            <resource>
+                <directory>${project.build.directory}</directory>
+                <includes>
+                    <include>hydrogen-prepackaged.zip</include>
+                </includes>
+                <targetPath>META-INF/prepackagedSites</targetPath>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>generate zip file for the site</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/site.xml</descriptor>
+                            </descriptors>
+                            <finalName>site</finalName>
+                            <attach>false</attach>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate zip file for the whole prepackaged content</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/prepackaged.xml</descriptor>
+                            </descriptors>
+                            <finalName>hydrogen-prepackaged</finalName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

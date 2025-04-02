@@ -15,8 +15,9 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
-import { addNode, createSite, deleteSite } from '@jahia/cypress'
+import { addNode, createSite, deleteSite, publishAndWaitJobEnding } from '@jahia/cypress'
 import { addSimplePage } from '../utils/Utils'
+import { siteKey } from '../e2e/hydrogen-tutorial/data'
 
 require('cypress-terminal-report/src/installLogsCollector')({
     xhr: {
@@ -74,8 +75,57 @@ before('Create test site', () => {
     })
 })
 
+before('Create tutorial sample site', () => {
+    cy.log('Creating sample site ' + siteKey + '...')
+    cy.log('Cypress env variables', Cypress.env())
+    const prepackaged_site_URL = Cypress.env('PREPACKAGED_SITE_URL')
+    cy.log('Cypress prepackaged site URL', prepackaged_site_URL)
+    if (prepackaged_site_URL && prepackaged_site_URL.startsWith('jar:mvn:')) {
+        // the prepackaged site should be fetched from a Maven URL
+        cy.runProvisioningScript({
+            fileContent: `- importSite: "${prepackaged_site_URL}"`,
+            type: 'application/yaml',
+        }).then(() => publishAndWaitJobEnding(`/sites/${siteKey}`, ['en']))
+    } else {
+        // otherwise, assume it's a glob filename related to the ./artifacts/ folder
+        cy.log(`Unzipping ${prepackaged_site_URL}...`)
+        const prepackaged_archive_path = 'META-INF/prepackagedSites/hydrogen-prepackaged.zip'
+        cy.task('unzipArtifact', {
+            artifactFilename: prepackaged_site_URL,
+            filteredPath: prepackaged_archive_path,
+        })
+            .then(() => {
+                cy.log(`Extracting site.zip from  ${prepackaged_archive_path}...`)
+                return cy.task('unzipArtifact', {
+                    artifactFilename: prepackaged_archive_path,
+                    filteredPath: 'site.zip',
+                })
+            })
+            .then(() => {
+                cy.log('Importing site.zip...')
+                const site_archive_path = '../../artifacts/site.zip'
+                return cy.runProvisioningScript(
+                    {
+                        fileContent: `- importSite: "${site_archive_path}"`,
+                        type: 'application/yaml',
+                    },
+                    [{ fileName: site_archive_path }],
+                )
+            })
+            .then(() => {
+                cy.log(`Publishing site '${siteKey}'...`)
+                publishAndWaitJobEnding(`/sites/${siteKey}`, ['en'])
+            })
+    }
+})
+
 after('Clean', () => {
     cy.visit('/start', { failOnStatusCode: false })
     deleteSite('javascriptTestSite')
     cy.logout()
+})
+
+after('Clean tutorial sample site', () => {
+    // Delete the tutorial sample site
+    deleteSite(siteKey)
 })

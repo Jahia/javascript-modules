@@ -1,0 +1,20 @@
+.footer {
+  padding: 4rem 1rem;
+  color: #fff;
+  background: linear-gradient(to bottom, #024, #000);
+
+  > nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-block: 1rem;
+  }
+
+  > p {
+    text-align: center;
+  }
+
+  a {
+    color: inherit;
+  }
+}

@@ -1,0 +1,18 @@
+.cta {
+  display: block;
+  padding: 1rem;
+  border: 2px solid #fff;
+  color: #fff;
+  font-weight: bold;
+  backdrop-filter: blur(0.5rem);
+  transition:
+    transform 150ms,
+    background 150ms;
+  text-decoration: inherit;
+
+  &:hover,
+  &:focus {
+    transform: scale(1.05);
+    background-color: #fff8;
+  }
+}

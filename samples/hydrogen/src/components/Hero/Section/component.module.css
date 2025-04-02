@@ -1,0 +1,25 @@
+.hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 50vh;
+  color: #fff;
+  background: #d3deda 50% 25% / cover;
+  text-shadow: 0 0 0.25rem #0008;
+  overflow: hidden;
+
+  > * {
+    margin: 0;
+    text-align: center;
+  }
+
+  > h1 {
+    font-size: 3rem;
+    line-height: 1;
+  }
+}
+.small {
+  min-height: 25vh;
+}
