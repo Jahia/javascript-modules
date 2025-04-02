@@ -106,7 +106,7 @@ jobs:
           zencrepes_secret: ${{ secrets.ZENCREPES_WEBHOOK_SECRET }}
         env:
           YARN_VERSION: 4.7.0
-          PREPACKAGED_SITE_URL: "javascript-modules-samples-hydrogen-prepackaged-*.jar"
+          CYPRESS_PREPACKAGED_SITE_URL: "javascript-modules-samples-hydrogen-prepackaged-*.jar"
       - name: Test Report
         uses: dorny/test-reporter@v1
         if: success() || failure()

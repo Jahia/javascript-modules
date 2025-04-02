@@ -89,7 +89,7 @@ before('Create tutorial sample site', () => {
     } else {
         // otherwise, assume it's a glob filename related to the ./artifacts/ folder
         cy.task('unzipArtifact', {
-            artifactFilename: 'javascript-modules-samples-hydrogen-prepackaged-*.jar',
+            artifactFilename: prepackaged_site_URL,
             filteredPath: 'META-INF/prepackagedSites/hydrogen-prepackaged.zip',
         })
             .then(() => {

@@ -59,4 +59,4 @@ jobs:
           reporter: java-junit
           fail-on-error: "false"
     env:
-      PREPACKAGED_SITE_URL: "jar:mvn:org.jahia.samples/javascript-modules-samples-hydrogen-prepackaged/zip!/site.zip"
+      CYPRESS_PREPACKAGED_SITE_URL: "jar:mvn:org.jahia.samples/javascript-modules-samples-hydrogen-prepackaged/zip!/site.zip"

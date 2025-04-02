@@ -105,7 +105,7 @@ jobs:
           reporter: java-junit
           fail-on-error: "false"
     env:
-      PREPACKAGED_SITE_URL: "javascript-modules-samples-hydrogen-prepackaged-*.jar"
+      CYPRESS_PREPACKAGED_SITE_URL: "javascript-modules-samples-hydrogen-prepackaged-*.jar"
 
   publish:
     name: Publish module
