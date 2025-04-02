@@ -36,3 +36,9 @@ yarn
 ```
 yarn dev
 ```
+
+7. Install the pre-packaged site:
+
+```
+curl -u "root:root1234" -X POST http://localhost:8080/modules/api/provisioning --form script='[{"importSite":"jar:mvn:org.jahia.samples/javascript-modules-samples-hydrogen-prepackaged/zip!/site.zip"}]' 
+```
