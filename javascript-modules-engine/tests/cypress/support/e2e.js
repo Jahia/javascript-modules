@@ -88,25 +88,32 @@ before('Create tutorial sample site', () => {
         }).then(() => publishAndWaitJobEnding(`/sites/${siteKey}`, ['en']))
     } else {
         // otherwise, assume it's a glob filename related to the ./artifacts/ folder
+        cy.log(`Unzipping ${prepackaged_site_URL}...`)
+        const prepackaged_archive_path = 'META-INF/prepackagedSites/hydrogen-prepackaged.zip'
         cy.task('unzipArtifact', {
             artifactFilename: prepackaged_site_URL,
-            filteredPath: 'META-INF/prepackagedSites/hydrogen-prepackaged.zip',
+            filteredPath: prepackaged_archive_path,
         })
             .then(() => {
+                cy.log(`Extracting site.zip from  ${prepackaged_archive_path}...`)
                 return cy.task('unzipArtifact', {
-                    artifactFilename: 'META-INF/prepackagedSites/hydrogen-prepackaged.zip',
+                    artifactFilename: prepackaged_archive_path,
                     filteredPath: 'site.zip',
                 })
             })
             .then(() => {
-                const locationOfSiteToImport = '../../artifacts/site.zip'
-                cy.runProvisioningScript(
+                cy.log('Importing site.zip...')
+                const site_archive_path = '../../artifacts/site.zip'
+                return cy.runProvisioningScript(
                     {
-                        fileContent: `- importSite: "${locationOfSiteToImport}"`,
+                        fileContent: `- importSite: "${site_archive_path}"`,
                         type: 'application/yaml',
                     },
-                    [{ fileName: locationOfSiteToImport }],
+                    [{ fileName: site_archive_path }],
                 )
+            })
+            .then(() => {
+                cy.log(`Publishing site '${siteKey}'...`)
                 publishAndWaitJobEnding(`/sites/${siteKey}`, ['en'])
             })
     }
