@@ -77,9 +77,9 @@ before('Create test site', () => {
 
 before('Create tutorial sample site', () => {
     cy.log('Creating sample site ' + siteKey + '...')
-    console.log('Cypress env variables', Cypress.env())
+    cy.log('Cypress env variables', Cypress.env())
     const prepackaged_site_URL = Cypress.env('PREPACKAGED_SITE_URL')
-    console.log('Cypress prepackaged site URL', prepackaged_site_URL)
+    cy.log('Cypress prepackaged site URL', prepackaged_site_URL)
     if (prepackaged_site_URL && prepackaged_site_URL.startsWith('jar:mvn:')) {
         // the prepackaged site should be fetched from a Maven URL
         cy.runProvisioningScript({
