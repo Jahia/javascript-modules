@@ -75,30 +75,41 @@ before('Create test site', () => {
     })
 })
 
-before('Create test site', () => {
-    cy.task('unzipArtifact', {
-        artifactFilename: 'javascript-modules-samples-hydrogen-prepackaged-0.7.0-SNAPSHOT.jar',
-        filteredPath: 'META-INF/prepackagedSites/hydrogen-prepackaged.zip',
-    })
-        .then(() => {
-            return cy.task('unzipArtifact', {
-                artifactFilename: 'META-INF/prepackagedSites/hydrogen-prepackaged.zip',
-                filteredPath: 'site.zip',
+before('Create tutorial sample site', () => {
+    cy.log('Creating sample site ' + siteKey + '...')
+    console.log('Cypress env variables', Cypress.env())
+    const prepackaged_site_URL = Cypress.env('PREPACKAGED_SITE_URL')
+    console.log('Cypress prepackaged site URL', prepackaged_site_URL)
+    if (prepackaged_site_URL && prepackaged_site_URL.startsWith('jar:mvn:')) {
+        // the prepackaged site should be fetched from a Maven URL
+        cy.runProvisioningScript({
+            fileContent: `- importSite: "${prepackaged_site_URL}"`,
+            type: 'application/yaml',
+        }).then(() => publishAndWaitJobEnding(`/sites/${siteKey}`, ['en']))
+    } else {
+        // otherwise, assume it's a glob filename related to the ./artifacts/ folder
+        cy.task('unzipArtifact', {
+            artifactFilename: 'javascript-modules-samples-hydrogen-prepackaged-*.jar',
+            filteredPath: 'META-INF/prepackagedSites/hydrogen-prepackaged.zip',
+        })
+            .then(() => {
+                return cy.task('unzipArtifact', {
+                    artifactFilename: 'META-INF/prepackagedSites/hydrogen-prepackaged.zip',
+                    filteredPath: 'site.zip',
+                })
             })
-        })
-        .then(() => {
-            // import and publish the tutorial sample site
-            cy.log('Creating sample site ' + siteKey + '...')
-            const locationOfSiteToImport = '../../artifacts/site.zip'
-            cy.runProvisioningScript(
-                {
-                    fileContent: `- importSite: "${locationOfSiteToImport}"`,
-                    type: 'application/yaml',
-                },
-                [{ fileName: locationOfSiteToImport }],
-            )
-            publishAndWaitJobEnding(`/sites/${siteKey}`, ['en'])
-        })
+            .then(() => {
+                const locationOfSiteToImport = '../../artifacts/site.zip'
+                cy.runProvisioningScript(
+                    {
+                        fileContent: `- importSite: "${locationOfSiteToImport}"`,
+                        type: 'application/yaml',
+                    },
+                    [{ fileName: locationOfSiteToImport }],
+                )
+                publishAndWaitJobEnding(`/sites/${siteKey}`, ['en'])
+            })
+    }
 })
 
 after('Clean', () => {
@@ -107,7 +118,7 @@ after('Clean', () => {
     cy.logout()
 })
 
-after('Clean tutorial site', () => {
+after('Clean tutorial sample site', () => {
     // Delete the tutorial sample site
     deleteSite(siteKey)
 })

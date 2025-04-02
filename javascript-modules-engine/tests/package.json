@@ -38,7 +38,8 @@
     },
     "dependencies": {
         "cypress-real-events": "^1.7.6",
-        "decompress": "^4.2.1"
+        "decompress": "^4.2.1",
+        "glob": "^11.0.1"
     },
     "workspaces": [
         "jahia-module"
