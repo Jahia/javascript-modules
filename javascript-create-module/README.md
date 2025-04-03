@@ -7,7 +7,7 @@ This CLI scaffolds a new Jahia JavaScript module.
 To create a new module, run:
 
 ```
-npm init @jahia/module <module-name>
+npm init @jahia/module@latest <module-name>
 ```
 
 It creates a new JavaScript Module in a directory named `module-name` in the current working directory.

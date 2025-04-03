@@ -44,7 +44,7 @@ You can start this part while Jahia is downloading. We'll create a new project u
 
 ```bash
 # Create a new project in ./hydrogen
-npm init @jahia/module hydrogen
+npm init @jahia/module@latest hydrogen
 ```
 
 Once your project is ready, the tool will suggest you to run a few commands to start it. You can run them all except the last one, `yarn build && yarn dev`, because Jahia is not ready yet. Please note that git commands, while optional, are strongly recommended. If `code .` doesn't work, open your code editor and open the project folder manually.
