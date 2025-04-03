@@ -62,4 +62,4 @@ jobs:
     env:
       # During manual tests, the prepackaged site is fetched from a Maven repository.
       # For test executions using built artifacts, a local prepackaged archive is used (moved to the ./artifacts/ folder during the build).
-      CYPRESS_PREPACKAGED_SITE_URL: "jar:mvn:org.jahia.samples/javascript-modules-samples-hydrogen-prepackaged/zip!/site.zip"
+      CYPRESS_PREPACKAGED_SITE_URL: "jar:mvn:org.jahia.samples/javascript-modules-samples-hydrogen-prepackaged/LATEST/zip!/site.zip"
