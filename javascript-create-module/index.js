@@ -26,7 +26,7 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
     console.error(
       `No module name provided.
 
-  Usage: npm init @jahia/module ${styleText("blueBright", "<module-name>")}
+  Usage: npm init @jahia/module@latest ${styleText("blueBright", "<module-name>")}
 
 It will create a new module at this location with the provided name:
 
