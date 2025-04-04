@@ -21,7 +21,7 @@
     <parent>
         <artifactId>javascript-modules</artifactId>
         <groupId>org.jahia.modules</groupId>
-        <version>0.7.0-SNAPSHOT</version>
+        <version>0.6.1-SNAPSHOT</version>
     </parent>
     <artifactId>javascript-modules-engine</artifactId>
     <name>Javascript Modules Engine</name>
@@ -29,7 +29,7 @@
     <description>This is the engine allowing Javascript modules to run on a Jahia server.</description>
 
     <properties>
-        <jahia-module-signature>MC0CFFNmSp3nFJsnMdpW0xRVEvQ9fzxBAhUAhbGeMDieoSF6Q2ZknB8tjhBSSvI=</jahia-module-signature>
+        <jahia-module-signature>MCwCFCKnpC2WF0H7/LeX30dn92RKKYi7AhR6trSU/HD1TXIvxex1HbYofSfAOA==</jahia-module-signature>
         <import-package>
             graphql.annotations.annotationTypes;version="[7.2,99)",
             graphql.schema;version="[13.0,22)",
