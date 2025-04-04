@@ -209,7 +209,7 @@ public class JavascriptProtocolConnection extends URLConnection {
         setIfPresent(jahiaProps, "module-priority", instructions, "Jahia-Module-Priority");
         instructions.put("Jahia-Module-Type", jahiaProps.getOrDefault("module-type", "module"));
         setIfPresent(jahiaProps, "private-app-store", instructions, "Jahia-Private-App-Store");
-        instructions.put("Jahia-Required-Version", jahiaProps.getOrDefault("required-version", "8.2.0.0"));
+        instructions.put("Jahia-Required-Version", jahiaProps.getOrDefault("required-version", "8.2.1.0"));
         setIfPresent(jahiaProps, "server", instructions, BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT);
         // always include "/static" as folder for the static resources
         instructions.put("Jahia-Static-Resources", StringUtils.defaultIfEmpty((String) jahiaProps.get("static-resources"), "/css,/icons,/images,/img,/javascript") + ",/static");
