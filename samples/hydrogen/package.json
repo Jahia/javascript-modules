@@ -1,6 +1,6 @@
 {
   "name": "hydrogen",
-  "version": "0.6.1-SNAPSHOT",
+  "version": "0.6.1",
   "type": "module",
   "files": [
     "dist",
