@@ -26,8 +26,8 @@
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
+                <!-- Map Yarn commands to corresponding Maven phases -->
                 <executions>
-                    <!-- Executions bound on the "initialize" phase (executed in order of declaration): -->
                     <execution>
                         <id>install node and yarn</id>
                         <phase>initialize</phase>
@@ -50,6 +50,36 @@
                         </goals>
                         <configuration>
                             <arguments>build</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>set-alpha-version</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>node ../.m2/sync-version.js ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}-alpha-${timestamp}</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>publish-alpha-tag</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>npm publish --tag alpha --access public</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>reset-version</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>node ../.m2/sync-version.js ${project.version}</arguments>
                         </configuration>
                     </execution>
                 </executions>
