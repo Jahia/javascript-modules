@@ -87,7 +87,7 @@ You project is fully configured to work out the box with VSCode and IntelliJ. If
 At this point, your Jahia instance should be up and running. You can access it at [localhost:8080](http://localhost:8080). Because the fresh Jahia instance has modules packaged with it, they might be outdated. We'll upgrade the JavaScript Modules engine to the latest version to make sure we have the latest features:
 
 <details open>
-<summary>For <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/linux/linux-original.svg" width="16" height="16" valign="text-bottom" /> Linux and <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/apple/apple-original.svg" width="16" height="16" valign="text-bottom" /> macOS (bash/zsh) users</summary>
+<summary>For Linux and macOS (bash/zsh) users</summary>
 
 ```bash
 # Upgrade the JavaScript Modules engine to the latest version
@@ -98,7 +98,7 @@ curl http://root:root1234@localhost:8080/modules/api/provisioning \
 
 </details>
 <details>
-<summary>For <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/windows11/windows11-original.svg" width="16" height="16" valign="text-bottom" /> Windows (PowerShell) users</summary>
+<summary>For Windows (PowerShell) users</summary>
 
 ```powershell
 curl http://root:root1234@localhost:8080/modules/api/provisioning `
