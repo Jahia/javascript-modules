@@ -10,7 +10,7 @@ This tutorial will guide you through the setup of your development environment t
 We'll be running Jahia in a Docker container and using Node.js to build our project. Make sure you have the following installed:
 
 - Docker: [docs.docker.com/get-docker](https://docs.docker.com/get-docker/).
-- Node.js LTS: [nodejs.org/en/download](https://nodejs.org/en/download). Select **for [your platform]** and **with Yarn** instead of **with npm**. Keep the default installation method for your platform.
+- Node.js 22+: [nodejs.org/en/download](https://nodejs.org/en/download). Select **for [your platform]** and **with Yarn** instead of with npm. Keep the default installation method for your platform.
 - A code editor: we recommend [Visual Studio Code](https://code.visualstudio.com/).
 
 At this time of writing here are the versions we are using:
@@ -24,9 +24,12 @@ Docker version 27.5.1, build 9f9e405
 
 It might work with other versions but we can't guarantee it. If you encounter any issues, please refer to the official documentation of the tools.
 
+> [!IMPORTANT]
+> Make sure you are running **Node 22.14 or later** by running `node -v`. You will need **Yarn 4.7** or later, which **should be managed by [Corepack](https://github.com/nodejs/corepack)**. Make sure to run `corepack enable yarn` to enable it. [You don't need a global installation of Yarn.](https://yarnpkg.com/getting-started/install)
+
 ## Starting Jahia
 
-This step might be a bit long because you have to download about 1 GB of data, we'll start with it and let it run in the background while we set up the rest. Make sure Docker Desktop is running and execute the following command:
+This step might be a bit long because you have to download about 1 GB of data, we'll start with it and let it run in the background while we set up the rest. **Make sure Docker Desktop is running** and execute the following command:
 
 ```bash
 # Start Jahia
@@ -83,6 +86,9 @@ You project is fully configured to work out the box with VSCode and IntelliJ. If
 
 At this point, your Jahia instance should be up and running. You can access it at [localhost:8080](http://localhost:8080). Because the fresh Jahia instance has modules packaged with it, they might be outdated. We'll upgrade the JavaScript Modules engine to the latest version to make sure we have the latest features:
 
+<details open>
+<summary>For Linux and macOS (bash/zsh) users</summary>
+
 ```bash
 # Upgrade the JavaScript Modules engine to the latest version
 curl http://root:root1234@localhost:8080/modules/api/provisioning \
@@ -90,8 +96,9 @@ curl http://root:root1234@localhost:8080/modules/api/provisioning \
   --data '[{"installOrUpgradeBundle":"mvn:org.jahia.modules/javascript-modules-engine","autoStart":true}]'
 ```
 
+</details>
 <details>
-<summary>For PowerShell (Windows) users</summary>
+<summary>For Windows (PowerShell) users</summary>
 
 ```powershell
 curl http://root:root1234@localhost:8080/modules/api/provisioning `
