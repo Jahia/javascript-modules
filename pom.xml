@@ -226,7 +226,7 @@
                             <includes>
                                 javascript-modules-engine/yarn.lock,jahia-test-module/yarn.lock
                             </includes>
-                            <message>ci(release): Prepare release ${project.version}</message>
+                            <message>chore(release): Prepare release ${project.version}</message>
                         </configuration>
                     </plugin>
                 </plugins>
