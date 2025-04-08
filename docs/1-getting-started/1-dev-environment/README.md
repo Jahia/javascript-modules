@@ -29,7 +29,7 @@ It might work with other versions but we can't guarantee it. If you encounter an
 
 ## Starting Jahia
 
-This step might be a bit long because you have to download about 1 GB of data, we'll start with it and let it run in the background while we set up the rest. Make sure Docker Desktop is running and execute the following command:
+This step might be a bit long because you have to download about 1 GB of data, we'll start with it and let it run in the background while we set up the rest. **Make sure Docker Desktop is running** and execute the following command:
 
 ```bash
 # Start Jahia
