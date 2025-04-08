@@ -74,15 +74,15 @@ It will create a new module at this location with the provided name:
 
   console.log(`${styleText("greenBright", "Successfully created a new Jahia module project!")}
 
-Next steps:
-  ${styleText("magentaBright", `cd ${name}`)}
-  ${styleText("magentaBright", "yarn")}  ${styleText("dim", "# Install dependencies")}
-  ${styleText("magentaBright", 'git init && git add . && git commit -m "chore: create module"')}  ${styleText(
+Run the following commands to get started:
+  ${styleText("dim", "1.")} ${styleText("redBright", `cd ${name}`)}
+  ${styleText("dim", "2.")} ${styleText("yellowBright", "yarn install")}  ${styleText("dim", "# Install dependencies")}
+  ${styleText("dim", "3.")} ${styleText("greenBright", 'git init && git add . && git commit -m "chore: create module"')}  ${styleText(
     "dim",
     "# Commit all files",
   )}
-  ${styleText("magentaBright", "code .")}  ${styleText("dim", "# Open the project in VSCode")}
-  ${styleText("magentaBright", "yarn build && yarn dev")}  ${styleText("dim", "# Build and start the dev mode")}
+  ${styleText("dim", "4.")} ${styleText("cyanBright", "code .")}  ${styleText("dim", "# Open the project in VSCode")}
+  ${styleText("dim", "5.")} ${styleText("magentaBright", "yarn build && yarn dev")}  ${styleText("dim", "# Build and start the dev mode")}
 `);
 } catch (error) {
   console.error(
