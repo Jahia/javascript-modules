@@ -121,6 +121,10 @@ jobs:
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
+      - name: Setup .yarnrc.yml file to allow publication to https://registry.npmjs.org with a 'yarn npm publish'
+        shell: bash
+        run: |
+          echo "npmAuthToken: ${{ secrets.NPMJS_PUBLISH_TOKEN }}" >> ~/.yarnrc.yml
       - uses: jahia/jahia-modules-action/publish@v2
         with:
           # the test module is built as part of the Maven build
