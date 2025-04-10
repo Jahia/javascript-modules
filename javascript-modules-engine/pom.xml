@@ -39,9 +39,7 @@
             org.jahia.modules.graphql.provider.dxm.util;version="[2.7,4)",
         </import-package>
         <require-capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version&gt;=17))"</require-capability>
-        <!--  Since React 19 and new JSX transformation, in production, all other jsmodules should be production  -->
-        <!--  To get a full compatibility, we use dev mode by default  -->
-        <yarn-build>build:development</yarn-build>
+        <yarn-build>build</yarn-build>
     </properties>
 
     <dependencies>

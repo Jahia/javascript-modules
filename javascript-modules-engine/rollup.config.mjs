@@ -32,8 +32,6 @@ const plugins = [
   }),
   typescript(),
   sbom({ specVersion: "1.4" }),
-  // Only minify in production
-  buildEnv === "production" && terser(),
 ];
 
 export default defineConfig([
@@ -45,7 +43,11 @@ export default defineConfig([
       file: "src/main/resources/javascript/index.js",
     },
     external: Object.keys(sharedLibs),
-    plugins,
+    plugins: [
+      ...plugins,
+      // Minify client files in production
+      buildEnv === "production" && terser(),
+    ],
   },
   // Bundle the shared libraries
   // They are used by both the main client-side script and module scripts
@@ -54,7 +56,11 @@ export default defineConfig([
     output: {
       dir: "./src/main/resources/javascript/shared-libs/",
     },
-    plugins,
+    plugins: [
+      ...plugins,
+      // Minify client files in production
+      buildEnv === "production" && terser(),
+    ],
   },
   // Build the server-side script
   // It takes care of rendering JSX components on the server
