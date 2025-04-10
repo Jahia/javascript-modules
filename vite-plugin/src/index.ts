@@ -123,6 +123,12 @@ export default function jahia(
         builder: { sharedConfigBuild: true },
         // Enforce bundling of all dependencies
         ssr: { noExternal: true },
+        // Replace process.env.NODE_ENV with the actual value
+        define: {
+          "process.env.NODE_ENV": JSON.stringify(
+            config.build?.watch ? "development" : "production",
+          ),
+        },
         // Define the environments (client and ssr)
         environments: {
           client: {
