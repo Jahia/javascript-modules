@@ -1,9 +1,9 @@
+import { createFilter } from "@rollup/pluginutils";
 import { print } from "esrap";
 import type { Node } from "estree";
+import path from "node:path";
 import type { Plugin } from "rollup";
 import { walk } from "zimmerframe";
-import { createFilter } from "@rollup/pluginutils";
-import path from "node:path";
 
 /**
  * This plugin adds a `__filename` property to all default exports.
@@ -32,8 +32,8 @@ import path from "node:path";
  * @param root The root of the transformation. Files outside this directory will not be transformed,
  *   files inside will have their inserted path relative to this directory.
  */
-export const insertFilename = (root: string, prefix: string): Plugin => {
-  const filter = createFilter(null, null, {
+export const insertFilename = (root: string, glob: string | string[], prefix: string): Plugin => {
+  const filter = createFilter(glob, null, {
     resolve: root,
   });
   return {

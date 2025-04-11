@@ -157,6 +157,7 @@ export default function jahia(
           },
           ssr: {
             build: {
+              sourcemap: true,
               lib: {
                 /**
                  * Necessary for IIFE format but not used; it's the name given to the global
@@ -202,7 +203,8 @@ export default function jahia(
                   // Insert filenames in client-side components
                   insertFilename(
                     options.client?.input?.dir ?? "./src/client/",
-                    options.client?.output ?? "./javascript/client/",
+                    options.client?.input?.glob ?? "**/*.jsx",
+                    (options.client?.output ?? "./javascript/client/").replace(/^\.\//, ""),
                   ),
                 ],
               },
