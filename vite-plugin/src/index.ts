@@ -134,7 +134,7 @@ export default function jahia(
 
       return {
         // Build all environments https://vite.dev/guide/api-environment-frameworks.html#environments-during-build
-        builder: { sharedConfigBuild: true },
+        builder: {},
         // Enforce bundling of all dependencies
         ssr: { noExternal: true },
         // Replace process.env.NODE_ENV with the actual value
@@ -148,23 +148,27 @@ export default function jahia(
           client: {
             build: {
               sourcemap: options.client?.sourcemap ?? Boolean(config.build?.watch),
-              lib: {
+              // Assets will be emitted in the SSR build
+              emitAssets: false,
+              rollupOptions: {
                 entry: Object.fromEntries(
                   clientEntries.map((file) => [file, path.join(clientBaseDir, file)]),
                 ),
-                formats: ["es"],
-              },
-              rollupOptions: {
                 output: {
                   dir: options.client?.output ?? "./javascript/client/",
+                  // Preserve the filenames of the entry points, to allow the hydration code
+                  // to import the correct files
+                  entryFileNames: "[name].js",
                 },
+                // By default, Vite only keep side effects, but entry points work by exporting a
+                // default function component. Ensure entry points keep their "signature" (i.e.
+                // their exports).
+                preserveEntrySignatures: "allow-extension",
                 external,
                 plugins: [
                   {
                     name: "forbid-library",
                     resolveId(id) {
-                      this.debug(id);
-                      console.log(id);
                       if (id === "@jahia/javascript-modules-library") {
                         throw new Error(
                           `You cannot import '@jahia/javascript-modules-library' in the client bundle`,
@@ -179,20 +183,14 @@ export default function jahia(
           ssr: {
             build: {
               sourcemap: options.server?.sourcemap ?? true,
-              lib: {
-                /**
-                 * Necessary for IIFE format but not used; it's the name given to the global
-                 * variable that will be created by the IIFE.
-                 */
-                name: "serverBundle",
-                entry: options.server?.input ?? "./src/index.{js,ts}",
-                fileName: options.server?.output?.fileName ?? "index",
-                // Bundle the old way, as an IIFE, to replace libs with globals
-                formats: ["iife"],
-              },
+              // Emit assets, produce a single CSS file
+              emitAssets: true,
+              cssCodeSplit: false,
               rollupOptions: {
+                input: options.server?.input ?? "./src/index.{js,ts}",
                 output: {
                   dir: options.server?.output?.dir ?? "./javascript/server/",
+                  format: "iife",
                   // Replace the imports of external libraries with the globals
                   globals: Object.fromEntries(
                     [
@@ -206,6 +204,9 @@ export default function jahia(
                       `javascriptModulesLibraryBuilder.getSharedLibrary(${JSON.stringify(lib)})`,
                     ]),
                   ),
+                  // Produce a consistent name for the style file, hash other assets
+                  assetFileNames: ({ names }) =>
+                    names.includes("style.css") ? "style.css" : "assets/[name]-[hash][extname]",
                 },
                 external: [...external, "@jahia/javascript-modules-library"],
                 treeshake: {
@@ -233,6 +234,16 @@ export default function jahia(
                 ],
               },
             },
+          },
+        },
+
+        experimental: {
+          renderBuiltUrl(filename) {
+            return {
+              runtime: `javascriptModulesLibrary.buildModuleFileUrl(${JSON.stringify(
+                (options.server?.output?.dir ?? "./javascript/server/") + filename,
+              )})`,
+            };
           },
         },
       };
