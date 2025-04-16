@@ -10,6 +10,7 @@ jahiaComponent(
   () => (
     <div>
       React version:<span data-testid="react-version">{version}</span>
+      NODE_ENV: <span data-testid="node-env">{process.env.NODE_ENV}</span>
     </div>
   ),
 );
