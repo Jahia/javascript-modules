@@ -50,16 +50,25 @@
     </modules>
 
     <properties>
-        <graalvm.sdk.version>23.0.2</graalvm.sdk.version>
         <!-- override the version of org.sonatype.plugins:nexus-staging-maven-plugin to ensure compatibility with JDK 17 -->
         <nexus.maven.plugin.version>1.7.0</nexus.maven.plugin.version>
         <!-- frontend-maven-plugin requires to use yarn 1.22.x as a "bootstrap" but then, the .yarnrc.yml will be detected and Yarn Berry (4+) will be used -->
         <frontend-maven-plugin.yarn.version>v1.22.22</frontend-maven-plugin.yarn.version>
         <frontend-maven-plugin.node.version>v22.10.0</frontend-maven-plugin.node.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <frontend-maven-plugin.version>1.15.1</frontend-maven-plugin.version>
+        <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
+        <maven-clean-plugin.version>3.4.0</maven-clean-plugin.version>
+        <maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
+        <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
+        <buildnumber-maven-plugin.version>3.2.1</buildnumber-maven-plugin.version>
+        <exec-maven-plugin.version>3.5.0</exec-maven-plugin.version>
+        <cyclonedx-maven-plugin.version>2.9.1</cyclonedx-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- Maven modules: -->
             <dependency>
                 <groupId>org.jahia.test</groupId>
                 <artifactId>javascript-modules-engine-test-module</artifactId>
@@ -94,6 +103,148 @@
                 <version>${project.version}</version>
                 <type>pom</type>
             </dependency>
+
+            <!-- Jahia dependencies: -->
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>1.9.4</version> <!-- matches https://github.com/Jahia/jahia/blob/JAHIA_8_2_1_0/core/pom.xml#L144 -->
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.14.0</version> <!-- matches https://github.com/Jahia/jahia/blob/JAHIA_8_2_1_0/core/pom.xml#L154 -->
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson-databind.osgi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>3.0.2</version> <!-- matches https://github.com/Jahia/jahia/blob/JAHIA_8_2_1_0/core/pom.xml#L1742 -->
+            </dependency>
+            <dependency>
+                <groupId>javax.el</groupId>
+                <artifactId>javax.el-api</artifactId>
+                <version>3.0.0-jahia1</version> <!-- matches https://github.com/Jahia/jahia/blob/JAHIA_8_2_1_0/features/core/pom.xml#L85 -->
+            </dependency>
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>1</version>  <!-- matches https://github.com/Jahia/jahia-private/blob/JAHIA_8_2_1_0/war/src/data/resources/karaf/etc/custom.properties#L401 -->
+            </dependency>
+            <dependency>
+                <groupId>javax.jcr</groupId>
+                <artifactId>jcr</artifactId>
+                <version>2.0</version> <!-- matches https://github.com/Jahia/jahia/blob/JAHIA_8_2_1_0/core/pom.xml#L457 -->
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.25.0</version> <!-- matches https://github.com/Jahia/jahia/blob/JAHIA_8_2_1_0/core/pom.xml#L144 -->
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.12.0</version> <!-- matches https://github.com/Jahia/jahia/blob/JAHIA_8_2_1_0/core/pom.xml#L175 -->
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.fileinstall</artifactId>
+                <version>${felix.fileinstall.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.framework</artifactId>
+                <version>${felix.framework.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.jackrabbit</groupId>
+                <artifactId>jackrabbit-jcr-commons</artifactId>
+                <version>${jackrabbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.jackrabbit</groupId>
+                <artifactId>jackrabbit-spi-commons</artifactId>
+                <version>${jackrabbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.sdk</groupId>
+                <artifactId>graal-sdk</artifactId>
+                <version>${graalvm.languages.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jahia.server</groupId>
+                <artifactId>jahia-impl</artifactId>
+                <version>8.2.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.swissbox</groupId>
+                <artifactId>pax-swissbox-bnd</artifactId>
+                <version>${pax.swissbox.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.web</groupId>
+                <artifactId>pax-web-jsp</artifactId>
+                <version>7.3.29-jahia2</version> <!-- matches https://github.com/Jahia/jahia/blob/JAHIA_8_2_1_0/jahia-parent/pom.xml#L179 -->
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>osgi.annotation</artifactId>
+                <version>${osgi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>osgi.cmpn</artifactId>
+                <version>${osgi.compendium.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>pl.touk</groupId>
+                <artifactId>throwing-function</artifactId>
+                <version>1.3</version> <!--matches https://github.com/Jahia/jahia/blob/JAHIA_8_2_1_0/core/pom.xml#L807 -->
+            </dependency>
+
+            <!-- test dependencies: -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>pl.pragmatists</groupId>
+                <artifactId>JUnitParams</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+
+            <!-- other dependencies: -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-pool2</artifactId>
+                <version>2.9.0</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.bensku</groupId>
+                <artifactId>java-ts-bind</artifactId>
+                <version>1.0.0-jahia-2</version>
+                <classifier>all</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.spec.javax.servlet</groupId>
+                <artifactId>jboss-servlet-api_3.1_spec</artifactId>
+                <version>1.0.2.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>xml-apis</groupId>
+                <artifactId>xml-apis</artifactId>
+                <version>1.4.01</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -118,52 +269,52 @@
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <version>1.15.1</version>
+                    <version>${frontend-maven-plugin.version}</version>
                     <configuration>
                         <nodeVersion>${frontend-maven-plugin.node.version}</nodeVersion>
                         <yarnVersion>${frontend-maven-plugin.yarn.version}</yarnVersion>
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>${maven-antrun-plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>${maven-clean-plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                </plugin>
+                <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>${maven-dependency-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.6.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.5.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.cyclonedx</groupId>
-                    <artifactId>cyclonedx-maven-plugin</artifactId>
-                    <version>2.9.1</version>
+                    <version>${build-helper-maven-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>${buildnumber-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>${exec-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.cyclonedx</groupId>
+                    <artifactId>cyclonedx-maven-plugin</artifactId>
+                    <version>${cyclonedx-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <!-- when releasing, the checksum of the javascript-modules-library package in the yarn.lock files changes -->
