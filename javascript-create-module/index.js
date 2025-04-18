@@ -5,6 +5,7 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 import camelCase from "camelcase";
 import { styleText } from "node:util";
+import pkg from "./package.json" with { type: "json" };
 
 try {
   console.log(styleText("bgBlueBright", " Jahia JavaScript Module Creator "), "\n");
@@ -50,7 +51,8 @@ It will create a new module at this location with the provided name:
     name.startsWith(`dot${path.sep}`) ? `.${name.slice(4)}` : name;
 
   /** Replaces `$MODULE` with the actual module name. */
-  const templatify = (/** @type {string} */ str) => str.replaceAll("$MODULE", module);
+  const templatify = (/** @type {string} */ str) =>
+    str.replaceAll("$MODULE", module).replaceAll("$VERSION", pkg.version);
 
   // Copy the template to the output directory
   const input = fileURLToPath(new URL("template/", import.meta.url));
