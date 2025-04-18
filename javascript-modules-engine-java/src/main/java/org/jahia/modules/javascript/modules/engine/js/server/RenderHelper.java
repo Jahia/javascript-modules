@@ -16,7 +16,7 @@
 package org.jahia.modules.javascript.modules.engine.js.server;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jackrabbit.util.Text;
 import org.apache.taglibs.standard.tag.common.core.ParamParent;
 import org.graalvm.polyglot.proxy.ProxyArray;
