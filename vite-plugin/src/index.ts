@@ -48,6 +48,13 @@ export default function jahia(
        * @default "./javascript/client/"
        */
       output?: string;
+      /**
+       * Enable source maps for client-side files.
+       *
+       * @default `true` in dev mode, `false` otherwise
+       * @see https://vite.dev/config/build-options.html#build-sourcemap
+       */
+      sourcemap?: boolean | "hidden" | "inline" | undefined;
     };
 
     /** Options for the server-side bundle. */
@@ -78,6 +85,13 @@ export default function jahia(
          */
         fileName?: string;
       };
+      /**
+       * Enable source maps for the server-side bundle.
+       *
+       * @default `true`
+       * @see https://vite.dev/config/build-options.html#build-sourcemap
+       */
+      sourcemap?: boolean | "hidden" | "inline" | undefined;
     };
 
     /**
@@ -133,6 +147,7 @@ export default function jahia(
         environments: {
           client: {
             build: {
+              sourcemap: options.client?.sourcemap ?? Boolean(config.build?.watch),
               lib: {
                 entry: Object.fromEntries(
                   clientEntries.map((file) => [file, path.join(clientBaseDir, file)]),
@@ -163,6 +178,7 @@ export default function jahia(
           },
           ssr: {
             build: {
+              sourcemap: options.server?.sourcemap ?? true,
               lib: {
                 /**
                  * Necessary for IIFE format but not used; it's the name given to the global
@@ -207,8 +223,12 @@ export default function jahia(
                     buildSuccessPlugin(options.watchCallback),
                   // Insert filenames in client-side components
                   insertFilename(
-                    options.client?.input?.dir ?? "./src/client/",
-                    options.client?.output ?? "./javascript/client/",
+                    clientBaseDir,
+                    options.client?.input?.glob ?? "**/*.jsx",
+                    // Convert a client source filename into a client production filename
+                    (id: string) =>
+                      (options.client?.output ?? "./javascript/client/").replace(/^\.\//, "") +
+                      path.relative(clientBaseDir, id),
                   ),
                 ],
               },
