@@ -51,7 +51,7 @@ export default function jahia(
       /**
        * Enable source maps for client-side files.
        *
-       * @default `"hidden"`
+       * @default `true` in dev mode, `false` otherwise
        * @see https://vite.dev/config/build-options.html#build-sourcemap
        */
       sourcemap?: boolean | "hidden" | "inline" | undefined;
@@ -141,7 +141,7 @@ export default function jahia(
         environments: {
           client: {
             build: {
-              sourcemap: options.client?.sourcemap ?? "hidden",
+              sourcemap: options.client?.sourcemap ?? Boolean(config.build?.watch),
               lib: {
                 entry: Object.fromEntries(
                   clientEntries.map((file) => [file, path.join(clientBaseDir, file)]),
