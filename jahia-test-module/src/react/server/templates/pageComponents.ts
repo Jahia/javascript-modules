@@ -13,17 +13,6 @@ export const login = {
   nodeType: "jnt:loginForm",
 };
 
-export const navMenu = {
-  name: "navMenu",
-  nodeType: "javascriptExample:navMenu",
-  mixins: ["jmix:renderable"],
-  properties: {
-    "j:maxDepth": "10",
-    "j:baselineNode": "home",
-    "j:menuItemView": "menuElement",
-  },
-};
-
 export const hydratedNavMenu = {
   name: "hydratedNavMenu",
   nodeType: "javascriptExample:hydratedNavMenu",
