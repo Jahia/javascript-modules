@@ -6,7 +6,7 @@
       "target/java-ts-bind/sources/dependencies"
     ],
     "symbols": [
-      "target/java-ts-bind/jars/commons-lang.jar",
+      "target/java-ts-bind/jars/commons-lang3.jar",
       "target/java-ts-bind/jars/graal-sdk.jar",
       "target/java-ts-bind/jars/jackrabbit-spi-commons.jar",
       "target/java-ts-bind/jars/jahia-impl.jar",

@@ -190,7 +190,7 @@
                         </goals>
                         <configuration>
                             <includeArtifactIds>
-                                commons-lang,
+                                commons-lang3,
                                 graal-sdk,
                                 jackrabbit-spi-commons,
                                 jahia-impl,
