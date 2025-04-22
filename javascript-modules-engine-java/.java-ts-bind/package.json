@@ -17,9 +17,6 @@
       "target/java-ts-bind/jars/jsp-api.jar",
       "target/java-ts-bind/jars/org.apache.felix.framework.jar",
       "target/java-ts-bind/jars/osgi.annotation.jar",
-      "target/java-ts-bind/jars/spring-beans.jar",
-      "target/java-ts-bind/jars/spring-context.jar",
-      "target/java-ts-bind/jars/spring-web.jar",
       "target/java-ts-bind/jars/xml-apis.jar"
     ],
     "out": "target/java-ts-bind/types",
@@ -470,9 +467,6 @@
       "org.osgi.framework.BundleListener",
       "org.osgi.framework.FrameworkListener",
       "org.osgi.framework.ServiceListener",
-      "org.springframework.beans.factory.DisposableBean",
-      "org.springframework.beans.factory.InitializingBean",
-      "org.springframework.web.context.ServletContextAware",
       "org.xml.sax.ContentHandler"
     ],
     "gettersAndSettersOff": true,
