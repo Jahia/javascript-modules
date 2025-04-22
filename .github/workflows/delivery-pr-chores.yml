@@ -8,7 +8,7 @@ on:
       - opened
       - reopened
       - edited
-      - synchronize
+      - synchronize  
   pull_request_review:
 
 jobs:

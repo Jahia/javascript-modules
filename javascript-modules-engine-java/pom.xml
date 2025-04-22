@@ -190,7 +190,7 @@
                         </goals>
                         <configuration>
                             <includeArtifactIds>
-                                commons-lang,
+                                commons-lang3,
                                 graal-sdk,
                                 jackrabbit-spi-commons,
                                 jahia-impl,
@@ -200,9 +200,6 @@
                                 jsp-api,
                                 org.apache.felix.framework,
                                 osgi.annotation,
-                                spring-beans,
-                                spring-context,
-                                spring-web,
                                 xml-apis
                             </includeArtifactIds>
                             <outputDirectory>${project.build.directory}/java-ts-bind/jars</outputDirectory>

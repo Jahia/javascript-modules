@@ -15,7 +15,7 @@
  */
 package org.jahia.modules.javascript.modules.engine.views;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jahia.bin.Jahia;
 import org.jahia.modules.javascript.modules.engine.registrars.ViewsRegistrar;
 import org.jahia.services.content.JCRNodeWrapper;

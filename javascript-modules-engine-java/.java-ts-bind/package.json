@@ -6,7 +6,7 @@
       "target/java-ts-bind/sources/dependencies"
     ],
     "symbols": [
-      "target/java-ts-bind/jars/commons-lang.jar",
+      "target/java-ts-bind/jars/commons-lang3.jar",
       "target/java-ts-bind/jars/graal-sdk.jar",
       "target/java-ts-bind/jars/jackrabbit-spi-commons.jar",
       "target/java-ts-bind/jars/jahia-impl.jar",
@@ -17,9 +17,6 @@
       "target/java-ts-bind/jars/jsp-api.jar",
       "target/java-ts-bind/jars/org.apache.felix.framework.jar",
       "target/java-ts-bind/jars/osgi.annotation.jar",
-      "target/java-ts-bind/jars/spring-beans.jar",
-      "target/java-ts-bind/jars/spring-context.jar",
-      "target/java-ts-bind/jars/spring-web.jar",
       "target/java-ts-bind/jars/xml-apis.jar"
     ],
     "out": "target/java-ts-bind/types",
@@ -434,7 +431,7 @@
       "javax.servlet.RequestDispatcher",
       "javax.servlet.ServletContext",
       "javax.servlet.http.HttpServlet",
-      "org.apache.commons.lang.mutable.MutableInt",
+      "org.apache.commons.lang3.mutable.MutableInt",
       "org.jahia.api.usermanager.JahiaUserManagerService",
       "org.jahia.data.beans.CategoryBean",
       "org.jahia.data.templates.JahiaTemplatesPackage",
@@ -470,9 +467,6 @@
       "org.osgi.framework.BundleListener",
       "org.osgi.framework.FrameworkListener",
       "org.osgi.framework.ServiceListener",
-      "org.springframework.beans.factory.DisposableBean",
-      "org.springframework.beans.factory.InitializingBean",
-      "org.springframework.web.context.ServletContextAware",
       "org.xml.sax.ContentHandler"
     ],
     "gettersAndSettersOff": true,
