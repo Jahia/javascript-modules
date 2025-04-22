@@ -77,9 +77,9 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>2.1</version>
+            <groupId>jakarta.servlet.jsp</groupId>
+            <artifactId>jakarta.servlet.jsp-api</artifactId>
+            <version>2.3.6</version> <!-- defined in Jahia/org.ops4j.pax.web/pom.xml -->
             <scope>provided</scope>
         </dependency>
 

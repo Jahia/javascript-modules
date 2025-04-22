@@ -82,9 +82,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>2.1</version>
+            <groupId>jakarta.servlet.jsp</groupId>
+            <artifactId>jakarta.servlet.jsp-api</artifactId>
+            <version>2.3.6</version> <!-- defined in Jahia/org.ops4j.pax.web/pom.xml -->
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -194,10 +194,10 @@
                                 graal-sdk,
                                 jackrabbit-spi-commons,
                                 jahia-impl,
+                                jakarta.servlet.jsp-api,
                                 javax.servlet-api,
                                 jboss-servlet-api_3.1_spec,
                                 jcr,
-                                jsp-api,
                                 org.apache.felix.framework,
                                 osgi.annotation,
                                 xml-apis

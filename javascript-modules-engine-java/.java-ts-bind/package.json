@@ -10,11 +10,11 @@
       "target/java-ts-bind/jars/graal-sdk.jar",
       "target/java-ts-bind/jars/jackrabbit-spi-commons.jar",
       "target/java-ts-bind/jars/jahia-impl.jar",
+      "target/java-ts-bind/jars/jakarta.servlet.jsp-api.jar",
       "target/java-ts-bind/jars/javascript-modules-engine-java-classes.jar",
       "target/java-ts-bind/jars/javax.servlet-api.jar",
       "target/java-ts-bind/jars/jboss-servlet-api_3.1_spec.jar",
       "target/java-ts-bind/jars/jcr.jar",
-      "target/java-ts-bind/jars/jsp-api.jar",
       "target/java-ts-bind/jars/org.apache.felix.framework.jar",
       "target/java-ts-bind/jars/osgi.annotation.jar",
       "target/java-ts-bind/jars/xml-apis.jar"
