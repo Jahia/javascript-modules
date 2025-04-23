@@ -14,9 +14,9 @@
       "target/java-ts-bind/jars/javax.servlet-api.jar",
       "target/java-ts-bind/jars/jboss-servlet-api_3.1_spec.jar",
       "target/java-ts-bind/jars/jcr.jar",
-      "target/java-ts-bind/jars/jsp-api.jar",
       "target/java-ts-bind/jars/org.apache.felix.framework.jar",
       "target/java-ts-bind/jars/osgi.annotation.jar",
+      "target/java-ts-bind/jars/pax-web-jsp.jar",
       "target/java-ts-bind/jars/xml-apis.jar"
     ],
     "out": "target/java-ts-bind/types",

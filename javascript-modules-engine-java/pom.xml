@@ -28,83 +28,164 @@
     <description>This is the Java part of the Javascript modules engine.</description>
 
     <dependencies>
+        <!-- dependencies provided by Jahia: -->
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.annotation</artifactId>
-            <version>${osgi.version}</version>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
-            <groupId>org.ops4j.pax.swissbox</groupId>
-            <artifactId>pax-swissbox-bnd</artifactId>
-            <version>1.8.3</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.fileinstall</artifactId>
-            <version>${felix.fileinstall.version}</version>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
-            <groupId>org.graalvm.sdk</groupId>
-            <artifactId>graal-sdk</artifactId>
-            <version>${graalvm.sdk.version}</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
-            <version>2.9.0</version>
-        </dependency>
-        <!-- tool used to generate *.d.ts files -->
-        <dependency>
-            <groupId>io.github.bensku</groupId>
-            <artifactId>java-ts-bind</artifactId>
-            <version>1.0.0-jahia-2</version>
-            <classifier>all</classifier>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
             <scope>provided</scope>
         </dependency>
-        <!-- dependencies not present / different required to generate the *d.ts files: -->
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>javax.jcr</groupId>
             <artifactId>jcr</artifactId>
-            <version>2.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>2.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.fileinstall</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jackrabbit</groupId>
+            <artifactId>jackrabbit-jcr-commons</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>graal-sdk</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jahia.server</groupId>
+            <artifactId>jahia-impl</artifactId>
+            <scope>provided</scope>
+            <exclusions>
+                <!-- prevent transitive dependencies to be used in lieu of the declared dependencies -->
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.cmpn</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>pl.touk</groupId>
+            <artifactId>throwing-function</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.web</groupId>
+            <artifactId>pax-web-jsp</artifactId>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <!-- javax.el:javax.el-api is used instead -->
+                    <groupId>org.apache.tomcat.embed</groupId>
+                    <artifactId>tomcat-embed-el</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>javax.el-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
-        <!-- test dependencies -->
+        <!-- dependencies that should be embedded in the final bundle as they are not provided by Jahia: -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.swissbox</groupId>
+            <artifactId>pax-swissbox-bnd</artifactId>
+        </dependency>
+
+        <!-- utility tool to generate the TypeScript Type Declaration files (*.d.ts) from Java code -->
+        <dependency>
+            <groupId>io.github.bensku</groupId>
+            <artifactId>java-ts-bind</artifactId>
+            <classifier>all</classifier>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- dependencies exposed in the TypeScript Type Declaration files (*.d.ts), but not used in Java: -->
+        <dependency>
+            <groupId>org.apache.jackrabbit</groupId>
+            <artifactId>jackrabbit-spi-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.spec.javax.servlet</groupId>
+            <artifactId>jboss-servlet-api_3.1_spec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.annotation</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- test dependencies: -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>pl.pragmatists</groupId>
             <artifactId>JUnitParams</artifactId>
-            <version>1.1.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -112,15 +193,12 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
                 <configuration>
                     <release>17</release>
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
@@ -146,7 +224,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
@@ -197,13 +274,34 @@
                                 javax.servlet-api,
                                 jboss-servlet-api_3.1_spec,
                                 jcr,
-                                jsp-api,
                                 org.apache.felix.framework,
                                 osgi.annotation,
+                                pax-web-jsp,
                                 xml-apis
                             </includeArtifactIds>
                             <outputDirectory>${project.build.directory}/java-ts-bind/jars</outputDirectory>
                             <stripVersion>true</stripVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <failOnWarning>true</failOnWarning>
+                            <ignoredUnusedDeclaredDependencies>
+                                <!-- declared in the parent pom, hence inherited, but not used: -->
+                                <ignoredUnusedDeclaredDependency>org.springframework:spring-webmvc</ignoredUnusedDeclaredDependency>
+                                <ignoredUnusedDeclaredDependency>javax.servlet:jstl</ignoredUnusedDeclaredDependency>
+                                <!-- used to generate *.d.ts from Java code: -->
+                                <ignoredUnusedDeclaredDependency>io.github.bensku:java-ts-bind
+                                </ignoredUnusedDeclaredDependency>
+                                <!-- only exposed in *.d.ts files, not used in Java: -->
+                                <ignoredUnusedDeclaredDependency>org.apache.jackrabbit:jackrabbit-spi-commons</ignoredUnusedDeclaredDependency>
+                                <ignoredUnusedDeclaredDependency>org.jboss.spec.javax.servlet:jboss-servlet-api_3.1_spec</ignoredUnusedDeclaredDependency>
+                                <ignoredUnusedDeclaredDependency>org.osgi:osgi.annotation</ignoredUnusedDeclaredDependency>
+                                <ignoredUnusedDeclaredDependency>xml-apis:xml-apis</ignoredUnusedDeclaredDependency>
+                            </ignoredUnusedDeclaredDependencies>
                         </configuration>
                     </execution>
                 </executions>
@@ -245,7 +343,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
