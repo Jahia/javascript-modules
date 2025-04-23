@@ -4,7 +4,6 @@ import { addSimplePage } from '../../utils/Utils'
 
 const checkSectionsPresence = () => {
     cy.get('div[class="header"]').should('be.visible')
-    cy.get('div[class="nav"]').should('be.visible')
     cy.get('div[class="main"]').should('be.visible')
     cy.get('div[class="footer"]').should('be.visible')
 }
@@ -21,7 +20,7 @@ describe('Template testsuite', () => {
         ])
     })
 
-    it(`${pageName}: Verify 4 sections presence`, () => {
+    it(`${pageName}: Verify 3 sections presence`, () => {
         cy.login()
         cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         cy.iframe('#page-builder-frame-1').within(() => {
@@ -37,12 +36,11 @@ describe('Template testsuite', () => {
             cy.get('button[data-sel-role="createContent"]:first').click()
         })
         cy.get('li[role="treeitem"]:contains("javascriptExampleComponent")').click()
-        cy.get('li[role="treeitem"]:contains("Navigation Menu")').should('be.visible')
         cy.get('li[role="treeitem"]:contains("test")').should('be.visible')
         cy.logout()
     })
 
-    it(`${pageName}: Check 4 sections presence in LIVE workspace`, () => {
+    it(`${pageName}: Check 3 sections presence in LIVE workspace`, () => {
         cy.login()
         cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`)
         publishAndWaitJobEnding('/sites/javascriptTestSite')

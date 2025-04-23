@@ -73,7 +73,6 @@ describe('Content templates resolution testsuite', () => {
 
         // Check template is good:
         cy.get('div[class="header"]').should('be.visible')
-        cy.get('div[class="nav"]').should('be.visible')
         cy.get('div[class="main"]').should('be.visible')
         cy.get('div[class="footer"]').should('be.visible')
 

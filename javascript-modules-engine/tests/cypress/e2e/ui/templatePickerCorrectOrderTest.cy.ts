@@ -22,7 +22,6 @@ describe('Template Picker Correct Order Test', () => {
             'Events page',
             'Home page',
             'Home page with hydrated menu',
-            'Nav Menu',
             'Simple page',
             'Template example priority -5',
             'Template example priority -5',
