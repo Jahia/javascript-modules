@@ -30,14 +30,6 @@
 
     <properties>
         <jahia-module-signature>MCsCFHQLKOK7O2Q/j38Puro78KPX4sqVAhM6ywV7HEhKveasQixBgigZLYyO</jahia-module-signature>
-        <import-package>
-            graphql.annotations.annotationTypes;version="[7.2,99)",
-            graphql.schema;version="[13.0,22)",
-            org.jahia.modules.graphql.provider.dxm;version="[2.7,4)",
-            org.jahia.modules.graphql.provider.dxm.node;version="[2.7,4)",
-            org.jahia.modules.graphql.provider.dxm.osgi.annotations;version="[2.7,4)",
-            org.jahia.modules.graphql.provider.dxm.util;version="[2.7,4)",
-        </import-package>
         <require-capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version&gt;=17))"</require-capability>
         <yarn-build>build</yarn-build>
     </properties>
