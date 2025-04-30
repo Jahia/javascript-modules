@@ -13,3 +13,8 @@
       - 'js:mvn:org.jahia.samples/javascript-modules-samples-hydrogen/0.7.0-SNAPSHOT/tgz'
   autoStart: true
   uninstallPreviousVersion: true
+
+- installBundle:
+      - 'mvn:simple-osgi-service'
+  autoStart: true
+  uninstallPreviousVersion: true

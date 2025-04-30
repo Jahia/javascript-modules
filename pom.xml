@@ -46,6 +46,7 @@
         <module>javascript-modules-library</module>
         <module>samples/hydrogen</module>
         <module>samples/hydrogen-prepackaged</module>
+        <module>samples/simple-osgi-service</module>
         <module>vite-plugin</module>
     </modules>
 
