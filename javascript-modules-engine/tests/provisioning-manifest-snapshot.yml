@@ -15,6 +15,6 @@
   uninstallPreviousVersion: true
 
 - installBundle:
-      - 'mvn:simple-osgi-service'
+      - 'mvn:org.jahia.samples/simple-osgi-service'
   autoStart: true
   uninstallPreviousVersion: true

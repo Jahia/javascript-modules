@@ -13,6 +13,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
+    <groupId>org.jahia.samples</groupId>
     <artifactId>simple-osgi-service</artifactId>
     <packaging>bundle</packaging>
     <name>Simple OSGi Service</name>

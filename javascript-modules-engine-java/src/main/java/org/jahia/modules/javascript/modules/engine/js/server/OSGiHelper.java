@@ -64,7 +64,20 @@ public class OSGiHelper {
      * @return the OSGi instance associated to the fully qualified class name
      */
     public Object getService(String clazz) {
-        return BundleUtils.getOsgiService(clazz);
+        return getService(clazz, null);
+    }
+
+    /**
+     * Retrieves an OSGi service instance by its fully qualified class name.
+     * An interface name can be used as long as a service properly declares
+     * implementing it.
+     *
+     * @param clazz the fully qualified class name of the OSGi service
+     * @param filter the filter to apply to the service
+     * @return the OSGi instance associated to the fully qualified class name
+     */
+    public Object getService(String clazz, String filter) {
+        return BundleUtils.getOsgiService(clazz, filter);
     }
 
     /**
