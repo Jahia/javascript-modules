@@ -122,6 +122,8 @@
 
 [javascriptExample:testConfig] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
 
+[javascriptExample:testOSGi] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
+
 [javascriptExample:testFindDisplayableContent] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
  - target (weakreference)
 

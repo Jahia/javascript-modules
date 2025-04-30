@@ -21,6 +21,7 @@ import org.jahia.data.templates.JahiaTemplatesPackage;
 import org.jahia.modules.javascript.modules.engine.js.injector.OSGiService;
 import org.jahia.modules.javascript.modules.engine.jsengine.ContextProvider;
 import org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine;
+import org.jahia.osgi.BundleUtils;
 import org.jahia.services.render.RenderException;
 import org.jahia.services.templates.JahiaTemplateManagerService;
 import org.osgi.framework.Bundle;
@@ -52,6 +53,31 @@ public class OSGiHelper {
     @OSGiService
     public void setTemplateManagerService(JahiaTemplateManagerService templateManagerService) {
         this.templateManagerService = templateManagerService;
+    }
+
+    /**
+     * Retrieves an OSGi service instance by its fully qualified class name.
+     * An interface name can be used as long as a service properly declares
+     * implementing it.
+     *
+     * @param clazz the fully qualified class name of the OSGi service
+     * @return the OSGi instance associated to the fully qualified class name
+     */
+    public Object getService(String clazz) {
+        return getService(clazz, null);
+    }
+
+    /**
+     * Retrieves an OSGi service instance by its fully qualified class name.
+     * An interface name can be used as long as a service properly declares
+     * implementing it.
+     *
+     * @param clazz the fully qualified class name of the OSGi service
+     * @param filter the filter to apply to the service
+     * @return the OSGi instance associated to the fully qualified class name
+     */
+    public Object getService(String clazz, String filter) {
+        return BundleUtils.getOsgiService(clazz, filter);
     }
 
     /**
