@@ -360,8 +360,11 @@ public class RenderHelper {
 
     public String renderArea(Map<String, Object> attr, RenderContext renderContext) throws IllegalAccessException, InvocationTargetException, JspException, IOException {
         checkAttributes(attr, AREA_ALLOWED_ATTRIBUTES);
-        String name = readMandatoryAttribute(attr, "name");
-        attr.put("path", renderContext.getMainResource().getNode().getPath() + "/" + name);
+        // This is actually expected, the path of an area is relative by default, so the name is directly mapped to: path
+        // the AreaTag will resolve the area content using template inheritance hierarchy.
+        // Even if it's not used in the javascript engine, we need to respect this concept for compatibility with existing system relying on this behavior.
+        // (jExperience for example is using this behavior, for page perso/opti, by pushing the page variant node as parent template)
+        attr.put("path", readMandatoryAttribute(attr, "name"));
         return internalRenderArea(attr, "area", renderContext);
     }
 
