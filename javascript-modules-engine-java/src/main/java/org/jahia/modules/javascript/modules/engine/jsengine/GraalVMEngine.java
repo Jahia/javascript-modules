@@ -23,6 +23,7 @@ import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.graalvm.home.Version;
 import org.graalvm.polyglot.*;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -49,6 +50,7 @@ public class GraalVMEngine {
     private static final Logger logger = LoggerFactory.getLogger(GraalVMEngine.class);
 
     public static final String JS = "js";
+    private static final String UNKNOWN_SYS_PROP = "Unknown";
 
     private Engine sharedEngine;
 
@@ -61,6 +63,7 @@ public class GraalVMEngine {
     private final AtomicInteger version = new AtomicInteger(0);
 
     private BundleContext bundleContext;
+
     public BundleContext getBundleContext() {
         return bundleContext;
     }
@@ -99,7 +102,7 @@ public class GraalVMEngine {
             logger.error("Cannot execute main init script", e);
         }
         Engine.Builder builder = Engine.newBuilder();
-        Map<String,String> poolOptions = new HashMap<>();
+        Map<String, String> poolOptions = new HashMap<>();
         boolean experimental = props.containsKey("experimental") && Boolean.parseBoolean(props.get("experimental").toString());
         builder.allowExperimentalOptions(experimental);
         for (Map.Entry<String, ?> entry : props.entrySet()) {
@@ -168,9 +171,11 @@ public class GraalVMEngine {
 
     private void initialEngineCheckup() {
         // check VM
-        String vmVendor = System.getProperty("java.vm.vendor", "Unknown");
-        if (!vmVendor.contains("GraalVM")) {
-            logger.warn("Javascript Modules Engine requires GraalVM for production usage, detected {}.", vmVendor);
+        if (!Version.getCurrent().isRelease()) {
+            String specVersion = System.getProperty("java.specification.version", UNKNOWN_SYS_PROP);
+            String vendorVersion = System.getProperty("java.vendor.version", specVersion);
+            String vendor = System.getProperty("java.vendor", UNKNOWN_SYS_PROP);
+            logger.warn("Javascript Modules Engine requires GraalVM for production usage, detected {} (vendor: {}).", vendorVersion, vendor);
             return;
         }
 
@@ -182,7 +187,7 @@ public class GraalVMEngine {
         }
     }
 
-    private void initializePool(Map<String,String> poolOptions) {
+    private void initializePool(Map<String, String> poolOptions) {
         GenericObjectPoolConfig<ContextProvider> config = new GenericObjectPoolConfig<>();
         try {
             BeanUtils.populate(config, poolOptions);
