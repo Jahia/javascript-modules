@@ -11,6 +11,11 @@ on:
     tags-ignore:
       - "**"
 
+concurrency:
+  # ensure there is at most one execution of this workflow at any time
+  # if another workflow is "in progress", the queued workflow will be "pending"
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+
 jobs:
   update-signature:
     name: Update module signature
