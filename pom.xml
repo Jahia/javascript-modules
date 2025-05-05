@@ -233,7 +233,7 @@
             <dependency>
                 <groupId>io.github.bensku</groupId>
                 <artifactId>java-ts-bind</artifactId>
-                <version>1.0.0-jahia-2</version>
+                <version>1.0.0-jahia-3</version>
                 <classifier>all</classifier>
             </dependency>
             <dependency>
