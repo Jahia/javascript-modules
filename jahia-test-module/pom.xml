@@ -56,17 +56,6 @@
                             <goal>yarn</goal>
                         </goals>
                     </execution>
-                    <!-- Executions bound on the "process-sources" phase (executed in order of declaration): -->
-                    <execution>
-                        <id>yarn lint</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>lint</arguments>
-                        </configuration>
-                    </execution>
                     <!-- Executions bound on the "package" phase (executed in order of declaration): -->
                     <execution>
                         <id>yarn pack</id>

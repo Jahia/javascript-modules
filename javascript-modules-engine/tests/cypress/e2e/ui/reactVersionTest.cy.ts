@@ -27,7 +27,7 @@ describe('Test React version', () => {
     it('React version should be correct', function () {
         cy.login()
         cy.visit('/cms/render/default/en/sites/javascriptTestSite/home/testReactVersion.html')
-        cy.get('span[data-testid="react-version"]').should('have.text', '19.0.0')
+        cy.get('span[data-testid="react-version"]').should('have.text', '19.1.0')
         cy.get('span[data-testid="node-env"]').should('have.text', 'production')
         cy.logout()
     })

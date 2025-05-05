@@ -29,19 +29,19 @@
     "lint": "yarn run --top-level lint"
   },
   "dependencies": {
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.5.0"
   },
   "devDependencies": {
-    "@types/react": "^19.0.8",
+    "@types/react": "^19.1.2",
     "devalue": "^5.1.1",
-    "graphql": "^16.10.0",
-    "i18next": "^23.10.1",
-    "publint": "^0.3.6",
-    "react-i18next": "^15.4.0",
-    "typescript": "^5.7.3"
+    "graphql": "^16.11.0",
+    "i18next": "^25.0.2",
+    "publint": "^0.3.12",
+    "react-i18next": "^15.5.1",
+    "typescript": "^5.8.3"
   },
   "peerDependencies": {
-    "i18next": "^23.0.0",
+    "i18next": "^25.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-i18next": "^15.4.0",
