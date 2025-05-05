@@ -42,7 +42,7 @@ public class JSScript implements Script {
 
     @Override
     public String execute(Resource resource, RenderContext renderContext) throws RenderException {
-        return graalVMEngine.doWithContext(ThrowingFunction.unchecked(contextProvider -> {
+        String output = graalVMEngine.doWithContext(ThrowingFunction.unchecked(contextProvider -> {
             Map<String, Object> viewValues = jsView.getRegistryInstance(contextProvider);
 
             if (!viewValues.containsKey("viewRenderer")) {
@@ -64,6 +64,15 @@ public class JSScript implements Script {
             Value value = Value.asValue(executionResult);
             return value.asString();
         }));
+
+        if (jsView.isTemplate()) {
+            // Jahia core TemplateNodeFilter is using this attribute to store the template in request for sub fragment cache entries
+            // We need to clean it after template output, in order for cache keys to be generated correctly for the main resource
+            // (part of code necessary to make template inheritance hierarchy and relatives areas working correctly)
+            renderContext.getRequest().setAttribute("previousTemplate", null);
+        }
+
+        return output;
     }
 
     @Override
