@@ -1,5 +1,5 @@
 import { AddResources, Area, jahiaComponent, Render } from "@jahia/javascript-modules-library";
-import { footer, header, login, navMenu } from "./pageComponents";
+import { footer, header, login } from "./pageComponents";
 
 jahiaComponent(
   {
@@ -23,27 +23,24 @@ jahiaComponent(
               <Render content={login} />
             </div>
           </div>
-          <div className="nav">
-            <Render content={navMenu} />
+        </div>
+        <div className="main">
+          <div className="article">
+            <Area name={"events"} allowedTypes={["jnt:event"]} />
           </div>
-          <div className="main">
-            <div className="article">
-              <Area name={"events"} allowedTypes={["jnt:event"]} />
-            </div>
-            <div className="aside">
-              <Render
-                content={{
-                  name: "boundComponentTest",
-                  nodeType: "javascriptExample:testBoundComponent",
-                  boundComponentRelativePath: "/events",
-                }}
-              />
-            </div>
+          <div className="aside">
+            <Render
+              content={{
+                name: "boundComponentTest",
+                nodeType: "javascriptExample:testBoundComponent",
+                boundComponentRelativePath: "/events",
+              }}
+            />
           </div>
-          <div className="footer">
-            <div className="footerContent">
-              <Render content={footer} />
-            </div>
+        </div>
+        <div className="footer">
+          <div className="footerContent">
+            <Render content={footer} />
           </div>
         </div>
       </body>
