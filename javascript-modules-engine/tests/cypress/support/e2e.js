@@ -83,8 +83,10 @@ before("Create tutorial sample site", () => {
   if (prepackaged_site_URL && prepackaged_site_URL.startsWith("jar:mvn:")) {
     // the prepackaged site should be fetched from a Maven URL
     cy.runProvisioningScript({
-      fileContent: `- importSite: "${prepackaged_site_URL}"`,
-      type: "application/yaml",
+      script: {
+        fileContent: `- importSite: "${prepackaged_site_URL}"`,
+        type: "application/yaml",
+      },
     }).then(() => publishAndWaitJobEnding(`/sites/${siteKey}`, ["en"]));
   } else {
     // otherwise, assume it's a glob filename related to the ./artifacts/ folder
@@ -104,13 +106,13 @@ before("Create tutorial sample site", () => {
       .then(() => {
         cy.log("Importing site.zip...");
         const site_archive_path = "../../artifacts/site.zip";
-        return cy.runProvisioningScript(
-          {
+        return cy.runProvisioningScript({
+          script: {
             fileContent: `- importSite: "${site_archive_path}"`,
             type: "application/yaml",
           },
-          [{ fileName: site_archive_path }],
-        );
+          files: [{ fileName: site_archive_path }],
+        });
       })
       .then(() => {
         cy.log(`Publishing site '${siteKey}'...`);
