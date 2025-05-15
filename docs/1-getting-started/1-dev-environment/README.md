@@ -46,7 +46,7 @@ The project you created has the following structure:
 
 - `.github/`: GitHub Actions configuration, builds your module on push.
 - `.idea/`: JetBrains IDE configuration.
-- `.vscode/`: VSCode configuration. **Make sure to install the recommended extensions!** Search `@recommended` in the extensions tab to list them.
+- `.vscode/`: VSCode configuration. **Make sure to install the recommended extensions!** Search for `@recommended` in the extensions tab to list them.
 - `.yarn/`, `.yarnrc.yml` and `yarn.lock`: Yarn configuration and lock file.
 - `node_modules/`: Node.js dependencies.
 - <mark>`settings/`: Jahia-specific settings.</mark>
