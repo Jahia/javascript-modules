@@ -21,8 +21,7 @@ services:
       test: ["CMD", "curl", "http://localhost:8080/start"]
       interval: 5s
       timeout: 1s
-      retries: 20
-      start_period: 20s
+      retries: 24
 
   postgres:
     image: postgres:16
