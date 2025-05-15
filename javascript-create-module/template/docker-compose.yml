@@ -18,7 +18,7 @@ services:
         source: ./docker
         target: /mnt/jahia
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      test: ["CMD", "curl", "http://localhost:8080/start"]
       interval: 5s
       timeout: 1s
       retries: 20
