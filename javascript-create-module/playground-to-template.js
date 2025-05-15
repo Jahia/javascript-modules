@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import pkg from "./package.json" with { type: "json" };
 
 /** Input directory. */
 const input = "playground";
@@ -14,7 +15,8 @@ const renameDot = (/** @type {string} */ name) =>
   name.startsWith(".") ? path.join("dot", name.slice(1)) : name;
 
 /** Replaces `playground` with `$MODULE`. */
-const templatify = (/** @type {string} */ str) => str.replaceAll("playground", "$MODULE");
+const templatify = (/** @type {string} */ str) =>
+  str.replaceAll("playground", "$MODULE").replaceAll(pkg.version, "$VERSION");
 
 // Recursively copy files from the input directory to the template directory
 for (const entry of fs.readdirSync(input, { recursive: true, withFileTypes: true })) {

@@ -84,7 +84,8 @@ Run the following commands to get started:
     "# Commit all files",
   )}
   ${styleText("dim", "4.")} ${styleText("cyanBright", "code .")}  ${styleText("dim", "# Open the project in VSCode")}
-  ${styleText("dim", "5.")} ${styleText("magentaBright", "yarn build && yarn dev")}  ${styleText("dim", "# Build and start the dev mode")}
+  ${styleText("dim", "5.")} ${styleText("blueBright", "docker-compose up --wait")}  ${styleText("dim", "# Start Jahia")}
+  ${styleText("dim", "6.")} ${styleText("magentaBright", "yarn build && yarn dev")}  ${styleText("dim", "# Build and start the dev mode")}
 `);
 } catch (error) {
   console.error(
