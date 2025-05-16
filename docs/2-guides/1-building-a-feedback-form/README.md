@@ -2,6 +2,8 @@
 
 The goal of this self-contained guide is to create a feedback form that uses client-side JavaScript to send data to a server. This first half will be about building the form, the second half about collecting the data on the server with jCustomer.
 
+This guide assumes you have followed the [Getting Started](../1-getting-started/1-dev-environment/) guide and have a working Jahia instance with a JavaScript Module running on it. If you haven't done so, please follow the instructions in that guide before continuing.
+
 ## Client-Side JavaScript
 
 The JavaScript Modules Library features a component we haven't used yet: `RenderInBrowser`. Contrary to the getting started, where all components were rendered on the server, this component allows you to render a component in the browser, and the browser only. This is useful for components that only make sense in the browser, because they need to be interactive.
