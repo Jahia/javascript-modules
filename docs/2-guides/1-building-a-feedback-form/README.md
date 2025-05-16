@@ -229,7 +229,7 @@ Running jCustomer locally is a bit tricky. You'll need to update both the `docke
   uninstallPreviousVersion: true
 ```
 
-</summary>
+</details>
 
 Once done, run `docker-compose up --wait` to start the containers. You need to enable both jExperience and jExperience Dashboards to the website you are using. You can do this by going to **Administration > Modules > jExperience > Usage in sites** and checking the box next to your website. Do the same for **jExperience Dashboards**.
 
