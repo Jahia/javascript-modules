@@ -10,7 +10,7 @@ The JavaScript Modules Library features a component we haven't used yet: `Render
 
 Let's start by creating a very basic node type and view for our feedback form:
 
-- Create `src/components/feedbackWidget/defintion.cnd` with the following content:
+- Create `src/components/feedbackWidget/definition.cnd` with the following content:
 
 ```cnd
 [hydrogen:feedbackWidget] > jnt:content, hydrogenmix:component
