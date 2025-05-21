@@ -1269,17 +1269,15 @@ __metadata:
   linkType: hard
 
 "cypress-terminal-report@npm:^7.1.0":
-  version: 7.1.0
-  resolution: "cypress-terminal-report@npm:7.1.0"
+  version: 7.2.0
+  resolution: "cypress-terminal-report@npm:7.2.0"
   dependencies:
     chalk: "npm:^4.0.0"
     compare-versions: "npm:^6.1.1"
-    fs-extra: "npm:^10.1.0"
-    process: "npm:^0.11.10"
     superstruct: "npm:0.14.2"
   peerDependencies:
     cypress: ">=10.0.0"
-  checksum: 10c0/3486d97d88485163998d233565a6e9fd047d2dda8cbb14a90f42b49632174ee6f8881e8c367563286ab58d009fa530d16a5359089512a7b310d36bfa9831d77f
+  checksum: 10c0/e2d3fb8697860ff11f3ce1fd56061d4333d10ec277650493a95b183abd67187edb9616069bdbca6dab2c1c35c83c67b45a2228d36fa7d36966d5e7cc977d0a29
   languageName: node
   linkType: hard
 
@@ -1890,7 +1888,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fs-extra@npm:^10.0.0, fs-extra@npm:^10.1.0":
+"fs-extra@npm:^10.0.0":
   version: 10.1.0
   resolution: "fs-extra@npm:10.1.0"
   dependencies:
