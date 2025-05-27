@@ -17,6 +17,19 @@ import sharedLibs from "./shared-libs.mjs";
 const buildEnv = process.env.BUILD || "development";
 
 /**
+ * List of files generated during the shared client libs build (2nd phase).
+ *
+ * This list is then re-injected in the server-side build (3rd phase) to add performance
+ * optimizations to `<InBrowser />`.
+ *
+ * The goal of all this is to flatten the network dependency graph of the hydrated code, by using
+ * `<link rel="modulepreload" />` hints.
+ *
+ * @type {string[]}
+ */
+let sharedLibFiles;
+
+/**
  * Rollup plugins common to all builds.
  *
  * @type {import("rollup").InputPluginOption[]}
@@ -60,6 +73,15 @@ export default defineConfig([
       ...plugins,
       // Minify client files in production
       buildEnv === "production" && terser(),
+      {
+        name: "extract-shared-lib-files",
+        generateBundle(_, bundle) {
+          // Collect all output JS files
+          sharedLibFiles = Object.entries(bundle)
+            .filter(([, { type }]) => type === "chunk")
+            .map(([name]) => name);
+        },
+      },
     ],
   },
   // Build the server-side script
@@ -94,6 +116,16 @@ export default defineConfig([
               ),
             );
           }
+        },
+      },
+      {
+        name: "inject-shared-lib-files",
+        resolveId(id) {
+          if (id === "virtual:shared-lib-files") return `\0shared-lib-files`;
+        },
+        load(id) {
+          if (id === "\0shared-lib-files")
+            return `export default ${JSON.stringify(sharedLibFiles)};`;
         },
       },
       ...plugins,

@@ -1,9 +1,10 @@
-import { useServerContext } from "../../../hooks/useServerContext.js";
-import { AddResources } from "../../AddResources.js";
-import { I18nextProvider } from "react-i18next";
-import i18n from "i18next";
 import * as devalue from "devalue";
+import i18n from "i18next";
+import { I18nextProvider } from "react-i18next";
+import sharedLibFiles from "virtual:shared-lib-files";
+import { useServerContext } from "../../../hooks/useServerContext.js";
 import { buildModuleFileUrl } from "../../../utils/urlBuilder/urlBuilder";
+import { AddResources } from "../../AddResources.js";
 
 /**
  * Import map to allow bare identifiers (e.g. `import { useState } from "react"`) to be imported
@@ -63,6 +64,21 @@ function InBrowser<T>({
 
   return (
     <>
+      {/* Insert modulepreload hints to preload files deep in the dependency tree */}
+      <AddResources
+        key="jsm-importmap-preload"
+        insert
+        targetTag="head"
+        inlineResource={sharedLibFiles
+          .map((file) => `<link rel="modulepreload" href="${engineBase}/shared-libs/${file}" />`)
+          .join("")}
+      />
+      <AddResources
+        key={`jsm-preload-${entry}`}
+        insert
+        targetTag="head"
+        inlineResource={`<link rel="modulepreload" href="${entry}" />`}
+      />
       {/* The import map must come first in the page so that all imports are resolved correctly */}
       <AddResources
         key="jsm-importmap"
@@ -74,7 +90,7 @@ function InBrowser<T>({
         key="jsm-bootstrap"
         insert
         targetTag="body"
-        inlineResource={/** HTML */ `<script type="module" src="${engineBase}/index.js"></script>`}
+        inlineResource={`<script type="module" src="${engineBase}/index.js"></script>`}
       />
 
       <div style={{ display: "contents" }}>
