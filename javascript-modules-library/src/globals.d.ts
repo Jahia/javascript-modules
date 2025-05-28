@@ -48,3 +48,13 @@ declare module "virtual:jahia-server" {
   };
   export default server;
 }
+
+/**
+ * This module is used for internal compilation of the project. It should not be used directly in
+ * your code.
+ */
+declare module "virtual:shared-lib-files" {
+  /** All client-side JS libs, used to create `<link rel="modulepreload">` tags */
+  declare const sharedLibFiles: string[];
+  export default sharedLibFiles;
+}
