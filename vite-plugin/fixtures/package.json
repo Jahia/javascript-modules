@@ -1,0 +1,17 @@
+{
+  "name": "@jahia/vite-plugin-fixtures",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vite build && node --test"
+  },
+  "devDependencies": {
+    "@fontsource-variable/fira-code": "^5.2.5",
+    "@jahia/javascript-modules-library": "workspace:*",
+    "@jahia/vite-plugin": "workspace:*",
+    "modern-normalize": "^3.0.1",
+    "vite": "^6.3.4",
+    "vite-plugin-inspect": "^11.1.0"
+  },
+  "packageManager": "yarn@4.7.0"
+}

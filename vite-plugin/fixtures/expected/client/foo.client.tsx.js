@@ -1,0 +1,1 @@
+import{jsx as o}from"react/jsx-runtime";import{useEffect as e}from"react";const r="_pre_1cbxx_3",s={pre:r};function n(){return e(()=>{console.log("Foo component mounted")}),o("pre",{className:s.pre,children:"Hello World!"})}export{n as default};
