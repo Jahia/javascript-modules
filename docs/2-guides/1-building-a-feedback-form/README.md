@@ -226,7 +226,7 @@ Add this at the end of the file:
     kibana_dashboards_provider.KibanaProxy.enable: "true"
     kibana_dashboards_provider.KibanaProxy.cloud: "true"
 - installBundle:
-    - "mvn:org.jahia.modules/kibana-dashboards-provider/1.3.0"
+    - "mvn:org.jahia.modules/kibana-dashboards-provider/1.4.0"
   autoStart: true
   uninstallPreviousVersion: true
 ```
