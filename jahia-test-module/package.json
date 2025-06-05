@@ -1,6 +1,6 @@
 {
   "name": "javascript-modules-engine-test-module",
-  "version": "0.8.0-SNAPSHOT",
+  "version": "0.7.2-SNAPSHOT",
   "private": true,
   "description": "Test module for Javascript Module Engine",
   "license": "MIT",
