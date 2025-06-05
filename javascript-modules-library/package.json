@@ -1,6 +1,6 @@
 {
   "name": "@jahia/javascript-modules-library",
-  "version": "0.7.2-SNAPSHOT",
+  "version": "0.7.2",
   "homepage": "https://github.com/Jahia/javascript-modules/tree/main/javascript-modules-library#readme",
   "bugs": {
     "url": "https://github.com/Jahia/javascript-modules/issues"
