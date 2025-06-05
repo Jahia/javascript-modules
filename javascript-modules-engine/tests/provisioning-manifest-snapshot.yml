@@ -5,12 +5,12 @@
   uninstallPreviousVersion: true
 
 - installBundle:
-    - "js:mvn:org.jahia.test/javascript-modules-engine-test-module/0.7.0-SNAPSHOT/tgz"
+    - "js:mvn:org.jahia.test/javascript-modules-engine-test-module/0.7.2-SNAPSHOT/tgz"
   autoStart: true
   uninstallPreviousVersion: true
 
 - installBundle:
-    - "js:mvn:org.jahia.samples/javascript-modules-samples-hydrogen/0.7.0-SNAPSHOT/tgz"
+    - "js:mvn:org.jahia.samples/javascript-modules-samples-hydrogen/0.7.2-SNAPSHOT/tgz"
   autoStart: true
   uninstallPreviousVersion: true
 

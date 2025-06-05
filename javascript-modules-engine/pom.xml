@@ -21,7 +21,7 @@
     <parent>
         <artifactId>javascript-modules</artifactId>
         <groupId>org.jahia.modules</groupId>
-        <version>0.8.0-SNAPSHOT</version>
+        <version>0.7.2-SNAPSHOT</version>
     </parent>
     <artifactId>javascript-modules-engine</artifactId>
     <name>Javascript Modules Engine</name>
@@ -29,7 +29,7 @@
     <description>This is the engine allowing Javascript modules to run on a Jahia server.</description>
 
     <properties>
-        <jahia-module-signature>MC0CFFNUDw26UyU0C1jRps1+wTtni4qwAhUAksrk30vo7XgYffhbocRPIjPzpXw=</jahia-module-signature>
+        <jahia-module-signature>MC0CFFt7KtYMtrlPQezqr2O5WlJZF6bKAhUAkK2GK6NRr3Ep/e3SDEIAf0QZ3Rk=</jahia-module-signature>
         <require-capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version&gt;=17))"</require-capability>
         <yarn-build>build</yarn-build>
     </properties>
