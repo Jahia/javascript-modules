@@ -29,7 +29,7 @@
     <description>This is the engine allowing Javascript modules to run on a Jahia server.</description>
 
     <properties>
-        <jahia-module-signature>MC0CFFt7KtYMtrlPQezqr2O5WlJZF6bKAhUAkK2GK6NRr3Ep/e3SDEIAf0QZ3Rk=</jahia-module-signature>
+        <jahia-module-signature>MCwCFEcgjerN/Ym7PHr0luMxHCQM2bBvAhQdtUPtqkFEXid0XrpkcvkWDyRchA==</jahia-module-signature>
         <require-capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version&gt;=17))"</require-capability>
         <yarn-build>build</yarn-build>
     </properties>
