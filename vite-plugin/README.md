@@ -14,27 +14,25 @@ import { spawnSync } from "node:child_process";
 export default defineConfig({
   plugins: [
     jahia({
+      // Parent directory of all JS code
+      inputDir: "src",
+
+      // Output directory for the compiled module
+      outputDir: "dist",
+
+      // Directory where static assets will be copied
+      assetsDir: "assets", // Computed as dist/assets
+
       // Client options
       client: {
-        input: {
-          // Parent directory of client-side code
-          dir: "./src/client",
-          // Glob pattern to match all client-side code in dir
-          glob: "**‍/*.jsx",
-        }
-        // Output directory for client-side code
-        output: "./javascript/client/",
+        inputGlob: "**/*.client.{jsx,tsx}", // Computed as src/**/*.client.{jsx,tsx}
+        outputDir: "client", // Computed as dist/client
       },
 
       // Server options
       server: {
-        // You can use a glob pattern to match multiple files
-        input: "./src/server/index.{js,ts}",
-        output: {
-          dir: "./javascript/server",
-          fileName: "index", // Will produce index.js and index.css
-          // A known bug causes the css file to be named style.css regardless of this setting
-        },
+        inputGlob: "**/*.server.{jsx,tsx}", // Computed as src/**/*.server.{jsx,tsx}
+        outputFile: "server/index.js", // Computed as dist/server/index.js
       },
 
       // This function is called every time a build succeeds in watch mode

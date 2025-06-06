@@ -1,6 +1,6 @@
 import multiEntry from "@rollup/plugin-multi-entry";
 import sharedLibs from "javascript-modules-engine/shared-libs.mjs";
-import path from "node:path";
+import path from "node:path/posix";
 import { styleText } from "node:util";
 import type { Plugin } from "rollup";
 import { globSync } from "tinyglobby";
@@ -22,32 +22,46 @@ function buildSuccessPlugin(callback: () => void | Promise<void>): Plugin {
 
 export default function jahia(
   options: {
+    /**
+     * Source directory where to find all source files.
+     *
+     * @default "src"
+     */
+    inputDir?: string;
+
+    /**
+     * Directory where to put all built files.
+     *
+     * @default "dist"
+     */
+    outputDir?: string;
+
+    /**
+     * Directory where to put all built assets (e.g. images, fonts, etc.).
+     *
+     * This directory will be nested in the `outputDir` directory.
+     *
+     * @default "assets"
+     */
+    assetsDir?: string;
+
     /** Options for the client-side loader. */
     client?: {
-      /** Entrypoint for the client-side bundle. */
-      input?: {
-        /**
-         * Parent directory of the client-side code.
-         *
-         * @default "./src/client/"
-         */
-        dir?: string;
-        /**
-         * Glob pattern(s) used to find all client-side code in `dir`.
-         *
-         * See [tinyglobby](https://www.npmjs.com/package/tinyglobby) for supported patterns.
-         *
-         * @default "**‍/*.jsx"
-         */
-        glob?: string | string[];
-      };
+      /**
+       * Glob pattern(s) used to find all client-side code in `inputDir`.
+       *
+       * See [tinyglobby](https://www.npmjs.com/package/tinyglobby) for supported patterns.
+       *
+       * @default "**‍/*.client.{jsx,tsx}"
+       */
+      inputGlob?: string | string[];
       /**
        * Where to put the client-side bundle. It is a directory that will have the same structure as
-       * the source directory.
+       * the source directory. It will be nested in the `outputDir` directory.
        *
-       * @default "./javascript/client/"
+       * @default "client"
        */
-      output?: string;
+      outputDir?: string;
       /**
        * Enable source maps for client-side files.
        *
@@ -65,26 +79,16 @@ export default function jahia(
        * [Glob patterns are
        * supported.](https://www.npmjs.com/package/@rollup/plugin-multi-entry#supported-input-types)
        *
-       * @default "./src/index.{js,ts}"
+       * @default "**‍/*.server.{jsx.tsx}"
        */
-      input?: string;
-      /** Where to put the built server-side bundle. */
-      output?: {
-        /**
-         * Directory where to put the built server-side bundle.
-         *
-         * @default "./javascript/server/"
-         */
-        dir?: string;
-        /**
-         * Base name for the built server-side bundle.
-         *
-         * Will be appended with '.js' for the JavaScript output and '.css' for the CSS output.
-         *
-         * @default "index"
-         */
-        fileName?: string;
-      };
+      inputGlob?: string;
+      /**
+       * Where to put the server-side bundle. As the bundle is a single file, this is the path to
+       * the output file, relative to the `outputDir` directory, without the extension.
+       *
+       * @default "server/index.js"
+       */
+      outputFile?: string;
       /**
        * Enable source maps for the server-side bundle.
        *
@@ -103,16 +107,19 @@ export default function jahia(
     watchCallback?: () => void | Promise<void>;
   } = {},
 ): PluginOption {
-  const clientBaseDir = options.client?.input?.dir ?? "./src/client/";
-  const clientEntries = globSync(options.client?.input?.glob ?? "**/*.jsx", { cwd: clientBaseDir });
+  const assetsDir = options.assetsDir ?? "assets";
+  const clientBaseDir = options.inputDir ?? "src";
+  const clientEntries = globSync(options.client?.inputGlob ?? "**/*.client.{jsx,tsx}", {
+    cwd: clientBaseDir,
+  });
 
   if (clientEntries.length === 0) {
     console.warn(
       `${styleText("yellowBright", "[@jahia/vite-plugin] Skipping client build because there are no entry files...")}
  • If this is the intended behavior, you can safely ignore this message
  • Otherwise, ensure that your client files are properly configured in the plugin options
-   Client base directory: ${styleText("cyanBright", options.client?.input?.dir ?? "./src/client/ (default value)")}
-   Client glob pattern:   ${styleText("cyanBright", String(options.client?.input?.glob ?? "**/*.jsx (default value)"))}`,
+   Client base directory: ${styleText("cyanBright", options.inputDir ?? "src (default value)")}
+   Client glob pattern:   ${styleText("cyanBright", String(options.client?.inputGlob ?? "**/*.client.{jsx,tsx} (default value)"))}`,
     );
   }
 
@@ -134,7 +141,7 @@ export default function jahia(
 
       return {
         // Build all environments https://vite.dev/guide/api-environment-frameworks.html#environments-during-build
-        builder: { sharedConfigBuild: true },
+        builder: {},
         // Enforce bundling of all dependencies
         ssr: { noExternal: true },
         // Replace process.env.NODE_ENV with the actual value
@@ -148,23 +155,28 @@ export default function jahia(
           client: {
             build: {
               sourcemap: options.client?.sourcemap ?? Boolean(config.build?.watch),
-              lib: {
-                entry: Object.fromEntries(
+              // Assets will be emitted in the SSR build
+              emitAssets: false,
+              assetsDir,
+              rollupOptions: {
+                input: Object.fromEntries(
                   clientEntries.map((file) => [file, path.join(clientBaseDir, file)]),
                 ),
-                formats: ["es"],
-              },
-              rollupOptions: {
                 output: {
-                  dir: options.client?.output ?? "./javascript/client/",
+                  dir: options.outputDir ?? "dist",
+                  // Preserve the filenames of the entry points, to allow the hydration code
+                  // to import the correct files
+                  entryFileNames: path.join(options.client?.outputDir ?? "client", "[name].js"),
                 },
+                // By default, Vite only keep side effects, but entry points work by exporting a
+                // default function component. Ensure entry points keep their "signature" (i.e.
+                // their exports).
+                preserveEntrySignatures: "allow-extension",
                 external,
                 plugins: [
                   {
                     name: "forbid-library",
                     resolveId(id) {
-                      this.debug(id);
-                      console.log(id);
                       if (id === "@jahia/javascript-modules-library") {
                         throw new Error(
                           `You cannot import '@jahia/javascript-modules-library' in the client bundle`,
@@ -179,20 +191,20 @@ export default function jahia(
           ssr: {
             build: {
               sourcemap: options.server?.sourcemap ?? true,
-              lib: {
-                /**
-                 * Necessary for IIFE format but not used; it's the name given to the global
-                 * variable that will be created by the IIFE.
-                 */
-                name: "serverBundle",
-                entry: options.server?.input ?? "./src/index.{js,ts}",
-                fileName: options.server?.output?.fileName ?? "index",
-                // Bundle the old way, as an IIFE, to replace libs with globals
-                formats: ["iife"],
-              },
+              // Emit assets, produce a single CSS file
+              emitAssets: true,
+              assetsDir,
+              cssCodeSplit: false,
+              emptyOutDir: false,
               rollupOptions: {
+                input: path.join(
+                  options.inputDir ?? "src",
+                  options.server?.inputGlob ?? "**/*.server.{jsx,tsx}",
+                ),
                 output: {
-                  dir: options.server?.output?.dir ?? "./javascript/server/",
+                  dir: options.outputDir ?? "dist",
+                  chunkFileNames: "server/[name]-[hash].js",
+                  format: "iife",
                   // Replace the imports of external libraries with the globals
                   globals: Object.fromEntries(
                     [
@@ -206,6 +218,15 @@ export default function jahia(
                       `javascriptModulesLibraryBuilder.getSharedLibrary(${JSON.stringify(lib)})`,
                     ]),
                   ),
+                  // Produce a consistent name for the style file, hash other assets
+                  assetFileNames: ({ originalFileNames }) =>
+                    path.join(
+                      assetsDir,
+                      // `style.css` is hardcoded in Vite when CSS Code Splitting is disabled
+                      originalFileNames.includes("style.css")
+                        ? "style.css"
+                        : "[name]-[hash][extname]",
+                    ),
                 },
                 external: [...external, "@jahia/javascript-modules-library"],
                 treeshake: {
@@ -215,7 +236,7 @@ export default function jahia(
                 plugins: [
                   multiEntry({
                     exports: false,
-                    entryFileName: `${options.server?.output?.fileName ?? "index"}.js`,
+                    entryFileName: options.server?.outputFile ?? "server/index.js",
                   }),
                   // Only add the callback plugin in watch mode
                   config.build?.watch &&
@@ -224,15 +245,32 @@ export default function jahia(
                   // Insert filenames in client-side components
                   insertFilename(
                     clientBaseDir,
-                    options.client?.input?.glob ?? "**/*.jsx",
+                    options.client?.inputGlob ?? "**/*.client.{jsx,tsx}",
                     // Convert a client source filename into a client production filename
                     (id: string) =>
-                      (options.client?.output ?? "./javascript/client/").replace(/^\.\//, "") +
-                      path.relative(clientBaseDir, id),
+                      path.join(
+                        options.outputDir ?? "dist",
+                        options.client?.outputDir ?? "client",
+                        path.relative(clientBaseDir, id),
+                      ),
                   ),
                 ],
               },
             },
+          },
+        },
+
+        experimental: {
+          renderBuiltUrl(filename, { ssr, hostType }) {
+            // In SSR, resolve the full path to the file in the server output directory
+            if (ssr) {
+              // In JS mode, resolve to the full output path
+              if (hostType === "js") return path.join(options.outputDir ?? "dist", filename);
+
+              // In CSS mode, resolve to the relative path from the assets directory
+              return path.relative(assetsDir, filename);
+            }
+            return { relative: true };
           },
         },
       };

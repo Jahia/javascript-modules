@@ -39,4 +39,5 @@ export default tseslint.config(
 
   // Ignore the same files as .gitignore
   includeIgnoreFile(path.resolve(import.meta.dirname, ".gitignore")),
+  { ignores: ["**/fixtures/expected/**"] },
 );

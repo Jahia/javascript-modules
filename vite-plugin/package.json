@@ -15,8 +15,12 @@
   "files": [
     "dist"
   ],
+  "workspaces": [
+    "fixtures"
+  ],
   "scripts": {
-    "build": "pkgroll && publint"
+    "build": "pkgroll && publint",
+    "test": "yarn ./fixtures test"
   },
   "dependencies": {
     "@rollup/plugin-multi-entry": "^6.0.1",
@@ -33,5 +37,6 @@
   },
   "peerDependencies": {
     "vite": ">=6.0.0"
-  }
+  },
+  "packageManager": "yarn@4.7.0"
 }

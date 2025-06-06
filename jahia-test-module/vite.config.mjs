@@ -1,3 +1,4 @@
+// @ts-check
 import { defineConfig } from "vite";
 import jahia from "@jahia/vite-plugin";
 import path from "node:path";
@@ -9,20 +10,11 @@ export default defineConfig({
   plugins: [
     jahia({
       client: {
-        input: {
-          glob: "**/*.tsx",
-        },
-        output: "./dist/client/",
+        inputGlob: "client/**/*.tsx",
       },
       server: {
-        input: "./src/react/server/**/*.{ts,tsx}",
-        output: {
-          dir: "./dist/server",
-        },
+        inputGlob: "react/server/**/*.{ts,tsx}",
       },
     }),
   ],
-  build: {
-    sourcemap: true,
-  },
 });
