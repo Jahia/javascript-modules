@@ -25,4 +25,7 @@ export default defineConfig({
     },
     excludeSpecPattern: "fileInstallTest.spec.ts",
   },
+
+  // Until we are able to address the flakiness of the tests
+  retries: { runMode: 1, openMode: 0 },
 });

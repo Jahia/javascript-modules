@@ -53,6 +53,6 @@
     "module-dependencies": "default",
     "module-type": "templatesSet",
     "server": "dist/server/index.js",
-    "static-resources": "/dist,/locales,/images,/icons"
+    "static-resources": "/dist/client,/dist/assets,/locales,/images,/icons"
   }
 }
