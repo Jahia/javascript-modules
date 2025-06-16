@@ -1,10 +1,10 @@
-import { posts, siteKey } from "./data";
+import { HYDROGEN_SITE_KEY, HYDROGEN_POSTS } from '../../support/constants';
 
 describe("Validate the concepts of the tutorial: 4 - Making a Blog", () => {
   it("the blog home page should only list published posts in the right order", () => {
-    cy.visit(`/sites/${siteKey}/blog.html`);
-    cy.get("body main article").should("have.length", posts.length);
-    posts.forEach((post, index) => {
+    cy.visit(`/sites/${HYDROGEN_SITE_KEY}/blog.html`);
+    cy.get("body main article").should("have.length", HYDROGEN_POSTS.length);
+    HYDROGEN_POSTS.forEach((post, index) => {
       cy.get("body main article")
         .eq(index)
         .within(() => {
@@ -16,8 +16,8 @@ describe("Validate the concepts of the tutorial: 4 - Making a Blog", () => {
   });
 
   it("each article should be clickable and lead to a valid page", () => {
-    cy.visit(`/sites/${siteKey}/blog.html`);
-    posts.forEach((post, index) => {
+    cy.visit(`/sites/${HYDROGEN_SITE_KEY}/blog.html`);
+    HYDROGEN_POSTS.forEach((post, index) => {
       cy.get("body main article")
         .eq(index)
         .within(() => {

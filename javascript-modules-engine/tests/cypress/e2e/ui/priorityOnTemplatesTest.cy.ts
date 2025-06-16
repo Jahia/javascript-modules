@@ -1,10 +1,10 @@
 import { deleteNode } from "@jahia/cypress";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 import "cypress-wait-until";
-import { addSimplePage } from "../../utils/Utils";
 
 describe("Test priority parameter on templates", () => {
   const pageName = "testPriorityTemplatePage";
-  const siteKey = "javascriptTestSite";
   const examples = [
     { template: "testPriorityTemplateExample1", expectedPriority: 9 },
     { template: "testPriorityTemplateExample2", expectedPriority: -5 },
@@ -15,14 +15,17 @@ describe("Test priority parameter on templates", () => {
     },
   ];
 
+  beforeEach('Login', () => { cy.login(); });
+
   afterEach("Delete the test page after each test", () => {
-    deleteNode(`/sites/${siteKey}/${pageName}`);
+    deleteNode(`/sites/${GENERIC_SITE_KEY}/${pageName}`);
+    cy.logout();
   });
 
   examples.forEach(({ template, mixin, expectedPriority }) => {
     it(`${template}: GIVEN multiple templates with different priorities WHEN resolving the template THEN the template with the highest priority (${expectedPriority}) is used`, () => {
       addSimplePage(
-        `/sites/${siteKey}`,
+        `/sites/${GENERIC_SITE_KEY}`,
         pageName,
         "Test priority template page",
         "en",
@@ -30,15 +33,13 @@ describe("Test priority parameter on templates", () => {
         [],
         mixin ? [mixin] : [],
       );
-      cy.login();
-      cy.visit(`/jahia/jcontent/${siteKey}/en/pages/${pageName}`);
+      cy.visit(`/jahia/jcontent/${GENERIC_SITE_KEY}/en/pages/${pageName}`);
       cy.iframe("#page-builder-frame-1").within(() => {
         cy.get('div[data-testid="testPriorityTemplate"] span[data-testid="priorityValue"]').should(
           "have.text",
           expectedPriority,
         );
       });
-      cy.logout();
     });
   });
 });

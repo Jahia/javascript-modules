@@ -1,10 +1,11 @@
 import { addNode, publishAndWaitJobEnding } from "@jahia/cypress";
-import { addSimplePage } from "../../utils/Utils";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("proxyProps function test", () => {
   before("Create test page and contents", () => {
     addSimplePage(
-      "/sites/javascriptTestSite/home",
+      `/sites/${GENERIC_SITE_KEY}/home`,
       "testProxyProps",
       "Test proxyProps",
       "en",
@@ -17,7 +18,7 @@ describe("proxyProps function test", () => {
       ],
     ).then(() => {
       addNode({
-        parentPathOrId: "/sites/javascriptTestSite/home/testProxyProps/pagecontent",
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/testProxyProps/pagecontent`,
         name: "testProxyPropsSample",
         primaryNodeType: "javascriptExample:testProxyProps",
         properties: [
@@ -27,13 +28,13 @@ describe("proxyProps function test", () => {
           { name: "myFourthProp", value: "Fourth prop value" },
         ],
       }).then(() => {
-        publishAndWaitJobEnding("/sites/javascriptTestSite/home", ["en"]);
+        publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}/home`, ["en"]);
       });
     });
   });
 
   it("Verify property values from getNodeProps", function () {
-    cy.visit("/sites/javascriptTestSite/home/testProxyProps.html");
+    cy.visit(`/sites/${GENERIC_SITE_KEY}/home/testProxyProps.html`);
 
     cy.get('div[data-testid="proxyProps_myFirstProp"]').contains("First prop value");
     cy.get('div[data-testid="proxyProps_mySecondProp"]').contains("Second prop value");

@@ -1,10 +1,12 @@
 import { addNode, publishAndWaitJobEnding } from "@jahia/cypress";
-import { addSimplePage } from "../../utils/Utils";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
+import "cypress-wait-until";
 
 describe("Verify client side component are rehydrated as expected", () => {
   before("Create test contents", () => {
     addSimplePage(
-      "/sites/javascriptTestSite/home",
+      `/sites/${GENERIC_SITE_KEY}/home`,
       "testHydrateInBrowser",
       "Test HydrateInBrowser",
       "en",
@@ -17,19 +19,22 @@ describe("Verify client side component are rehydrated as expected", () => {
       ],
     ).then(() => {
       addNode({
-        parentPathOrId: "/sites/javascriptTestSite/home/testHydrateInBrowser/pagecontent",
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/testHydrateInBrowser/pagecontent`,
         name: "test",
         primaryNodeType: "javascriptExample:testReactClientSide",
       });
     });
-    publishAndWaitJobEnding("/sites/javascriptTestSite/home/testHydrateInBrowser");
+    publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}/home/testHydrateInBrowser`);
   });
 
-  beforeEach("Login and visit", () => cy.login());
+  beforeEach("Login", () => cy.login());
+  afterEach("Logout", () => cy.logout());
+
+  // dynamically generated test cases
   for (const workspace of ["default", "live"]) {
     it(`${workspace}: Check that components is hydrated correctly`, () => {
       cy.visit(
-        `/cms/render/${workspace}/en/sites/javascriptTestSite/home/testHydrateInBrowser.html`,
+        `/cms/render/${workspace}/en/sites/${GENERIC_SITE_KEY}/home/testHydrateInBrowser.html`,
       );
       // Check <InBrowser> children
       cy.get('[data-testid="ssr-child"]').should("exist");
@@ -54,7 +59,7 @@ describe("Verify client side component are rehydrated as expected", () => {
       cy.get('span[data-testid="path"]').should("exist");
       cy.get('span[data-testid="path"]').should(
         "contain",
-        "/sites/javascriptTestSite/home/testHydrateInBrowser/pagecontent/test",
+        `/sites/${GENERIC_SITE_KEY}/home/testHydrateInBrowser/pagecontent/test`,
       );
       cy.get('span[data-testid="counter"]').should("exist");
       cy.get('span[data-testid="counter"]').should("not.contain", "0");
@@ -63,6 +68,4 @@ describe("Verify client side component are rehydrated as expected", () => {
       cy.get('[data-testid="ssr-child"]').should("contain", "Server-side rendered");
     });
   }
-
-  afterEach("Logout", () => cy.logout());
 });

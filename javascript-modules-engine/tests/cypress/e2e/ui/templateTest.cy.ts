@@ -1,6 +1,7 @@
 import { publishAndWaitJobEnding } from "@jahia/cypress";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 import "cypress-iframe";
-import { addSimplePage } from "../../utils/Utils";
 
 const checkSectionsPresence = () => {
   cy.get('div[class="header"]').should("be.visible");
@@ -12,7 +13,7 @@ describe("Template testsuite", () => {
   const pageName = "testTemplate";
 
   before("Create test page and contents", () => {
-    addSimplePage("/sites/javascriptTestSite/home", pageName, pageName, "en", "simple", [
+    addSimplePage(`/sites/${GENERIC_SITE_KEY}/home`, pageName, pageName, "en", "simple", [
       {
         name: "pagecontent",
         primaryNodeType: "jnt:contentList",
@@ -20,32 +21,30 @@ describe("Template testsuite", () => {
     ]);
   });
 
-  it(`${pageName}: Verify 3 sections presence`, () => {
+  beforeEach("Login and visit test page", () => {
     cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
+    cy.visit(`/jahia/jcontent/${GENERIC_SITE_KEY}/en/pages/home/${pageName}`);
+  });
+
+  afterEach("Logout", () => { cy.logout(); });
+
+  it(`${pageName}: Verify 3 sections presence`, () => {
     cy.iframe("#page-builder-frame-1").within(() => {
       checkSectionsPresence();
     });
-    cy.logout();
   });
 
   it(`${pageName}: Check grouping components`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('button[data-sel-role="createContent"]:first').click();
     });
     cy.get('li[role="treeitem"]:contains("javascriptExampleComponent")').click();
     cy.get('li[role="treeitem"]:contains("test")').should("be.visible");
-    cy.logout();
   });
 
   it(`${pageName}: Check 3 sections presence in LIVE workspace`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
-    publishAndWaitJobEnding("/sites/javascriptTestSite");
-    cy.visit(`/sites/javascriptTestSite/home/${pageName}.html`);
+    publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}`);
+    cy.visit(`/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     checkSectionsPresence();
-    cy.logout();
   });
 });

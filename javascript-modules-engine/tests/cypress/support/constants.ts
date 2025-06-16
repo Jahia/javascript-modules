@@ -1,5 +1,7 @@
-export const siteKey = "hydrogen";
-export const posts = [
+export const GENERIC_SITE_KEY = 'javascriptTestSite';
+export const HYDROGEN_SITE_KEY = "hydrogen";
+export const HYDROGEN_PREPACKAGED_SITE="jar:mvn:org.jahia.samples/javascript-modules-samples-hydrogen-prepackaged/LATEST/zip!/site.zip";
+export const HYDROGEN_POSTS = [
   {
     page: "a-second-article",
     title: "A second Article",

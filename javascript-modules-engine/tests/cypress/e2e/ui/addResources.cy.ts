@@ -1,18 +1,19 @@
 import { addNode } from "@jahia/cypress";
-import { addSimplePage } from "../../utils/Utils";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Test on add resources component/helper", () => {
   const pageName = "testAddResources";
 
   before("Create test page and contents", () => {
-    addSimplePage("/sites/javascriptTestSite/home", pageName, pageName, "en", "simple", [
+    addSimplePage(`/sites/${GENERIC_SITE_KEY}/home`, pageName, pageName, "en", "simple", [
       {
         name: "pagecontent",
         primaryNodeType: "jnt:contentList",
       },
     ]).then(() => {
       addNode({
-        parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/pagecontent`,
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent`,
         name: "test",
         primaryNodeType: "javascriptExample:testCurrentContent",
         properties: [
@@ -28,30 +29,28 @@ describe("Test on add resources component/helper", () => {
     });
   });
 
+  beforeEach("Login", () => { cy.login(); });
+  afterEach('Logout', () => { cy.logout(); });
+
   it(`${pageName}: should not contain a div in the head tag in the page source code`, () => {
-    cy.login();
-    cy.request(`/cms/render/default/en/sites/javascriptTestSite/home/${pageName}.html`) // Replace with your website URL
+    cy.request(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`)
       .then((response) => {
         const regex = /<head>[\s\S]*?<div>[\s\S]*?<\/head>/;
         expect(regex.test(response.body)).to.be.false;
       });
-    cy.logout();
   });
 
   it(`${pageName} : should contain a link tag in the head tag to load the CSS styles`, () => {
-    cy.login();
-    cy.visit(`/cms/render/default/en/sites/javascriptTestSite/home/${pageName}.html`);
+    cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     cy.get('head link[href="/modules/javascript-modules-engine-test-module/css/styles.css"]').then(
       ($link: JQuery<HTMLLinkElement>) => {
         expect($link.attr("id")).to.match(/^staticAssetCSS/);
       },
     );
-    cy.logout();
   });
 
   it(`${pageName} : should contain a script tag under the body tag`, () => {
-    cy.login();
-    cy.visit(`/cms/render/default/en/sites/javascriptTestSite/home/${pageName}.html`);
+    cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     cy.get(
       'body script[src="/modules/javascript-modules-engine-test-module/javascript/body-script.js"]',
     )
@@ -59,19 +58,15 @@ describe("Test on add resources component/helper", () => {
       .then(($script: JQuery<HTMLScriptElement>) => {
         expect($script.attr("id")).to.match(/^staticAssetJavascriptBODY/); // Replace with your specific string
       });
-    cy.logout();
   });
 
   it(`${pageName} : should contain the test body element created by the body script`, () => {
-    cy.login();
-    cy.visit(`/cms/render/default/en/sites/javascriptTestSite/home/${pageName}.html`);
+    cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     cy.get("#testBodyElement").should("exist");
-    cy.logout();
   });
 
   it(`${pageName} : should contain a script tag under the head tag`, () => {
-    cy.login();
-    cy.visit(`/cms/render/default/en/sites/javascriptTestSite/home/${pageName}.html`);
+    cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     cy.get(
       `head script[src="${"/modules/javascript-modules-engine-test-module/javascript/head-script.js"}"]`,
     )
@@ -79,20 +74,15 @@ describe("Test on add resources component/helper", () => {
       .then(($script: JQuery<HTMLScriptElement>) => {
         expect($script.attr("id")).to.match(/^staticAssetJavascript/); // Replace with your specific string
       });
-    cy.logout();
   });
 
   it(`${pageName} : should contain the test head element created by the head script`, () => {
-    cy.login();
-    cy.visit(`/cms/render/default/en/sites/javascriptTestSite/home/${pageName}.html`);
+    cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     cy.get("#testHeadElement").should("exist");
-    cy.logout();
   });
 
   it(`${pageName} : should contain the test inline script element created by the inline script`, () => {
-    cy.login();
-    cy.visit(`/cms/render/default/en/sites/javascriptTestSite/home/${pageName}.html`);
+    cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     cy.get("#testInlineScript").should("exist");
-    cy.logout();
   });
 });

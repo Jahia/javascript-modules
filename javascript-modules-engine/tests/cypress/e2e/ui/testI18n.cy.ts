@@ -1,5 +1,5 @@
 import { addNode, createSite, deleteSite, publishAndWaitJobEnding } from "@jahia/cypress";
-import { addSimplePage } from "../../utils/Utils";
+import { addSimplePage } from "../../utils/helpers";
 
 const testData = {
   translations: {

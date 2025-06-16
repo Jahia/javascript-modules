@@ -1,16 +1,15 @@
 import { addNode, enableModule } from "@jahia/cypress";
-import { addEventPageAndEvents, addSimplePage } from "../../utils/Utils";
+import { addEventPageAndEvents, addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Content templates resolution testsuite", () => {
-  const siteKey = "javascriptTestSite";
-
   before("Create test page and contents", () => {
-    enableModule("calendar", siteKey);
-    enableModule("event", siteKey);
+    enableModule("calendar", GENERIC_SITE_KEY);
+    enableModule("event", GENERIC_SITE_KEY);
 
-    addEventPageAndEvents(siteKey, "events", "testEvents", () => {
+    addEventPageAndEvents(GENERIC_SITE_KEY, "events", "testEvents", () => {
       addSimplePage(
-        "/sites/javascriptTestSite/home",
+        `/sites/${GENERIC_SITE_KEY}/home`,
         "testFindDisplayableNode",
         "Simple page",
         "en",
@@ -23,13 +22,13 @@ describe("Content templates resolution testsuite", () => {
         ],
       ).then(() => {
         addNode({
-          parentPathOrId: "/sites/javascriptTestSite/home/testFindDisplayableNode/pagecontent",
+          parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/testFindDisplayableNode/pagecontent`,
           name: "findDisplayableContent",
           primaryNodeType: "javascriptExample:testFindDisplayableContent",
           properties: [
             {
               name: "target",
-              value: "/sites/javascriptTestSite/home/testEvents/events/event-a",
+              value: `/sites/${GENERIC_SITE_KEY}/home/testEvents/events/event-a`,
               type: "WEAKREFERENCE",
             },
           ],
@@ -38,7 +37,7 @@ describe("Content templates resolution testsuite", () => {
     });
 
     addSimplePage(
-      "/sites/javascriptTestSite/home",
+      `/sites/${GENERIC_SITE_KEY}/home`,
       "testContentTemplate",
       "testContentTemplate",
       "en",
@@ -51,14 +50,14 @@ describe("Content templates resolution testsuite", () => {
       ],
     ).then(() => {
       addNode({
-        parentPathOrId: "/sites/javascriptTestSite/home/testContentTemplate/pagecontent",
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/testContentTemplate/pagecontent`,
         name: "content",
         primaryNodeType: "javascriptExample:testContentTemplate",
       });
     });
 
     addSimplePage(
-      "/sites/javascriptTestSite/home",
+      `/sites/${GENERIC_SITE_KEY}/home`,
       "testContentTemplateWithView",
       "testContentTemplateWithView",
       "en",
@@ -71,7 +70,7 @@ describe("Content templates resolution testsuite", () => {
       ],
     ).then(() => {
       addNode({
-        parentPathOrId: "/sites/javascriptTestSite/home/testContentTemplateWithView/pagecontent",
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/testContentTemplateWithView/pagecontent`,
         name: "content",
         primaryNodeType: "javascriptExample:testContentTemplate",
         mixins: ["jmix:renderable"],
@@ -80,12 +79,14 @@ describe("Content templates resolution testsuite", () => {
     });
   });
 
+  beforeEach('Login', () => { cy.login(); });
+  afterEach('Logout', () => { cy.logout(); });
+
   it("Verify content template for jnt:event is correctly displayed", function () {
-    cy.login();
     cy.visit(
-      `/jahia/page-composer/default/en/sites/${siteKey}/home/testEvents/events/event-a.full.html`,
+      `/jahia/page-composer/default/en/sites/${GENERIC_SITE_KEY}/home/testEvents/events/event-a.full.html`,
     );
-    cy.visit(`/cms/render/default/en/sites/${siteKey}/home/testEvents/events/event-a.full.html`);
+    cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testEvents/events/event-a.full.html`);
 
     // Check template is good:
     cy.get('div[class="header"]').should("be.visible");
@@ -95,41 +96,34 @@ describe("Content templates resolution testsuite", () => {
     // Check main resource display is correct:
     cy.get('div[class="eventsBody"]').should("be.visible");
     cy.get('div[class="eventsBody"]').contains("The first event");
-    cy.logout();
   });
 
   it("Verify findDisplayableNode is correctly resolving jnt:event that is using a JS content template", function () {
-    cy.login();
-    cy.visit(`/jahia/page-composer/default/en/sites/${siteKey}/home/testFindDisplayableNode.html`);
-    cy.visit(`/cms/render/default/en/sites/${siteKey}/home/testFindDisplayableNode.html`);
+    cy.visit(`/jahia/page-composer/default/en/sites/${GENERIC_SITE_KEY}/home/testFindDisplayableNode.html`);
+    cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testFindDisplayableNode.html`);
 
     cy.get('p[data-testid="displayableContent"]').contains(
-      "Found displayable content: /sites/javascriptTestSite/home/testEvents/events/event-a",
+      `Found displayable content: /sites/${GENERIC_SITE_KEY}/home/testEvents/events/event-a`,
     );
-    cy.logout();
   });
 
   it("Test default content template is working properly when content doesn't have specific view", function () {
-    cy.login();
     cy.visit(
-      `/cms/render/default/en/sites/${siteKey}/home/testContentTemplate/pagecontent/content.html`,
+      `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testContentTemplate/pagecontent/content.html`,
     );
     // Check template is correctly resolved:
     cy.get(".header").should("exist");
     // Check content is correctly displayed:
     cy.contains("Just a normal view").should("be.visible");
-    cy.logout();
   });
 
   it("Test default content template is working properly when content have specific view", function () {
-    cy.login();
     cy.visit(
-      `/cms/render/default/en/sites/${siteKey}/home/testContentTemplateWithView/pagecontent/content.html`,
+      `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testContentTemplateWithView/pagecontent/content.html`,
     );
     // Check template is correctly resolved:
     cy.get(".header").should("exist");
     // Check content is correctly displayed:
     cy.contains("Just an other normal view").should("be.visible");
-    cy.logout();
   });
 });

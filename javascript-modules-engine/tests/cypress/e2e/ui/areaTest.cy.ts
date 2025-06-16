@@ -1,39 +1,42 @@
 import { addNode, enableModule } from "@jahia/cypress";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 import "cypress-wait-until";
-import { addSimplePage } from "../../utils/Utils";
 
 describe("Area test", () => {
   const pageName = "testJArea";
 
   before("Create test page and contents", () => {
-    enableModule("event", "javascriptTestSite");
+    enableModule('event', GENERIC_SITE_KEY);
 
-    addSimplePage("/sites/javascriptTestSite/home", pageName, pageName, "en", "simple", [
+    addSimplePage(`/sites/${GENERIC_SITE_KEY}/home`, pageName, pageName, "en", "simple", [
       {
         name: "pagecontent",
         primaryNodeType: "jnt:contentList",
       },
     ]).then(() => {
       addNode({
-        parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/pagecontent`,
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent`,
         name: "test",
         primaryNodeType: "javascriptExample:testAreas",
       });
     });
   });
 
-  it(`${pageName}: Basic Area test`, () => {
+  beforeEach('Login and visit test page', () => {
     cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
+    cy.visit(`/jahia/jcontent/${GENERIC_SITE_KEY}/en/pages/home/${pageName}`);
+  });
+
+  afterEach('Logout', () => cy.logout());
+
+  it(`${pageName}: Basic Area test`, () => {
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="basicArea"]').find('div[type="area"]').should("be.visible");
     });
-    cy.logout();
   });
 
   it(`${pageName}: Allowed types area`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="allowedTypesArea"]')
         .find('div[type="placeholder"]')
@@ -46,19 +49,16 @@ describe("Area test", () => {
             .should("not.exist");
         });
     });
-    cy.logout();
   });
 
   it(`${pageName}: Number of items area`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     addNode({
-      parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/numberOfItemsArea`,
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/${pageName}/numberOfItemsArea`,
       name: "item1",
       primaryNodeType: "jnt:bigText",
     });
     addNode({
-      parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/numberOfItemsArea`,
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/${pageName}/numberOfItemsArea`,
       name: "item2",
       primaryNodeType: "jnt:bigText",
     });
@@ -68,52 +68,36 @@ describe("Area test", () => {
         .find('div[type="placeholder"]')
         .should("not.be.visible");
     });
-    cy.logout();
   });
 
   it(`${pageName}: areaView Area`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="areaViewArea"]').find('ul[class*="dropdown"]').should("be.visible");
     });
-    cy.logout();
   });
 
   it(`${pageName}: path Area`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="parentArea"]').find('div[type="area"]').should("exist");
     });
-    cy.logout();
   });
 
   it(`${pageName}: non editable Area`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="nonEditableArea"]').should("be.empty");
     });
-    cy.logout();
   });
 
   it(`${pageName}: Area type`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="areaType"]').find('div[data-testid="row-areaType"]').should("exist");
     });
-    cy.logout();
   });
 
   it(`${pageName}: should render area with parameters`, function () {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="areaParam-string1"]').should("contain", "stringParam1=stringValue1");
       cy.get('div[data-testid="areaParam-string2"]').should("contain", "stringParam2=stringValue2");
     });
-    cy.logout();
   });
 });
