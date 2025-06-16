@@ -1,7 +1,6 @@
 import { addNode, publishAndWaitJobEnding } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
 import { GENERIC_SITE_KEY } from '../../support/constants';
-import "cypress-wait-until";
 
 describe("Verify client side component are rehydrated as expected", () => {
   before("Create test contents", () => {
