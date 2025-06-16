@@ -2,39 +2,52 @@
 
 The goal of this self-contained guide is to create a feedback form that uses client-side JavaScript to send data to a server. This first half will be about building the form, the second half about collecting the data on the server with jCustomer.
 
+We will build something very similar to the widget that can be found on many documentation websites:
+
+![Sample Feedback Forms](./samples.png)
+
 This guide assumes you have followed the [Getting Started](../1-getting-started/1-dev-environment/) guide and have a working Jahia instance with a JavaScript Module running on it. If you haven't done so, please follow the instructions in that guide before continuing.
 
 ## Client-Side JavaScript
 
-The JavaScript Modules Library features a component we haven't used yet: `RenderInBrowser`. Contrary to the getting started, where all components were rendered on the server, this component allows you to render a component in the browser, and the browser only. This is useful for components that only make sense in the browser, because they need to be interactive.
+The JavaScript Modules Library features a component we haven't used yet: `RenderInBrowser`. Contrary to the getting started, where all views were rendered on the server, this component allows you to render a component in the browser, and the browser only.
+
+This render mode is useful for components that only make sense in the browser, because they need to be interactive, and are not usable without client-side JavaScript.
 
 Let's start by creating a very basic node type and view for our feedback form:
 
-- Create `src/components/feedbackWidget/definition.cnd` with the following content (use the right namespace for your module):
+- Create `src/components/FeedbackWidget/definition.cnd` with the following content (use the right namespace for your module):
 
-```cnd
-[hydrogen:feedbackWidget] > jnt:content, hydrogenmix:component
-```
+  ```cnd
+  [hydrogen:feedbackWidget] > jnt:content, hydrogenmix:component
+  - question (string) = 'Was this helpful?'
+  ```
 
-- Create `src/components/feedbackWidget/default.server.tsx` with the following content:
+  We'll keep this definition simple in this guide, but feel free to make the widget as configurable as desired.
 
-```tsx
-import { jahiaComponent } from "@jahia/javascript-modules-library";
+- Create `src/components/FeedbackWidget/default.server.tsx` with the following content:
 
-jahiaComponent(
-  {
-    nodeType: "hydrogen:feedbackWidget",
-    componentType: "view",
-  },
-  () => <div>Hello World!</div>,
-);
-```
+  ```tsx
+  import { jahiaComponent } from "@jahia/javascript-modules-library";
 
-Start or restart `yarn dev` to push the component to your local Jahia instance. Add your component to a page and check that it renders correctly. You should see "Hello World!" in the browser.
+  interface Props {
+    question: string;
+  }
 
-You can try replacing the `div` with `<button onClick={() => alert("Hello World!")}>Click me</button>` to see that the component, when rendered on the server, does not become interactive. This is intended: the default rendering mode (Server-Side Rendering, SSR) ships no JavaScript to the browser.
+  jahiaComponent(
+    {
+      nodeType: "hydrogen:feedbackWidget",
+      componentType: "view",
+    },
+    ({ question }: Props) => <div>{question}</div>,
+  );
+  ```
 
-Let's create an interactive component: create a file named `src/components/feedbackWidget/Widget.client.tsx` with the following content:
+Start or restart `yarn dev` to push the component to your local Jahia instance. Add your component to a page and check that it renders correctly. You should see "Was this helpful?" in the browser.
+
+You can try replacing the `div` with `<button onClick={() => alert("Hello World!")}>Click me</button>` to see that the component, when rendered on the server, does not become interactive. **This is intended: the default rendering mode (Server-Side Rendering, SSR) ships no JavaScript to the browser.**
+
+Let's create an interactive component: create a file named `src/components/FeedbackWidget/Widget.client.tsx` with the following content:
 
 ```tsx
 export default function Widget() {
@@ -59,18 +72,24 @@ Update the `src/components/feedbackWidget/default.server.tsx` file to use the ne
 import { jahiaComponent, RenderInBrowser } from "@jahia/javascript-modules-library";
 import Widget from "./Widget.client.jsx";
 
+interface Props {
+  question: string;
+}
+
 jahiaComponent(
   {
     nodeType: "hydrogen:feedbackWidget",
     componentType: "view",
   },
-  () => <RenderInBrowser child={Widget} />,
+  ({ question }: Props) => <RenderInBrowser child={Widget} props={{ question }} />,
 );
 ```
 
 You'll need to restart `yarn dev` for Vite to collect your new client files, but once pushed, should see the exact same button as before, but now it will alert "Hello World!" when clicked.
 
-The `RenderInBrowser` component is a wrapper that will ensure the code of `Widget` gets forwarded to the browser, enabling what is called "partial hydration": only this component will be hydrated, and the rest of the page will remain server-rendered. This is a great way to improve performance, as it allows you to only ship the JavaScript that is needed for the interactive parts of your page.
+The `RenderInBrowser` component is a wrapper that will ensure the code of `Widget` gets forwarded to the browser, enabling what is called Island Architecture: this component will be rendered client-side, but the rest of the page will remain server-rendered. This is a great way to improve performance, as it allows to only ship the JavaScript that is needed for the interactive parts of your page.
+
+The `props` prop of `RenderInBrowser` allows you to pass props to the component that will be rendered in the browser. Because they will be sent to the browser, they should be serializable.
 
 If you nest children to `RenderInBrowser`, they will be displayed until `Widget` is loaded. This is where you can put a loading message for instance: `<RenderInBrowser child={Widget}>The widget is loading...</RenderInBrowser>`.
 
@@ -83,7 +102,7 @@ Update `Widget.client.tsx` to the following content:
 ```tsx
 import { useState } from "react";
 
-export default function Widget() {
+export default function Widget({ question }: { question: string }) {
   const [sent, setSent] = useState(false);
 
   const handler = (happy: boolean) => () => {
@@ -96,7 +115,7 @@ export default function Widget() {
 
   return (
     <aside>
-      Was this helpful?
+      {question}
       <button type="button" onClick={handler(true)}>
         Yes
       </button>
@@ -113,7 +132,7 @@ What matters now is what we place in `handler`. For now we only set a state vari
 If you are using Google Tag Manager, you can use the `window.dataLayer` object to send data to GTM:
 
 ```tsx
-// Replace TODO with this to push data to GTM:
+// Replace TODO in the handler with this to push to GTM:
 dataLayer.push({
   event: "feedback",
   happy,
@@ -233,7 +252,7 @@ Add this at the end of the file:
 
 </details>
 
-Once done, run `docker-compose down jahia && docker-compose up --wait` to start the containers. You need to enable both jExperience and jExperience Dashboards to the website you are using. You can do this by going to **Administration > Modules > jExperience > Usage in sites** and checking the box next to your website. Do the same for **jExperience Dashboards**.
+Once done, run `docker compose down jahia && docker compose up --wait` to start the containers. You need to enable both jExperience and jExperience Dashboards to the website you are using. You can do this by going to **Administration > Modules > jExperience > Usage in sites** and checking the box next to your website. Do the same for **jExperience Dashboards**.
 
 ![Enable jExperience](enable-jexperience.png)
 
@@ -254,10 +273,10 @@ jCustomer events are created out of two things:
 - A source, which is the starting point of the event. It is usually the page where the event happened, but it can be anything else.
 - A target, which is usually the action taking place (a click, a form submission, a navigation).
 
-The combination of the two creates an event, the unit of data sent to jCustomer. Replace the `TODO` in the `handler` function with the following code to create an event and send it to jCustomer:
+The combination of the two creates an event, representing a visitor interaction, that can be sent to jCustomer. Replace the `TODO` in the `handler` function with the following code to create an event and send it to jCustomer:
 
 ```tsx
-// Replace TODO with this to push data to jCustomer:
+// Replace TODO with this to push to jCustomer:
 const source = wem.buildSourcePage();
 const target = wem.buildTarget("feedback", "click", { happy });
 const event = wem.buildEvent("click", target, source);
@@ -309,7 +328,7 @@ Click the **Save** button and give it a name, for instance `All Feedbacks`.
 
 ![Save Kibana Search](save-kibana-search.png)
 
-Browse the interface to create a new dashboard. Click **Create dashboard** then **Create visualization**
+Browse the interface to create a new dashboard. Click **Create dashboard**:
 
 ![Kibana New Dashboard](new-dashboard.png)
 
