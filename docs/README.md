@@ -20,12 +20,13 @@ The goal of this section is to help you create a Jahia website with React and Ja
 
 Start here: [Setting up your dev environment](./1-getting-started/1-dev-environment/)
 
-<!-- Hidden until available:
 ## Guides
 
 This section contains independent, self-contained guides that help you build specific features or solve specific problems. Each guide is a step-by-step tutorial that you can follow to achieve a specific goal.
 
 - [Building a Feedback Form](./2-guides/1-building-a-feedback-form/)
+
+<!-- Hidden until available:
 - [Accessibility and Performance](./2-guides/2-accessibility-and-performance/)
 - [Building a Menu and Sitemap](./2-guides/3-building-a-menu-and-sitemap/)
 - [Adding Icons](./2-guides/4-adding-icons/)
@@ -36,8 +37,9 @@ This section contains independent, self-contained guides that help you build spe
 - [Debugging](./2-guides/9-debugging/)
 - [Using Web Components](./2-guides/A-using-web-components/)
 
-More guides are coming soon, and contributions are welcome!
 -->
+
+More guides are coming soon, and contributions are welcome!
 
 ## Reference
 
