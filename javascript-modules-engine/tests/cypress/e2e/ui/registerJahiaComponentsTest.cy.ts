@@ -1,10 +1,11 @@
 import { addNode } from "@jahia/cypress";
-import { addSimplePage } from "../../utils/Utils";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Verify that registerJahiaComponents behaves as expected", () => {
   before("Create test contents", () => {
     addSimplePage(
-      "/sites/javascriptTestSite/home",
+      `/sites/${GENERIC_SITE_KEY}/home`,
       "testRegisterJahiaComponents",
       "Test registerJahiaComponents",
       "en",
@@ -17,7 +18,7 @@ describe("Verify that registerJahiaComponents behaves as expected", () => {
       ],
     ).then(() => {
       addNode({
-        parentPathOrId: "/sites/javascriptTestSite/home/testRegisterJahiaComponents/pagecontent",
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/testRegisterJahiaComponents/pagecontent`,
         name: "test",
         primaryNodeType: "javascriptExample:testReactViewRegistration",
       });
@@ -26,8 +27,10 @@ describe("Verify that registerJahiaComponents behaves as expected", () => {
 
   beforeEach("Login and visit", () => {
     cy.login();
-    cy.visit("/jahia/jcontent/javascriptTestSite/en/pages/home/testRegisterJahiaComponents");
+    cy.visit(`/jahia/jcontent/${GENERIC_SITE_KEY}/en/pages/home/testRegisterJahiaComponents`);
   });
+
+  afterEach("Logout", () => cy.logout());
 
   it("Check that components are properly registered", () => {
     cy.iframe("#page-builder-frame-1").within(() => {
@@ -39,6 +42,4 @@ describe("Verify that registerJahiaComponents behaves as expected", () => {
       cy.get('div[data-testid="noRegistration"]').contains("null");
     });
   });
-
-  afterEach("Logout", () => cy.logout());
 });

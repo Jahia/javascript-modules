@@ -1,10 +1,11 @@
-import { addSimplePage } from "../../utils/Utils";
 import { addNode } from "@jahia/cypress";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Test has permission", () => {
   before("Create test contents", () => {
     addSimplePage(
-      "/sites/javascriptTestSite/home",
+      `/sites/${GENERIC_SITE_KEY}/home`,
       "testHasPermission",
       "Test has permission",
       "en",
@@ -17,18 +18,19 @@ describe("Test has permission", () => {
       ],
     ).then(() => {
       addNode({
-        parentPathOrId: "/sites/javascriptTestSite/home/testHasPermission/pagecontent",
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/testHasPermission/pagecontent`,
         name: "test",
         primaryNodeType: "javascriptExample:testHasPermission",
       });
     });
   });
 
+  beforeEach('Login', () => { cy.login(); });
+  afterEach('Logout', () => { cy.logout(); });
+
   it("should display the permission", () => {
-    cy.login();
-    cy.visit("/cms/render/default/en/sites/javascriptTestSite/home/testHasPermission.html");
+    cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testHasPermission.html`);
     cy.get('div[data-testid="currentNode_hasPermission"]').should("exist").contains("true");
     cy.get('div[data-testid="currentNode_hasNotPermission"]').should("exist").contains("false");
-    cy.logout();
   });
 });

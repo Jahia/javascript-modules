@@ -1,24 +1,25 @@
 import { addNode, getNodeTypes, publishAndWaitJobEnding } from "@jahia/cypress";
-import { addSimplePage } from "../../utils/Utils";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Check that components of a module are correctly registered", () => {
   it("Create a page with .hbs template", function () {
     cy.login();
 
-    addSimplePage("/sites/javascriptTestSite/home", "simple", "Simple page", "en", "simple", [
+    addSimplePage(`/sites/${GENERIC_SITE_KEY}/home`, "simple", "Simple page", "en", "simple", [
       {
         name: "pagecontent",
         primaryNodeType: "jnt:contentList",
       },
     ]).then(() => {
       addNode({
-        parentPathOrId: "/sites/javascriptTestSite/home/simple/pagecontent",
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/simple/pagecontent`,
         name: "simple-text",
         primaryNodeType: "jnt:text",
         properties: [{ name: "text", value: "Main content text", language: "en" }],
       });
-      publishAndWaitJobEnding("/sites/javascriptTestSite/home/simple", ["en"]);
-      cy.visit("/sites/javascriptTestSite/home/simple.html");
+      publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}/home/simple`, ["en"]);
+      cy.visit(`/sites/${GENERIC_SITE_KEY}/home/simple.html`);
       cy.contains("Main content text");
     });
 

@@ -1,5 +1,6 @@
 import { addNode, addVanityUrl, deleteNode, publishAndWaitJobEnding } from "@jahia/cypress";
-import { addSimplePage } from "../../utils/Utils";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Test on url helper", () => {
   before("Create test page and contents", () => {
@@ -8,7 +9,7 @@ describe("Test on url helper", () => {
       const file = new File([blob], "image.jpg", { type: blob.type });
       cy.apollo({
         variables: {
-          path: "/sites/javascriptTestSite/files",
+          path: `/sites/${GENERIC_SITE_KEY}/files`,
           name: "image.jpg",
           mimeType: "image/jpeg",
           file: file,
@@ -16,45 +17,45 @@ describe("Test on url helper", () => {
         mutationFile: "graphql/jcrUploadFile.graphql",
       });
     });
-    addSimplePage("/sites/javascriptTestSite/home", "linkedPage", "linkedPage", "en", "simple", [
+    addSimplePage(`/sites/${GENERIC_SITE_KEY}/home`, "linkedPage", "linkedPage", "en", "simple", [
       {
         name: "pagecontent",
         primaryNodeType: "jnt:contentList",
       },
     ]);
-    addSimplePage("/sites/javascriptTestSite/home", "testUrl", "testUrl", "en", "simple", [
+    addSimplePage(`/sites/${GENERIC_SITE_KEY}/home`, "testUrl", "testUrl", "en", "simple", [
       {
         name: "pagecontent",
         primaryNodeType: "jnt:contentList",
       },
     ]).then(() => {
       addNode({
-        parentPathOrId: "/sites/javascriptTestSite/home/testUrl/pagecontent",
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/testUrl/pagecontent`,
         name: "test",
         primaryNodeType: "javascriptExample:testUrl",
         properties: [
           {
             name: "linknode",
-            value: "/sites/javascriptTestSite/home/linkedPage",
+            value: `/sites/${GENERIC_SITE_KEY}/home/linkedPage`,
             type: "WEAKREFERENCE",
             language: "en",
           },
           {
             name: "image",
-            value: "/sites/javascriptTestSite/files/image.jpg",
+            value: `/sites/${GENERIC_SITE_KEY}/files/image.jpg`,
             type: "WEAKREFERENCE",
           },
         ],
       });
     });
 
-    publishAndWaitJobEnding("/sites/javascriptTestSite");
+    publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}`);
   });
 
   after("Clean", () => {
-    deleteNode("/sites/javascriptTestSite/files/image.jpg");
-    deleteNode("/sites/javascriptTestSite/home/testUrl");
-    publishAndWaitJobEnding("/sites/javascriptTestSite");
+    deleteNode(`/sites/${GENERIC_SITE_KEY}/files/image.jpg`);
+    deleteNode(`/sites/${GENERIC_SITE_KEY}/home/testUrl`);
+    publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}`);
   });
 
   const testUrl = (urls) => {
@@ -80,7 +81,7 @@ describe("Test on url helper", () => {
 
   it("Generated URLs should be correct", function () {
     cy.login();
-    cy.visit("/cms/render/default/en/sites/javascriptTestSite/home/testUrl.html");
+    cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testUrl.html`);
 
     // Check default workspace in preview
     testUrl([
@@ -88,7 +89,7 @@ describe("Test on url helper", () => {
         dataTestId: "image_reference",
         tag: "img",
         attribute: "src",
-        expectedURL: "/files/default/sites/javascriptTestSite/files/image.jpg",
+        expectedURL: `/files/default/sites/${GENERIC_SITE_KEY}/files/image.jpg`,
       },
       {
         dataTestId: "image_static_resource",
@@ -112,37 +113,37 @@ describe("Test on url helper", () => {
         dataTestId: "content_link",
         tag: "a",
         attribute: "href",
-        expectedURL: "/cms/render/default/en/sites/javascriptTestSite/home/linkedPage.html",
+        expectedURL: `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_mode_edit",
         tag: "a",
         attribute: "href",
-        expectedURL: "/cms/edit/default/en/sites/javascriptTestSite/home/linkedPage.html",
+        expectedURL: `/cms/edit/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_mode_preview",
         tag: "a",
         attribute: "href",
-        expectedURL: "/cms/render/default/en/sites/javascriptTestSite/home/linkedPage.html",
+        expectedURL: `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_mode_live",
         tag: "a",
         attribute: "href",
-        expectedURL: "/sites/javascriptTestSite/home/linkedPage.html",
+        expectedURL: `/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_language_fr",
         tag: "a",
         attribute: "href",
-        expectedURL: "/cms/render/default/fr/sites/javascriptTestSite/home/linkedPage.html",
+        expectedURL: `/cms/render/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_parameters",
         tag: "a",
         attribute: "href",
-        expectedURL: "/cms/render/default/en/sites/javascriptTestSite/home/linkedPage.html?",
+        expectedURL: `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html?`,
       },
       {
         dataTestId: "content_link_parameters",
@@ -160,25 +161,25 @@ describe("Test on url helper", () => {
         dataTestId: "action_url",
         tag: "a",
         attribute: "href",
-        expectedURL: "/cms/render/default/en/sites/javascriptTestSite/home/linkedPage.myAction.do",
+        expectedURL: `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.myAction.do`,
       },
       {
         dataTestId: "fragment_link",
         tag: "a",
         attribute: "href",
         expectedURL:
-          "/cms/render/default/en/sites/javascriptTestSite/home/testUrl/pagecontent/test.html.ajax",
+          `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testUrl/pagecontent/test.html.ajax`,
       },
     ]);
 
     // Check live workspace
-    cy.visit("/sites/javascriptTestSite/home/testUrl.html");
+    cy.visit(`/sites/${GENERIC_SITE_KEY}/home/testUrl.html`);
     testUrl([
       {
         dataTestId: "image_reference",
         tag: "img",
         attribute: "src",
-        expectedURL: "/files/live/sites/javascriptTestSite/files/image.jpg",
+        expectedURL: `/files/live/sites/${GENERIC_SITE_KEY}/files/image.jpg`,
       },
       {
         dataTestId: "image_static_resource",
@@ -202,37 +203,37 @@ describe("Test on url helper", () => {
         dataTestId: "content_link",
         tag: "a",
         attribute: "href",
-        expectedURL: "/sites/javascriptTestSite/home/linkedPage.html",
+        expectedURL: `/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_mode_edit",
         tag: "a",
         attribute: "href",
-        expectedURL: "/cms/edit/default/en/sites/javascriptTestSite/home/linkedPage.html",
+        expectedURL: `/cms/edit/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_mode_preview",
         tag: "a",
         attribute: "href",
-        expectedURL: "/cms/render/default/en/sites/javascriptTestSite/home/linkedPage.html",
+        expectedURL: `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_mode_live",
         tag: "a",
         attribute: "href",
-        expectedURL: "/sites/javascriptTestSite/home/linkedPage.html",
+        expectedURL: `/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_language_fr",
         tag: "a",
         attribute: "href",
-        expectedURL: "/fr/sites/javascriptTestSite/home/linkedPage.html",
+        expectedURL: `/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_parameters",
         tag: "a",
         attribute: "href",
-        expectedURL: "/sites/javascriptTestSite/home/linkedPage.html?",
+        expectedURL: `/sites/${GENERIC_SITE_KEY}/home/linkedPage.html?`,
       },
       {
         dataTestId: "content_link_parameters",
@@ -250,13 +251,13 @@ describe("Test on url helper", () => {
         dataTestId: "action_url",
         tag: "a",
         attribute: "href",
-        expectedURL: "/sites/javascriptTestSite/home/linkedPage.myAction.do",
+        expectedURL: `/sites/${GENERIC_SITE_KEY}/home/linkedPage.myAction.do`,
       },
       {
         dataTestId: "fragment_link",
         tag: "a",
         attribute: "href",
-        expectedURL: "/sites/javascriptTestSite/home/testUrl/pagecontent/test.html.ajax",
+        expectedURL: `/sites/${GENERIC_SITE_KEY}/home/testUrl/pagecontent/test.html.ajax`,
       },
     ]);
 
@@ -265,11 +266,11 @@ describe("Test on url helper", () => {
 
   it("Generated URLs should be correct with vanity", function () {
     // Add a vanity url
-    addVanityUrl("/sites/javascriptTestSite/home/linkedPage", "en", "/vanityUrlTest");
-    publishAndWaitJobEnding("/sites/javascriptTestSite/home/linkedPage");
+    addVanityUrl(`/sites/${GENERIC_SITE_KEY}/home/linkedPage`, "en", "/vanityUrlTest");
+    publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}/home/linkedPage`);
 
     cy.login();
-    cy.visit("/cms/render/default/en/sites/javascriptTestSite/home/testUrl.html");
+    cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testUrl.html`);
 
     // Check default workspace in preview
     testUrl([
@@ -277,7 +278,7 @@ describe("Test on url helper", () => {
         dataTestId: "image_reference",
         tag: "img",
         attribute: "src",
-        expectedURL: "/files/default/sites/javascriptTestSite/files/image.jpg",
+        expectedURL: `/files/default/sites/${GENERIC_SITE_KEY}/files/image.jpg`,
       },
       {
         dataTestId: "image_static_resource",
@@ -307,7 +308,7 @@ describe("Test on url helper", () => {
         dataTestId: "content_link_mode_edit",
         tag: "a",
         attribute: "href",
-        expectedURL: "/cms/edit/default/en/sites/javascriptTestSite/home/linkedPage.html",
+        expectedURL: `/cms/edit/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_mode_preview",
@@ -325,7 +326,7 @@ describe("Test on url helper", () => {
         dataTestId: "content_link_language_fr",
         tag: "a",
         attribute: "href",
-        expectedURL: "/cms/render/default/fr/sites/javascriptTestSite/home/linkedPage.html",
+        expectedURL: `/cms/render/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_parameters",
@@ -349,25 +350,25 @@ describe("Test on url helper", () => {
         dataTestId: "action_url",
         tag: "a",
         attribute: "href",
-        expectedURL: "/cms/render/default/en/sites/javascriptTestSite/home/linkedPage.myAction.do",
+        expectedURL: `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.myAction.do`,
       },
       {
         dataTestId: "fragment_link",
         tag: "a",
         attribute: "href",
         expectedURL:
-          "/cms/render/default/en/sites/javascriptTestSite/home/testUrl/pagecontent/test.html.ajax",
+          `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testUrl/pagecontent/test.html.ajax`,
       },
     ]);
 
     // Check live workspace
-    cy.visit("/sites/javascriptTestSite/home/testUrl.html");
+    cy.visit(`/sites/${GENERIC_SITE_KEY}/home/testUrl.html`);
     testUrl([
       {
         dataTestId: "image_reference",
         tag: "img",
         attribute: "src",
-        expectedURL: "/files/live/sites/javascriptTestSite/files/image.jpg",
+        expectedURL: `/files/live/sites/${GENERIC_SITE_KEY}/files/image.jpg`,
       },
       {
         dataTestId: "image_static_resource",
@@ -392,7 +393,7 @@ describe("Test on url helper", () => {
         dataTestId: "content_link_mode_edit",
         tag: "a",
         attribute: "href",
-        expectedURL: "/cms/edit/default/en/sites/javascriptTestSite/home/linkedPage.html",
+        expectedURL: `/cms/edit/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_mode_preview",
@@ -410,7 +411,7 @@ describe("Test on url helper", () => {
         dataTestId: "content_link_language_fr",
         tag: "a",
         attribute: "href",
-        expectedURL: "/fr/sites/javascriptTestSite/home/linkedPage.html",
+        expectedURL: `/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_parameters",
@@ -434,13 +435,13 @@ describe("Test on url helper", () => {
         dataTestId: "action_url",
         tag: "a",
         attribute: "href",
-        expectedURL: "/sites/javascriptTestSite/home/linkedPage.myAction.do",
+        expectedURL: `/sites/${GENERIC_SITE_KEY}/home/linkedPage.myAction.do`,
       },
       {
         dataTestId: "fragment_link",
         tag: "a",
         attribute: "href",
-        expectedURL: "/sites/javascriptTestSite/home/testUrl/pagecontent/test.html.ajax",
+        expectedURL: `/sites/${GENERIC_SITE_KEY}/home/testUrl/pagecontent/test.html.ajax`,
       },
     ]);
 

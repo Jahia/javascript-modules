@@ -1,9 +1,9 @@
-import { posts, siteKey } from "./data";
+import { HYDROGEN_SITE_KEY, HYDROGEN_POSTS } from '../../support/constants';
 
 describe("Validate the concepts of the tutorial: 5 - View Content in Full Page", () => {
-  posts.forEach(({ page, title, subTitle, details, extract }) => {
+  HYDROGEN_POSTS.forEach(({ page, title, subTitle, details, extract }) => {
     it(`${page}.html: the hero section should be present on the blog post`, () => {
-      cy.visit(`/sites/${siteKey}/contents/blog/${page}.html`);
+      cy.visit(`/sites/${HYDROGEN_SITE_KEY}/contents/blog/${page}.html`);
       cy.get("body header")
         .first()
         .within(() => {
@@ -13,7 +13,7 @@ describe("Validate the concepts of the tutorial: 5 - View Content in Full Page",
     });
 
     it(`${page}.html: the main article should be displayed`, () => {
-      cy.visit(`/sites/${siteKey}/contents/blog/${page}.html`);
+      cy.visit(`/sites/${HYDROGEN_SITE_KEY}/contents/blog/${page}.html`);
       cy.get("body main")
         .first()
         .within(() => {
@@ -23,12 +23,12 @@ describe("Validate the concepts of the tutorial: 5 - View Content in Full Page",
     });
 
     it(`${page}.html: the page should have a 'back to blog home' link`, () => {
-      cy.visit(`/sites/${siteKey}/contents/blog/${page}.html`);
+      cy.visit(`/sites/${HYDROGEN_SITE_KEY}/contents/blog/${page}.html`);
       cy.get("body main footer p")
         .first()
         .within(() => {
           cy.get("a")
-            .should("have.attr", "href", `/sites/${siteKey}/blog.html`)
+            .should("have.attr", "href", `/sites/${HYDROGEN_SITE_KEY}/blog.html`)
             .and("have.text", "Back to blog home");
         });
     });

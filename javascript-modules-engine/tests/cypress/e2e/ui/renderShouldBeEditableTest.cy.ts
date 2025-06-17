@@ -1,10 +1,11 @@
 import { addNode } from "@jahia/cypress";
-import { addSimplePage } from "../../utils/Utils";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Render should be editable", () => {
   before("Create test contents", () => {
     addSimplePage(
-      "/sites/javascriptTestSite/home",
+      `/sites/${GENERIC_SITE_KEY}/home`,
       "testRenderEditable",
       "Test render editable",
       "en",
@@ -21,12 +22,12 @@ describe("Render should be editable", () => {
       ],
     ).then(() => {
       addNode({
-        parentPathOrId: "/sites/javascriptTestSite/home/testRenderEditable/pagecontent",
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/testRenderEditable/pagecontent`,
         name: "test",
         primaryNodeType: "javascriptExample:testRenderEditable",
       });
       addNode({
-        parentPathOrId: "/sites/javascriptTestSite/home/testRenderEditable/pagecontent/test",
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/testRenderEditable/pagecontent/test`,
         name: "text",
         primaryNodeType: "javascriptExample:simpleText",
         properties: [{ name: "text", value: "Testing editable", language: "en" }],
@@ -34,10 +35,12 @@ describe("Render should be editable", () => {
     });
   });
 
-  beforeEach("Login and visit", () => {
+  beforeEach("Login and visit test page", () => {
     cy.login();
-    cy.visit("/jahia/jcontent/javascriptTestSite/en/pages/home/testRenderEditable");
+    cy.visit(`/jahia/jcontent/${GENERIC_SITE_KEY}/en/pages/home/testRenderEditable`);
   });
+
+  afterEach("Logout", () => cy.logout());
 
   it("Without parameter, text should be editable", () => {
     cy.iframe("#page-builder-frame-1").within(() => {
@@ -62,6 +65,4 @@ describe("Render should be editable", () => {
         .should("exist");
     });
   });
-
-  afterEach("Logout", () => cy.logout());
 });

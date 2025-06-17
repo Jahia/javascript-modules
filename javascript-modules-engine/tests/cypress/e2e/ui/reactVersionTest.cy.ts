@@ -1,10 +1,11 @@
 import { addNode, deleteNode, publishAndWaitJobEnding } from "@jahia/cypress";
-import { addSimplePage } from "../../utils/Utils";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Test React version", () => {
   before("Create test data", () => {
     addSimplePage(
-      "/sites/javascriptTestSite/home",
+      `/sites/${GENERIC_SITE_KEY}/home`,
       "testReactVersion",
       "testReactVersion",
       "en",
@@ -17,25 +18,25 @@ describe("Test React version", () => {
       ],
     ).then(() => {
       addNode({
-        parentPathOrId: "/sites/javascriptTestSite/home/testReactVersion/pagecontent",
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/testReactVersion/pagecontent`,
         name: "test",
         primaryNodeType: "javascriptExample:testReactVersion",
       });
     });
 
-    publishAndWaitJobEnding("/sites/javascriptTestSite");
+    publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}`);
+    cy.login();
   });
 
   after("Cleanup test data", () => {
-    deleteNode("/sites/javascriptTestSite/home/testReactVersion");
-    publishAndWaitJobEnding("/sites/javascriptTestSite");
+    cy.logout();
+    deleteNode(`/sites/${GENERIC_SITE_KEY}/home/testReactVersion`);
+    publishAndWaitJobEnding(`/sites/GENERIC_SITE_KEY`);
   });
 
   it("React version should be correct", function () {
-    cy.login();
-    cy.visit("/cms/render/default/en/sites/javascriptTestSite/home/testReactVersion.html");
+    cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testReactVersion.html`);
     cy.get('span[data-testid="react-version"]').should("have.text", "19.1.0");
     cy.get('span[data-testid="node-env"]').should("have.text", "production");
-    cy.logout();
   });
 });

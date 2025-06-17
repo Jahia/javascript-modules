@@ -1,23 +1,24 @@
 import { addNode, publishAndWaitJobEnding } from "@jahia/cypress";
-import { addSimplePage } from "../../utils/Utils";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Test OSGi configuration in views", () => {
   const pageName = "testConfig";
 
   before("Create test page", () => {
-    addSimplePage("/sites/javascriptTestSite/home", pageName, pageName, "en", "simple", [
+    addSimplePage(`/sites/${GENERIC_SITE_KEY}/home`, pageName, pageName, "en", "simple", [
       {
         name: "pagecontent",
         primaryNodeType: "jnt:contentList",
       },
     ]).then(() => {
       addNode({
-        parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/pagecontent`,
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent`,
         name: "test",
         primaryNodeType: "javascriptExample:testConfig",
       });
     });
-    publishAndWaitJobEnding("/sites/javascriptTestSite");
+    publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}`);
   });
 
   const testConfigEntries = () => {
@@ -50,14 +51,14 @@ describe("Test OSGi configuration in views", () => {
 
   it(`${pageName}: test config in preview`, function () {
     cy.login();
-    cy.visit(`/cms/render/default/en/sites/javascriptTestSite/home/${pageName}.html`);
+    cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     testConfigEntries();
     cy.logout();
   });
 
   it(`${pageName}: test config in edit`, function () {
     cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
+    cy.visit(`/jahia/jcontent/${GENERIC_SITE_KEY}/en/pages/home/${pageName}`);
     cy.iframe('[data-sel-role="page-builder-frame-active"]', { timeout: 90000, log: true }).within(
       () => {
         testConfigEntries();
@@ -67,19 +68,19 @@ describe("Test OSGi configuration in views", () => {
   });
 
   it(`${pageName}: test config in live guest`, function () {
-    cy.visit(`/sites/javascriptTestSite/home/${pageName}.html`);
+    cy.visit(`/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     testConfigEntries();
   });
 
   it(`${pageName}: test config in live logged`, function () {
     cy.login();
-    cy.visit(`/sites/javascriptTestSite/home/${pageName}.html`);
+    cy.visit(`/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     testConfigEntries();
     cy.logout();
   });
 
   it(`${pageName}: test config in ajax rendered content`, function () {
-    cy.visit(`/sites/javascriptTestSite/home/${pageName}/pagecontent/test.html.ajax`);
+    cy.visit(`/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent/test.html.ajax`);
     testConfigEntries();
   });
 });

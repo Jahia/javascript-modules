@@ -1,5 +1,6 @@
 import { addNode } from "@jahia/cypress";
-import { addEvent, addSimplePage } from "../../utils/Utils";
+import { addEvent, addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("getNodesByJCRQuery function test", () => {
   const initEvent = (index: number) => {
@@ -8,7 +9,7 @@ describe("getNodesByJCRQuery function test", () => {
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     return {
-      parentPath: "/sites/javascriptTestSite/contents/events",
+      parentPath: `/sites/${GENERIC_SITE_KEY}/contents/events`,
       name: `event-${index}`,
       title: `Event ${index}`,
       startDate: today,
@@ -18,7 +19,7 @@ describe("getNodesByJCRQuery function test", () => {
 
   before("Create test page and contents", () => {
     addSimplePage(
-      "/sites/javascriptTestSite/home",
+      `/sites/${GENERIC_SITE_KEY}/home`,
       "getNodesByJCRQuery",
       "Test getNodesByJCRQuery",
       "en",
@@ -31,40 +32,45 @@ describe("getNodesByJCRQuery function test", () => {
       ],
     ).then(() => {
       addNode({
-        parentPathOrId: "/sites/javascriptTestSite/home/getNodesByJCRQuery/pagecontent",
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/getNodesByJCRQuery/pagecontent`,
         name: "getNodesByJCRQuery",
         primaryNodeType: "javascriptExample:testJCRQuery",
       });
 
       addNode({
-        parentPathOrId: "/sites/javascriptTestSite/contents",
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/contents`,
         name: "events",
         primaryNodeType: "jnt:contentFolder",
       }).then(() => {
-        addEvent("javascriptTestSite", initEvent(1));
-        addEvent("javascriptTestSite", initEvent(2));
-        addEvent("javascriptTestSite", initEvent(3));
-        addEvent("javascriptTestSite", initEvent(4));
-        addEvent("javascriptTestSite", initEvent(5));
+        addEvent(GENERIC_SITE_KEY, initEvent(1));
+        addEvent(GENERIC_SITE_KEY, initEvent(2));
+        addEvent(GENERIC_SITE_KEY, initEvent(3));
+        addEvent(GENERIC_SITE_KEY, initEvent(4));
+        addEvent(GENERIC_SITE_KEY, initEvent(5));
       });
     });
   });
+  
+  beforeEach("Login", () => { cy.login(); });
+  afterEach("Logout", () => { cy.logout(); });
+
+  // dynmically generated test cases
   [
     {
       testCase: "all",
       expected: [
-        "/sites/javascriptTestSite/contents/events/event-1",
-        "/sites/javascriptTestSite/contents/events/event-2",
-        "/sites/javascriptTestSite/contents/events/event-3",
-        "/sites/javascriptTestSite/contents/events/event-4",
-        "/sites/javascriptTestSite/contents/events/event-5",
+        `/sites/${GENERIC_SITE_KEY}/contents/events/event-1`,
+        `/sites/${GENERIC_SITE_KEY}/contents/events/event-2`,
+        `/sites/${GENERIC_SITE_KEY}/contents/events/event-3`,
+        `/sites/${GENERIC_SITE_KEY}/contents/events/event-4`,
+        `/sites/${GENERIC_SITE_KEY}/contents/events/event-5`,
       ],
     },
     {
       testCase: "limit",
       expected: [
-        "/sites/javascriptTestSite/contents/events/event-1",
-        "/sites/javascriptTestSite/contents/events/event-2",
+        `/sites/${GENERIC_SITE_KEY}/contents/events/event-1`,
+        `/sites/${GENERIC_SITE_KEY}/contents/events/event-2`,
         undefined,
         undefined,
         undefined,
@@ -77,9 +83,9 @@ describe("getNodesByJCRQuery function test", () => {
     {
       testCase: "offset",
       expected: [
-        "/sites/javascriptTestSite/contents/events/event-3",
-        "/sites/javascriptTestSite/contents/events/event-4",
-        "/sites/javascriptTestSite/contents/events/event-5",
+        `/sites/${GENERIC_SITE_KEY}/contents/events/event-3`,
+        `/sites/${GENERIC_SITE_KEY}/contents/events/event-4`,
+        `/sites/${GENERIC_SITE_KEY}/contents/events/event-5`,
         undefined,
         undefined,
       ],
@@ -87,8 +93,8 @@ describe("getNodesByJCRQuery function test", () => {
     {
       testCase: "limitOffset",
       expected: [
-        "/sites/javascriptTestSite/contents/events/event-3",
-        "/sites/javascriptTestSite/contents/events/event-4",
+        `/sites/${GENERIC_SITE_KEY}/contents/events/event-3`,
+        `/sites/${GENERIC_SITE_KEY}/contents/events/event-4`,
         undefined,
         undefined,
         undefined,
@@ -96,11 +102,10 @@ describe("getNodesByJCRQuery function test", () => {
     },
   ].forEach((test) => {
     it(`Test getNodesByJCRQuery, case: ${test.testCase}`, function () {
-      cy.login();
       cy.visit(
-        "/jahia/page-composer/default/en/sites/javascriptTestSite/home/getNodesByJCRQuery.html",
+        `/jahia/page-composer/default/en/sites/${GENERIC_SITE_KEY}/home/getNodesByJCRQuery.html`,
       );
-      cy.visit("/cms/render/default/en/sites/javascriptTestSite/home/getNodesByJCRQuery.html");
+      cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/getNodesByJCRQuery.html`);
 
       for (let i = 0; i < test.expected.length; i++) {
         const expectedElement = test.expected[i];
@@ -114,8 +119,6 @@ describe("getNodesByJCRQuery function test", () => {
           );
         }
       }
-
-      cy.logout();
     });
   });
 });

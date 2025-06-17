@@ -1,10 +1,11 @@
 import { addNode, deleteNode, publishAndWaitJobEnding } from "@jahia/cypress";
-import { addSimplePage } from "../../utils/Utils";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Verify that the legacy/deprecated registration behaves as expected", () => {
   beforeEach("Create test data", () => {
     addSimplePage(
-      "/sites/javascriptTestSite/home",
+      `/sites/${GENERIC_SITE_KEY}/home`,
       "testRegisterLegacyJahiaComponents",
       "Test registerLegacyJahiaComponents",
       "en",
@@ -16,24 +17,24 @@ describe("Verify that the legacy/deprecated registration behaves as expected", (
         },
       ],
     ).then(() => {
-      publishAndWaitJobEnding(`/sites/javascriptTestSite/home/testRegisterLegacyJahiaComponents`);
+      publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}/home/testRegisterLegacyJahiaComponents`);
     });
   });
 
   afterEach("Cleanup data", () => {
-    deleteNode("/sites/javascriptTestSite/home/testRegisterLegacyJahiaComponents");
-    publishAndWaitJobEnding("/sites/javascriptTestSite/home");
+    deleteNode(`/sites/${GENERIC_SITE_KEY}/home/testRegisterLegacyJahiaComponents`);
+    publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}/home`);
   });
 
   it("Test minimum legacy registration of Jahia components", () => {
     addNode({
       parentPathOrId:
-        "/sites/javascriptTestSite/home/testRegisterLegacyJahiaComponents/pagecontent",
+        `/sites/${GENERIC_SITE_KEY}/home/testRegisterLegacyJahiaComponents/pagecontent`,
       name: "test-legacy-registration-minimal",
       primaryNodeType: "javascriptExample:testLegacyRegistrationMinimal",
     }).then(() => {
-      publishAndWaitJobEnding("/sites/javascriptTestSite/home/testRegisterLegacyJahiaComponents");
-      cy.visit(`/sites/javascriptTestSite/home/testRegisterLegacyJahiaComponents.html`);
+      publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}/home/testRegisterLegacyJahiaComponents`);
+      cy.visit(`/sites/${GENERIC_SITE_KEY}/home/testRegisterLegacyJahiaComponents.html`);
       cy.get('div[data-testid="legacyRegistrationMinimal"]').contains(
         "javascriptExample:testLegacyRegistrationMinimal view component",
       );
@@ -43,7 +44,7 @@ describe("Verify that the legacy/deprecated registration behaves as expected", (
   it("Test advanced legacy registration of Jahia components", () => {
     addNode({
       parentPathOrId:
-        "/sites/javascriptTestSite/home/testRegisterLegacyJahiaComponents/pagecontent",
+        `/sites/${GENERIC_SITE_KEY}/home/testRegisterLegacyJahiaComponents/pagecontent`,
       name: "testLegacyRegistrationAdvanced",
       primaryNodeType: "javascriptExample:testLegacyRegistrationAdvanced",
       mixins: ["jmix:renderable"],
@@ -52,8 +53,8 @@ describe("Verify that the legacy/deprecated registration behaves as expected", (
         { name: "myProp", value: "my value" },
       ],
     }).then(() => {
-      publishAndWaitJobEnding("/sites/javascriptTestSite/home/testRegisterLegacyJahiaComponents");
-      cy.visit(`/sites/javascriptTestSite/home/testRegisterLegacyJahiaComponents.html`);
+      publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}/home/testRegisterLegacyJahiaComponents`);
+      cy.visit(`/sites/${GENERIC_SITE_KEY}/home/testRegisterLegacyJahiaComponents.html`);
       cy.get('div[data-testid="legacyRegistrationAdvanced"]').should("exist");
       cy.get(
         'div[data-testid="legacyRegistrationAdvanced"] span[data-testid="registryName"]',

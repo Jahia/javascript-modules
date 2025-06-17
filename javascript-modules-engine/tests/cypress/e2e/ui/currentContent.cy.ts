@@ -1,18 +1,19 @@
 import { addNode } from "@jahia/cypress";
-import { addSimplePage } from "../../utils/Utils";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Test on currentContent injected data", () => {
   const pageName = "testCurrentContent";
 
   before("Create test page and contents", () => {
-    addSimplePage("/sites/javascriptTestSite/home", pageName, pageName, "en", "simple", [
+    addSimplePage(`/sites/${GENERIC_SITE_KEY}/home`, pageName, pageName, "en", "simple", [
       {
         name: "pagecontent",
         primaryNodeType: "jnt:contentList",
       },
     ]).then(() => {
       addNode({
-        parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/pagecontent`,
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent`,
         name: "test",
         primaryNodeType: "javascriptExample:testCurrentContent",
         properties: [
@@ -28,20 +29,22 @@ describe("Test on currentContent injected data", () => {
     });
   });
 
+  beforeEach("Login", () => { cy.login(); });
+  afterEach('Logout', () => { cy.logout(); });
+
   it(`${pageName}: Check currentContent injected JSON node in current view`, function () {
-    cy.login();
-    cy.visit(`/cms/render/default/en/sites/javascriptTestSite/home/${pageName}.html`);
+    cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     cy.get('div[data-testid="currentContent_resourcePath"]').should(
       "contain",
-      `/sites/javascriptTestSite/home/${pageName}/pagecontent/test`,
+      `/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent/test`,
     );
     cy.get('div[data-testid="currentContent_nodePath"]').should(
       "contain",
-      `/sites/javascriptTestSite/home/${pageName}/pagecontent/test`,
+      `/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent/test`,
     );
     cy.get('div[data-testid="currentContent_mainNodePath"]').should(
       "contain",
-      `/sites/javascriptTestSite/home/${pageName}`,
+      `/sites/${GENERIC_SITE_KEY}/home/${pageName}`,
     );
     cy.get('div[data-testid="currentContent_properties_prop1"]').should("contain", "prop1 value");
     cy.get('div[data-testid="currentContent_properties_jcr:title"]').should(
@@ -59,16 +62,15 @@ describe("Test on currentContent injected data", () => {
     cy.get('div[data-testid="currentContent_name"]').should("contain", "test");
     cy.get('div[data-testid="currentContent_path"]').should(
       "contain",
-      `/sites/javascriptTestSite/home/${pageName}/pagecontent/test`,
+      `/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent/test`,
     );
     cy.get('div[data-testid="currentContent_parent"]').should(
       "contain",
-      `/sites/javascriptTestSite/home/${pageName}/pagecontent`,
+      `/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent`,
     );
     cy.get('div[data-testid="currentContent_nodeType"]').should(
       "contain",
       "javascriptExample:test",
     );
-    cy.logout();
   });
 });

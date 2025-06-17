@@ -1,86 +1,89 @@
 import { addNode, enableModule } from "@jahia/cypress";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 import "cypress-wait-until";
-import { addSimplePage } from "../../utils/Utils";
 
 describe("Absolute Area test", () => {
   const pageName = "testAbsoluteArea";
 
   before("Create test page and contents", () => {
-    enableModule("event", "javascriptTestSite");
+    enableModule("event", GENERIC_SITE_KEY);
 
     // First let's create the content on the home page that will be referenced by areas in the test pages.
     addNode({
-      parentPathOrId: "/sites/javascriptTestSite/home",
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home`,
       name: "pagecontent",
       primaryNodeType: "jnt:contentList",
     });
 
     addNode({
-      parentPathOrId: "/sites/javascriptTestSite/home/pagecontent",
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/pagecontent`,
       name: "twoColumns",
       primaryNodeType: "javascriptExample:testAreaColumns",
     });
 
     addNode({
-      parentPathOrId: "/sites/javascriptTestSite/home/pagecontent/twoColumns",
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/pagecontent/twoColumns`,
       name: "twoColumns-col-1",
       primaryNodeType: "jnt:contentList",
     });
 
     addNode({
-      parentPathOrId: "/sites/javascriptTestSite/home/pagecontent/twoColumns/twoColumns-col-1",
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/pagecontent/twoColumns/twoColumns-col-1`,
       name: "bigText",
       primaryNodeType: "jnt:bigText",
       properties: [{ name: "text", value: "Column 1", language: "en" }],
     });
 
     addNode({
-      parentPathOrId: "/sites/javascriptTestSite/home/pagecontent/twoColumns",
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/pagecontent/twoColumns`,
       name: "twoColumns-col-2",
       primaryNodeType: "jnt:contentList",
     });
 
     addNode({
-      parentPathOrId: "/sites/javascriptTestSite/home/pagecontent/twoColumns/twoColumns-col-2",
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/pagecontent/twoColumns/twoColumns-col-2`,
       name: "bigText",
       primaryNodeType: "jnt:bigText",
       properties: [{ name: "text", value: "Column 2", language: "en" }],
     });
 
-    addSimplePage("/sites/javascriptTestSite/home", pageName, pageName, "en", "simple", [
+    addSimplePage(`/sites/${GENERIC_SITE_KEY}/home`, pageName, pageName, "en", "simple", [
       {
         name: "pagecontent",
         primaryNodeType: "jnt:contentList",
       },
     ]);
     addNode({
-      parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/pagecontent`,
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent`,
       name: "test",
       primaryNodeType: "javascriptExample:testAbsoluteAreas",
     });
     addNode({
-      parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/pagecontent/test`,
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent/test`,
       // the content node is expected to exist in TestAbsolutArea
       name: "basicArea",
       primaryNodeType: "jnt:contentList",
     });
-    addSimplePage("/sites/javascriptTestSite", "custom", "Custom", "en", "simple").then(() =>
-      addSimplePage("/sites/javascriptTestSite/custom", "sub-level", "Sub level", "en", "simple"),
+    addSimplePage(`/sites/${GENERIC_SITE_KEY}`, "custom", "Custom", "en", "simple").then(() =>
+      addSimplePage(`/sites/${GENERIC_SITE_KEY}/custom`, "sub-level", "Sub level", "en", "simple"),
     );
   });
 
-  it(`${pageName}: Basic Area test`, () => {
+  beforeEach("Login and visit test page", () => {
     cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
+    cy.visit(`/jahia/jcontent/${GENERIC_SITE_KEY}/en/pages/home/${pageName}`);
+  });
+
+  afterEach("Logout", () => cy.logout());
+
+  it(`${pageName}: Basic Area test`, () => {
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="basicArea"]').find('div[type="absoluteArea"]').should("be.visible");
     });
-    cy.logout();
   });
 
   it(`${pageName}: Allowed types area`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="allowedTypesArea"]')
         .find('div[type="placeholder"]')
@@ -93,19 +96,16 @@ describe("Absolute Area test", () => {
             .should("not.exist");
         });
     });
-    cy.logout();
   });
 
   it(`${pageName}: Number of items area`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     addNode({
-      parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/numberOfItemsArea`,
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/${pageName}/numberOfItemsArea`,
       name: "item1",
       primaryNodeType: "jnt:bigText",
     });
     addNode({
-      parentPathOrId: `/sites/javascriptTestSite/home/${pageName}/numberOfItemsArea`,
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/${pageName}/numberOfItemsArea`,
       name: "item2",
       primaryNodeType: "jnt:bigText",
     });
@@ -115,87 +115,62 @@ describe("Absolute Area test", () => {
         .find('div[type="placeholder"]')
         .should("not.be.visible");
     });
-    cy.logout();
   });
 
   it(`${pageName}: areaView Area`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="areaViewArea"]').find('ul[class*="dropdown"]').should("be.visible");
     });
-    cy.logout();
   });
 
   it(`${pageName}: absolute Area home page`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="absoluteAreaHomePage"] div[data-testid="row-twoColumns"]').should(
         "exist",
       );
     });
-    cy.logout();
   });
 
   it(`${pageName}: absolute Area site root`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="absoluteAreaCustomPage"]')
         .find('div[type="absoluteArea"]')
         .should("be.visible");
     });
-    cy.logout();
   });
 
   it(`${pageName}: absolute Area custom page (sub-level)`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="absoluteAreaCustomPage"]')
         .find('div[type="absoluteArea"]')
         .should("be.visible");
     });
-    cy.logout();
   });
 
   it(`${pageName}: non editable Area`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="nonEditableArea"]').should("be.empty");
     });
-    cy.logout();
   });
 
   it(`${pageName}: Area type`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="areaType"]').find('div[data-testid="row-areaType"]').should("exist");
     });
-    cy.logout();
   });
 
   it(`${pageName}: Limited absolute area editing`, () => {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="limitedAbsoluteAreaEdit"]')
         .find('div[type="existingNode"]')
         .should("not.exist");
     });
-    cy.logout();
   });
 
   it(`${pageName}: should render absolute area with parameters`, function () {
-    cy.login();
-    cy.visit(`/jahia/jcontent/javascriptTestSite/en/pages/home/${pageName}`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="areaParam-string1"]').should("contain", "stringParam1=stringValue1");
       cy.get('div[data-testid="areaParam-string2"]').should("contain", "stringParam2=stringValue2");
     });
-    cy.logout();
   });
 });

@@ -1,10 +1,10 @@
 import { addNode, deleteNode } from "@jahia/cypress";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 import "cypress-wait-until";
-import { addSimplePage } from "../../utils/Utils";
 
 describe("Test priority parameter on views", () => {
   const pageName = "testPriorityViewPage";
-  const siteKey = "javascriptTestSite";
   const examples = [
     { nodeType: "javascriptExample:testPriorityView1", expectedPriority: 6 },
     { nodeType: "javascriptExample:testPriorityView2", expectedPriority: -3 },
@@ -13,33 +13,34 @@ describe("Test priority parameter on views", () => {
   ];
 
   beforeEach("Create test page before each test", () => {
-    addSimplePage(`/sites/${siteKey}`, pageName, "Test components priorities", "en", "simple", [
+    addSimplePage(`/sites/${GENERIC_SITE_KEY}`, pageName, "Test components priorities", "en", "simple", [
       {
         name: "pagecontent",
         primaryNodeType: "jnt:contentList",
       },
     ]);
+    cy.login();
   });
+
   afterEach("Delete the test page after each test", () => {
-    deleteNode(`/sites/${siteKey}/${pageName}`);
+    deleteNode(`/sites/${GENERIC_SITE_KEY}/${pageName}`);
+      cy.logout();
   });
 
   examples.forEach(({ nodeType, expectedPriority }) => {
     it(`${nodeType}: GIVEN multiple views with different priorities WHEN resolving the view THEN the view with the highest priority (${expectedPriority}) is used`, () => {
       addNode({
-        parentPathOrId: `/sites/${siteKey}/${pageName}/pagecontent`,
+        parentPathOrId: `/sites/${GENERIC_SITE_KEY}/${pageName}/pagecontent`,
         name: "testPriority",
         primaryNodeType: nodeType,
       });
-      cy.login();
-      cy.visit(`/jahia/jcontent/${siteKey}/en/pages/${pageName}`);
+      cy.visit(`/jahia/jcontent/${GENERIC_SITE_KEY}/en/pages/${pageName}`);
       cy.iframe("#page-builder-frame-1").within(() => {
         cy.get('div[data-testid="testPriorityView"] span[data-testid="priorityValue"]').should(
           "have.text",
           expectedPriority,
         );
       });
-      cy.logout();
     });
   });
 });

@@ -1,5 +1,6 @@
-import { addSimplePage } from "../../utils/Utils";
 import { publishAndWaitJobEnding, revokeRoles } from "@jahia/cypress";
+import { addSimplePage } from "../../utils/helpers";
+import { GENERIC_SITE_KEY } from '../../support/constants';
 
 const homePage = "homePageHydratedMenu";
 
@@ -17,13 +18,13 @@ const pages = [
 ];
 
 function buildLink(page) {
-  return `/sites/javascriptTestSite/${homePage}/${page.path}.html`;
+  return `/sites/${GENERIC_SITE_KEY}/${homePage}/${page.path}.html`;
 }
 
 describe("Test hydration of the navigation menu", () => {
   before(() => {
     addSimplePage(
-      "/sites/javascriptTestSite",
+      `/sites/${GENERIC_SITE_KEY}`,
       homePage,
       "Home (with hydrated menu)",
       "en",
@@ -41,7 +42,7 @@ describe("Test hydration of the navigation menu", () => {
         ? page.path.substring(0, page.path.lastIndexOf("/"))
         : "";
       addSimplePage(
-        `/sites/javascriptTestSite/${homePage}/${parentPath}`,
+        `/sites/${GENERIC_SITE_KEY}/${homePage}/${parentPath}`,
         page.path.split("/").pop(),
         page.title,
         "en",
@@ -49,7 +50,7 @@ describe("Test hydration of the navigation menu", () => {
       );
       if (page.restricted) {
         revokeRoles(
-          `/sites/javascriptTestSite/${homePage}/${page.path}`,
+          `/sites/${GENERIC_SITE_KEY}/${homePage}/${page.path}`,
           ["reader"],
           "guest",
           "USER",
@@ -57,19 +58,14 @@ describe("Test hydration of the navigation menu", () => {
       }
     });
 
-    publishAndWaitJobEnding(`/sites/javascriptTestSite/${homePage}`);
+    publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}/${homePage}`);
   });
 
-  beforeEach(() => {
-    cy.login();
-  });
-
-  afterEach(() => {
-    cy.logout();
-  });
+  beforeEach(() => { cy.login(); });
+  afterEach(() => { cy.logout(); });
 
   it("Should only have the links to the public pages in the initial HTML returned by the server", () => {
-    cy.request(`/sites/javascriptTestSite/${homePage}.html`).then((resp) => {
+    cy.request(`/sites/${GENERIC_SITE_KEY}/${homePage}.html`).then((resp) => {
       pages.forEach((page) => {
         const link = buildLink(page);
         if (page.restricted) {
@@ -82,7 +78,7 @@ describe("Test hydration of the navigation menu", () => {
   });
 
   it("Should have all links available as root after hydration", () => {
-    cy.visit(`/sites/javascriptTestSite/${homePage}.html`);
+    cy.visit(`/sites/${GENERIC_SITE_KEY}/${homePage}.html`);
 
     // Wait for the page to be hydrated
     cy.get("div.hydrated").should("exist");
@@ -96,7 +92,7 @@ describe("Test hydration of the navigation menu", () => {
   it("Should not have restricted links available as guest after hydration", () => {
     cy.logout(); // Force to be guest
 
-    cy.visit(`/sites/javascriptTestSite/${homePage}.html`);
+    cy.visit(`/sites/${GENERIC_SITE_KEY}/${homePage}.html`);
 
     // Wait for the page to be hydrated
     cy.get("div.hydrated").should("exist");
