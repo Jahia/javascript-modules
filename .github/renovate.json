@@ -12,6 +12,7 @@
     "dependencyDashboardApproval": true
   },
   "patch": {
-    "automerge": true
+    "automerge": true,
+    "groupName": "patch"
   }
 }
