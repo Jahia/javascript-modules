@@ -67,10 +67,6 @@ export const jahiaComponent = <T extends (props: never, context: ServerContext) 
 const wrap = (Component: (props: never, context: ServerContext) => JSX.Element) => () => {
   // Retrieve the current context
   const context = useServerContext();
-  const session = context.currentNode.getSession();
-
-  /** Resolves a JCR reference to a node. */
-  const resolveRef = (id: string) => session.getNodeByIdentifier(id);
 
   /** All possible JCR value unwrappers, by type. */
   const unwrappers = [
@@ -83,8 +79,8 @@ const wrap = (Component: (props: never, context: ServerContext) => JSX.Element) 
     (value: JCRValueWrapper) => value.getBoolean(), // 6: Boolean
     (value: JCRValueWrapper) => value.getString(), // 7: Name
     (value: JCRValueWrapper) => value.getString(), // 8: Path
-    (value: JCRValueWrapper) => resolveRef(value.getString()), // 9: Reference
-    (value: JCRValueWrapper) => resolveRef(value.getString()), // 10: WeakReference
+    (value: JCRValueWrapper) => value.getNode(), // 9: Reference
+    (value: JCRValueWrapper) => value.getNode(), // 10: WeakReference
     (value: JCRValueWrapper) => value.getString(), // 11: URI
     (value: JCRValueWrapper) => value.getString(), // 12: Decimal
   ];
@@ -115,7 +111,7 @@ const wrap = (Component: (props: never, context: ServerContext) => JSX.Element) 
         ? property.getValues().map((value) => unwrapper(value))
         : unwrapper(property.getValue());
     },
-    ownKeys() {
+    ownKeys: () => {
       const propertiesIterator = context.currentNode.getProperties();
       const keys = [];
       while (propertiesIterator.hasNext()) {
@@ -124,10 +120,10 @@ const wrap = (Component: (props: never, context: ServerContext) => JSX.Element) 
       }
       return keys;
     },
-    getOwnPropertyDescriptor() {
+    getOwnPropertyDescriptor: () => {
       return { enumerable: true, configurable: true };
     },
-    has(target, key) {
+    has: (_, key) => {
       if (typeof key !== "string") {
         return false;
       }
