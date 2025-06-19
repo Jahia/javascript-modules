@@ -544,8 +544,6 @@ __metadata:
       optional: true
     styled-jsx:
       optional: true
-  bin:
-    jahia-deploy: bin/jahia-deploy.mjs
   languageName: unknown
   linkType: soft
 
@@ -577,6 +575,8 @@ __metadata:
     vite: "npm:^6.3.4"
   peerDependencies:
     vite: ">=6.0.0"
+  bin:
+    jahia-deploy: bin/jahia-deploy.js
   languageName: unknown
   linkType: soft
 
