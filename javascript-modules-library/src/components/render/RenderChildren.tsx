@@ -10,6 +10,7 @@ export function RenderChildren({
   view,
   pagination,
   filter = "jnt:content",
+  nodeTypes,
 }: {
   /** View to use when rendering the children. */
   view?: string | undefined;
@@ -33,6 +34,12 @@ export function RenderChildren({
    * @default "jnt:content"
    */
   filter?: string | ((node: JCRNodeWrapper) => boolean);
+  /**
+   * The node types to add, forwarded to <AddContentButtons />.
+   *
+   * This property is unrelated to `filter`.
+   */
+  nodeTypes?: string[];
 }): JSX.Element {
   const { currentNode } = useServerContext();
   const offset = pagination
@@ -52,7 +59,7 @@ export function RenderChildren({
       ).map((node) => (
         <Render key={node.getIdentifier()} node={node} view={view} />
       ))}
-      <AddContentButtons />
+      <AddContentButtons nodeTypes={nodeTypes} />
     </>
   );
 }

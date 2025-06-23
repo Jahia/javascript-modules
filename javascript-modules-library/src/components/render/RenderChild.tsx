@@ -11,6 +11,7 @@ import { AddContentButtons } from "../AddContentButtons.js";
 export function RenderChild({
   name,
   view,
+  nodeTypes,
 }: {
   /**
    * The name of the child node to render.
@@ -20,10 +21,12 @@ export function RenderChild({
   name: string;
   /** View to use when rendering the child. */
   view?: string | undefined;
+  /** The node types to add, forwarded to <AddContentButtons />. */
+  nodeTypes?: string[];
 }): JSX.Element {
   const { currentNode } = useServerContext();
   if (currentNode.hasNode(name)) {
     return <Render node={currentNode.getNode(name)} view={view} />;
   }
-  return <AddContentButtons childName={name} />;
+  return <AddContentButtons childName={name} nodeTypes={nodeTypes} />;
 }
