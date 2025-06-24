@@ -1,5 +1,6 @@
 import * as devalue from "devalue";
 import i18n from "i18next";
+import { createElement } from "react";
 import { I18nextProvider } from "react-i18next";
 import sharedLibFiles from "virtual:shared-lib-files";
 import { useServerContext } from "../../../hooks/useServerContext.js";
@@ -93,25 +94,30 @@ function InBrowser<T>({
         inlineResource={`<script type="module" src="${engineBase}/index.js"></script>`}
       />
 
-      <div style={{ display: "contents" }}>
-        <script type="application/json" data-hydration-mode={ssr ? "hydrate" : "render"}>
-          {devalue.stringify({
-            lang: language,
-            entry,
-            bundle: bundleKey,
-            props: props ?? {},
-          })}
-        </script>
-        {ssr ? (
-          <I18nextProvider i18n={i18n}>
-            <Child {...props}>
-              <div style={{ display: "contents" }}>{children}</div>
-            </Child>
-          </I18nextProvider>
-        ) : (
-          children
-        )}
-      </div>
+      {
+        // We use a custom element to create the hydration marker, rather than a div or a span,
+        // to prevent a broken DOM structure in the browser. (e.g. a `<div>` inside a `<p>`)
+        createElement(ssr ? "jsm-hydrate" : "jsm-render", {
+          "style": { display: "contents" },
+          "data-src": entry,
+          "data-lang": language,
+          "data-bundle": bundleKey,
+          "children": [
+            props !== undefined && (
+              <script type="application/json">{devalue.stringify(props)}</script>
+            ),
+            ssr ? (
+              <I18nextProvider i18n={i18n}>
+                <Child {...props}>
+                  {createElement("jsm-children", { style: { display: "contents" }, children })}
+                </Child>
+              </I18nextProvider>
+            ) : (
+              children
+            ),
+          ],
+        })
+      }
 
       {i18nScript && (
         <AddResources key={`i18n_initialStore_${bundleKey}`} insert inlineResource={i18nScript} />
