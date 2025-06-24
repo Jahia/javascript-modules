@@ -45,7 +45,7 @@ const load = async (element: HTMLElement) => {
 
   const rawProps = element.querySelector("script[type='application/json']")?.textContent;
   const props = rawProps && devalue.parse(rawProps);
-  const hydrate = element.dataset.hydrationMode === "hydrate";
+  const hydrate = element.tagName.toLowerCase() === "jsm-hydrate";
 
   const { default: Component } = await import(entry);
 
