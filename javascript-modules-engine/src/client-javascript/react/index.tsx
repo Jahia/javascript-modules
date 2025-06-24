@@ -24,8 +24,8 @@ const ComponentWrapper = ({
 
   return (
     <Component {...props}>
-      {/* This div is an hydration border: hydration will stop here */}
-      <div dangerouslySetInnerHTML={{ __html: "" }} suppressHydrationWarning />
+      {/* @ts-expect-error This is an hydration border: hydration will stop here */}
+      <jsm-children dangerouslySetInnerHTML={{ __html: "" }} suppressHydrationWarning />
     </Component>
   );
 };
