@@ -2,22 +2,6 @@ import * as devalue from "devalue";
 import i18next from "i18next";
 import type { ComponentType } from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
-import * as v from "valibot";
-
-/**
- * Basic runtime validation for hydration nodes. This will prevent cryptic errors for the end user
- * in case something goes wrong.
- */
-const schema = v.object({
-  /** Bundle key; module name */
-  bundle: v.string(),
-  /** JS entry point, import it to get the load function */
-  entry: v.string(),
-  /** Current language */
-  lang: v.string(),
-  /** Initial props */
-  props: v.looseObject({}),
-});
 
 /** Ensures the component is hydrated with the right i18next context */
 const ComponentWrapper = ({
@@ -40,8 +24,8 @@ const ComponentWrapper = ({
 
   return (
     <Component {...props}>
-      {/* This div is an hydration border: hydration will stop here */}
-      <div dangerouslySetInnerHTML={{ __html: "" }} suppressHydrationWarning />
+      {/* @ts-expect-error This is an hydration border: hydration will stop here */}
+      <jsm-children dangerouslySetInnerHTML={{ __html: "" }} suppressHydrationWarning />
     </Component>
   );
 };
@@ -51,8 +35,17 @@ const ComponentWrapper = ({
  * care of importing the component from the module bundle.
  */
 const load = async (element: HTMLElement) => {
-  const { entry, bundle, lang, props } = v.parse(schema, devalue.parse(element.textContent));
-  const hydrate = element.dataset.hydrationMode === "hydrate";
+  const entry = element.dataset.src;
+  const lang = element.dataset.lang;
+  const bundle = element.dataset.bundle;
+
+  if (!entry || !lang || !bundle) {
+    throw new Error("Missing required data attributes on the hydration element.");
+  }
+
+  const rawProps = element.querySelector("script[type='application/json']")?.textContent;
+  const props = rawProps && devalue.parse(rawProps);
+  const hydrate = element.tagName.toLowerCase() === "jsm-hydrate";
 
   const { default: Component } = await import(entry);
 
@@ -63,32 +56,25 @@ const load = async (element: HTMLElement) => {
 };
 
 /** Hydrates a single React component. */
-const hydrateReactComponent = async (script: HTMLScriptElement) => {
-  if (script.dataset.hydrated) return;
+const hydrateReactComponent = async (root: HTMLElement) => {
+  if (root.dataset.hydrated) return;
 
   try {
-    const { hydrate, component } = await load(script);
+    const { hydrate, component } = await load(root);
     if (hydrate) {
-      hydrateRoot(script.parentElement, component);
+      hydrateRoot(root, component);
     } else {
-      const root = createRoot(script.parentElement);
-      root.render(component);
+      createRoot(root).render(component);
     }
-    script.dataset.hydrated = "true";
-    console.log(
-      "javascript-modules-engine: React component",
-      hydrate ? "hydrated" : "rendered",
-      // Script is only kept when hydrating, not rendering
-      hydrate ? script.nextElementSibling : script.parentElement,
-    );
+    root.dataset.hydrated = "true";
   } catch (error) {
-    console.error("Hydration failed for element", script, error);
+    console.error("Hydration failed for element", root, error);
   }
 };
 
 /** Hydrates all React components of `root`. */
-export const hydrateReactComponents = (root: HTMLElement) => {
-  for (const element of root.querySelectorAll("script[data-hydration-mode]")) {
-    hydrateReactComponent(element as HTMLScriptElement);
+export const hydrateReactComponents = () => {
+  for (const element of document.querySelectorAll("jsm-hydrate, jsm-render")) {
+    hydrateReactComponent(element as HTMLElement);
   }
 };
