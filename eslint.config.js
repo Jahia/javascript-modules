@@ -5,7 +5,7 @@ import tseslint from "typescript-eslint";
 import path from "node:path";
 import globals from "globals";
 import eslintReact from "@eslint-react/eslint-plugin";
-import pluginCypress from "eslint-plugin-cypress/flat";
+import pluginCypress from "eslint-plugin-cypress";
 
 export default tseslint.config(
   {
