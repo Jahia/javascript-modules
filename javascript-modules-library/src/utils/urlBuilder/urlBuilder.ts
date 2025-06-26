@@ -83,6 +83,8 @@ export function buildNodeUrl(
     currentResource?: Resource;
   } = useServerContext(),
 ): string {
+  if (!node) throw new Error("Expected a node in buildNodeUrl, received undefined");
+
   // Use context values if not provided
   const mode = config.mode ?? context.renderContext?.getMode();
   const language = config.language ?? context.currentResource?.getLocale().toString();
@@ -127,6 +129,11 @@ export function buildModuleFileUrl(
     renderContext?: RenderContext;
   } = useServerContext(),
 ): string {
+  if (/^[a-zA-Z0-9.+-]+:/.test(filePath)) {
+    // If path has a protocol (e.g. data: URI), return it as is.
+    return filePath;
+  }
+
   if (!context.renderContext && !config.moduleName) {
     throw new Error(
       `You cannot build a module asset url for ${filePath} outside of a RenderContext context`,

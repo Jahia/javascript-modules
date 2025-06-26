@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import {
   jahiaComponent,
   server,
@@ -5,6 +6,7 @@ import {
   buildModuleFileUrl,
   buildNodeUrl,
 } from "@jahia/javascript-modules-library";
+import goat from "./goat.png";
 
 jahiaComponent(
   {
@@ -60,6 +62,10 @@ jahiaComponent(
             )}
             alt="goat_endpoint"
           />
+        </div>
+
+        <div data-testid="image_base64">
+          <img height="32" src={buildModuleFileUrl(goat)} alt="goat_base64" />
         </div>
 
         {linkNodeRef && (
