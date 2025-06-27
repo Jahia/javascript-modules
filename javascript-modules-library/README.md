@@ -214,6 +214,8 @@ This function transforms a path to a file in the module into a full URL.
 const styles = buildModuleFileUrl("dist/styles.css");
 ```
 
+If the path has a protocol (e.g. `data:` URI), it will be returned as is, pairing nicely with [Vite static asset imports.](https://vite.dev/guide/assets.html#importing-asset-as-url)
+
 ## Java server API
 
 ### `server`

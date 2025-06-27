@@ -83,6 +83,8 @@ export function buildNodeUrl(
     currentResource?: Resource;
   } = useServerContext(),
 ): string {
+  if (!node) throw new Error("Expected a node in buildNodeUrl, received undefined");
+
   // Use context values if not provided
   const mode = config.mode ?? context.renderContext?.getMode();
   const language = config.language ?? context.currentResource?.getLocale().toString();
@@ -111,7 +113,8 @@ export function buildNodeUrl(
  * Build a URL for a file in a module. Note that to be accessible, the folder that contains the file
  * must be part of the jahia.static-resources in package.json.
  *
- * The URL must not be absolute (start with a / or a protocol).
+ * The URL must not be absolute (start with a /). Url with a protocol (e.g. data: URI) will be
+ * returned as is.
  */
 export function buildModuleFileUrl(
   /** Relative path of the file from the module's root (examples: css/my.css, images/myImage.webp) */
@@ -127,6 +130,11 @@ export function buildModuleFileUrl(
     renderContext?: RenderContext;
   } = useServerContext(),
 ): string {
+  if (/^[a-zA-Z0-9.+-]+:/.test(filePath)) {
+    // If path has a protocol (e.g. data: URI), return it as is.
+    return filePath;
+  }
+
   if (!context.renderContext && !config.moduleName) {
     throw new Error(
       `You cannot build a module asset url for ${filePath} outside of a RenderContext context`,

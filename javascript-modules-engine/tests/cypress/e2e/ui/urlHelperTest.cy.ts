@@ -1,6 +1,6 @@
 import { addNode, addVanityUrl, deleteNode, publishAndWaitJobEnding } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 
 describe("Test on url helper", () => {
   before("Create test page and contents", () => {
@@ -110,6 +110,12 @@ describe("Test on url helper", () => {
         expectedURL: "/modules/javascript-modules-engine-test-module/static/images/goat.jpg",
       },
       {
+        dataTestId: "image_base64",
+        tag: "img",
+        attribute: "src",
+        expectedURL: "data:image/png;base64,",
+      },
+      {
         dataTestId: "content_link",
         tag: "a",
         attribute: "href",
@@ -167,8 +173,7 @@ describe("Test on url helper", () => {
         dataTestId: "fragment_link",
         tag: "a",
         attribute: "href",
-        expectedURL:
-          `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testUrl/pagecontent/test.html.ajax`,
+        expectedURL: `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testUrl/pagecontent/test.html.ajax`,
       },
     ]);
 
@@ -356,8 +361,7 @@ describe("Test on url helper", () => {
         dataTestId: "fragment_link",
         tag: "a",
         attribute: "href",
-        expectedURL:
-          `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testUrl/pagecontent/test.html.ajax`,
+        expectedURL: `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testUrl/pagecontent/test.html.ajax`,
       },
     ]);
 
