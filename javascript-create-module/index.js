@@ -1,19 +1,20 @@
 #!/usr/bin/env node
+import * as prompts from "@clack/prompts";
+import camelCase from "camelcase";
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
-import camelCase from "camelcase";
 import { styleText } from "node:util";
 import pkg from "./package.json" with { type: "json" };
 
 try {
-  console.log(styleText("bgBlueBright", " Jahia JavaScript Module Creator "), "\n");
+  prompts.intro("Jahia JavaScript Module Creator");
 
   const nodeVersion = Number(process.versions.node.split(".")[0]);
 
   if (nodeVersion < 22) {
-    console.warn(
+    prompts.log.warn(
       `You are using ${styleText("redBright", `Node.js ${process.versions.node}`)} which is not officially supported.
 Please upgrade to ${styleText("greenBright", "Node.js 22 or later")} if you encounter any issues.
 Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
@@ -21,30 +22,58 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
     );
   }
 
-  const name = process.argv[2];
+  const name = await prompts.text({
+    message: "Where should the module be created?",
+    // As the name will be used as a directory name, enforce a specific format
+    placeholder: "a-z, 0-9 and -",
+    initialValue: process.argv[2],
+    validate(value) {
+      if (value.trim() === "") return "Module name cannot be empty.";
+      if (!/^[a-z0-9-]+$/.test(value))
+        return "Module name can only contain lowercase letters, numbers, and hyphens.";
+    },
+  });
 
-  if (!name) {
-    console.error(
-      `No module name provided.
-
-  Usage: npm init @jahia/module@latest ${styleText("blueBright", "<module-name>")}
-
-It will create a new module at this location with the provided name:
-
-  ${path.join(process.cwd(), styleText("blueBright", "<module-name>"))}`,
-    );
-    process.exit(1);
+  if (prompts.isCancel(name)) {
+    prompts.cancel("See you soon!");
+    process.exit(0);
   }
 
   // Module name and output directory
   const module = camelCase(name);
   const output = path.join(process.cwd(), name);
 
-  console.log(`Creating a new Jahia module project...
+  prompts.log.info(`Creating a new Jahia module project...
 
   Module name: ${styleText("blueBright", module)}
   Path:        ${styleText("blueBright", output)}
 `);
+
+  const template = await prompts.select({
+    message: "Which module type do you want?",
+    options: [
+      {
+        value: "hello-world",
+        label: "A minimal Hello World template set",
+        hint: "Recommended for discovery",
+      },
+      {
+        value: "template-set",
+        label: "An empty template set",
+        hint: "You want to start from scratch",
+      },
+      {
+        value: "module",
+        label: "An empty module",
+        hint: "Slightly more than an empty directory",
+      },
+    ],
+  });
+
+  if (prompts.isCancel(template)) {
+    prompts.cancel("Have a nice day!");
+    process.exit(0);
+  }
 
   /** Renames the `dot` directory to dotfiles and dotdirs. */
   const renameDot = (/** @type {string} */ name) =>
@@ -74,7 +103,7 @@ It will create a new module at this location with the provided name:
     }
   }
 
-  console.log(`${styleText("greenBright", "Successfully created a new Jahia module project!")}
+  prompts.outro(`${styleText("greenBright", "Successfully created a new Jahia module project!")}
 
 Run the following commands to get started:
   ${styleText("dim", "1.")} ${styleText("redBright", `cd ${name}`)}
@@ -88,12 +117,13 @@ Run the following commands to get started:
   ${styleText("dim", "6.")} ${styleText("magentaBright", "yarn build && yarn dev")}  ${styleText("dim", "# Build and start the dev mode")}
 `);
 } catch (error) {
-  console.error(
+  prompts.cancel(
     `${styleText("bgRedBright", "Something went wrong")}
 
 If you believe this is a bug, please report it at:
   ${styleText("underline", "https://github.com/Jahia/javascript-modules/issues")}
 `,
-    error,
   );
+  console.error(error);
+  process.exit(1);
 }
