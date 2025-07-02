@@ -512,7 +512,6 @@ __metadata:
   resolution: "@jahia/create-module@workspace:javascript-create-module"
   dependencies:
     "@clack/prompts": "npm:^0.11.0"
-    camelcase: "npm:^8.0.0"
     publint: "npm:^0.3.12"
   bin:
     create-module: ./index.js
@@ -1757,13 +1756,6 @@ __metadata:
   version: 3.1.0
   resolution: "callsites@npm:3.1.0"
   checksum: 10c0/fff92277400eb06c3079f9e74f3af120db9f8ea03bad0e84d9aede54bbe2d44a56cccb5f6cf12211f93f52306df87077ecec5b712794c5a9b5dac6d615a3f301
-  languageName: node
-  linkType: hard
-
-"camelcase@npm:^8.0.0":
-  version: 8.0.0
-  resolution: "camelcase@npm:8.0.0"
-  checksum: 10c0/56c5fe072f0523c9908cdaac21d4a3b3fb0f608fb2e9ba90a60e792b95dd3bb3d1f3523873ab17d86d146e94171305f73ef619e2f538bd759675bc4a14b4bff3
   languageName: node
   linkType: hard
 

@@ -8,7 +8,7 @@ const ignore = /^(\.yarn\/|dist\/|node_modules\/|yarn\.lock)|\.DS_Store/;
 
 /** Resolves a file path relative to the template directory. */
 const resolveTemplate = (/** @type {string} */ path) =>
-  new URL(`template/${path}`, import.meta.url);
+  new URL(`templates/hello-world/${path}`, import.meta.url);
 
 /** Renames dotfiles and dotdirs to the `dot` directory. */
 const renameDot = (/** @type {string} */ name) =>

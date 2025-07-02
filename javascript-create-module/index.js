@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 import * as prompts from "@clack/prompts";
-import camelCase from "camelcase";
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { styleText } from "node:util";
 import pkg from "./package.json" with { type: "json" };
+
+/** Renames the `dot` directory to dotfiles and dotdirs. */
+const renameDot = (/** @type {string} */ name) =>
+  name.startsWith(`dot${path.sep}`) ? `.${name.slice(4)}` : name;
 
 try {
   prompts.intro("Jahia JavaScript Module Creator");
@@ -22,32 +25,34 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
     );
   }
 
-  const name = await prompts.text({
-    message: "Where should the module be created?",
-    // As the name will be used as a directory name, enforce a specific format
-    placeholder: "a-z, 0-9 and -",
+  const module = await prompts.text({
+    message: "What is the name of your module?",
+    placeholder: "A-Z, a-z, 0-9",
     initialValue: process.argv[2],
     validate(value) {
       if (value.trim() === "") return "Module name cannot be empty.";
-      if (!/^[a-z0-9-]+$/.test(value))
-        return "Module name can only contain lowercase letters, numbers, and hyphens.";
+      if (!/^[A-Za-z0-9]+$/.test(value)) return "Module name can only contain letters and numbers.";
     },
   });
 
-  if (prompts.isCancel(name)) {
+  if (prompts.isCancel(module)) {
     prompts.cancel("See you soon!");
     process.exit(0);
   }
 
-  // Module name and output directory
-  const module = camelCase(name);
-  const output = path.join(process.cwd(), name);
+  const output = await prompts.text({
+    message: "Where do you want to create the module?",
+    initialValue: path.join(process.cwd(), module.toLowerCase()),
+    validate(value) {
+      if (value.trim() === "") return "Path cannot be empty.";
+      if (fs.existsSync(value)) return "Path already exists. Please choose a different path.";
+    },
+  });
 
-  prompts.log.info(`Creating a new Jahia module project...
-
-  Module name: ${styleText("blueBright", module)}
-  Path:        ${styleText("blueBright", output)}
-`);
+  if (prompts.isCancel(output)) {
+    prompts.cancel("Goodbye!");
+    process.exit(0);
+  }
 
   const template = await prompts.select({
     message: "Which module type do you want?",
@@ -75,38 +80,40 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
     process.exit(0);
   }
 
-  /** Renames the `dot` directory to dotfiles and dotdirs. */
-  const renameDot = (/** @type {string} */ name) =>
-    name.startsWith(`dot${path.sep}`) ? `.${name.slice(4)}` : name;
+  // We apply the templates in this order until the selected template
+  const templates = ["module", "template-set", "hello-world"];
+  const bases = templates.slice(0, templates.indexOf(template) + 1);
 
   /** Replaces `$MODULE` with the actual module name. */
   const templatify = (/** @type {string} */ str) =>
     str.replaceAll("$MODULE", module).replaceAll("$VERSION", pkg.version);
 
-  // Copy the template to the output directory
-  const input = fileURLToPath(new URL("template/", import.meta.url));
-  for (const entry of fs.readdirSync(input, { recursive: true, withFileTypes: true })) {
-    if (entry.isDirectory()) continue;
+  for (const base of bases) {
+    // Copy the template to the output directory
+    const input = fileURLToPath(new URL(`templates/${base}/`, import.meta.url));
+    for (const entry of fs.readdirSync(input, { recursive: true, withFileTypes: true })) {
+      if (entry.isDirectory()) continue;
 
-    const from = path.join(entry.parentPath, entry.name);
-    const to = path.join(output, templatify(renameDot(path.relative(input, from))));
+      const from = path.join(entry.parentPath, entry.name);
+      const to = path.join(output, templatify(renameDot(path.relative(input, from))));
 
-    // Ensure the parent directory exists
-    fs.mkdirSync(path.dirname(to), { recursive: true });
+      // Ensure the parent directory exists
+      fs.mkdirSync(path.dirname(to), { recursive: true });
 
-    // Binary files are copied as is, text files are templated
-    if (entry.name.endsWith(".png")) {
-      fs.copyFileSync(from, to);
-    } else {
-      const contents = fs.readFileSync(from, "utf-8");
-      fs.writeFileSync(to, templatify(contents));
+      // Binary files are copied as is, text files are templated
+      if (entry.name.endsWith(".png")) {
+        fs.copyFileSync(from, to);
+      } else {
+        const contents = fs.readFileSync(from, "utf-8");
+        fs.writeFileSync(to, templatify(contents));
+      }
     }
   }
 
   prompts.outro(`${styleText("greenBright", "Successfully created a new Jahia module project!")}
 
 Run the following commands to get started:
-  ${styleText("dim", "1.")} ${styleText("redBright", `cd ${name}`)}
+  ${styleText("dim", "1.")} ${styleText("redBright", `cd ${output}`)}
   ${styleText("dim", "2.")} ${styleText("yellowBright", "yarn install")}  ${styleText("dim", "# Install dependencies")}
   ${styleText("dim", "3.")} ${styleText("greenBright", 'git init && git add . && git commit -m "chore: create module"')}  ${styleText(
     "dim",

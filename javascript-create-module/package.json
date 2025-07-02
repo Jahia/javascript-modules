@@ -28,8 +28,7 @@
     "test": "node --test"
   },
   "dependencies": {
-    "@clack/prompts": "^0.11.0",
-    "camelcase": "^8.0.0"
+    "@clack/prompts": "^0.11.0"
   },
   "devDependencies": {
     "publint": "^0.3.12"
