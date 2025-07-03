@@ -32,7 +32,7 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
     validate(value) {
       if (!/^[a-z]/.test(value)) return "Module name must start with a letter.";
       if (!/^[a-z0-9-]+$/.test(value))
-        return "Module name can only contain letters, numbers, and hyphens.";
+        return "Module name can only contain lowercase letters, numbers, and hyphens.";
     },
   });
 
