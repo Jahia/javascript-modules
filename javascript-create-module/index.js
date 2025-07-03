@@ -43,7 +43,7 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
 
   const output = await prompts.text({
     message: "Where do you want to create the module?",
-    initialValue: path.join(process.cwd(), module.toLowerCase()),
+    initialValue: path.join(process.cwd(), module),
     validate(value) {
       if (value.trim() === "") return "Path cannot be empty.";
       if (fs.existsSync(value)) return "Path already exists. Please choose a different path.";
