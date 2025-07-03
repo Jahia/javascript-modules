@@ -27,11 +27,12 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
 
   const module = await prompts.text({
     message: "What is the name of your module?",
-    placeholder: "A-Z, a-z, 0-9",
+    placeholder: "a-z, 0-9 and - only",
     initialValue: process.argv[2],
     validate(value) {
-      if (value.trim() === "") return "Module name cannot be empty.";
-      if (!/^[A-Za-z0-9]+$/.test(value)) return "Module name can only contain letters and numbers.";
+      if (!/^[a-z]/.test(value)) return "Module name must start with a letter.";
+      if (!/^[a-z0-9-]+$/.test(value))
+        return "Module name can only contain letters, numbers, and hyphens.";
     },
   });
 
@@ -54,43 +55,40 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
     process.exit(0);
   }
 
-  const template = await prompts.select({
+  const templates = await prompts.select({
     message: "Which module type do you want?",
     options: [
       {
-        value: "hello-world",
+        // This module is created by combining 3 templates:
+        value: ["module", "template-set", "hello-world"],
         label: "A minimal Hello World template set",
         hint: "Recommended for discovery",
       },
       {
-        value: "template-set",
+        value: ["module", "template-set"],
         label: "An empty template set",
         hint: "You want to start from scratch",
       },
       {
-        value: "module",
+        value: ["module"],
         label: "An empty module",
         hint: "Slightly more than an empty directory",
       },
     ],
   });
 
-  if (prompts.isCancel(template)) {
+  if (prompts.isCancel(templates)) {
     prompts.cancel("Have a nice day!");
     process.exit(0);
   }
-
-  // We apply the templates in this order until the selected template
-  const templates = ["module", "template-set", "hello-world"];
-  const bases = templates.slice(0, templates.indexOf(template) + 1);
 
   /** Replaces `$MODULE` with the actual module name. */
   const templatify = (/** @type {string} */ str) =>
     str.replaceAll("$MODULE", module).replaceAll("$VERSION", pkg.version);
 
-  for (const base of bases) {
+  for (const template of templates) {
     // Copy the template to the output directory
-    const input = fileURLToPath(new URL(`templates/${base}/`, import.meta.url));
+    const input = fileURLToPath(new URL(`templates/${template}/`, import.meta.url));
     for (const entry of fs.readdirSync(input, { recursive: true, withFileTypes: true })) {
       if (entry.isDirectory()) continue;
 
