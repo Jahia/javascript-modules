@@ -30,7 +30,7 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
     placeholder: "a-z, 0-9 and - only",
     initialValue: process.argv[2],
     validate(value) {
-      if (!/^[a-z]/.test(value)) return "Module name must start with a letter.";
+      if (!/^[a-z]/.test(value)) return "Module name must start with a lowercase letter.";
       if (!/^[a-z0-9-]+$/.test(value))
         return "Module name can only contain lowercase letters, numbers, and hyphens.";
     },
