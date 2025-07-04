@@ -20,7 +20,6 @@
     "watch:callback": "run package && run deploy"
   },
   "dependencies": {
-    "clsx": "^2.1.1",
     "modern-normalize": "^3.0.1"
   },
   "devDependencies": {
