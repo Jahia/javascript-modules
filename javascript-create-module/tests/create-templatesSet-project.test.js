@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import { once } from "node:events";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -48,8 +49,8 @@ test("Project creation", async () => {
   child.stdin.write("\r");
   await setTimeout(100);
   child.stdin.write("\r");
-  await setTimeout(100);
-  child.stdin.destroy();
+  child.stdin.end();
+  await once(child, "exit");
 
   const projectPath = path.join(tempDir, "project-name");
   assert(fs.existsSync(projectPath));
