@@ -6,7 +6,7 @@ import classes from "./component.module.css";
 jahiaComponent(
   {
     componentType: "view",
-    nodeType: "$MODULE:languageSwitcher",
+    nodeType: "$NAMESPACE:languageSwitcher",
     displayName: "Language Switcher",
     // Disable cache for this component
     properties: { "cache.timeout": "0" },

@@ -23,7 +23,6 @@
   "scripts": {
     "build": "yarn pack --out dist/package.tgz && publint",
     "lint": "yarn run --top-level lint",
-    "playground-to-template": "rm -rf template && node ./playground-to-template.js",
     "template-to-playground": "rm -rf playground && create-module playground",
     "test": "node --test"
   },

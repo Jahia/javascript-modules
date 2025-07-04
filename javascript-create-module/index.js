@@ -84,7 +84,11 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
 
   /** Replaces `$MODULE` with the actual module name. */
   const templatify = (/** @type {string} */ str) =>
-    str.replaceAll("$MODULE", module).replaceAll("$VERSION", pkg.version);
+    str
+      .replaceAll("$MODULE", module)
+      // A CND namespace cannot contain hyphens
+      .replaceAll("$NAMESPACE", module.replaceAll("-", ""))
+      .replaceAll("$VERSION", pkg.version);
 
   for (const template of templates) {
     // Copy the template to the output directory

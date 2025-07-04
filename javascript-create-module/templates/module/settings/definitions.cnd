@@ -1,7 +1,7 @@
 <jnt = 'http://www.jahia.org/jahia/nt/1.0'>
 <jmix = 'http://www.jahia.org/jahia/mix/1.0'>
-<$MODULE = 'https://example.com/$MODULE/1.0'>
-<$MODULEmix = 'https://example.com/$MODULEmix/1.0'>
+<$NAMESPACE = 'https://example.com/$MODULE/nt/1.0'>
+<$NAMESPACEmix = 'https://example.com/$MODULE/mix/1.0'>
 
 // Defining the content types is similar to defining a data model: once deployed, you cannot change the type of a property.
 // If you need to do changes during the development phase, it is possible to remove the definitions from the tools:
@@ -11,4 +11,4 @@
 
 // This mixin creates a category to regroup types in the content type selector UI. Apply it to any definition you want
 // to see in this category.
-[$MODULEmix:component] > jmix:droppableContent, jmix:accessControllableContent mixin
+[$NAMESPACEmix:component] > jmix:droppableContent, jmix:accessControllableContent mixin
