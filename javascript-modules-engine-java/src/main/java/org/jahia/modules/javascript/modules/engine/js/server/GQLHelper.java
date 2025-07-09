@@ -134,6 +134,7 @@ public class GQLHelper {
         };
         HttpServletResponseMock responseMock = new HttpServletResponseMock();
         servlet.service(req, responseMock);
+        // TODO: use JSON.parse
         return context.getContext().eval("js", "(" + ((ServletOutputStreamMock) responseMock.getOutputStream()).getContent() + ")");
     }
 

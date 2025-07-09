@@ -1,3 +1,0 @@
-[$MODULE:helloWorld] > jnt:content, $MODULEmix:component orderable
- - name (string) i18n mandatory
- + * ($MODULE:helloCard) = $MODULE:helloCard

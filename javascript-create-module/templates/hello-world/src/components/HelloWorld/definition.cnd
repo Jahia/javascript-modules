@@ -1,0 +1,3 @@
+[$NAMESPACE:helloWorld] > jnt:content, $NAMESPACEmix:component orderable
+ - name (string) i18n mandatory
+ + * ($NAMESPACE:helloCard) = $NAMESPACE:helloCard

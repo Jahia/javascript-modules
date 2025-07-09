@@ -1,9 +1,11 @@
-import { execSync } from "node:child_process";
+import assert from "node:assert/strict";
+import { spawn } from "node:child_process";
+import { once } from "node:events";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { test, before, after } from "node:test";
-import assert from "node:assert/strict";
+import { after, before, test } from "node:test";
+import { setTimeout } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -34,7 +36,22 @@ test("Project creation", async () => {
 
   // Create a new test-project from within the temp directory
   process.chdir(tempDir);
-  console.log(execSync(`node ${indexFile} project-name`).toString());
+
+  // Because the CLI is interactive, we use spawn it and interact with it
+  const child = spawn("node", [indexFile, "project-name"], {
+    stdio: ["pipe", "inherit", "inherit"],
+  });
+
+  // Press enter three times to confirm the default values
+  await setTimeout(100);
+  child.stdin.write("\r");
+  await setTimeout(100);
+  child.stdin.write("\r");
+  await setTimeout(100);
+  child.stdin.write("\r");
+  child.stdin.end();
+  await once(child, "exit");
+
   const projectPath = path.join(tempDir, "project-name");
   assert(fs.existsSync(projectPath));
 
@@ -55,12 +72,12 @@ test("Project creation", async () => {
     "docker-compose.yml",
     "docker/provisioning.yml",
     // Make sure the renaming with MODULE_NAME is correct
-    "settings/resources/projectName.properties",
-    "settings/resources/projectName_fr.properties",
-    "settings/content-types-icons/projectNamemix_component.png",
-    "settings/content-types-icons/projectName_helloWorld.png",
-    "settings/content-types-icons/projectName_helloCard.png",
-    "settings/content-types-icons/projectName_languageSwitcher.png",
+    "settings/resources/project-name.properties",
+    "settings/resources/project-name_fr.properties",
+    "settings/content-types-icons/project-namemix_component.png",
+    "settings/content-types-icons/project-name_helloWorld.png",
+    "settings/content-types-icons/project-name_helloCard.png",
+    "settings/content-types-icons/project-name_languageSwitcher.png",
     // Make sure the static and config folders exist
     "static/illustrations/code.svg",
     "static/illustrations/coffee.svg",

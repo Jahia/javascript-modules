@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<content
+  xmlns:j="http://www.jahia.org/jahia/1.0"
+  xmlns:jcr="http://www.jcp.org/jcr/1.0"
+  >
+  <modules jcr:primaryType="jnt:modules">
+    <$MODULE>
+      <home
+        j:isHomePage="true"
+        j:templateName="basic"
+        jcr:primaryType="jnt:page"
+        >
+        <j:translation_en
+          jcr:language="en"
+          jcr:mixinTypes="mix:title"
+          jcr:primaryType="jnt:translation"
+          jcr:title="Home"
+          />
+        <j:translation_fr
+          jcr:language="fr"
+          jcr:mixinTypes="mix:title"
+          jcr:primaryType="jnt:translation"
+          jcr:title="Accueil"
+          />
+      </home>
+    </$MODULE>
+  </modules>
+</content>
