@@ -18,7 +18,7 @@
   "type": "module",
   "bin": "./index.js",
   "files": [
-    "template"
+    "templates"
   ],
   "scripts": {
     "build": "yarn pack --out dist/package.tgz && publint",
