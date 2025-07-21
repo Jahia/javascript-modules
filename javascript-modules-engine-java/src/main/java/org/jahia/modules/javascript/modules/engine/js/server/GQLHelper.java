@@ -34,6 +34,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.*;
 
@@ -54,6 +56,7 @@ public class GQLHelper {
 
     /**
      * Execute an asynchronous GraphQL query using the specified parameters and return a Promise that will be resolved with the result
+     *
      * @param parameters the parameters can contain the following keys:
      *                   <ul>
      *                   <li> query (string) : the GraphQL query to be executed </li>
@@ -80,6 +83,7 @@ public class GQLHelper {
 
     /**
      * Execute a synchronous GraphQL query using the specified parameters and return the result
+     *
      * @param parameters the parameters can contain the following keys:
      *                   <ul>
      *                   <li> query (string) : the GraphQL query to be executed </li>
@@ -132,7 +136,7 @@ public class GQLHelper {
                 return super.getParameter(name);
             }
         };
-        HttpServletResponseMock responseMock = new HttpServletResponseMock();
+        HttpServletResponseMock responseMock = new HttpServletResponseMock(req.getCharacterEncoding());
         servlet.service(req, responseMock);
         // TODO: use JSON.parse
         return context.getContext().eval("js", "(" + ((ServletOutputStreamMock) responseMock.getOutputStream()).getContent() + ")");
@@ -505,11 +509,17 @@ public class GQLHelper {
 
     private static class ServletOutputStreamMock extends ServletOutputStream {
 
-        private final StringBuilder buffer = new StringBuilder();
+        private final String characterEncoding;
+
+        private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        public ServletOutputStreamMock(String characterEncoding) {
+            this.characterEncoding = characterEncoding;
+        }
 
         @Override
         public void write(int b) throws IOException {
-            buffer.append((char) b);
+            buffer.write(b);
         }
 
         @Override
@@ -522,15 +532,21 @@ public class GQLHelper {
         }
 
         public String getContent() {
-            return buffer.toString();
+            try {
+                return buffer.toString(characterEncoding != null ? characterEncoding : StandardCharsets.UTF_8.name());
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     private static class HttpServletResponseMock implements HttpServletResponse {
         private final ServletOutputStream out;
+        private final String characterEncoding;
 
-        public HttpServletResponseMock() {
-            this.out = new ServletOutputStreamMock();
+        public HttpServletResponseMock(String characterEncoding) {
+            this.out = new ServletOutputStreamMock(characterEncoding);
+            this.characterEncoding = characterEncoding;
         }
 
         @Override
@@ -609,11 +625,6 @@ public class GQLHelper {
         }
 
         @Override
-        public void setStatus(int sc) {
-
-        }
-
-        @Override
         public void setStatus(int sc, String sm) {
 
         }
@@ -621,6 +632,11 @@ public class GQLHelper {
         @Override
         public int getStatus() {
             return 0;
+        }
+
+        @Override
+        public void setStatus(int sc) {
+
         }
 
         @Override
@@ -640,7 +656,7 @@ public class GQLHelper {
 
         @Override
         public String getCharacterEncoding() {
-            return null;
+            return characterEncoding;
         }
 
         @Override
