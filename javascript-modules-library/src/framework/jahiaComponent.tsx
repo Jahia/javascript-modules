@@ -1,8 +1,8 @@
-import type { JCRValueWrapper } from "org.jahia.services.content";
 import type { Bundle } from "org.osgi.framework";
 import type { JSX } from "react";
 import server from "virtual:jahia-server";
 import { type ServerContext, useServerContext } from "../hooks/useServerContext.js";
+import { getNodeProps } from "../utils/jcr/getNodeProps.js";
 
 declare const bundle: Bundle;
 
@@ -68,68 +68,5 @@ const wrap = (Component: (props: never, context: ServerContext) => JSX.Element) 
   // Retrieve the current context
   const context = useServerContext();
 
-  /** All possible JCR value unwrappers, by type. */
-  const unwrappers = [
-    null, // 0: Undefined
-    (value: JCRValueWrapper) => value.getString(), // 1: String
-    null, // 2: Binary, deprecated
-    (value: JCRValueWrapper) => value.getLong(), // 3: Long
-    (value: JCRValueWrapper) => value.getDouble(), // 4: Double
-    (value: JCRValueWrapper) => value.getString(), // 5: Date. Use string as Date only supports the current system timezone
-    (value: JCRValueWrapper) => value.getBoolean(), // 6: Boolean
-    (value: JCRValueWrapper) => value.getString(), // 7: Name
-    (value: JCRValueWrapper) => value.getString(), // 8: Path
-    (value: JCRValueWrapper) => value.getNode(), // 9: Reference
-    (value: JCRValueWrapper) => value.getNode(), // 10: WeakReference
-    (value: JCRValueWrapper) => value.getString(), // 11: URI
-    (value: JCRValueWrapper) => value.getString(), // 12: Decimal
-  ];
-
-  /**
-   * The props of the component.
-   *
-   * We use a `Proxy` to automatically retrieve the props from the JCR layer, and properly unwrap
-   * them.
-   */
-  const props = new Proxy({} as never, {
-    get: (_, key) => {
-      if (typeof key !== "string") {
-        throw new Error("Invalid prop type");
-      }
-
-      if (!context.currentNode.hasProperty(key)) {
-        console.debug(`Property not found: ${key}`);
-        return undefined;
-      }
-      const property = context.currentNode.getProperty(key);
-      const unwrapper = unwrappers[property.getType()];
-      if (!unwrapper) {
-        throw new Error(`Unknown JCR property type: ${property.getType()}`);
-      }
-
-      return property.isMultiple()
-        ? property.getValues().map((value) => unwrapper(value))
-        : unwrapper(property.getValue());
-    },
-    ownKeys: () => {
-      const propertiesIterator = context.currentNode.getProperties();
-      const keys = [];
-      while (propertiesIterator.hasNext()) {
-        const property = propertiesIterator.nextProperty();
-        keys.push(property.getName());
-      }
-      return keys;
-    },
-    getOwnPropertyDescriptor: () => {
-      return { enumerable: true, configurable: true };
-    },
-    has: (_, key) => {
-      if (typeof key !== "string") {
-        return false;
-      }
-      return context.currentNode.hasProperty(key);
-    },
-  });
-
-  return Component(props, context);
+  return Component(getNodeProps(context.currentNode), context);
 };

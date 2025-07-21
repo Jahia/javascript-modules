@@ -12,9 +12,7 @@ export { AddResources } from "./components/AddResources.js";
 export { Area } from "./components/Area.js";
 
 // Declaration and registration
-export { defineJahiaComponent } from "./framework/defineJahiaComponent.js";
 export { jahiaComponent } from "./framework/jahiaComponent.js";
-export { registerJahiaComponents } from "./framework/register.js";
 
 // Hooks
 export { useGQLQuery } from "./hooks/useGQLQuery.js";

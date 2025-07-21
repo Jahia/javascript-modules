@@ -9,33 +9,18 @@ import server from "virtual:jahia-server";
  */
 export function Area({
   name,
-  areaView,
   view,
-  allowedTypes,
   allowedNodeTypes,
   numberOfItems,
   readOnly = false,
-  areaType = "jnt:contentList",
   nodeType = "jnt:contentList",
   parameters,
 }: Readonly<{
   /** The name of the area. */
   name: string;
 
-  /**
-   * The view to use for the area.
-   *
-   * @deprecated Use {@link #view} instead
-   */
-  areaView?: string;
   /** The view to use for the area. */
   view?: string;
-  /**
-   * The allowed types for the area.
-   *
-   * @deprecated Use {@link #allowedNodeTypes} instead
-   */
-  allowedTypes?: string[];
   /** The allowed types for the area. */
   allowedNodeTypes?: string[];
   /** The number of items to display in the area. */
@@ -48,12 +33,6 @@ export function Area({
    */
   readOnly?: boolean;
 
-  /**
-   * Node type to be used to create the area (if the node does not exist yet)
-   *
-   * @deprecated Use {@link #nodeType} instead
-   * @default jnt:contentList
-   */
   areaType?: string;
   /**
    * Node type to be used to create the area (if the node does not exist yet)
@@ -61,11 +40,7 @@ export function Area({
    * @default jnt:contentList
    */
   nodeType?: string;
-  /**
-   * Map of custom parameters that can be passed to the backend engine for advanced logic.
-   *
-   * @deprecated Not recommended
-   */
+  /** Map of custom parameters that can be passed to the backend engine for advanced logic. */
   parameters?: Record<string, unknown>;
 }>): JSX.Element {
   const { renderContext } = useServerContext();
@@ -76,10 +51,10 @@ export function Area({
         __html: server.render.renderArea(
           {
             name,
-            view: view ?? areaView,
-            allowedNodeTypes: allowedNodeTypes ?? allowedTypes,
+            view,
+            allowedNodeTypes,
             numberOfItems,
-            nodeType: nodeType ?? areaType,
+            nodeType,
             editable: !readOnly,
             parameters,
           },

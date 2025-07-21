@@ -36,40 +36,13 @@ export function AddContentButtons(
     editCheck?: boolean;
   }>,
 ): JSX.Element;
-/**
- * Change nodeTypes="type1 type2 type3" to nodeTypes={["type1", "type2", "type3"]}
- *
- * @deprecated
- */
-export function AddContentButtons(
-  props: Readonly<{
-    /**
-     * Change nodeTypes="type1 type2 type3" to nodeTypes={["type1", "type2", "type3"]}
-     *
-     * @deprecated
-     */
-    nodeTypes?: string;
-    /**
-     * The child name.
-     *
-     * @default *
-     */
-    childName?: string;
-    /**
-     * If true, the edit check will be performed.
-     *
-     * @default false
-     */
-    editCheck?: boolean;
-  }>,
-): JSX.Element;
 
 export function AddContentButtons({
   nodeTypes = defaultNodeTypes,
   childName = "*",
   editCheck = false,
 }: Readonly<{
-  nodeTypes?: string[] | string; // string is deprecated
+  nodeTypes?: string[]; // string is deprecated
   childName?: string;
   editCheck?: boolean;
 }>): JSX.Element {
@@ -83,7 +56,7 @@ export function AddContentButtons({
           // The render produces a ModuleTag instance under the hood
           // (<template:module nodeTypes="type1 type2 type3" /> in JSP),
           // it expects a string with the node types separated by a space.
-          Array.isArray(nodeTypes) ? nodeTypes.join(" ") : nodeTypes,
+          nodeTypes.join(" "),
           editCheck,
           renderContext,
           currentResource,
