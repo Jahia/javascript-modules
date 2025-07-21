@@ -26,7 +26,7 @@ jahiaComponent(
         </div>
         <div className="main">
           <div className="article">
-            <Area name={"events"} allowedTypes={["jnt:event"]} />
+            <Area name={"events"} allowedNodeTypes={["jnt:event"]} />
           </div>
           <div className="aside">
             <Render
