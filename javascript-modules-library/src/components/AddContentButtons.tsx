@@ -42,7 +42,7 @@ export function AddContentButtons({
   childName = "*",
   editCheck = false,
 }: Readonly<{
-  nodeTypes?: string[]; // string is deprecated
+  nodeTypes?: string[];
   childName?: string;
   editCheck?: boolean;
 }>): JSX.Element {
