@@ -3,6 +3,7 @@ package org.jahia.modules.javascript.modules.engine.js;
 import org.graalvm.polyglot.proxy.ProxyObject;
 import org.jahia.modules.javascript.modules.engine.js.injector.OSGiServiceInjector;
 import org.jahia.modules.javascript.modules.engine.js.server.*;
+import org.jahia.modules.javascript.modules.engine.js.server.gql.GQLHelper;
 import org.jahia.modules.javascript.modules.engine.jsengine.ContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
