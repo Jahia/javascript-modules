@@ -1285,15 +1285,15 @@ __metadata:
   linkType: hard
 
 "cypress-terminal-report@npm:^7.1.0":
-  version: 7.2.0
-  resolution: "cypress-terminal-report@npm:7.2.0"
+  version: 7.2.1
+  resolution: "cypress-terminal-report@npm:7.2.1"
   dependencies:
     chalk: "npm:^4.0.0"
     compare-versions: "npm:^6.1.1"
     superstruct: "npm:0.14.2"
   peerDependencies:
     cypress: ">=10.0.0"
-  checksum: 10c0/e2d3fb8697860ff11f3ce1fd56061d4333d10ec277650493a95b183abd67187edb9616069bdbca6dab2c1c35c83c67b45a2228d36fa7d36966d5e7cc977d0a29
+  checksum: 10c0/8396407f0fc5d8300c71e9026973fa38f370c22a28b08d1b53fa35a4595f7d626d975c304ac9f88c6bb4a239cdc42da163684fb8560ba7bc3bd43bcfce416515
   languageName: node
   linkType: hard
 
@@ -1305,8 +1305,8 @@ __metadata:
   linkType: hard
 
 "cypress@npm:^14.3.2":
-  version: 14.5.1
-  resolution: "cypress@npm:14.5.1"
+  version: 14.5.2
+  resolution: "cypress@npm:14.5.2"
   dependencies:
     "@cypress/request": "npm:^3.0.8"
     "@cypress/xvfb": "npm:^1.2.4"
@@ -1354,7 +1354,7 @@ __metadata:
     yauzl: "npm:^2.10.0"
   bin:
     cypress: bin/cypress
-  checksum: 10c0/23c87cafcd2fe949af1b3297cc4c9c8f8d741f5dfa8119ff54b387227dba8dc0dbcfb2d160c4df5d4f281374524753598f3501f0fdf0b1ea66c5b8047484c0d2
+  checksum: 10c0/55d1ba4773dc7d22769e6566bbdd5a78fd16dde4a4806d474de18a2713ed313db3d0734486f774fe11b3078c66d6b03703dfac05c26746ee3d704317734ebc0e
   languageName: node
   linkType: hard
 
