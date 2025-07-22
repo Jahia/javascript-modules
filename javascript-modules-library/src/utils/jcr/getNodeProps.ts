@@ -30,19 +30,26 @@ const createPropsProxy = (node: JCRNodeWrapper) =>
         throw new Error("Invalid prop type");
       }
 
+      const id = node.getIdentifier();
       if (!node.hasProperty(key)) {
-        console.debug(`Property not found: ${key}`);
+        console.debug(`Property ${key} not found on node ${id}`);
         return undefined;
       }
+
       const property = node.getProperty(key);
       const unwrapper = unwrappers[property.getType()];
       if (!unwrapper) {
-        throw new Error(`Unknown JCR property type: ${property.getType()}`);
+        throw new Error(`Unknown JCR property type ${property.getType()} (${key} of node ${id})`);
       }
 
-      return property.isMultiple()
-        ? property.getValues().map((value) => unwrapper(value))
-        : unwrapper(property.getValue());
+      try {
+        return property.isMultiple()
+          ? property.getValues().map((value) => unwrapper(value))
+          : unwrapper(property.getValue());
+      } catch (error) {
+        console.debug(`Could not retrieve ${key} of node ${id}:`, error);
+        return undefined;
+      }
     },
     ownKeys: () => {
       const propertiesIterator = node.getProperties();
