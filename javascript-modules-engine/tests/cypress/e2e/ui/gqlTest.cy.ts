@@ -17,7 +17,7 @@ describe("Test GQL", () => {
         properties: [
           { name: "jcr:title", value: "test component" },
           { name: "prop1", value: "prop1 value" },
-          { name: "prop2", value: "prop2 value" },
+          { name: "prop2", value: "prop2 value !@#$%ˆ//{}È" },
           {
             name: "propRichText",
             value: '<p data-testid="propRichTextValue">Hello this is a sample rich text</p>',
@@ -35,7 +35,7 @@ describe("Test GQL", () => {
     cy.get('li[data-testid="j:nodename"]').should("contain", "test");
     cy.get('li[data-testid="jcr:title"]').should("contain", "test component");
     cy.get('li[data-testid="prop1"]').should("contain", "prop1 value");
-    cy.get('li[data-testid="prop2"]').should("contain", "prop2 value");
+    cy.get('li[data-testid="prop2"]').should("contain", "prop2 value !@#$%ˆ//{}È");
     cy.get('li[data-testid="propRichText"]').should("contain", "Hello this is a sample rich text");
   });
 });
