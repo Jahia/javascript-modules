@@ -50,22 +50,25 @@ export default () => {
         </StyleRegistry>
       );
 
-      // Some server side components are using dangerouslySetInnerHTML to render their content,
-      // we need to clean the output to avoid having unwanted divs in the final output (e.g. <unwanteddiv>content</unwanteddiv>)
-      const cleanedRenderedElement = ReactDOMServer.renderToString(element)
-        .replace(/<unwanteddiv>/g, "")
-        .replace(/<\/unwanteddiv>/g, "");
+      const html = ReactDOMServer.renderToString(element)
+        // We use a `<jsm-raw-html>` element to wrap raw HTML output because React does not allow
+        // directly returning raw HTML strings. These elements are removed there, to avoid
+        // having them in the final output.
+        // `<jsm-raw-html>` SHOULD NOT be used in userland code, it is an internal implementation
+        // detail.
+        .replaceAll(/<\/?jsm-raw-html>/g, "");
 
       const styles = ReactDOMServer.renderToStaticMarkup(styleRegistry.styles());
       const stylesResource = styles
         ? `<jahia:resource type="inline" key="styles${currentNode.getIdentifier()}">${styles}</jahia:resource>`
         : "";
+
       if (currentResource.getContextConfiguration() === "page") {
         // Set the HTML5 doctype that can't be rendered in JSX
-        return `<!DOCTYPE html>${cleanedRenderedElement}${stylesResource}`;
+        return `<!DOCTYPE html>${html}${stylesResource}`;
       }
 
-      return `${cleanedRenderedElement}${stylesResource}`;
+      return `${html}${stylesResource}`;
     },
   });
 };

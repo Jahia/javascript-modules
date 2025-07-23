@@ -1,7 +1,8 @@
-import type React from "react";
-import { useServerContext } from "../hooks/useServerContext.js";
-import server from "virtual:jahia-server";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
+import type React from "react";
+import { createElement } from "react";
+import server from "virtual:jahia-server";
+import { useServerContext } from "../hooks/useServerContext.js";
 
 /**
  * Generates an absolute area in which editors may insert content objects.
@@ -54,25 +55,22 @@ export function AbsoluteArea({
   parameters?: Record<string, unknown>;
 }>): React.JSX.Element {
   const { renderContext } = useServerContext();
-  return (
-    // @ts-expect-error <unwanteddiv> is not a valid HTML element
-    <unwanteddiv
-      dangerouslySetInnerHTML={{
-        __html: server.render.renderAbsoluteArea(
-          {
-            name,
-            parent: parent,
-            view,
-            allowedNodeTypes,
-            numberOfItems,
-            nodeType,
-            editable: readOnly !== true,
-            limitedAbsoluteAreaEdit: readOnly === "children",
-            parameters,
-          },
-          renderContext,
-        ),
-      }}
-    />
-  );
+  return createElement("jsm-raw-html", {
+    dangerouslySetInnerHTML: {
+      __html: server.render.renderAbsoluteArea(
+        {
+          name,
+          parent: parent,
+          view,
+          allowedNodeTypes,
+          numberOfItems,
+          nodeType,
+          editable: readOnly !== true,
+          limitedAbsoluteAreaEdit: readOnly === "children",
+          parameters,
+        },
+        renderContext,
+      ),
+    },
+  });
 }

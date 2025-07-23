@@ -1,6 +1,6 @@
 import { addNode, enableModule } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 
 describe("Test on render and createContentButtons helpers", () => {
   const pageName = "testRender";
@@ -23,8 +23,12 @@ describe("Test on render and createContentButtons helpers", () => {
     });
   });
 
-  beforeEach('Login', () => { cy.login(); });
-  afterEach('Logout', () => { cy.logout(); });
+  beforeEach("Login", () => {
+    cy.login();
+  });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
   it(`${pageName}: should display page composer create button correctly using createContentButtons helper`, function () {
     cy.visit(`/jahia/jcontent/${GENERIC_SITE_KEY}/en/pages/home/${pageName}`);
@@ -38,7 +42,7 @@ describe("Test on render and createContentButtons helpers", () => {
   it(`${pageName}: should render jnt:text JSON node`, function () {
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     cy.get('div[data-testid="component-text-json-node"]').should("contain", "JSON node rendered");
-    cy.get("unwanteddiv").should("not.exist");
+    cy.get("jsm-raw-html").should("not.exist");
   });
 
   it(`${pageName}: should render jnt:text JSON node in config: OPTION`, function () {
@@ -47,7 +51,7 @@ describe("Test on render and createContentButtons helpers", () => {
       "contain",
       "JSON node rendered with option config",
     );
-    cy.get("unwanteddiv").should("not.exist");
+    cy.get("jsm-raw-html").should("not.exist");
   });
 
   it(`${pageName}: should render javascriptExample:test JSON node in config: OPTION with view: sub`, function () {
@@ -56,20 +60,20 @@ describe("Test on render and createContentButtons helpers", () => {
       "contain",
       "prop1 value it is",
     );
-    cy.get("unwanteddiv").should("not.exist");
+    cy.get("jsm-raw-html").should("not.exist");
   });
 
   it(`${pageName}: should render JSON node with INCLUDE config`, function () {
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     cy.get('div[data-testid="component-react-node-include"]').should("contain", "prop1 value");
-    cy.get("unwanteddiv").should("not.exist");
+    cy.get("jsm-raw-html").should("not.exist");
   });
 
   it(`${pageName}: should render JSON node with mixin`, function () {
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     cy.get('div[data-testid="component-json-node-with-mixin"]').should("contain", "tag1");
     cy.get('div[data-testid="component-json-node-with-mixin"]').should("contain", "tag2");
-    cy.get("unwanteddiv").should("not.exist");
+    cy.get("jsm-raw-html").should("not.exist");
   });
 
   it(`${pageName}: should render JSON node with parameters passed to render`, function () {
@@ -83,7 +87,7 @@ describe("Test on render and createContentButtons helpers", () => {
     cy.get(
       'div[data-testid="component-json-node-with-parameters"] div[data-testid="renderParam-notString-notSupported"]',
     ).should("contain", "objectParam not supported=");
-    cy.get("unwanteddiv").should("not.exist");
+    cy.get("jsm-raw-html").should("not.exist");
   });
 
   it(`${pageName}: should render node with parameters passed to render`, function () {
@@ -97,7 +101,7 @@ describe("Test on render and createContentButtons helpers", () => {
     cy.get(
       'div[data-testid="component-react-node-with-parameters"] div[data-testid="renderParam-notString-notSupported"]',
     ).should("contain", "objectParam not supported=");
-    cy.get("unwanteddiv").should("not.exist");
+    cy.get("jsm-raw-html").should("not.exist");
   });
 
   it(`${pageName}: should render existing child node using relative path`, function () {
@@ -114,6 +118,6 @@ describe("Test on render and createContentButtons helpers", () => {
       "contain",
       "Child node rendered using relative path",
     );
-    cy.get("unwanteddiv").should("not.exist");
+    cy.get("jsm-raw-html").should("not.exist");
   });
 });
