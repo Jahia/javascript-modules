@@ -1,9 +1,12 @@
-import server from "virtual:jahia-server";
-import ReactDOMServer from "react-dom/server.edge";
-import { createStyleRegistry, StyleRegistry } from "styled-jsx";
 import { ServerContextProvider } from "@jahia/javascript-modules-library";
 import i18n from "i18next";
+import type { RenderContext, Resource } from "org.jahia.services.render";
+import type { Bundle } from "org.osgi.framework";
+import type { ComponentType } from "react";
+import ReactDOMServer from "react-dom/server.edge";
 import { I18nextProvider } from "react-i18next";
+import { createStyleRegistry, StyleRegistry } from "styled-jsx";
+import server from "virtual:jahia-server";
 
 export default () => {
   server.registry.add("view", "react", {
@@ -11,7 +14,11 @@ export default () => {
   });
 
   server.registry.add("viewRenderer", "react", {
-    render: (currentResource, renderContext, view) => {
+    render: (
+      currentResource: Resource,
+      renderContext: RenderContext,
+      view: { bundle: Bundle; component: ComponentType },
+    ) => {
       const bundleKey = view.bundle.getSymbolicName();
       // I18next configuration
       // Load locales
@@ -23,9 +30,6 @@ export default () => {
       i18n.changeLanguage(language);
 
       // SSR
-      const props = {
-        id: "reactTarget" + Math.floor(Math.random() * 100000000),
-      };
       const styleRegistry = createStyleRegistry();
       const currentNode = currentResource.getNode();
       const mainNode = renderContext.getMainResource().getNode();
@@ -41,7 +45,7 @@ export default () => {
             bundleKey={bundleKey}
           >
             <I18nextProvider i18n={i18n} />
-            <View {...props} />
+            <View />
           </ServerContextProvider>
         </StyleRegistry>
       );
@@ -54,7 +58,7 @@ export default () => {
 
       const styles = ReactDOMServer.renderToStaticMarkup(styleRegistry.styles());
       const stylesResource = styles
-        ? `<jahia:resource type="inline" key="styles${props.id}">${styles}</jahia:resource>`
+        ? `<jahia:resource type="inline" key="styles${currentNode.getIdentifier()}">${styles}</jahia:resource>`
         : "";
       if (currentResource.getContextConfiguration() === "page") {
         // Set the HTML5 doctype that can't be rendered in JSX
