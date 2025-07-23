@@ -1,4 +1,4 @@
-import type { JSX } from "react";
+import { createElement, type JSX } from "react";
 import server from "virtual:jahia-server";
 import { useServerContext } from "../hooks/useServerContext.js";
 
@@ -67,12 +67,9 @@ export function AddResources(
   }>,
 ): JSX.Element {
   const { renderContext } = useServerContext();
-  return (
-    // @ts-expect-error <unwanteddiv> is not a valid HTML element
-    <unwanteddiv
-      dangerouslySetInnerHTML={{
-        __html: server.render.addResources(props, renderContext),
-      }}
-    />
-  );
+  return createElement("jsm-raw-html", {
+    dangerouslySetInnerHTML: {
+      __html: server.render.addResources(props, renderContext),
+    },
+  });
 }

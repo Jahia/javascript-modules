@@ -1,6 +1,6 @@
-import type { JSX } from "react";
-import { useServerContext } from "../hooks/useServerContext.js";
+import { createElement, type JSX } from "react";
 import server from "virtual:jahia-server";
+import { useServerContext } from "../hooks/useServerContext.js";
 
 /**
  * Generates an area in which editors may insert content objects.
@@ -44,23 +44,20 @@ export function Area({
   parameters?: Record<string, unknown>;
 }>): JSX.Element {
   const { renderContext } = useServerContext();
-  return (
-    // @ts-expect-error <unwanteddiv> is not a valid HTML element
-    <unwanteddiv
-      dangerouslySetInnerHTML={{
-        __html: server.render.renderArea(
-          {
-            name,
-            view,
-            allowedNodeTypes,
-            numberOfItems,
-            nodeType,
-            editable: !readOnly,
-            parameters,
-          },
-          renderContext,
-        ),
-      }}
-    />
-  );
+  return createElement("jsm-raw-html", {
+    dangerouslySetInnerHTML: {
+      __html: server.render.renderArea(
+        {
+          name,
+          view,
+          allowedNodeTypes,
+          numberOfItems,
+          nodeType,
+          editable: !readOnly,
+          parameters,
+        },
+        renderContext,
+      ),
+    },
+  });
 }

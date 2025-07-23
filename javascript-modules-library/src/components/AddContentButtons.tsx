@@ -1,4 +1,4 @@
-import type { JSX } from "react";
+import { createElement, type JSX } from "react";
 import server from "virtual:jahia-server";
 import { useServerContext } from "../hooks/useServerContext.js";
 
@@ -47,21 +47,18 @@ export function AddContentButtons({
   editCheck?: boolean;
 }>): JSX.Element {
   const { renderContext, currentResource } = useServerContext();
-  return (
-    // @ts-expect-error <unwanteddiv> is not a valid HTML element
-    <unwanteddiv
-      dangerouslySetInnerHTML={{
-        __html: server.render.createContentButtons(
-          childName,
-          // The render produces a ModuleTag instance under the hood
-          // (<template:module nodeTypes="type1 type2 type3" /> in JSP),
-          // it expects a string with the node types separated by a space.
-          nodeTypes.join(" "),
-          editCheck,
-          renderContext,
-          currentResource,
-        ),
-      }}
-    />
-  );
+  return createElement("jsm-raw-html", {
+    dangerouslySetInnerHTML: {
+      __html: server.render.createContentButtons(
+        childName,
+        // The render produces a ModuleTag instance under the hood
+        // (<template:module nodeTypes="type1 type2 type3" /> in JSP),
+        // it expects a string with the node types separated by a space.
+        nodeTypes.join(" "),
+        editCheck,
+        renderContext,
+        currentResource,
+      ),
+    },
+  });
 }

@@ -1,6 +1,8 @@
+import type { JCRNodeWrapper } from "org.jahia.services.content";
+import type React from "react";
+import { createElement } from "react";
 import server from "virtual:jahia-server";
 import { useServerContext } from "../../hooks/useServerContext.js";
-import type { JCRNodeWrapper } from "org.jahia.services.content";
 
 /**
  * Render a content node
@@ -42,25 +44,22 @@ export function Render({
   parameters?: unknown;
 }>): React.JSX.Element {
   const { renderContext, currentResource } = useServerContext();
-  return (
-    // @ts-expect-error <unwanteddiv> is not a valid HTML element
-    <unwanteddiv
-      dangerouslySetInnerHTML={{
-        __html: server.render.render(
-          {
-            content,
-            node,
-            path,
-            editable: !readOnly,
-            advanceRenderingConfig,
-            templateType,
-            view,
-            parameters,
-          },
-          renderContext,
-          currentResource,
-        ),
-      }}
-    />
-  );
+  return createElement("jsm-raw-html", {
+    dangerouslySetInnerHTML: {
+      __html: server.render.render(
+        {
+          content,
+          node,
+          path,
+          editable: !readOnly,
+          advanceRenderingConfig,
+          templateType,
+          view,
+          parameters,
+        },
+        renderContext,
+        currentResource,
+      ),
+    },
+  });
 }
