@@ -306,9 +306,7 @@ This type represents a boolean value, that is, a value that can be either `true`
 
 ### `reference` (9)
 
-`reference` is used to store references to JCR nodes. `reference` properties enforce referential integrity while `weakreference` properties and `path` properties do not.
-
-This means that when a node is deleted, all references to it will be deleted as well. This is probably never what you want, that's why we recommend you use `weakreference` instead.
+While defined in the JCR specification, `reference` is not implemented in Jahia, and is instead interpreted as `weakreference`. Don't use the `reference` type in your projects, as it may be implemented differently in the future.
 
 ### `weakreference` (10)
 
