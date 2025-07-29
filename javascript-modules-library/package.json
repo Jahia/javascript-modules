@@ -28,7 +28,7 @@
     "dotenv": "^16.5.0"
   },
   "devDependencies": {
-    "@types/react": "^19.1.2",
+    "@types/react": "^19.1.8",
     "devalue": "^5.1.1",
     "graphql": "^16.11.0",
     "i18next": "^25.0.2",
