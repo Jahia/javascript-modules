@@ -23,7 +23,7 @@
   "devDependencies": {
     "@jahia/javascript-modules-library": "workspace:^",
     "@jahia/vite-plugin": "workspace:^",
-    "@types/react": "^19.1.2",
+    "@types/react": "^19.1.8",
     "i18next": "^25.0.2",
     "react-i18next": "^15.5.1",
     "typescript": "^5.8.3",

@@ -531,7 +531,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@jahia/javascript-modules-library@workspace:javascript-modules-library"
   dependencies:
-    "@types/react": "npm:^19.1.2"
+    "@types/react": "npm:^19.1.8"
     devalue: "npm:^5.1.1"
     dotenv: "npm:^16.5.0"
     graphql: "npm:^16.11.0"
@@ -1315,7 +1315,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^19.1.2":
+"@types/react@npm:^19.1.8":
   version: 19.1.8
   resolution: "@types/react@npm:19.1.8"
   dependencies:
@@ -2925,7 +2925,7 @@ __metadata:
     "@jahia/javascript-modules-library": "workspace:^"
     "@jahia/vite-plugin": "workspace:^"
     "@types/canvas-confetti": "npm:^1.9.0"
-    "@types/react": "npm:^19.1.2"
+    "@types/react": "npm:^19.1.8"
     canvas-confetti: "npm:^1.9.3"
     clsx: "npm:^2.1.1"
     eslint: "npm:^9.31.0"
@@ -2933,7 +2933,7 @@ __metadata:
     i18next: "npm:^25.0.2"
     modern-normalize: "npm:^3.0.1"
     prettier: "npm:^3.5.3"
-    react: "npm:^19.1.0"
+    react: "npm:^19.1.1"
     react-i18next: "npm:^15.5.1"
     typescript: "npm:^5.8.3"
     typescript-eslint: "npm:^8.37.0"
@@ -3218,7 +3218,7 @@ __metadata:
   dependencies:
     "@jahia/javascript-modules-library": "workspace:^"
     "@jahia/vite-plugin": "workspace:^"
-    "@types/react": "npm:^19.1.2"
+    "@types/react": "npm:^19.1.8"
     i18next: "npm:^25.0.2"
     react-i18next: "npm:^15.5.1"
     typescript: "npm:^5.8.3"
@@ -3241,8 +3241,8 @@ __metadata:
     devalue: "npm:^5.1.1"
     fast-text-encoding: "npm:^1.0.6"
     i18next: "npm:^25.0.2"
-    react: "npm:^19.1.0"
-    react-dom: "npm:^19.1.0"
+    react: "npm:^19.1.1"
+    react-dom: "npm:^19.1.1"
     react-i18next: "npm:^15.5.1"
     rollup: "npm:^4.40.1"
     rollup-plugin-sbom: "npm:^2.0.3"
@@ -4567,7 +4567,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^19.1.0":
+"react-dom@npm:^19.1.1":
   version: 19.1.1
   resolution: "react-dom@npm:19.1.1"
   dependencies:
@@ -4599,7 +4599,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^19.1.0":
+"react@npm:^19.1.1":
   version: 19.1.1
   resolution: "react@npm:19.1.1"
   checksum: 10c0/8c9769a2dfd02e603af6445058325e6c8a24b47b185d0e461f66a6454765ddcaecb3f0a90184836c68bb509f3c38248359edbc42f0d07c23eb500a5c30c87b4e

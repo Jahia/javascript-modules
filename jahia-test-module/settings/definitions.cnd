@@ -154,8 +154,6 @@
  - image (weakreference, picker[type='image']) < 'jmix:image'
  - linknode (weakreference, picker[type='editoriallink']) internationalized < 'jmix:droppableContent', 'jnt:page'
 
-[javascriptExample:testReactVersion] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
-
 [javascriptExample:testRule] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
  - triggerProp (string)
  - resultProp (string)
