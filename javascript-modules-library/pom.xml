@@ -1,4 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+    >
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>javascript-modules</artifactId>
@@ -36,20 +40,6 @@
                 <!-- Map Yarn commands to corresponding Maven phases -->
                 <executions>
                     <execution>
-                        <id>install node and yarn</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>install-node-and-yarn</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>yarn install</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                    </execution>
-                    <execution>
                         <id>yarn lint</id>
                         <phase>compile</phase>
                         <goals>
@@ -60,23 +50,15 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>yarn build</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>build</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>set-alpha-version</id>
                         <phase>deploy</phase>
                         <goals>
                             <goal>yarn</goal>
                         </goals>
                         <configuration>
-                            <arguments>node ../.m2/sync-version.js ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}-alpha-${timestamp}</arguments>
+                            <arguments>
+                                node ../.m2/sync-version.js
+                                ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}-alpha-${timestamp}</arguments>
                         </configuration>
                     </execution>
                     <execution>
@@ -111,13 +93,10 @@
                             <goal>unpack-dependencies</goal>
                         </goals>
                         <configuration>
-                            <includeArtifactIds>
-                                javascript-modules-engine-java
-                            </includeArtifactIds>
+                            <includeArtifactIds> javascript-modules-engine-java </includeArtifactIds>
                             <classifier>typescript-types</classifier>
                             <type>tgz</type>
-                            <outputDirectory>${project.build.directory}/types
-                            </outputDirectory>
+                            <outputDirectory>${project.build.directory}/types </outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -152,7 +131,8 @@
         </profile>
         <profile>
             <id>release-perform</id>
-            <!-- publish the tgz during the release:perform task (i.e. when the profile "release-perform" is enabled) -->
+            <!-- publish the tgz during the release:perform task (i.e. when the profile
+            "release-perform" is enabled) -->
             <build>
                 <plugins>
                     <plugin>

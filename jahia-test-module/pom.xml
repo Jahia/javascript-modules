@@ -1,4 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+    >
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>javascript-modules</artifactId>
@@ -11,8 +15,11 @@
     <description>Test module for Javascript Module Engine</description>
 
     <dependencies>
-        <!-- the dependencies towards other modules of the mono-repo listed in the package.json should be listed here as well (so the Maven Reactor can determine the build order of the modules) -->
-        <!-- TODO create/use a Maven plugin to convert the package.json dependencies into Maven dependencies -->
+        <!-- the dependencies towards other modules of the mono-repo listed in the package.json
+        should be listed here as well (so the Maven Reactor can determine the build order of the
+        modules) -->
+        <!-- TODO create/use a Maven plugin to convert the package.json dependencies into Maven
+        dependencies -->
         <dependency>
             <groupId>org.jahia.modules</groupId>
             <artifactId>vite-plugin</artifactId>
@@ -38,43 +45,12 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <executions>
-                    <!-- Executions bound on the "initialize" phase (executed in order of declaration): -->
-                    <execution>
-                        <id>install node and yarn</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>install-node-and-yarn</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>yarn install</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                    </execution>
-                    <!-- Executions bound on the "package" phase (executed in order of declaration): -->
-                    <execution>
-                        <id>yarn pack</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>build</arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <!-- attach the dist/package.tgz artifact to the Maven build so it will be installed/deployed as part of the Maven build -->
+                        <!-- attach the dist/package.tgz artifact to the Maven build so it will be
+                        installed/deployed as part of the Maven build -->
                         <!-- bound to the "package" phase -->
                         <id>attach-tgz-artifact</id>
                         <goals>
@@ -95,7 +71,9 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <!-- copy the dist/package.tgz to the target directory with the finalName of the Maven build in the target/ folder so it is found by the CI when looking for jars to install before running integration tests -->
+                        <!-- copy the dist/package.tgz to the target directory with the finalName of
+                        the Maven build in the target/ folder so it is found by the CI when looking
+                        for jars to install before running integration tests -->
                         <id>copy-dist-package</id>
                         <phase>package</phase>
                         <goals>
@@ -103,7 +81,10 @@
                         </goals>
                         <configuration>
                             <target>
-                                <copy file="dist/package.tgz" tofile="${project.build.directory}/${project.build.finalName}.tgz" />
+                                <copy
+                                    file="dist/package.tgz"
+                                    tofile="${project.build.directory}/${project.build.finalName}.tgz"
+                                    />
                             </target>
                         </configuration>
                     </execution>
