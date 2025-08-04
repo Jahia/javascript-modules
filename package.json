@@ -11,7 +11,7 @@
     "vite-plugin"
   ],
   "scripts": {
-    "build": "yarn workspaces foreach -Atvv run build",
+    "build": "yarn workspaces foreach -Avv --topological-dev run build",
     "format": "prettier --write --list-different $INIT_CWD",
     "lint": "eslint $INIT_CWD"
   },
