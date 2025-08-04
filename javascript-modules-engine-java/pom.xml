@@ -1,22 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-   Copyright (C) 2002-2024 Jahia Solutions Group SA. All rights reserved.
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+    >
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>javascript-modules</artifactId>
@@ -139,7 +126,8 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- dependencies that should be embedded in the final bundle as they are not provided by Jahia: -->
+        <!-- dependencies that should be embedded in the final bundle as they are not provided by
+        Jahia: -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
@@ -157,7 +145,8 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- dependencies exposed in the TypeScript Type Declaration files (*.d.ts), but not used in Java: -->
+        <!-- dependencies exposed in the TypeScript Type Declaration files (*.d.ts), but not used in
+        Java: -->
         <dependency>
             <groupId>org.apache.jackrabbit</groupId>
             <artifactId>jackrabbit-spi-commons</artifactId>
@@ -210,8 +199,14 @@
                         <configuration>
                             <target>
                                 <mkdir dir="${project.build.directory}/java-ts-bind/sources" />
-                                <get src="https://codeload.github.com/openjdk/jdk17u/zip/refs/heads/master" dest="${project.build.directory}/java-ts-bind/sources/jdk17u-master.zip" />
-                                <unzip src="${project.build.directory}/java-ts-bind/sources/jdk17u-master.zip" dest="${project.build.directory}/java-ts-bind/sources">
+                                <get
+                                    src="https://codeload.github.com/openjdk/jdk17u/zip/refs/heads/master"
+                                    dest="${project.build.directory}/java-ts-bind/sources/jdk17u-master.zip"
+                                    />
+                                <unzip
+                                    src="${project.build.directory}/java-ts-bind/sources/jdk17u-master.zip"
+                                    dest="${project.build.directory}/java-ts-bind/sources"
+                                    >
                                     <patternset>
                                         <include name="jdk17u-master/src/java.base/share/classes/**" />
                                     </patternset>
@@ -233,14 +228,11 @@
                             <goal>unpack-dependencies</goal>
                         </goals>
                         <configuration>
-                            <includeArtifactIds>
-                                jahia-impl,
-                                javax.servlet-api,
-                                jcr,
-                                org.apache.felix.framework
-                            </includeArtifactIds>
+                            <includeArtifactIds> jahia-impl, javax.servlet-api, jcr,
+                                org.apache.felix.framework </includeArtifactIds>
                             <classifier>sources</classifier>
-                            <outputDirectory>${project.build.directory}/java-ts-bind/sources/dependencies
+                            <outputDirectory>
+                                ${project.build.directory}/java-ts-bind/sources/dependencies
                             </outputDirectory>
                         </configuration>
                     </execution>
@@ -251,9 +243,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <includeArtifactIds>
-                                java-ts-bind
-                            </includeArtifactIds>
+                            <includeArtifactIds> java-ts-bind </includeArtifactIds>
                             <classifier>all</classifier>
                             <outputDirectory>${project.build.directory}/java-ts-bind/exec</outputDirectory>
                             <stripVersion>true</stripVersion>
@@ -266,19 +256,9 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <includeArtifactIds>
-                                commons-lang3,
-                                graal-sdk,
-                                jackrabbit-spi-commons,
-                                jahia-impl,
-                                javax.servlet-api,
-                                jboss-servlet-api_3.1_spec,
-                                jcr,
-                                org.apache.felix.framework,
-                                osgi.annotation,
-                                pax-web-jsp,
-                                xml-apis
-                            </includeArtifactIds>
+                            <includeArtifactIds> commons-lang3, graal-sdk, jackrabbit-spi-commons,
+                                jahia-impl, javax.servlet-api, jboss-servlet-api_3.1_spec, jcr,
+                                org.apache.felix.framework, osgi.annotation, pax-web-jsp, xml-apis </includeArtifactIds>
                             <outputDirectory>${project.build.directory}/java-ts-bind/jars</outputDirectory>
                             <stripVersion>true</stripVersion>
                         </configuration>
@@ -294,11 +274,12 @@
                                 <ignoredUnusedDeclaredDependency>org.springframework:spring-webmvc</ignoredUnusedDeclaredDependency>
                                 <ignoredUnusedDeclaredDependency>javax.servlet:jstl</ignoredUnusedDeclaredDependency>
                                 <!-- used to generate *.d.ts from Java code: -->
-                                <ignoredUnusedDeclaredDependency>io.github.bensku:java-ts-bind
-                                </ignoredUnusedDeclaredDependency>
+                                <ignoredUnusedDeclaredDependency>io.github.bensku:java-ts-bind </ignoredUnusedDeclaredDependency>
                                 <!-- only exposed in *.d.ts files, not used in Java: -->
-                                <ignoredUnusedDeclaredDependency>org.apache.jackrabbit:jackrabbit-spi-commons</ignoredUnusedDeclaredDependency>
-                                <ignoredUnusedDeclaredDependency>org.jboss.spec.javax.servlet:jboss-servlet-api_3.1_spec</ignoredUnusedDeclaredDependency>
+                                <ignoredUnusedDeclaredDependency>
+                                    org.apache.jackrabbit:jackrabbit-spi-commons</ignoredUnusedDeclaredDependency>
+                                <ignoredUnusedDeclaredDependency>
+                                    org.jboss.spec.javax.servlet:jboss-servlet-api_3.1_spec</ignoredUnusedDeclaredDependency>
                                 <ignoredUnusedDeclaredDependency>org.osgi:osgi.annotation</ignoredUnusedDeclaredDependency>
                                 <ignoredUnusedDeclaredDependency>xml-apis:xml-apis</ignoredUnusedDeclaredDependency>
                             </ignoredUnusedDeclaredDependencies>
@@ -313,9 +294,12 @@
                 <executions>
                     <execution>
                         <id>generate-d.ts-files-from-java</id>
-                        <!-- important to be executed between the "process-classes" and the "package" phases: -->
-                        <!-- the "process-classes" phase is when the .jar file with the classes is created (which is required by java-ts-bind in this execution) -->
-                        <!-- the "package" phase is when the .tgz file is created with the *.d.ts files generated here -->
+                        <!-- important to be executed between the "process-classes" and the
+                        "package" phases: -->
+                        <!-- the "process-classes" phase is when the .jar file with the classes is
+                        created (which is required by java-ts-bind in this execution) -->
+                        <!-- the "package" phase is when the .tgz file is created with the *.d.ts
+                        files generated here -->
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>exec</goal>
@@ -324,7 +308,8 @@
                             <executable>java</executable>
                             <arguments>
                                 <argument>-jar</argument>
-                                <argument>${project.basedir}/target/java-ts-bind/exec/java-ts-bind-all.jar</argument>
+                                <argument>
+                                    ${project.basedir}/target/java-ts-bind/exec/java-ts-bind-all.jar</argument>
                                 <argument>--packageJson</argument>
                                 <argument>${project.basedir}/.java-ts-bind/package.json</argument>
                             </arguments>
@@ -362,7 +347,8 @@
                     </execution>
                     <execution>
                         <!-- package the typescript *.d.ts files that have been previously generated -->
-                        <!-- NB: the generated .tgz file will be attached to the project and will be installed/deployed along with the .jar file -->
+                        <!-- NB: the generated .tgz file will be attached to the project and will be
+                        installed/deployed along with the .jar file -->
                         <id>package-typescript-types-tgz</id>
                         <phase>package</phase>
                         <goals>
