@@ -25,7 +25,7 @@
     "lint": "yarn run --top-level lint"
   },
   "dependencies": {
-    "dotenv": "^16.5.0"
+    "dotenv": "^17.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.1.8",
