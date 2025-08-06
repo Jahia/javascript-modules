@@ -567,7 +567,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@jahia/vite-plugin@workspace:vite-plugin"
   dependencies:
-    "@rollup/plugin-multi-entry": "npm:^6.0.1"
     "@rollup/pluginutils": "npm:^5.1.4"
     "@types/node": "npm:^22.15.3"
     magic-string: "npm:^0.30.17"
@@ -973,21 +972,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-multi-entry@npm:^6.0.1":
-  version: 6.0.1
-  resolution: "@rollup/plugin-multi-entry@npm:6.0.1"
-  dependencies:
-    "@rollup/plugin-virtual": "npm:^3.0.0"
-    matched: "npm:^5.0.1"
-  peerDependencies:
-    rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
-  peerDependenciesMeta:
-    rollup:
-      optional: true
-  checksum: 10c0/546d5d707eb2d726eff4c97ef1e07cdc4aeb56652c367895186a5d685a8e0f80ba02093361737daba04fe04905fe4e6e9926c150841985b955a13eabaf5ddb6b
-  languageName: node
-  linkType: hard
-
 "@rollup/plugin-node-resolve@npm:^16.0.1":
   version: 16.0.1
   resolution: "@rollup/plugin-node-resolve@npm:16.0.1"
@@ -1053,18 +1037,6 @@ __metadata:
     tslib:
       optional: true
   checksum: 10c0/b5bf7f54794d0b33ae5441c5aa202a95beb7068c206f40102f94997e888756c06c2bfe00517eb74a58771078432f94e8a34e99f5c6dbf89a22b49431b83c4798
-  languageName: node
-  linkType: hard
-
-"@rollup/plugin-virtual@npm:^3.0.0":
-  version: 3.0.2
-  resolution: "@rollup/plugin-virtual@npm:3.0.2"
-  peerDependencies:
-    rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
-  peerDependenciesMeta:
-    rollup:
-      optional: true
-  checksum: 10c0/7115edb7989096d1ce334939fcf6e1ba365586b487bf61b2dd4f915386197f350db70904030342c0720fe58f5a52828975c645c4d415c1d432d9b1b6760a22ef
   languageName: node
   linkType: hard
 
@@ -3567,16 +3539,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"matched@npm:^5.0.1":
-  version: 5.0.1
-  resolution: "matched@npm:5.0.1"
-  dependencies:
-    glob: "npm:^7.1.6"
-    picomatch: "npm:^2.2.1"
-  checksum: 10c0/aa4c271edcfe3ecc2a27a35770d0e22acde986b6984a1e2b2deff684d2b749e3f72d3d2892178081c8f2d66d212eea6ecc0354b789bfb3bd1d3eacf200b2ae8f
-  languageName: node
-  linkType: hard
-
 "mdast-util-from-markdown@npm:^2.0.0":
   version: 2.0.2
   resolution: "mdast-util-from-markdown@npm:2.0.2"
@@ -4357,7 +4319,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"picomatch@npm:^2.2.1, picomatch@npm:^2.3.1":
+"picomatch@npm:^2.3.1":
   version: 2.3.1
   resolution: "picomatch@npm:2.3.1"
   checksum: 10c0/26c02b8d06f03206fc2ab8d16f19960f2ff9e81a658f831ecb656d8f17d9edc799e8364b1f4a7873e89d9702dff96204be0fa26fe4181f6843f040f819dac4be
