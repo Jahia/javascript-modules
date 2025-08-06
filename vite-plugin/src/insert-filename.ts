@@ -36,11 +36,11 @@ import type { AstNode, Plugin } from "rollup";
  * @param glob The glob pattern(s) to match files to transform.
  * @param prefix The prefix to add to the path.
  */
-export const insertFilename = (
+export function insertFilename(
   root: string,
   glob: string | string[],
   transform: (id: string) => string,
-): Plugin => {
+): Plugin {
   const filter = createFilter(glob, null, {
     resolve: root,
   });
@@ -75,4 +75,4 @@ export const insertFilename = (
       };
     },
   };
-};
+}
