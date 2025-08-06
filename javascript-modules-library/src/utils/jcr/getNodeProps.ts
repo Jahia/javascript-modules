@@ -32,7 +32,6 @@ const createPropsProxy = (node: JCRNodeWrapper) =>
 
       const id = node.getIdentifier();
       if (!node.hasProperty(key)) {
-        console.debug(`Property ${key} not found on node ${id}`);
         return undefined;
       }
 
