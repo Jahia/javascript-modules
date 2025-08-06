@@ -34,7 +34,7 @@ import type { AstNode, Plugin } from "rollup";
  * @param root The root of the transformation. Files outside this directory will not be transformed,
  *   files inside (and matching the glob) will have their inserted path relative to this directory.
  * @param glob The glob pattern(s) to match files to transform.
- * @param prefix The prefix to add to the path.
+ * @param transform The function to transform the path.
  */
 export function insertFilename(
   root: string,
