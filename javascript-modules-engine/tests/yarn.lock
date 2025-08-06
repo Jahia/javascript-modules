@@ -139,8 +139,8 @@ __metadata:
   linkType: hard
 
 "@jahia/jahia-reporter@npm:^1.5.0":
-  version: 1.5.0
-  resolution: "@jahia/jahia-reporter@npm:1.5.0"
+  version: 1.6.0
+  resolution: "@jahia/jahia-reporter@npm:1.6.0"
   dependencies:
     "@oclif/command": "npm:^1"
     "@oclif/config": "npm:^1"
@@ -171,7 +171,7 @@ __metadata:
     xml-js: "npm:^1.6.11"
   bin:
     jahia-reporter: bin/run
-  checksum: 10c0/1e605660b29d0273577368f019508fb680dbcf99a953e2f913aea24e6e336d087da63bb845243eef1a0874c73aef54f75338c23425453331b5ff06bca860e3d4
+  checksum: 10c0/c0cc6630dd64b3c0ae922648ec38f9d1e66fb9913636a3b11aa248df235c195d1411189cbbd2da9210a65f6ecad78c4b933e2eecc8317d5bbe540cc5a463e1f1
   languageName: node
   linkType: hard
 
