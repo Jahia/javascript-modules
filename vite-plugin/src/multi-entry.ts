@@ -6,6 +6,11 @@ const VIRTUAL_ENTRY_ID = "\0virtual:entry";
 /**
  * This plugin is a fork of the original `@rollup/plugin-multi-entry` plugin, with
  * https://github.com/rollup/plugins/pull/1879 merged and unused features removed.
+ *
+ * Originally licensed under MIT:
+ *
+ * Copyright (c) 2019 RollupJS Plugin Contributors
+ * (https://github.com/rollup/plugins/graphs/contributors)
  */
 export function multiEntry(entryFileName: string): Plugin {
   let patterns: string[] = [];
@@ -35,7 +40,7 @@ export function multiEntry(entryFileName: string): Plugin {
       const files = await glob(patterns, { absolute: true });
       entrypoint = files
         .sort()
-        .map((path: string) => `import ${JSON.stringify(path)};\n`)
+        .map((path) => `import ${JSON.stringify(path)};\n`)
         .join("");
     },
 
