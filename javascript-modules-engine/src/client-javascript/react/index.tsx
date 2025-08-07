@@ -45,7 +45,7 @@ const load = async (element: HTMLElement) => {
 
   const rawProps = element.querySelector("script[type='application/json']")?.textContent;
   const props = rawProps && devalue.parse(rawProps);
-  const hydrate = element.tagName.toLowerCase() === "jsm-hydrate";
+  const hydrate = Boolean(element.dataset.clientOnly);
 
   const { default: Component } = await import(entry);
 
@@ -74,7 +74,7 @@ const hydrateReactComponent = async (root: HTMLElement) => {
 
 /** Hydrates all React components of `root`. */
 export const hydrateReactComponents = () => {
-  for (const element of document.querySelectorAll("jsm-hydrate, jsm-render")) {
+  for (const element of document.querySelectorAll("jsm-island")) {
     hydrateReactComponent(element as HTMLElement);
   }
 };

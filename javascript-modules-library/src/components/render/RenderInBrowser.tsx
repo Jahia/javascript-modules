@@ -1,9 +1,10 @@
-import InBrowser from "./internal/InBrowser.js";
+import { Island } from "./Island.js";
 
 /**
  * Will render the given React component in the browser. Be careful, the component will not have
  * access to the '@jahia/javascript-modules-library' library from the browser.
  *
+ * @deprecated Use `<Island clientOnly />` instead.
  * @returns The component to be rendered in the browser
  */
 export function RenderInBrowser<T>(
@@ -21,6 +22,7 @@ export function RenderInBrowser<T>(
   }>,
 ): React.JSX.Element;
 
+/** @deprecated Use `<Island clientOnly />` instead. */
 export function RenderInBrowser(
   props: Readonly<{
     /** The React component */
@@ -29,6 +31,7 @@ export function RenderInBrowser(
   }>,
 ): React.JSX.Element;
 
+/** @deprecated Use `<Island clientOnly />` instead. */
 export function RenderInBrowser<T>({
   child: Child,
   props,
@@ -38,9 +41,6 @@ export function RenderInBrowser<T>({
   props?: T & React.JSX.IntrinsicAttributes;
   children?: React.ReactNode;
 }>): React.JSX.Element {
-  return (
-    <InBrowser child={Child} props={props as never}>
-      {children}
-    </InBrowser>
-  );
+  // @ts-expect-error The type of Island is too complex for TypeScript to infer correctly
+  return <Island clientOnly component={Child} props={props} children={children} />;
 }
