@@ -1,6 +1,6 @@
 import * as devalue from "devalue";
 import i18n from "i18next";
-import { createElement, type ComponentType, type ReactNode, type JSX } from "react";
+import { createElement, type ComponentType, type ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
 import sharedLibFiles from "virtual:shared-lib-files";
 import { useServerContext } from "../../hooks/useServerContext.js";
@@ -27,78 +27,80 @@ import { AddResources } from "../AddResources.js";
  *   case, children are used as a placeholder until the component is hydrated.
  */
 // @ts-expect-error TS complains that the signature does not match the implementation, but it does
-export function Island<Props>({}: {
-  /** The React component to render. */
-  component: ComponentType<Props>;
-} & (keyof Omit<Props, "children"> extends never
-  ? {
-      props?: never; // If the component has no properties (other than children), none can be passed
-    }
-  : Omit<Props, "children"> extends Required<Omit<Props, "children">>
+export function Island<Props>(
+  props: {
+    /** The React component to render. */
+    component: ComponentType<Props>;
+  } & (keyof Omit<Props, "children"> extends never
     ? {
-        // If at least one property of component are mandatory, they must be passed
-        /** Props to forward to the component. */
-        props: Omit<Props, "children">;
+        props?: never; // If the component has no properties (other than children), none can be passed
       }
-    : {
-        // If all properties of component are optional, they may be passed or not
-        /** Props to forward to the component. */
-        props?: Omit<Props, "children">;
-      }) &
-  (Props extends { children: infer Children }
-    ? // If the component has mandatory children, it cannot be client-only
-      {
-        /**
-         * If false or undefined, the component will be rendered on the server. If true, server-side
-         * rendering will be skipped.
-         */
-        clientOnly?: false;
-        /** The children to render inside the component. */
-        children: Children;
-      }
-    : Props extends { children?: infer Children }
-      ? // If the component has optional children, it may be client-only or not
-        | {
-              // In SSR mode, the children are passed to the component and must be of the correct type
-              /**
-               * If false or undefined, the component will be rendered on the server. If true,
-               * server-side rendering will be skipped.
-               */
-              clientOnly?: false;
-              /** The children to render inside the component. */
-              children?: Children;
-            }
+    : Omit<Props, "children"> extends Required<Omit<Props, "children">>
+      ? {
+          // If at least one property of component are mandatory, they must be passed
+          /** Props to forward to the component. */
+          props: Omit<Props, "children">;
+        }
+      : {
+          // If all properties of component are optional, they may be passed or not
+          /** Props to forward to the component. */
+          props?: Omit<Props, "children">;
+        }) &
+    (Props extends { children: infer Children }
+      ? // If the component has mandatory children, it cannot be client-only
+        {
+          /**
+           * If false or undefined, the component will be rendered on the server. If true,
+           * server-side rendering will be skipped.
+           */
+          clientOnly?: false;
+          /** The children to render inside the component. */
+          children: Children;
+        }
+      : Props extends { children?: infer Children }
+        ? // If the component has optional children, it may be client-only or not
           | {
-              // In CSR mode, the children are used as a placeholder and may be of any type
-              /**
-               * If false or undefined, the component will be rendered on the server. If true,
-               * server-side rendering will be skipped.
-               */
-              clientOnly: true;
-              /** Placeholder content until the component is rendered on the client. */
-              children?: ReactNode;
-            }
-      : // If the component has no children, it may be client-only or not
-        | {
-              // In SSR mode, the component cannot have children
-              /**
-               * If false or undefined, the component will be rendered on the server. If true,
-               * server-side rendering will be skipped.
-               */
-              clientOnly?: false;
-              // Prevent children from being passed to the component
-              children?: never;
-            }
+                // In SSR mode, the children are passed to the component and must be of the correct type
+                /**
+                 * If false or undefined, the component will be rendered on the server. If true,
+                 * server-side rendering will be skipped.
+                 */
+                clientOnly?: false;
+                /** The children to render inside the component. */
+                children?: Children;
+              }
+            | {
+                // In CSR mode, the children are used as a placeholder and may be of any type
+                /**
+                 * If false or undefined, the component will be rendered on the server. If true,
+                 * server-side rendering will be skipped.
+                 */
+                clientOnly: true;
+                /** Placeholder content until the component is rendered on the client. */
+                children?: ReactNode;
+              }
+        : // If the component has no children, it may be client-only or not
           | {
-              // In CSR mode, the children are used as a placeholder and may be of any type
-              /**
-               * If false or undefined, the component will be rendered on the server. If true,
-               * server-side rendering will be skipped.
-               */
-              clientOnly: true;
-              /** Placeholder content until the component is rendered on the client. */
-              children?: ReactNode;
-            })): ReactNode;
+                // In SSR mode, the component cannot have children
+                /**
+                 * If false or undefined, the component will be rendered on the server. If true,
+                 * server-side rendering will be skipped.
+                 */
+                clientOnly?: false;
+                // Prevent children from being passed to the component
+                children?: never;
+              }
+            | {
+                // In CSR mode, the children are used as a placeholder and may be of any type
+                /**
+                 * If false or undefined, the component will be rendered on the server. If true,
+                 * server-side rendering will be skipped.
+                 */
+                clientOnly: true;
+                /** Placeholder content until the component is rendered on the client. */
+                children?: ReactNode;
+              }),
+): ReactNode;
 
 // We use an overload rather than a single function because some props (e.g. children) are not always defined
 export function Island({
@@ -107,8 +109,8 @@ export function Island({
   clientOnly,
   children,
 }: Readonly<{
-  component: ComponentType;
-  props?: any;
+  component: ComponentType<{ children?: ReactNode }>;
+  props?: Record<string, unknown>;
   clientOnly?: boolean;
   children?: ReactNode;
 }>): ReactNode {
@@ -209,9 +211,13 @@ export function Island({
               children
             ) : (
               <I18nextProvider i18n={i18n}>
-                <Component {...props}>
-                  {createElement("jsm-children", { style: { display: "contents" }, children })}
-                </Component>
+                <Component
+                  {...props}
+                  children={createElement("jsm-children", {
+                    style: { display: "contents" },
+                    children,
+                  })}
+                />
               </I18nextProvider>
             ),
           ],
