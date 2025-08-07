@@ -136,7 +136,11 @@ export function Island({
         targetTag="head"
         inlineResource={
           /* HTML */ `${
-              // Module preload hints for shared libraries, deep in the dependency tree
+              /**
+               * Module preload hints for shared libraries, deep in the dependency tree
+               *
+               * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/modulepreload
+               */
               sharedLibFiles
                 .map((file) => `<link rel="modulepreload" href="${base}/shared-libs/${file}" />`)
                 .join("")
@@ -147,7 +151,7 @@ export function Island({
                  * Import map to allow bare identifiers (e.g. `import { useState } from "react"`) to
                  * be imported from our bundle in the browser.
                  *
-                 * @see {@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap}
+                 * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
                  */
                 imports: {
                   // Explicitly exposed:
@@ -171,7 +175,7 @@ export function Island({
       />
       {i18nResourceBundle && (
         <AddResources
-          key={`jsm-i18n-${entry}`}
+          key={`jsm-i18n-${bundleKey}`}
           insert
           targetTag="head"
           inlineResource={
@@ -181,7 +185,6 @@ export function Island({
           }
         />
       )}
-      {/* The import map must come first in the page so that all imports are resolved correctly */}
       <AddResources
         key="jsm-bootstrap"
         insert

@@ -44,7 +44,7 @@ const load = async (element: HTMLElement) => {
   }
 
   const rawProps = element.querySelector("script[type='application/json']")?.textContent;
-  const props = rawProps && devalue.parse(rawProps);
+  const props = rawProps ? devalue.parse(rawProps) : {};
   const hydrate = Boolean(element.dataset.clientOnly);
 
   const { default: Component } = await import(entry);
