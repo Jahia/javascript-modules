@@ -22,7 +22,11 @@ jahiaComponent(
 
       <h3>Test i18n: rendered client side</h3>
       <div data-testid="i18n-rendered-client-side">
-        <Island component={SampleI18n} props={{ placeholder: "We are rendered client side !" }} />
+        <Island
+          clientOnly
+          component={SampleI18n}
+          props={{ placeholder: "We are rendered client side !" }}
+        />
       </div>
 
       <h3>getSiteLocales()</h3>

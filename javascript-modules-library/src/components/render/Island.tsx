@@ -197,7 +197,7 @@ export function Island({
         // to prevent a broken DOM structure in the browser. (e.g. a `<div>` inside a `<p>`)
         createElement("jsm-island", {
           "style": { display: "contents" },
-          "data-client-only": clientOnly ? 1 : undefined,
+          "data-client-only": clientOnly ? true : undefined,
           "data-src": entry,
           "data-lang": language,
           "data-bundle": bundleKey,
