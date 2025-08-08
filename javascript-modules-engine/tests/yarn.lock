@@ -204,11 +204,11 @@ __metadata:
   linkType: soft
 
 "@jahia/jcontent-cypress@npm:^3.4.0-tests.2":
-  version: 3.4.0-tests.2
-  resolution: "@jahia/jcontent-cypress@npm:3.4.0-tests.2"
+  version: 3.4.0-tests.3
+  resolution: "@jahia/jcontent-cypress@npm:3.4.0-tests.3"
   dependencies:
     cypress-real-events: "npm:^1.14.0"
-  checksum: 10c0/5d7e5fe54cb44b02d9f72ee15d17275f33e445d8b44152b93ec22d6a6088f63de92d2d674f343f03371758b6775664c2379aa499f38fdaa77e6eb7fc1efdd6d1
+  checksum: 10c0/63dc56e289cd29340ebbe40062f85f0e3b8da9babb7c99ad0a7035709f8f9890cc6a56bcba027f877357034211493c42e518811ffedb8c708e3edfc55988d63e
   languageName: node
   linkType: hard
 
@@ -457,11 +457,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*, @types/node@npm:>=12.0.0":
-  version: 24.2.0
-  resolution: "@types/node@npm:24.2.0"
+  version: 24.2.1
+  resolution: "@types/node@npm:24.2.1"
   dependencies:
     undici-types: "npm:~7.10.0"
-  checksum: 10c0/0b55af4d7b37fea47bbeffffaff908462fa19ea9b1a18f92d9ed6d8415d97971b254f8cb3f629cd238916e94711fdb6ac939aa750cb353dfd6df6c0339435740
+  checksum: 10c0/439a3c7edf88a298e0c92e46f670234070b892589c3b06e82cc86c47a7e1cf220f4a4b4736ec6ac7e4b9e1c40d7b6d443a1e22f99dd17f13f9dd15de3b32011b
   languageName: node
   linkType: hard
 
@@ -473,11 +473,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:^22.15.12":
-  version: 22.17.0
-  resolution: "@types/node@npm:22.17.0"
+  version: 22.17.1
+  resolution: "@types/node@npm:22.17.1"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10c0/e1c603b660d3de3243dfc02ded5d40623ff3f36315ffbdd8cdc81bc2c5a8da172035879d437b72e9fa61ca01827f28e9c2b0c32898f411a8e9ba0a5efac0b4ca
+  checksum: 10c0/b04063bdabfc4146af05d14d4fd23ee68615194473d0ef971ddef549b80b791f52c8f93abdd8d1092ee0257f3dea862fa233519244fd051e79233cdce614de14
   languageName: node
   linkType: hard
 
