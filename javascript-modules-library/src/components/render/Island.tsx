@@ -33,18 +33,20 @@ export function Island<Props>(
     component: ComponentType<Props>;
   } & (keyof Omit<Props, "children"> extends never
     ? {
-        props?: never; // If the component has no properties (other than children), none can be passed
+        // If the component has no properties (other than children), none can be passed
+        props?: never;
       }
-    : Omit<Props, "children"> extends Required<Omit<Props, "children">>
+    : Partial<Omit<Props, "children">> extends Omit<Props, "children">
       ? {
-          // If at least one property of component are mandatory, they must be passed
-          /** Props to forward to the component. */
-          props: Omit<Props, "children">;
-        }
-      : {
-          // If all properties of component are optional, they may be passed or not
+          // If all properties of component are optional, they may be passed or not,
+          // props will default to an empty object if omitted
           /** Props to forward to the component. */
           props?: Omit<Props, "children">;
+        }
+      : {
+          // If at least one property is required, providing props is mandatory
+          /** Props to forward to the component. */
+          props: Omit<Props, "children">;
         }) &
     (Props extends { children: infer Children }
       ? // If the component has mandatory children, it cannot be client-only
@@ -57,7 +59,7 @@ export function Island<Props>(
           /** The children to render inside the component. */
           children: Children;
         }
-      : Props extends { children?: infer Children }
+      : "children" extends keyof Props
         ? // If the component has optional children, it may be client-only or not
           | {
                 // In SSR mode, the children are passed to the component and must be of the correct type
@@ -67,7 +69,7 @@ export function Island<Props>(
                  */
                 clientOnly?: false;
                 /** The children to render inside the component. */
-                children?: Children;
+                children?: Props["children"];
               }
             | {
                 // In CSR mode, the children are used as a placeholder and may be of any type
@@ -134,24 +136,16 @@ export function Island({
     <>
       <AddResources
         key="jsm-island-head"
-        insert
+        insert // Insert the resource at the top of the pile
         targetTag="head"
         inlineResource={
-          /* HTML */ `${
-              /**
-               * Module preload hints for shared libraries, deep in the dependency tree
-               *
-               * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/modulepreload
-               */
-              sharedLibFiles
-                .map((file) => `<link rel="modulepreload" href="${base}/shared-libs/${file}" />`)
-                .join("")
-            }
-            <script type="importmap">
+          /* HTML */ ` <script type="importmap">
               ${JSON.stringify({
                 /**
                  * Import map to allow bare identifiers (e.g. `import { useState } from "react"`) to
                  * be imported from our bundle in the browser.
+                 *
+                 * They must come before any module evaluation, including module preload hints.
                  *
                  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
                  */
@@ -166,19 +160,27 @@ export function Island({
                   "react-dom/client": `${base}/shared-libs/react-dom/client.js`,
                 },
               })}
-            </script>`
+            </script>
+            ${
+              /**
+               * Module preload hints for shared libraries, deep in the dependency tree.
+               *
+               * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/modulepreload
+               */
+              sharedLibFiles
+                .map((file) => `<link rel="modulepreload" href="${base}/shared-libs/${file}" />`)
+                .join("")
+            }`
         }
       />
       <AddResources
         key={`jsm-preload-${entry}`}
-        insert
         targetTag="head"
         inlineResource={`<link rel="modulepreload" href="${entry}" />`}
       />
       {i18nResourceBundle && (
         <AddResources
           key={`jsm-i18n-${bundleKey}`}
-          insert
           targetTag="head"
           inlineResource={
             /* HTML */ `<script type="application/json" data-i18n-store="${bundleKey}">
@@ -189,7 +191,6 @@ export function Island({
       )}
       <AddResources
         key="jsm-bootstrap"
-        insert
         targetTag="body"
         inlineResource={`<script type="module" src="${base}/index.js"></script>`}
       />
