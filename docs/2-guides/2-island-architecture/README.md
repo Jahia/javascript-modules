@@ -72,7 +72,7 @@ jahiaComponent(
 );
 ```
 
-Your button will be sent properly to the client, but **not made interactive.** This is because the default rendering mode of JavaScript Modules (and Jahia in general) is server-side rendering. **No JS is sent to the browser by default,** and therefore your button doesn't get its event listener attached.
+Your button will be sent properly to the client, but **not be made interactive.** This is because the default rendering mode of JavaScript Modules (and Jahia in general) is server-side rendering. **No JS is sent to the browser by default,** and therefore your button doesn't get its event listener attached.
 
 The solution is the `<Island />` component:
 
