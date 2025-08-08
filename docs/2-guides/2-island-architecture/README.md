@@ -106,7 +106,7 @@ It can also take other props, which are detailed in the following sections.
 
 By default, all islands are rendered on the server and made interactive on the client (the process is called [hydration](https://18.react.dev/reference/react-dom/client/hydrateRoot#hydrating-server-rendered-html)). This is great for the perceived performance of your application because even before being interactive, your page can be read by the user.
 
-Sometimes, the server cannot render the content (for instance, because it needs browser APIs like `window`, `document` or `navigator`). For these cases, the `<Island />` component has `clientOnly` code, which will skip server-side rendering and only render your component on the client.
+Sometimes, the server cannot render the content (for instance, because it needs browser APIs like `window`, `document` or `navigator`). For these cases, the `<Island />` component has a `clientOnly` mode, which will skip server-side rendering and only render your component on the client.
 
 ```tsx
 // Language.client.tsx
@@ -137,6 +137,8 @@ jahiaComponent(
   ),
 );
 ```
+
+This ensures that `<Language />` only runs on the client (the browser).
 
 ## `props`
 
@@ -201,15 +203,17 @@ jahiaComponent(
 );
 ```
 
+Our `<Pizza />` component receives its props during both server-side and client-side rendering.
+
 ## `children`
 
-Last but not least, the `children` prop, which is the technical name for all children passed to a React component. (`<Component children={<img />} />` is the same as `<Component><img /></Component>`.)
+Last but not least, the `children` prop, which is the technical name for all children passed to a React component. (`<Parent children={<Child />} />` is the same as `<Parent><Child /></Parent>`.)
 
 The `<Island />` component can take children, but its behavior depends on its `clientOnly` prop.
 
 In default mode (without `clientOnly`), the children are rendered on the server and sent to the client, as children of your island component. The children will not be made interactive.
 
-This behavior enables the development of components like accordions, where the `<Island />` is not a leaf of the component tree.
+This behavior enables components like accordions, where the `<Island />` is not a leaf of the component tree.
 
 [Schema of the accordion component](./accordion.svg)
 
@@ -220,6 +224,7 @@ Such a component can be implemented as follows:
 import type { ReactNode } from "react";
 
 export default function Accordion({ children }: { children: ReactNode }) {
+  // The accordion can be opened and closed
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -258,8 +263,8 @@ jahiaComponent(
 
 A few things to note:
 
-- The `{children}` insertion point must always be there. If you want to hide the children of your component, use CSS instead of a JS condition. Otherwise, they might not be sent to the client and your component will appear to have no children.
-- Children will be wrapped in a `jsm-children` element. This should not change anything 99% of the time, but don't use the `>` CSS selector to target children of your component.
+- The `{children}` insertion point must always be there. If you want to hide the children of your component, use CSS instead of a JS condition. Otherwise, they will not be sent to the client and your component will appear to have no children.
+- Children will be wrapped in a `jsm-children` element. This should not affect your code most of the time, but don't use the `>` CSS selector to target children of your component.
 
 In `clientOnly` mode, the children of an island will not be used as children of your island component. Instead, they will be rendered on the server and used as a placeholder until the client component is loaded.
 
@@ -284,10 +289,14 @@ jahiaComponent(
 );
 ```
 
+This is a good UX practice to tell show users that your site is currently loading instead of leaving an empty space. It can also prevent [layout shifts](https://web.dev/articles/cls) when the component finally loads.
+
 ## Implementation details
 
-It is not necessary to know any of this to create a successful Jahia integration, but it might come in handy if you need to debug your application.
+It is not necessary to know any of this to create a successful Jahia integration, but it might come in handy if you need to debug your application:
 
-- The `<Island />` component will be sent to the client as a `<jsm-island />` custom element. In client only mode, it will have a `data-client-only` attribute. Do not target `jsm-island` nor `jsm-children` in your CSS as they are implementation details and may change in non-major versions.
+- The `<Island />` component will be sent to the client as a `<jsm-island />` custom element. In client only mode, it will have a `data-client-only` attribute.
+
+  Do not target `jsm-island` nor `jsm-children` in your CSS as they are implementation details and may change in non-major versions.
 
 - We have written a complete article on the implement details of the `<Island />` component. You can read it on our blog: [Under the Hood: Hydrating React Components in Java](https://www.jahia.com/blog/under-the-hood-hydrating-react-components-in-java).
