@@ -14,7 +14,7 @@ export default defineConfig({
       //   outputDir: "client",
       // },
       // server: {
-      //   inputGlob: "**/*.server.{ts,tsx}",
+      //   inputGlob: "**/*.server.{jsx,tsx}",
       //   outputFile: "server/index.js",
       // },
 
