@@ -22,7 +22,8 @@
     "baseUrl": ".",
     "paths": {
       "*": ["target/types/*"]
-    }
+    },
+    "verbatimModuleSyntax": true
   },
   "include": ["src/**/*.js", "src/**/*.mjs", "src/**/*.ts"],
   "exclude": ["node_modules", "**/*.spec.ts", "**/*.spec.tsx"]

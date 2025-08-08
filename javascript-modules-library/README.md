@@ -4,7 +4,25 @@ This library exposes common types and utility functions for JavaScript modules r
 
 ## Rendering components
 
-### `RenderInBrowser`
+### `Island`
+
+This component creates an island of interactivity on the page, following the [Island Architecture](https://www.jahia.com/blog/leveraging-the-island-architecture-in-jahia-cms) paradigm.
+
+```tsx
+<Island component={MyComponent} props={{ foo: "bar" }}>
+  <div>If MyComponent takes children, it will receive them here.</div>
+</Island>
+```
+
+It takes an optional `clientOnly` prop:
+
+- By default or when set to `false`, the component will be rendered on the server and hydrated in
+  the browser. In this case, children are passed to the component.
+- When set to `true`, the component will be rendered only in the browser, skipping the server-side
+  rendering step. This is useful for components that cannot be rendered on the server. In this
+  case, children are used as a placeholder until the component is hydrated.
+
+### `RenderInBrowser` (deprecated)
 
 This component is used to render a React component in the browser. It is used to render a component in the browser, skipping the server-side rendering step. Provided children, if any, will be rendered on the server and replaced by the component in the browser.
 
@@ -14,7 +32,9 @@ This component is used to render a React component in the browser. It is used to
 </RenderInBrowser>
 ```
 
-### `HydrateInBrowser`
+This component is deprecated and will be removed in the future major version. Use the `Island` component with the `clientOnly` prop instead.
+
+### `HydrateInBrowser` (deprecated)
 
 This component is used to hydrate a React component in the browser. It will be rendered on the server then hydrated in the browser. Provided children, if any, will be children of the component.
 
@@ -23,6 +43,8 @@ This component is used to hydrate a React component in the browser. It will be r
   <div>I'm a child of MyComponent</div>
 </HydrateInBrowser>
 ```
+
+This component is deprecated and will be removed in the future major version. Use the `Island` component instead.
 
 ### `Render`
 
