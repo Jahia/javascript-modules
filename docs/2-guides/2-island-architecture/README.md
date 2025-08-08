@@ -106,7 +106,7 @@ It can also take other props, which are detailed in the following sections.
 
 By default, all islands are rendered on the server and made interactive on the client (the process is called [hydration](https://18.react.dev/reference/react-dom/client/hydrateRoot#hydrating-server-rendered-html)). This is great for the perceived performance of your application because even before being interactive, your page can be read by the user.
 
-Sometimes, the server cannot render the content (for instance, because it needs browser APIs like `window`, `document` or `navigator.geolocation`). For these cases, the `<Island />` component has `clientOnly` code, which will skip server-side rendering and only render your component on the client.
+Sometimes, the server cannot render the content (for instance, because it needs browser APIs like `window`, `document` or `navigator`). For these cases, the `<Island />` component has `clientOnly` code, which will skip server-side rendering and only render your component on the client.
 
 ```tsx
 // Language.client.tsx
