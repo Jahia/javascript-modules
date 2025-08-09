@@ -1,4 +1,3 @@
-import multiEntry from "@rollup/plugin-multi-entry";
 import sharedLibs from "javascript-modules-engine/shared-libs.mjs";
 import path from "node:path/posix";
 import { styleText } from "node:util";
@@ -6,6 +5,7 @@ import type { Plugin } from "rollup";
 import { globSync } from "tinyglobby";
 import type { PluginOption } from "vite";
 import { insertFilename } from "./insert-filename.js";
+import { multiEntry } from "./multi-entry.js";
 
 // These libraries are provided by Jahia and should not be bundled
 const external = Object.keys(sharedLibs);
@@ -234,10 +234,7 @@ export default function jahia(
                   manualPureFunctions: ["useEffect"],
                 },
                 plugins: [
-                  multiEntry({
-                    exports: false,
-                    entryFileName: options.server?.outputFile ?? "server/index.js",
-                  }),
+                  multiEntry(options.server?.outputFile ?? "server/index.js"),
                   // Only add the callback plugin in watch mode
                   config.build?.watch &&
                     options.watchCallback &&

@@ -27,7 +27,6 @@
     "test": "yarn ./fixtures test"
   },
   "dependencies": {
-    "@rollup/plugin-multi-entry": "^6.0.1",
     "@rollup/pluginutils": "^5.1.4",
     "magic-string": "^0.30.17",
     "tinyglobby": "^0.2.13"
