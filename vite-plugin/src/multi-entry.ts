@@ -1,4 +1,4 @@
-import { glob } from "tinyglobby";
+import { globSync } from "tinyglobby";
 import type { Plugin } from "rollup";
 
 const VIRTUAL_ENTRY_ID = "\0virtual:entry";
@@ -36,8 +36,8 @@ export function multiEntry(entryFileName: string): Plugin {
       };
     },
 
-    async buildStart() {
-      const files = await glob(patterns, { absolute: true });
+    buildStart() {
+      const files = globSync(patterns, { absolute: true });
       entrypoint = files
         .sort()
         .map((path) => `import ${JSON.stringify(path)};\n`)
