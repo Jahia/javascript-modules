@@ -1,10 +1,11 @@
-import InBrowser from "./internal/InBrowser.js";
+import { Island } from "./Island.js";
 
 /**
  * Will render the given React component server side and hydrate it in the browser to make it
  * dynamic. Be careful, the component will not have access to the
  * '@jahia/javascript-modules-library' library from the browser.
  *
+ * @deprecated Use `<Island />` instead.
  * @returns The component to be hydrated in the browser
  */
 export function HydrateInBrowser<T, U>(
@@ -22,6 +23,7 @@ export function HydrateInBrowser<T, U>(
   }>,
 ): React.JSX.Element;
 
+/** @deprecated Use `<Island />` instead. */
 export function HydrateInBrowser<U>(
   props: Readonly<{
     /** The React component. */
@@ -30,6 +32,7 @@ export function HydrateInBrowser<U>(
   }>,
 ): React.JSX.Element;
 
+/** @deprecated Use `<Island />` instead. */
 export function HydrateInBrowser<T>(
   props: Readonly<{
     /** The React component. */
@@ -45,6 +48,7 @@ export function HydrateInBrowser<T>(
 ): React.JSX.Element;
 
 // Without props declaration
+/** @deprecated Use `<Island />` instead. */
 export function HydrateInBrowser(
   props: Readonly<{
     /** The React component. */
@@ -53,6 +57,7 @@ export function HydrateInBrowser(
 ): React.JSX.Element;
 
 // Implementation
+/** @deprecated Use `<Island />` instead. */
 export function HydrateInBrowser<T>({
   child: Child,
   props,
@@ -62,9 +67,6 @@ export function HydrateInBrowser<T>({
   props?: T & React.JSX.IntrinsicAttributes;
   children?: React.ReactNode;
 }>): React.JSX.Element {
-  return (
-    <InBrowser ssr child={Child} props={props as never}>
-      {children}
-    </InBrowser>
-  );
+  // @ts-expect-error The type of Island is too complex for TypeScript to infer correctly
+  return <Island component={Child} props={props} children={children} />;
 }

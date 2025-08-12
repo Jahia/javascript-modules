@@ -81,17 +81,17 @@ jahiaComponent(
     nodeType: "hydrogen:feedbackWidget",
     componentType: "view",
   },
-  ({ question }: Props) => <RenderInBrowser child={Widget} props={{ question }} />,
+  ({ question }: Props) => <Island clientOnly component={Widget} props={{ question }} />,
 );
 ```
 
 You'll need to restart `yarn dev` for Vite to collect your new client files, but once pushed, should see the exact same button as before, but now it will alert "Hello World!" when clicked.
 
-The `RenderInBrowser` component is a wrapper that will ensure the code of `Widget` gets forwarded to the browser, enabling what is called Island Architecture: this component will be rendered client-side, but the rest of the page will remain server-rendered. This is a great way to improve performance, as it allows to only ship the JavaScript that is needed for the interactive parts of your page.
+The `Island` component is a wrapper that will ensure the code of `Widget` gets forwarded to the browser, enabling what is called Island Architecture: this component will be rendered client-side, but the rest of the page will remain server-rendered. This is a great way to improve performance, as it allows to only ship the JavaScript that is needed for the interactive parts of your page.
 
-The `props` prop of `RenderInBrowser` allows you to pass props to the component that will be rendered in the browser. Because they will be sent to the browser, they should be serializable.
+The `props` prop of `Island` allows you to pass props to the component that will be rendered in the browser. Because they will be sent to the browser, they should be serializable.
 
-If you nest children to `RenderInBrowser`, they will be displayed until `Widget` is loaded. This is where you can put a loading message for instance: `<RenderInBrowser child={Widget}>The widget is loading...</RenderInBrowser>`.
+If you nest children to `Island` in `clientOnly` mode, they will be displayed until `Widget` is loaded. This is where you can put a loading message for instance: `<Island clientOnly component={Widget}>The widget is loading...</Island>`.
 
 You now have all the tools needed to build any client-side component, but keep on reading to learn how to send data to jCustomer.
 

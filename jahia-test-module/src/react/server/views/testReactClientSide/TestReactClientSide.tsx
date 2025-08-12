@@ -1,8 +1,4 @@
-import {
-  HydrateInBrowser,
-  jahiaComponent,
-  RenderInBrowser,
-} from "@jahia/javascript-modules-library";
+import { Island, jahiaComponent } from "@jahia/javascript-modules-library";
 import SampleHydrateInBrowserReact from "$client/components/SampleHydrateInBrowserReact";
 import SampleRenderInBrowserReact from "$client/components/SampleRenderInBrowserReact";
 
@@ -16,18 +12,19 @@ jahiaComponent(
     return (
       <>
         <h2>Just a normal view, that is using a client side react component: </h2>
-        <HydrateInBrowser
-          child={SampleHydrateInBrowserReact}
+        <Island
+          component={SampleHydrateInBrowserReact}
           props={{ initialValue: 9, set: new Set(["a", "b", "c"]) }}
         >
           <p data-testid="ssr-child">Server-side rendered</p>
-        </HydrateInBrowser>
-        <RenderInBrowser
-          child={SampleRenderInBrowserReact}
+        </Island>
+        <Island
+          clientOnly
+          component={SampleRenderInBrowserReact}
           props={{ path: currentResource.getNode().getPath() }}
         >
           <p data-testid="ssr-placeholder">Server-side placeholder</p>
-        </RenderInBrowser>
+        </Island>
       </>
     );
   },

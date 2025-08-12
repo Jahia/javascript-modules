@@ -1,5 +1,5 @@
 import {
-  HydrateInBrowser,
+  Island,
   RenderChildren,
   buildModuleFileUrl,
   jahiaComponent,
@@ -51,7 +51,7 @@ jahiaComponent(
             />
           </p>
           <p>{t("OfBsezopuIko8aJ6X3kpw")}</p>
-          <HydrateInBrowser child={Celebrate} />
+          <Island component={Celebrate} />
           <p>
             <Trans
               i18nKey="nr31fYHB-RqO06BCl4rYO"

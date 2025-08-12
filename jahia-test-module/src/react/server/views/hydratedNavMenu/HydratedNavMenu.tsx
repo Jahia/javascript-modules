@@ -1,4 +1,4 @@
-import { HydrateInBrowser, jahiaComponent, server } from "@jahia/javascript-modules-library";
+import { Island, jahiaComponent, server } from "@jahia/javascript-modules-library";
 import SampleHydratedMenu from "$client/menu components/SampleHydratedMenu";
 import { buildNode } from "../../../../helpers/menu.js";
 import { useBaseNode } from "../../../../hooks/useBaseNode.js";
@@ -27,10 +27,7 @@ jahiaComponent(
       )) as unknown as JCRCallback<unknown>);
 
     return (
-      <HydrateInBrowser
-        child={SampleHydratedMenu}
-        props={{ staticMenu: staticMenu, rootPath: baseNode.getPath() }}
-      />
+      <Island component={SampleHydratedMenu} props={{ staticMenu, rootPath: baseNode.getPath() }} />
     );
   },
 );

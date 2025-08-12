@@ -25,6 +25,7 @@ Start here: [Setting up your dev environment](./1-getting-started/1-dev-environm
 This section contains independent, self-contained guides that help you build specific features or solve specific problems. Each guide is a step-by-step tutorial that you can follow to achieve a specific goal.
 
 - [Building a Feedback Form](./2-guides/1-building-a-feedback-form/)
+- [Island Architecture](./2-guides/2-island-architecture/)
 
 <!-- Hidden until available:
 - [Accessibility and Performance](./2-guides/2-accessibility-and-performance/)

@@ -1,4 +1,5 @@
 // Rendering components
+export { Island } from "./components/render/Island.js";
 export { RenderInBrowser } from "./components/render/RenderInBrowser.js";
 export { HydrateInBrowser } from "./components/render/HydrateInBrowser.js";
 export { Render } from "./components/render/Render.js";
