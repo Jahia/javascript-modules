@@ -299,4 +299,39 @@ It is not necessary to know any of this to create a successful Jahia integration
 
   Do not target `jsm-island` nor `jsm-children` in your CSS as they are implementation details and may change in non-major versions.
 
+- Client-side libraries used by your islands will be imported on the server, by the chain of top-level imports:
+
+  ```ts
+  // Map.client.tsx
+  import { foo, bar } from "map-provider";
+
+  export default function Map() {}
+
+  // default.server.tsx
+  import Map from "./Map.client.tsx"; // Will indirectly import "map-provider"
+  ```
+
+  This is not an issue for modern, well-built libraries, but can be troublesome for libraries with top-level side effects. If you have error messages on the server like `window/document is not defined`, it is likely that one of your dependencies is not compatible with server-side rendering (SSR).
+
+  To work around this problem, you can use the `import()` function in an effect instead of a top-level import:
+
+  ```tsx
+  // Map.client.tsx
+  import { useEffect } from "react";
+
+  export default function Map() {
+    // useEffect only runs on the client, it is skipped during SSR
+    useEffect(() => {
+      import("map-provider").then(({ foo, bar }) => {
+        // Use foo and bar here
+      });
+    }, []);
+  }
+
+  // default.server.tsx
+  import Map from "./Map.client.tsx"; // "map-provider" no longer imported here
+  ```
+
+  You can also report this issue (_the library is not compatible with server-side rendering_) to the library maintainers.
+
 - We have written a complete article on the implement details of the `<Island />` component. You can read it on our blog: [Under the Hood: Hydrating React Components in Java](https://www.jahia.com/blog/under-the-hood-hydrating-react-components-in-java).
