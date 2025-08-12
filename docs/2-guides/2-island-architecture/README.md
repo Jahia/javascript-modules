@@ -8,7 +8,7 @@ We have written a [complete article on the topic,](https://www.jahia.com/blog/le
 
 - Instead of shipping fully static or fully dynamic pages, Island Architecture is the middle ground where most of the page is static, but specific parts are made interactive on page load.
 
-  [A page mockup with two interactive islands: a navigation bar and a video player](./islands.svg)
+  ![A page mockup with two interactive islands: a navigation bar and a video player](./islands.svg)
 
   In this example, the page is mostly static, with the exception of the `<Navigation />` and `<Video />` components, which are the islands of interactivity of the page. After the initial page load, JavaScript is used to make them interactive without affecting the rest of the page.
 
@@ -215,7 +215,7 @@ In default mode (without `clientOnly`), the children are rendered on the server 
 
 This behavior enables components like accordions, where the `<Island />` is not a leaf of the component tree.
 
-[Schema of the accordion component](./accordion.svg)
+![Schema of the accordion component](./accordion.svg)
 
 Such a component can be implemented as follows:
 
