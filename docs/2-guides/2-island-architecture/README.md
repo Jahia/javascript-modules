@@ -48,7 +48,7 @@ export default function Button() {
 }
 ```
 
-If you use this button directly in a server file, it will not work as you expect:
+If you use this button directly in a server file, it will not work as you might have expected:
 
 ```tsx
 // default.server.tsx
