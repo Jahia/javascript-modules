@@ -289,7 +289,7 @@ jahiaComponent(
 );
 ```
 
-This is a good UX practice to tell show users that your site is currently loading instead of leaving an empty space. It can also prevent [layout shifts](https://web.dev/articles/cls) when the component finally loads.
+This is a good UX practice to tell users that your site is currently loading instead of leaving an empty space. It can also prevent [layout shifts](https://web.dev/articles/cls) when the component finally loads.
 
 ## Implementation details
 
