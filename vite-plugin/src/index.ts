@@ -204,7 +204,7 @@ export default function jahia(
                 output: {
                   dir: options.outputDir ?? "dist",
                   chunkFileNames: "server/[name]-[hash].js",
-                  format: "esm",
+                  format: "iife",
                   // Replace the imports of external libraries with the globals
                   globals: Object.fromEntries(
                     [
