@@ -6,7 +6,6 @@ import type { ComponentType } from "react";
 import ReactDOMServer from "react-dom/server.edge";
 import { I18nextProvider } from "react-i18next";
 import { createStyleRegistry, StyleRegistry } from "styled-jsx";
-import server from "virtual:jahia-server";
 
 server.registry.add("view", "react", {
   viewRenderer: "react",

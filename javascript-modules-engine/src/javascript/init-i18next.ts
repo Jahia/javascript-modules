@@ -1,6 +1,5 @@
 import i18n, { type BackendModule } from "i18next";
 import { initReactI18next } from "react-i18next";
-import server from "virtual:jahia-server";
 
 i18n
   .use({

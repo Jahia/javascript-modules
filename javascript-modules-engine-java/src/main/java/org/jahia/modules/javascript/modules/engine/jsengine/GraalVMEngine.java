@@ -16,6 +16,7 @@
 package org.jahia.modules.javascript.modules.engine.jsengine;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.compress.utils.SeekableInMemoryByteChannel;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.BasePooledObjectFactory;
@@ -35,8 +36,17 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.net.URL;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AccessMode;
+import java.nio.file.DirectoryStream;
+import java.nio.file.DirectoryStream.Filter;
+import java.nio.file.LinkOption;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -161,7 +171,8 @@ public class GraalVMEngine {
         if (resource == null) {
             throw new IOException("Cannot get resource " + bundle.getSymbolicName() + " / " + script);
         }
-        return Source.newBuilder(JS, resource, bundle.getSymbolicName() + "/" + script).build();
+        return Source.newBuilder(JS, resource, bundle.getSymbolicName() + "/" + script)
+                .mimeType("application/javascript+module").build();
     }
 
     public static String loadResource(Bundle bundle, String path) {
@@ -214,7 +225,75 @@ public class GraalVMEngine {
                     .allowHostAccess(HostAccess.ALL)
                     .allowPolyglotAccess(PolyglotAccess.ALL)
                     .allowIO(IOAccess.newBuilder().fileSystem(new FileSystem() {
-                        // TODO
+                        // Methods are in the same order as the execution order
+
+                        @Override
+                        public Path parsePath(String path) {
+                            logger.info("parsePath: {}", path);
+
+                            if (path.startsWith("/")) {
+                                return Path.of(path);
+                            }
+
+                            return Path.of("/META-INF/js/libs", path + ".js");
+                        }
+
+                        @Override
+                        public void checkAccess(Path path, Set<? extends AccessMode> modes, LinkOption... linkOptions) {
+                            // This method is expected to throw when access is refused
+                            // Never throw to always grant access
+                            logger.info("checkAccess: {}", path.toString());
+                        }
+
+                        @Override
+                        public Path toRealPath(Path path, LinkOption... linkOptions) throws IOException {
+                            logger.info("toRealPath: {}", path.toString());
+                            return path;
+                        }
+
+                        @Override
+                        public Path toAbsolutePath(Path path) {
+                            logger.info("toAbsolutePath: {}", path.toString());
+                            // This method is called during the resolution process but the result is not
+                            // used
+                            // Not sure why
+                            return path;
+                        }
+
+                        @Override
+                        public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options,
+                                FileAttribute<?>... attrs) throws IOException {
+                            logger.info("newByteChannel: {}", path.toString());
+                            URL url = bundleContext.getBundle().getResource(path.toString());
+                            return new SeekableInMemoryByteChannel(IOUtils.toByteArray(url.openStream()));
+                        }
+
+                        @Override
+                        public Path parsePath(URI uri) {
+                            throw new UnsupportedOperationException("Unimplemented method 'parsePath'");
+                        }
+
+                        @Override
+                        public void createDirectory(Path dir, FileAttribute<?>... attrs) throws IOException {
+                            throw new UnsupportedOperationException("Unimplemented method 'createDirectory'");
+                        }
+
+                        @Override
+                        public void delete(Path path) throws IOException {
+                            throw new UnsupportedOperationException("Unimplemented method 'delete'");
+                        }
+
+                        @Override
+                        public DirectoryStream<Path> newDirectoryStream(Path dir, Filter<? super Path> filter)
+                                throws IOException {
+                            throw new UnsupportedOperationException("Unimplemented method 'newDirectoryStream'");
+                        }
+
+                        @Override
+                        public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options)
+                                throws IOException {
+                            throw new UnsupportedOperationException("Unimplemented method 'readAttributes'");
+                        }
                     }).build())
                     .engine(sharedEngine).build();
 
@@ -232,7 +311,6 @@ public class GraalVMEngine {
                     // is registering stuff.
                     context.getBindings(JS).putMember("bundle", entry.getKey());
                     context.eval(entry.getValue());
-                    context.getBindings(JS).removeMember("bundle");
                 } catch (Exception e) {
                     logger.error("Cannot execute init script {} in bundle {}", entry.getValue(), entry.getKey(), e);
                 }

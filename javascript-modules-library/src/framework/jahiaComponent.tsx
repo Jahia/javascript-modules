@@ -1,6 +1,5 @@
 import type { Bundle } from "org.osgi.framework";
 import type { JSX } from "react";
-import server from "virtual:jahia-server";
 import { type ServerContext, useServerContext } from "../hooks/useServerContext.js";
 import { getNodeProps } from "../utils/jcr/getNodeProps.js";
 

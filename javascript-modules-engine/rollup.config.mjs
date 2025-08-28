@@ -90,17 +90,16 @@ export default defineConfig([
       // React ships as CJS, so we need our own shims
       // See src/client-javascript/shared-libs/README.md for details
       "react": "./src/client-javascript/shared-libs/react.ts",
-      "react/jsx-runtime": "./src/client-javascript/shared-libs/react/jsx-runtime.ts",
+      "@react/jsx-runtime": "./src/client-javascript/shared-libs/react/jsx-runtime.ts",
 
       // Packages already in ESM can be copied as-is from node_modules
       "i18next": "i18next",
       "react-i18next": "react-i18next",
-      "jahia/javascript-modules-library": "@jahia/javascript-modules-library",
+      "@jahia/javascript-modules-library": "@jahia/javascript-modules-library",
     },
     output: {
       dir: "./src/main/resources/META-INF/js/libs/",
     },
-    external: ["virtual:jahia-server"],
     plugins: [
       {
         /**
@@ -144,7 +143,6 @@ export default defineConfig([
       file: "./src/main/resources/META-INF/js/main.js",
     },
     external: [
-      "virtual:jahia-server",
       // All shared server libraries are imported using standard ESM imports
       "@jahia/javascript-modules-library",
       "@react/jsx-runtime",
