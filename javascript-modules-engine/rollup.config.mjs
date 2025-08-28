@@ -62,7 +62,7 @@ export default defineConfig([
       buildEnv === "production" && terser(),
     ],
   },
-  // Bundle the shared libraries
+  // Bundle the shared libraries for browser use
   // They are used by both the main client-side script and module scripts
   {
     input: sharedLibs,
@@ -84,16 +84,21 @@ export default defineConfig([
       },
     ],
   },
-  // Build the server-side script
-  // It takes care of rendering JSX components on the server
+  // Bundle the shared libraries for server use
   {
-    input: "./src/javascript/index.ts",
+    input: {
+      // React ships as CJS, so we need our own shims
+      // See src/client-javascript/shared-libs/README.md for details
+      "react": "./src/client-javascript/shared-libs/react.ts",
+      "react/jsx-runtime": "./src/client-javascript/shared-libs/react/jsx-runtime.ts",
+
+      // Packages already in ESM can be copied as-is from node_modules
+      "i18next": "i18next",
+      "react-i18next": "react-i18next",
+      "jahia/javascript-modules-library": "@jahia/javascript-modules-library",
+    },
     output: {
-      file: "./src/main/resources/META-INF/js/main.js",
-      format: "iife",
-      globals: {
-        "virtual:jahia-server": "javascriptModulesLibraryBuilder.getServer()",
-      },
+      dir: "./src/main/resources/META-INF/js/libs/",
     },
     external: ["virtual:jahia-server"],
     plugins: [
@@ -130,5 +135,23 @@ export default defineConfig([
       },
       ...plugins,
     ],
+  },
+  // Build the server-side script
+  // It takes care of rendering JSX components on the server
+  {
+    input: "./src/javascript/index.ts",
+    output: {
+      file: "./src/main/resources/META-INF/js/main.js",
+    },
+    external: [
+      "virtual:jahia-server",
+      // All shared server libraries are imported using standard ESM imports
+      "@jahia/javascript-modules-library",
+      "@react/jsx-runtime",
+      "i18next",
+      "react-i18next",
+      "react",
+    ],
+    plugins,
   },
 ]);

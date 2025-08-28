@@ -25,6 +25,8 @@ import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.graalvm.home.Version;
 import org.graalvm.polyglot.*;
+import org.graalvm.polyglot.io.FileSystem;
+import org.graalvm.polyglot.io.IOAccess;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.*;
@@ -75,7 +77,8 @@ public class GraalVMEngine {
 
     public void enableJavascriptModule(Bundle bundle) {
         try {
-            initScripts.put(bundle, getGraalSource(bundle, bundle.getHeaders().get(BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT)));
+            initScripts.put(bundle,
+                    getGraalSource(bundle, bundle.getHeaders().get(BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT)));
             version.incrementAndGet();
             logger.info("Registered bundle {} in GraalVM engine", bundle.getSymbolicName());
         } catch (IOException ioe) {
@@ -97,13 +100,15 @@ public class GraalVMEngine {
 
         initialEngineCheckup();
         try {
-            initScripts.put(bundleContext.getBundle(), getGraalSource(bundleContext.getBundle(), "META-INF/js/main.js"));
+            initScripts.put(bundleContext.getBundle(),
+                    getGraalSource(bundleContext.getBundle(), "META-INF/js/main.js"));
         } catch (IOException e) {
             logger.error("Cannot execute main init script", e);
         }
         Engine.Builder builder = Engine.newBuilder();
         Map<String, String> poolOptions = new HashMap<>();
-        boolean experimental = props.containsKey("experimental") && Boolean.parseBoolean(props.get("experimental").toString());
+        boolean experimental = props.containsKey("experimental")
+                && Boolean.parseBoolean(props.get("experimental").toString());
         builder.allowExperimentalOptions(experimental);
         for (Map.Entry<String, ?> entry : props.entrySet()) {
             if (entry.getKey().startsWith("polyglot.")) {
@@ -175,14 +180,16 @@ public class GraalVMEngine {
             String specVersion = System.getProperty("java.specification.version", UNKNOWN_SYS_PROP);
             String vendorVersion = System.getProperty("java.vendor.version", specVersion);
             String vendor = System.getProperty("java.vendor", UNKNOWN_SYS_PROP);
-            logger.warn("Javascript Modules Engine requires GraalVM for production usage, detected {} (vendor: {}).", vendorVersion, vendor);
+            logger.warn("Javascript Modules Engine requires GraalVM for production usage, detected {} (vendor: {}).",
+                    vendorVersion, vendor);
             return;
         }
 
         // Check if the 'js' extension is installed
         try (Context context = Context.create()) {
             if (!context.getEngine().getLanguages().containsKey(JS)) {
-                logger.error("Javascript Modules Engine detected GraalVM, but the 'js' extension is not installed. You can install it by running: gu install js");
+                logger.error(
+                        "Javascript Modules Engine detected GraalVM, but the 'js' extension is not installed. You can install it by running: gu install js");
             }
         }
     }
@@ -206,7 +213,9 @@ public class GraalVMEngine {
                     .allowHostClassLookup(s -> true)
                     .allowHostAccess(HostAccess.ALL)
                     .allowPolyglotAccess(PolyglotAccess.ALL)
-                    .allowIO(true)
+                    .allowIO(IOAccess.newBuilder().fileSystem(new FileSystem() {
+                        // TODO
+                    }).build())
                     .engine(sharedEngine).build();
 
             ContextProvider contextProvider = new ContextProvider(context, version.get());
@@ -219,7 +228,8 @@ public class GraalVMEngine {
             // Initialize context with available Server side JS from bundles
             for (Map.Entry<Bundle, Source> entry : initScripts.entrySet()) {
                 try {
-                    // Here we inject the bundle because registry is keeping track of witch bundle is registering stuff.
+                    // Here we inject the bundle because registry is keeping track of witch bundle
+                    // is registering stuff.
                     context.getBindings(JS).putMember("bundle", entry.getKey());
                     context.eval(entry.getValue());
                     context.getBindings(JS).removeMember("bundle");
