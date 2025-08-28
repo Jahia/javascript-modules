@@ -250,4 +250,4 @@ const bundle = server.osgi.getBundle(bundleKey);
 
 ## Remarks
 
-This module does not contain actual implementations of the components and hooks. All accesses to `@jahia/javascript-modules-engine` must be replaced by `javascriptModulesLibraryBuilder.getSharedLibrary('@jahia/javascript-modules-engine')` in the final bundle. This is done automatically during the build process if you use [@jahia/vite-plugin](https://www.npmjs.com/package/@jahia/vite-plugin).
+This module does not contain actual implementations of the components and hooks. All imports of `@jahia/javascript-modules-engine` must be preserved during the build. This is done automatically if you use [@jahia/vite-plugin](https://www.npmjs.com/package/@jahia/vite-plugin).

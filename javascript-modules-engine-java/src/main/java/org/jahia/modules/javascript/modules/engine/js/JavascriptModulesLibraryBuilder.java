@@ -24,8 +24,6 @@ public class JavascriptModulesLibraryBuilder {
 
     private final ProxyObject server;
 
-    private Map<String, Object> sharedLibraries = new HashMap<>();
-
     public JavascriptModulesLibraryBuilder(ContextProvider contextProvider) {
         Map<String, Object> server = new HashMap<>();
         server.put("config", new ConfigHelper(contextProvider));
@@ -47,13 +45,5 @@ public class JavascriptModulesLibraryBuilder {
 
     public ProxyObject getServer() {
         return server;
-    }
-
-    public void addSharedLibrary(String name, Object value) {
-        sharedLibraries.put(name, value);
-    }
-
-    public Object getSharedLibrary(String name) {
-        return sharedLibraries.get(name);
     }
 }

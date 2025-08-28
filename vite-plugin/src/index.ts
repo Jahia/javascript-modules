@@ -204,20 +204,6 @@ export default function jahia(
                 output: {
                   dir: options.outputDir ?? "dist",
                   chunkFileNames: "server/[name]-[hash].js",
-                  format: "iife",
-                  // Replace the imports of external libraries with the globals
-                  globals: Object.fromEntries(
-                    [
-                      ...external,
-                      // This is only available on the server, attempting to import it
-                      // on the client will throw an error
-                      "@jahia/javascript-modules-library",
-                    ].map((lib) => [
-                      lib,
-                      // This is how a shared library is imported in the server bundle
-                      `javascriptModulesLibraryBuilder.getSharedLibrary(${JSON.stringify(lib)})`,
-                    ]),
-                  ),
                   // Produce a consistent name for the style file, hash other assets
                   assetFileNames: ({ originalFileNames }) =>
                     path.join(
