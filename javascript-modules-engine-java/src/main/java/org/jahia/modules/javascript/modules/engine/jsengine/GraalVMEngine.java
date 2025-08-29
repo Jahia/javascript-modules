@@ -309,8 +309,8 @@ public class GraalVMEngine {
                 try {
                     // Here we inject the bundle because registry is keeping track of witch bundle
                     // is registering stuff.
-                    context.getBindings(JS).putMember("bundle", entry.getKey());
                     context.eval(entry.getValue());
+                    context.getBindings(JS).removeMember("bundle");
                 } catch (Exception e) {
                     logger.error("Cannot execute init script {} in bundle {}", entry.getValue(), entry.getKey(), e);
                 }
