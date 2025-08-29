@@ -72,6 +72,13 @@ public class GraalVMEngine {
     public static final String JS = "js";
     private static final String UNKNOWN_SYS_PROP = "Unknown";
 
+    /**
+     * Mimetype used by Graal to identify ESM source code.
+     *
+     * @see https://www.graalvm.org/latest/reference-manual/js/Modules/#ecmascript-modules-esm
+     */
+    private static final String JS_MODULE_MIMETYPE = "application/javascript+module";
+
     private Engine sharedEngine;
 
     private GenericObjectPool<ContextProvider> pool;
@@ -173,7 +180,8 @@ public class GraalVMEngine {
             throw new IOException("Cannot get resource " + bundle.getSymbolicName() + " / " + script);
         }
         return Source.newBuilder(JS, resource, bundle.getSymbolicName() + "/" + script)
-                .mimeType("application/javascript+module").build();
+                .mimeType(JS_MODULE_MIMETYPE)
+                .build();
     }
 
     public static String loadResource(Bundle bundle, String path) {
