@@ -16,6 +16,7 @@
 package org.jahia.modules.javascript.modules.engine.jsengine;
 
 import org.graalvm.polyglot.Context;
+import org.osgi.framework.Bundle;
 
 public class ContextProvider {
 
@@ -24,9 +25,11 @@ public class ContextProvider {
 
     private final Registry registry;
 
-    public ContextProvider(Context cx, int version) {
-        this.context = cx;
-        this.registry = new Registry(cx);
+    private Bundle activeBundle;
+
+    public ContextProvider(Context context, int version) {
+        this.context = context;
+        this.registry = new Registry(this);
         this.version = version;
     }
 
@@ -40,6 +43,14 @@ public class ContextProvider {
 
     public Registry getRegistry() {
         return registry;
+    }
+
+    public Bundle getActiveBundle() {
+        return activeBundle;
+    }
+
+    public void setActiveBundle(Bundle activeBundle) {
+        this.activeBundle = activeBundle;
     }
 
     public void close() {

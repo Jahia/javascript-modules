@@ -19,7 +19,7 @@ searches=(
     "getConfigFactoryIdentifiers(factoryPid: string): ProxyArray;"
     "getConfigValues(configPid: string): ProxyObject;"
     "getConfigFactoryValues(factoryPid: string, factoryIdentifier: string): ProxyObject;"
-    "import { Promise, ContextProvider } from 'org.jahia.modules.javascript.modules.engine.jsengine';"
+    "import { ContextProvider } from 'org.jahia.modules.javascript.modules.engine.jsengine';"
     "export class JCRNodeDecorator implements JCRNodeWrapper"
     "export class JCRSiteNode {"
     "export class JCRWorkspaceWrapper implements Workspace {"

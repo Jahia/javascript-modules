@@ -15,21 +15,18 @@
  */
 package org.jahia.modules.javascript.modules.engine.jsengine;
 
-import org.graalvm.polyglot.Context;
 import org.osgi.framework.Bundle;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine.JS;
-
 public class Registry {
-    private final Context context;
+    private final ContextProvider contextProvider;
     Map<String, Map<String, Object>> registryMap = new HashMap<>();
 
-    public Registry(Context context) {
-        this.context = context;
+    public Registry(ContextProvider contextProvider) {
+        this.contextProvider = contextProvider;
     }
 
     public Map<String, Object> get(String type, String key) {
@@ -47,7 +44,8 @@ public class Registry {
                 .filter(item -> filter.entrySet().stream().allMatch(f -> f.getValue().equals(item.get(f.getKey()))));
 
         if (orderBy != null) {
-            filtered = filtered.sorted(Comparator.comparing(m -> (Integer) m.get(orderBy), Comparator.nullsFirst(Comparator.reverseOrder())));
+            filtered = filtered.sorted(Comparator.comparing(m -> (Integer) m.get(orderBy),
+                    Comparator.nullsFirst(Comparator.reverseOrder())));
         }
 
         return filtered.collect(Collectors.toList());
@@ -65,9 +63,10 @@ public class Registry {
 
         object.put("key", key);
         object.put("type", type);
-        // We inject in each registry entry the bundle symbolic name, in order to be able to query
+        // We inject in each registry entry the bundle symbolic name, in order to be
+        // able to query
         // the registry per bundle basis
-        Bundle bundle = context.getBindings(JS).getMember("bundle").asHostObject();
+        Bundle bundle = contextProvider.getActiveBundle();
         object.put("bundleKey", bundle.getSymbolicName());
         registryMap.put(type + "-" + key, object);
     }

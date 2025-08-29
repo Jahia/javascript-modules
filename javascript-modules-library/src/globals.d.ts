@@ -1,4 +1,3 @@
-import type { Bundle } from "org.osgi.framework";
 import type {
   ConfigHelper,
   GQLHelper,
@@ -10,12 +9,6 @@ import type {
 
 /** The global declarations, where top-level objects are exposed to server-side scripts */
 declare global {
-  /**
-   * Exposed only during the server-side initial script registration process, not available during
-   * rendering
-   */
-  declare const bundle: Bundle;
-
   /**
    * A set of helpers that provide common functionality provided by Jahia for Javascript server-side
    * rendering

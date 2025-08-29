@@ -21,10 +21,12 @@ export const useGQLQuery = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }): { data: any; errors?: GraphQLFormattedError[] } => {
   const { renderContext } = useServerContext();
-  return server.gql.executeQuerySync({
-    query,
-    variables,
-    operationName,
-    renderContext,
-  });
+  return JSON.parse(
+    server.gql.executeQuerySync({
+      query,
+      variables,
+      operationName,
+      renderContext,
+    }),
+  );
 };

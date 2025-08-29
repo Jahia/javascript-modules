@@ -16,10 +16,7 @@
 package org.jahia.modules.javascript.modules.engine.js.server.gql;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graalvm.polyglot.Value;
 import org.jahia.modules.javascript.modules.engine.js.injector.OSGiService;
-import org.jahia.modules.javascript.modules.engine.jsengine.ContextProvider;
-import org.jahia.modules.javascript.modules.engine.jsengine.Promise;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.securityfilter.PermissionService;
 import org.jahia.services.securityfilter.ScopeDefinition;
@@ -41,46 +38,8 @@ public class GQLHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(GQLHelper.class);
 
-    private final ContextProvider context;
     private HttpServlet servlet;
     private PermissionService permissionService;
-
-    public GQLHelper(ContextProvider context) {
-        this.context = context;
-    }
-
-    /**
-     * Execute an asynchronous GraphQL query using the specified parameters and
-     * return a Promise that will be resolved with the result
-     *
-     * @param parameters the parameters can contain the following keys:
-     *                   <ul>
-     *                   <li>query (string) : the GraphQL query to be executed</li>
-     *                   <li>operationName (string) : the GraphQL operation name
-     *                   </li>
-     *                   <li>variables: the variables as a JSON string or a
-     *                   Map&lt;String, Object&gt;</li>
-     *                   <li>renderContext (RenderContext) : the render context
-     *                   if the renderContext is null, a request will be created
-     *                   with the parameters that were passed,
-     *                   otherwise the request from the renderContext will be used.
-     *                   </li>
-     *                   </ul>
-     * @return a Promise that will be resolved with the result of the query as a
-     *         JSON structure or with an error message
-     *         if there was an error executing the query
-     */
-    public Promise executeQuery(Map<String, ?> parameters) {
-        return (onResolve, onReject) -> {
-            // convert JSON string to Map
-            try {
-                Value js = executeQuerySync(parameters);
-                onResolve.execute(js);
-            } catch (Exception e) {
-                onReject.execute(e.getMessage());
-            }
-        };
-    }
 
     /**
      * Execute a synchronous GraphQL query using the specified parameters and return
@@ -99,11 +58,12 @@ public class GQLHelper {
      *                   otherwise the request from the renderContext will be used.
      *                   </li>
      *                   </ul>
-     * @return the result of the query as a JSON structure
+     * @return the result of the query as a JSON string
      * @throws ServletException
      * @throws IOException
      */
-    public Value executeQuerySync(Map<String, ?> parameters) throws ServletException, IOException, RepositoryException {
+    public String executeQuerySync(Map<String, ?> parameters)
+            throws ServletException, IOException, RepositoryException {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, String> params = new HashMap<>();
         params.put("query", (String) parameters.get("query"));
@@ -147,9 +107,7 @@ public class GQLHelper {
                 };
         HttpServletResponseMock responseMock = new HttpServletResponseMock(req.getCharacterEncoding());
         servlet.service(req, responseMock);
-        // TODO: use JSON.parse
-        return context.getContext().eval("js",
-                "(" + ((ServletOutputStreamMock) responseMock.getOutputStream()).getContent() + ")");
+        return ((ServletOutputStreamMock) responseMock.getOutputStream()).getContent();
     }
 
     @Inject

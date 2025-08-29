@@ -316,9 +316,13 @@ public class GraalVMEngine {
                 try {
                     // Here we inject the bundle because registry is keeping track of witch bundle
                     // is registering stuff.
-                    context.getBindings(JS).putMember("bundle", entry.getKey());
+                    Bundle bundle = entry.getKey();
+                    // Expose
+                    contextProvider.setActiveBundle(bundle);
+                    context.getBindings(JS).putMember("bundleKey", bundle.getSymbolicName());
                     context.eval(entry.getValue());
-                    context.getBindings(JS).removeMember("bundle");
+                    contextProvider.setActiveBundle(null);
+                    context.getBindings(JS).removeMember("bundleKey");
                 } catch (Exception e) {
                     logger.error("Cannot execute init script {} in bundle {}", entry.getValue(), entry.getKey(), e);
                 }
@@ -367,15 +371,15 @@ public class GraalVMEngine {
      * reference to several
      * server-side helpers.
      *
-     * @param context
+     * @param contextProvider
      * @return
      */
-    public ProxyObject getServer(ContextProvider context) {
+    public ProxyObject getServer(ContextProvider contextProvider) {
         Map<String, Object> server = new HashMap<>();
         server.put("config", new ConfigHelper());
-        server.put("registry", new RegistryHelper(context));
+        server.put("registry", new RegistryHelper(contextProvider.getRegistry()));
         server.put("render", new RenderHelper());
-        server.put("gql", new GQLHelper(context));
+        server.put("gql", new GQLHelper());
         server.put("osgi", new OSGiHelper());
         server.put("jcr", new JcrHelper());
 
