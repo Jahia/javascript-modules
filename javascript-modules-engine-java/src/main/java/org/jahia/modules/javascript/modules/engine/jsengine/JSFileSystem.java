@@ -1,5 +1,6 @@
 package org.jahia.modules.javascript.modules.engine.jsengine;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -92,6 +93,9 @@ public class JSFileSystem implements FileSystem {
   public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options,
       FileAttribute<?>... attrs) throws IOException {
     URL url = bundleContext.getBundle().getResource(path.toString());
+    if (url == null) {
+      throw new FileNotFoundException("Cannot import " + path + ", the file does not exist");
+    }
     return new SeekableInMemoryByteChannel(IOUtils.toByteArray(url.openStream()));
   }
 
