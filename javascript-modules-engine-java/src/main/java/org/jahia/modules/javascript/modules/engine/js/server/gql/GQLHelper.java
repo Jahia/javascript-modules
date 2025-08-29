@@ -18,9 +18,6 @@ package org.jahia.modules.javascript.modules.engine.js.server.gql;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graalvm.polyglot.Value;
 import org.jahia.modules.javascript.modules.engine.js.injector.OSGiService;
-import org.jahia.modules.javascript.modules.engine.js.server.gql.HttpServletRequestMock;
-import org.jahia.modules.javascript.modules.engine.js.server.gql.HttpServletResponseMock;
-import org.jahia.modules.javascript.modules.engine.js.server.gql.ServletOutputStreamMock;
 import org.jahia.modules.javascript.modules.engine.jsengine.ContextProvider;
 import org.jahia.modules.javascript.modules.engine.jsengine.Promise;
 import org.jahia.services.render.RenderContext;
@@ -37,7 +34,8 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Helper class to execute GraphQL queries. It provides both synchronous and asynchronous methods to execute queries.
+ * Helper class to execute GraphQL queries. It provides both synchronous and
+ * asynchronous methods to execute queries.
  */
 public class GQLHelper {
 
@@ -52,21 +50,27 @@ public class GQLHelper {
     }
 
     /**
-     * Execute an asynchronous GraphQL query using the specified parameters and return a Promise that will be resolved with the result
+     * Execute an asynchronous GraphQL query using the specified parameters and
+     * return a Promise that will be resolved with the result
      *
      * @param parameters the parameters can contain the following keys:
      *                   <ul>
-     *                   <li> query (string) : the GraphQL query to be executed </li>
-     *                   <li> operationName (string) : the GraphQL operation name </li>
-     *                   <li> variables: the variables as a JSON string or a Map&lt;String, Object&gt; </li>
-     *                   <li> renderContext (RenderContext) : the render context
-     *                   if the renderContext is null, a request will be created with the parameters that were passed,
-     *                   otherwise the request from the renderContext will be used. </li>
+     *                   <li>query (string) : the GraphQL query to be executed</li>
+     *                   <li>operationName (string) : the GraphQL operation name
+     *                   </li>
+     *                   <li>variables: the variables as a JSON string or a
+     *                   Map&lt;String, Object&gt;</li>
+     *                   <li>renderContext (RenderContext) : the render context
+     *                   if the renderContext is null, a request will be created
+     *                   with the parameters that were passed,
+     *                   otherwise the request from the renderContext will be used.
+     *                   </li>
      *                   </ul>
-     * @return a Promise that will be resolved with the result of the query as a JSON structure or with an error message
-     * if there was an error executing the query
+     * @return a Promise that will be resolved with the result of the query as a
+     *         JSON structure or with an error message
+     *         if there was an error executing the query
      */
-    public Promise executeQuery(Map parameters) {
+    public Promise executeQuery(Map<String, ?> parameters) {
         return (onResolve, onReject) -> {
             // convert JSON string to Map
             try {
@@ -79,22 +83,27 @@ public class GQLHelper {
     }
 
     /**
-     * Execute a synchronous GraphQL query using the specified parameters and return the result
+     * Execute a synchronous GraphQL query using the specified parameters and return
+     * the result
      *
      * @param parameters the parameters can contain the following keys:
      *                   <ul>
-     *                   <li> query (string) : the GraphQL query to be executed </li>
-     *                   <li> operationName (string) : the GraphQL operation name </li>
-     *                   <li> variables: the variables as a JSON string or a Map&lt;String, Object&gt; </li>
-     *                   <li> renderContext (RenderContext) : the render context
-     *                   if the renderContext is null, a request will be created with the parameters that were passed,
-     *                   otherwise the request from the renderContext will be used. </li>
+     *                   <li>query (string) : the GraphQL query to be executed</li>
+     *                   <li>operationName (string) : the GraphQL operation name
+     *                   </li>
+     *                   <li>variables: the variables as a JSON string or a
+     *                   Map&lt;String, Object&gt;</li>
+     *                   <li>renderContext (RenderContext) : the render context
+     *                   if the renderContext is null, a request will be created
+     *                   with the parameters that were passed,
+     *                   otherwise the request from the renderContext will be used.
+     *                   </li>
      *                   </ul>
      * @return the result of the query as a JSON structure
      * @throws ServletException
      * @throws IOException
      */
-    public Value executeQuerySync(Map parameters) throws ServletException, IOException, RepositoryException {
+    public Value executeQuerySync(Map<String, ?> parameters) throws ServletException, IOException, RepositoryException {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, String> params = new HashMap<>();
         params.put("query", (String) parameters.get("query"));
@@ -108,9 +117,11 @@ public class GQLHelper {
         }
 
         Collection<ScopeDefinition> currentScopes = permissionService.getCurrentScopes();
-        if (currentScopes == null || currentScopes.stream().noneMatch(scope -> "graphql".equals(scope.getScopeName()))) {
+        if (currentScopes == null
+                || currentScopes.stream().noneMatch(scope -> "graphql".equals(scope.getScopeName()))) {
             // Inject graphql scope if missing
-            Optional<ScopeDefinition> graphqlScope = permissionService.getAvailableScopes().stream().filter(scope -> scope.getScopeName().equals("graphql")).findFirst();
+            Optional<ScopeDefinition> graphqlScope = permissionService.getAvailableScopes().stream()
+                    .filter(scope -> scope.getScopeName().equals("graphql")).findFirst();
             if (graphqlScope.isPresent()) {
                 Set<ScopeDefinition> newScopes = new HashSet<>();
                 if (currentScopes != null) {
@@ -125,18 +136,20 @@ public class GQLHelper {
         }
 
         RenderContext renderContext = (RenderContext) parameters.get("renderContext");
-        HttpServletRequest req = renderContext == null ? new HttpServletRequestMock(params) : new HttpServletRequestWrapper(renderContext.getRequest()) {
-            public String getParameter(String name) {
-                if (params.containsKey(name)) {
-                    return params.get(name);
-                }
-                return super.getParameter(name);
-            }
-        };
+        HttpServletRequest req = renderContext == null ? new HttpServletRequestMock(params)
+                : new HttpServletRequestWrapper(renderContext.getRequest()) {
+                    public String getParameter(String name) {
+                        if (params.containsKey(name)) {
+                            return params.get(name);
+                        }
+                        return super.getParameter(name);
+                    }
+                };
         HttpServletResponseMock responseMock = new HttpServletResponseMock(req.getCharacterEncoding());
         servlet.service(req, responseMock);
         // TODO: use JSON.parse
-        return context.getContext().eval("js", "(" + ((ServletOutputStreamMock) responseMock.getOutputStream()).getContent() + ")");
+        return context.getContext().eval("js",
+                "(" + ((ServletOutputStreamMock) responseMock.getOutputStream()).getContent() + ")");
     }
 
     @Inject
@@ -146,8 +159,7 @@ public class GQLHelper {
     }
 
     @Inject
-    @OSGiService(service = HttpServlet.class,
-            filter = "(component.name=graphql.kickstart.servlet.OsgiGraphQLHttpServlet)")
+    @OSGiService(service = HttpServlet.class, filter = "(component.name=graphql.kickstart.servlet.OsgiGraphQLHttpServlet)")
     public void setServlet(HttpServlet servlet) {
         this.servlet = servlet;
     }

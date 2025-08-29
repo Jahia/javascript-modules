@@ -364,9 +364,9 @@ public class GraalVMEngine {
      */
     public ProxyObject getServer(ContextProvider context) {
         Map<String, Object> server = new HashMap<>();
-        server.put("config", new ConfigHelper(context));
+        server.put("config", new ConfigHelper());
         server.put("registry", new RegistryHelper(context));
-        server.put("render", new RenderHelper(context));
+        server.put("render", new RenderHelper());
         server.put("gql", new GQLHelper(context));
         server.put("osgi", new OSGiHelper());
         server.put("jcr", new JcrHelper());
@@ -378,6 +378,7 @@ public class GraalVMEngine {
                 logger.error("Cannot inject services for {} helper", entry.getKey(), e);
             }
         }
+
         return ProxyObject.fromMap(server);
     }
 }
