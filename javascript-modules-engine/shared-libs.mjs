@@ -1,21 +1,38 @@
 // @ts-check
 /**
  * These are the libraries embedded in the JavaScript Modules engine and shared with JavaScript
- * modules, both on the server and the client.
+ * modules on the client.
  *
  * Declared as `name: path` pairs, where the name is the import specifier and the path is the path
  * to the file. Bare import specifiers are resolved as `node_modules` paths.
  *
  * @type {Record<string, string>}
  */
-export default {
+export const clientLibs = {
   // React ships as CJS, so we need our own shims
-  // See src/client-javascript/shared-libs/README.md for details
-  "react": "./src/client-javascript/shared-libs/react.ts",
-  "react/jsx-runtime": "./src/client-javascript/shared-libs/react/jsx-runtime.ts",
-  "react-dom/client": "./src/client-javascript/shared-libs/react-dom/client.ts",
+  // See src/esm-shims/README.md for details
+  "react": "./src/esm-shims/react.ts",
+  "react/jsx-runtime": "./src/esm-shims/react/jsx-runtime.ts",
+  "react-dom/client": "./src/esm-shims/react-dom/client.ts",
 
   // Packages already in ESM can be copied as-is from node_modules
   "i18next": "i18next",
   "react-i18next": "react-i18next",
+};
+
+/**
+ * Same as {@link clientLibs}, but for server libraries.
+ *
+ * @type {Record<string, string>}
+ */
+export const serverLibs = {
+  "react": "./src/esm-shims/react.ts",
+  "react/jsx-runtime": "./src/esm-shims/react/jsx-runtime.ts",
+
+  // Packages already in ESM can be copied as-is from node_modules
+  "i18next": "i18next",
+  "react-i18next": "react-i18next",
+
+  // The JSM library is exclusive to the server
+  "@jahia/javascript-modules-library": "@jahia/javascript-modules-library",
 };

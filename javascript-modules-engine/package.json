@@ -17,8 +17,7 @@
     "i18next": "^25.0.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-i18next": "^15.5.1",
-    "styled-jsx": "^5.1.7"
+    "react-i18next": "^15.5.1"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.3",

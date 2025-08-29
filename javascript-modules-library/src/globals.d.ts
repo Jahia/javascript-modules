@@ -1,32 +1,19 @@
+import type {
+  ConfigHelper,
+  GQLHelper,
+  JcrHelper,
+  OSGiHelper,
+  RegistryHelper,
+  RenderHelper,
+} from "org.jahia.modules.javascript.modules.engine.js.server";
+
 /** The global declarations, where top-level objects are exposed to server-side scripts */
 declare global {
-  import type { Bundle } from "org.osgi.framework";
-
-  /**
-   * Exposed only during the server-side initial script registration process, not available during
-   * rendering
-   */
-  export const bundle: Bundle;
-}
-
-/**
- * This module is used for internal compilation of the project. It should not be used directly in
- * your code.
- */
-declare module "virtual:jahia-server" {
-  import type {
-    ConfigHelper,
-    GQLHelper,
-    JcrHelper,
-    OSGiHelper,
-    RegistryHelper,
-    RenderHelper,
-  } from "org.jahia.modules.javascript.modules.engine.js.server";
   /**
    * A set of helpers that provide common functionality provided by Jahia for Javascript server-side
    * rendering
    */
-  const server: {
+  declare const server: {
     /** This helper provides access to OSGi configuration */
     config: ConfigHelper;
     /** This helper allows to perform JCR operations */
@@ -46,15 +33,4 @@ declare module "virtual:jahia-server" {
      */
     render: RenderHelper;
   };
-  export default server;
-}
-
-/**
- * This module is used for internal compilation of the project. It should not be used directly in
- * your code.
- */
-declare module "virtual:shared-lib-files" {
-  /** All client-side JS libs, used to create `<link rel="modulepreload">` tags */
-  declare const sharedLibFiles: string[];
-  export default sharedLibFiles;
 }

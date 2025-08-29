@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
  * <p>
  * This annotation is processed at runtime by {@link OSGiServiceInjector}.
  */
-@Target({ElementType.METHOD, ElementType.FIELD})
+@Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OSGiService {
 
