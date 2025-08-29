@@ -535,7 +535,6 @@ __metadata:
     react: ^19.0.0
     react-dom: ^19.0.0
     react-i18next: ^15.4.0
-    styled-jsx: ^5.0.0
   peerDependenciesMeta:
     i18next:
       optional: true
@@ -544,8 +543,6 @@ __metadata:
     react-dom:
       optional: true
     react-i18next:
-      optional: true
-    styled-jsx:
       optional: true
   languageName: unknown
   linkType: soft
@@ -1783,13 +1780,6 @@ __metadata:
   version: 2.2.0
   resolution: "clean-stack@npm:2.2.0"
   checksum: 10c0/1f90262d5f6230a17e27d0c190b09d47ebe7efdd76a03b5a1127863f7b3c9aec4c3e6c8bb3a7bbf81d553d56a1fd35728f5a8ef4c63f867ac8d690109742a8c1
-  languageName: node
-  linkType: hard
-
-"client-only@npm:0.0.1":
-  version: 0.0.1
-  resolution: "client-only@npm:0.0.1"
-  checksum: 10c0/9d6cfd0c19e1c96a434605added99dff48482152af791ec4172fb912a71cff9027ff174efd8cdb2160cc7f377543e0537ffc462d4f279bc4701de3f2a3c4b358
   languageName: node
   linkType: hard
 
@@ -3216,7 +3206,6 @@ __metadata:
     react-i18next: "npm:^15.5.1"
     rollup: "npm:^4.40.1"
     rollup-plugin-sbom: "npm:^2.0.3"
-    styled-jsx: "npm:^5.1.7"
   languageName: unknown
   linkType: soft
 
@@ -5146,22 +5135,6 @@ __metadata:
   version: 2.0.1
   resolution: "strip-json-comments@npm:2.0.1"
   checksum: 10c0/b509231cbdee45064ff4f9fd73609e2bcc4e84a4d508e9dd0f31f70356473fde18abfb5838c17d56fb236f5a06b102ef115438de0600b749e818a35fbbc48c43
-  languageName: node
-  linkType: hard
-
-"styled-jsx@npm:^5.1.7":
-  version: 5.1.7
-  resolution: "styled-jsx@npm:5.1.7"
-  dependencies:
-    client-only: "npm:0.0.1"
-  peerDependencies:
-    react: ">= 16.8.0 || 17.x.x || ^18.0.0-0 || ^19.0.0-0"
-  peerDependenciesMeta:
-    "@babel/core":
-      optional: true
-    babel-plugin-macros:
-      optional: true
-  checksum: 10c0/7a2544664f74dbd940c96017f81c7066b6c1e88df6e2062fd1ffcada66cfb22eb3367438b4f0ec47de7ba37f7359d153f25da2bf9593a6f3e35af44c7bbaeb48
   languageName: node
   linkType: hard
 
