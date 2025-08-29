@@ -1,5 +1,6 @@
 /**
- * This module is meant to run once when the JSM is initializing. It only contains side effects:
+ * This module is meant to run once when the JSM engine is initializing. It only contains side
+ * effects:
  *
  * - Register a `TextEncoder` polyfill
  * - Initialize i18next

@@ -45,7 +45,7 @@ server.registry.add("viewRenderer", "react", {
       </ServerContextProvider>
     );
 
-    const html =
+    return (
       // In page mode, prepend the rendered HTML with the HTML5 doctype
       (currentResource.getContextConfiguration() === "page" ? "<!DOCTYPE html>" : "") +
       // We use a `<jsm-raw-html>` element to wrap raw HTML output because React does not allow
@@ -53,12 +53,7 @@ server.registry.add("viewRenderer", "react", {
       // having them in the final output.
       // `<jsm-raw-html>` SHOULD NOT be used in userland code, it is an internal implementation
       // detail.
-      ReactDOMServer.renderToString(element).replaceAll(/<\/?jsm-raw-html>/g, "");
-
-    if (currentResource.getContextConfiguration() === "page") {
-      return `<!DOCTYPE html>${html}`;
-    }
-
-    return html;
+      ReactDOMServer.renderToString(element).replaceAll(/<\/?jsm-raw-html>/g, "")
+    );
   },
 });

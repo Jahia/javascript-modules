@@ -1,4 +1,4 @@
-import sharedLibs from "javascript-modules-engine/shared-libs.mjs";
+import { clientLibs, serverLibs } from "javascript-modules-engine/shared-libs.mjs";
 import path from "node:path/posix";
 import { styleText } from "node:util";
 import type { Plugin } from "rollup";
@@ -6,9 +6,6 @@ import { globSync } from "tinyglobby";
 import type { PluginOption } from "vite";
 import { insertFilename } from "./insert-filename.js";
 import { multiEntry } from "./multi-entry.js";
-
-// These libraries are provided by Jahia and should not be bundled
-const external = Object.keys(sharedLibs);
 
 /** Plugin to execute a callback when a build succeeds. */
 function buildSuccessPlugin(callback: () => void | Promise<void>): Plugin {
@@ -172,7 +169,7 @@ export default function jahia(
                 // default function component. Ensure entry points keep their "signature" (i.e.
                 // their exports).
                 preserveEntrySignatures: "allow-extension",
-                external,
+                external: Object.keys(clientLibs),
                 plugins: [
                   {
                     name: "forbid-library",
@@ -214,7 +211,7 @@ export default function jahia(
                         : "[name]-[hash][extname]",
                     ),
                 },
-                external: [...external, "@jahia/javascript-modules-library"],
+                external: Object.keys(serverLibs),
                 treeshake: {
                   // Manually mark useEffect as pure to have it removed from the SSR bundle
                   manualPureFunctions: ["useEffect"],

@@ -232,10 +232,8 @@ public class GraalVMEngine {
             // Initialize context with available Server side JS from bundles
             for (Map.Entry<Bundle, Source> entry : initScripts.entrySet()) {
                 try {
-                    // Here we inject the bundle because registry is keeping track of witch bundle
-                    // is registering stuff.
+                    // Expose the current bundle during the execution of its entry point
                     Bundle bundle = entry.getKey();
-                    // Expose
                     contextProvider.setActiveBundle(bundle);
                     context.getBindings(JS).putMember("bundleKey", bundle.getSymbolicName());
                     context.eval(entry.getValue());
@@ -288,11 +286,12 @@ public class GraalVMEngine {
      * Creates the global js variable named `server` in js context. It holds a
      * reference to several
      * server-side helpers.
-     *
-     * @param contextProvider
-     * @return
      */
     public ProxyObject getServer(ContextProvider contextProvider) {
+        // Because JS is single-threaded but Java is not, Graal enforces strict safety
+        // constraints during the execution of scripts. The first one being that objects
+        // shared between threads cannot be accessed in JS (more or less). To mitigate
+        // this, we create a new `server` global variable for each execution.
         Map<String, Object> server = new HashMap<>();
         server.put("config", new ConfigHelper());
         server.put("registry", new RegistryHelper(contextProvider.getRegistry()));
