@@ -39,6 +39,7 @@ import org.jahia.taglibs.template.include.*;
 import org.jahia.taglibs.uicomponents.Functions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.jahia.api.Constants;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -158,9 +159,7 @@ public class RenderHelper {
                     } else {
                         Resource r = new Resource(node, templateType, (String) attr.get("view"),
                                 "INCLUDE".equals(renderConfig) ? "include" : "module");
-                        // TODO TECH-1335 use TO_CACHE_WITH_PARENT_FRAGMENT constant once minimal jahia
-                        // version >= 8.2.0.0
-                        r.getModuleParams().put("toCacheWithParentFragment", true);
+                        r.getModuleParams().put(Constants.TO_CACHE_WITH_PARENT_FRAGMENT, true);
 
                         try {
                             // handle render parameters for JSON rendering

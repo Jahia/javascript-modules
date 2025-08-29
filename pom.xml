@@ -182,6 +182,11 @@
                 <version>8.2.1.0</version>
             </dependency>
             <dependency>
+                <groupId>org.jahia.server</groupId>
+                <artifactId>jahia-api</artifactId>
+                <version>8.2.1.0</version>
+            </dependency>
+            <dependency>
                 <groupId>org.ops4j.pax.swissbox</groupId>
                 <artifactId>pax-swissbox-bnd</artifactId>
                 <version>${pax.swissbox.version}</version>

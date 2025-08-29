@@ -24,16 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.jcr.RepositoryException;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.util.*;
 
-/**
- * Helper class to execute GraphQL queries. It provides both synchronous and
- * asynchronous methods to execute queries.
- */
+/** Helper class to execute GraphQL queries. */
 public class GQLHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(GQLHelper.class);
@@ -62,8 +58,7 @@ public class GQLHelper {
      * @throws ServletException
      * @throws IOException
      */
-    public String executeQuerySync(Map<String, ?> parameters)
-            throws ServletException, IOException, RepositoryException {
+    public String executeQuerySync(Map<String, ?> parameters) throws ServletException, IOException {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, String> params = new HashMap<>();
         params.put("query", (String) parameters.get("query"));
@@ -96,7 +91,7 @@ public class GQLHelper {
         }
 
         RenderContext renderContext = (RenderContext) parameters.get("renderContext");
-        HttpServletRequest req = renderContext == null ? new HttpServletRequestMock(params)
+        HttpServletRequest request = renderContext == null ? new HttpServletRequestMock(params)
                 : new HttpServletRequestWrapper(renderContext.getRequest()) {
                     public String getParameter(String name) {
                         if (params.containsKey(name)) {
@@ -105,8 +100,8 @@ public class GQLHelper {
                         return super.getParameter(name);
                     }
                 };
-        HttpServletResponseMock responseMock = new HttpServletResponseMock(req.getCharacterEncoding());
-        servlet.service(req, responseMock);
+        HttpServletResponseMock responseMock = new HttpServletResponseMock(request.getCharacterEncoding());
+        servlet.service(request, responseMock);
         return ((ServletOutputStreamMock) responseMock.getOutputStream()).getContent();
     }
 
