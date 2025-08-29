@@ -28,6 +28,14 @@ import org.graalvm.home.Version;
 import org.graalvm.polyglot.*;
 import org.graalvm.polyglot.io.FileSystem;
 import org.graalvm.polyglot.io.IOAccess;
+import org.graalvm.polyglot.proxy.ProxyObject;
+import org.jahia.modules.javascript.modules.engine.js.injector.OSGiServiceInjector;
+import org.jahia.modules.javascript.modules.engine.js.server.ConfigHelper;
+import org.jahia.modules.javascript.modules.engine.js.server.JcrHelper;
+import org.jahia.modules.javascript.modules.engine.js.server.OSGiHelper;
+import org.jahia.modules.javascript.modules.engine.js.server.RegistryHelper;
+import org.jahia.modules.javascript.modules.engine.js.server.RenderHelper;
+import org.jahia.modules.javascript.modules.engine.js.server.gql.GQLHelper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.*;
@@ -66,8 +74,6 @@ public class GraalVMEngine {
 
     private Engine sharedEngine;
 
-    private JSGlobalVariableFactory globals;
-
     private GenericObjectPool<ContextProvider> pool;
     private final ThreadLocal<Stack<ContextProvider>> currentContext = ThreadLocal.withInitial(Stack::new);
 
@@ -78,11 +84,6 @@ public class GraalVMEngine {
 
     public BundleContext getBundleContext() {
         return bundleContext;
-    }
-
-    @Reference(service = JSGlobalVariableFactory.class, cardinality = ReferenceCardinality.MANDATORY)
-    public void bindVariable(JSGlobalVariableFactory globals) {
-        this.globals = globals;
     }
 
     public void enableJavascriptModule(Bundle bundle) {
@@ -299,10 +300,8 @@ public class GraalVMEngine {
 
             ContextProvider contextProvider = new ContextProvider(context, version.get());
 
-            // Inject globals object into the context
-            if (globals != null) {
-                context.getBindings(JS).putMember(globals.getName(), globals.getObject(contextProvider));
-            }
+            // Add the global "server" variable to the context
+            context.getBindings(JS).putMember("server", getServer(contextProvider));
 
             // Initialize context with available Server side JS from bundles
             for (Map.Entry<Bundle, Source> entry : initScripts.entrySet()) {
@@ -353,5 +352,32 @@ public class GraalVMEngine {
             logger.debug("ContextPoolFactory.destroyObject");
             p.getObject().close();
         }
+    }
+
+    /**
+     * Creates the global js variable named `server` in js context. It holds a
+     * reference to several
+     * server-side helpers.
+     *
+     * @param context
+     * @return
+     */
+    public ProxyObject getServer(ContextProvider context) {
+        Map<String, Object> server = new HashMap<>();
+        server.put("config", new ConfigHelper(context));
+        server.put("registry", new RegistryHelper(context));
+        server.put("render", new RenderHelper(context));
+        server.put("gql", new GQLHelper(context));
+        server.put("osgi", new OSGiHelper());
+        server.put("jcr", new JcrHelper());
+
+        for (Map.Entry<String, Object> entry : server.entrySet()) {
+            try {
+                OSGiServiceInjector.handleMethodInjection(entry.getValue());
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                logger.error("Cannot inject services for {} helper", entry.getKey(), e);
+            }
+        }
+        return ProxyObject.fromMap(server);
     }
 }
