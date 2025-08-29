@@ -13,7 +13,4 @@ import "fast-text-encoding"; // Required until Graal exposes TextEncoder
 
 import "./init-i18next.js";
 import "./init-react.js";
-
-import { initUrlBuilder } from "@jahia/javascript-modules-library";
-
-initUrlBuilder();
+import "./init-url-builder.js";

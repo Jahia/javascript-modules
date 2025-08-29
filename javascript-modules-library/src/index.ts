@@ -30,7 +30,6 @@ export {
   buildEndpointUrl,
   buildNodeUrl,
   buildModuleFileUrl,
-  initUrlBuilder,
 } from "./utils/urlBuilder/urlBuilder.js";
 
 // I18n
