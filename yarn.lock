@@ -4568,14 +4568,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"normalize-package-data@npm:7.0.0":
-  version: 7.0.0
-  resolution: "normalize-package-data@npm:7.0.0"
+"normalize-package-data@npm:7.0.1":
+  version: 7.0.1
+  resolution: "normalize-package-data@npm:7.0.1"
   dependencies:
     hosted-git-info: "npm:^8.0.0"
     semver: "npm:^7.3.5"
     validate-npm-package-license: "npm:^3.0.4"
-  checksum: 10c0/d492cbc4cdd92e99cba517b08cec6adf40ff37f2e97ecf4484ccb2da1ef5bd81c6dfbd8b434d3bdc749df639492ecdc71f4a61de1a8b99fe97fdf4faac13e7f1
+  checksum: 10c0/1c30f79c74257a1d4a0b0651683682f3dbcfeb1e0303d31448a08d58350197ca0d2c6f8786e3eb863a8463eedeb0a298cde5834ed64337ecb1b5b52b760f458a
   languageName: node
   linkType: hard
 
@@ -5172,14 +5172,20 @@ __metadata:
   linkType: hard
 
 "rollup-plugin-sbom@npm:^2.0.3":
-  version: 2.0.3
-  resolution: "rollup-plugin-sbom@npm:2.0.3"
+  version: 2.1.2
+  resolution: "rollup-plugin-sbom@npm:2.1.2"
   dependencies:
     "@cyclonedx/cyclonedx-library": "npm:7.1.0"
-    normalize-package-data: "npm:7.0.0"
+    normalize-package-data: "npm:7.0.1"
   peerDependencies:
     rollup: ^3 || ^4
-  checksum: 10c0/0f04e66d49943465e60d6a09ba0218fa2db97da368bf6245d97f3a0a3cc4feaef9b316b10e72d5bd9615b0d5dd19ef5067848a9f72e9049aa6a2c355377c301c
+    vite: ^4 || ^5 || ^6
+  peerDependenciesMeta:
+    rollup:
+      optional: true
+    vite:
+      optional: true
+  checksum: 10c0/53fe18c4eed188abecf84dfaf3f2e9695188c0930e55f28254a625117835ba67956ce624181f5481b5df591ef6a4c6a5c579e60b1db9c61eb460160d1063bd18
   languageName: node
   linkType: hard
 
