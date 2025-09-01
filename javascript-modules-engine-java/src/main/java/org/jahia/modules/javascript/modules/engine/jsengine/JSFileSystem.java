@@ -59,10 +59,14 @@ public class JSFileSystem implements FileSystem {
     return Path.of("/META-INF/js/libs", path + ".js");
   }
 
-  /** This method is expected to throw when access is refused. */
+  /**
+   * This method throws when access is refused, does nothing otherwise.
+   */
   @Override
-  public void checkAccess(Path path, Set<? extends AccessMode> modes, LinkOption... linkOptions) {
-    // Always grant access for now
+  public void checkAccess(Path path, Set<? extends AccessMode> modes, LinkOption... linkOptions) throws IOException {
+    if (!path.startsWith("/META-INF/js/libs/")) {
+      throw new IOException("Access refused to import " + path);
+    }
   }
 
   /**
