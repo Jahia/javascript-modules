@@ -32,7 +32,6 @@ export function Area({
    */
   readOnly?: boolean;
 
-  areaType?: string;
   /**
    * Node type to be used to create the area (if the node does not exist yet)
    *
