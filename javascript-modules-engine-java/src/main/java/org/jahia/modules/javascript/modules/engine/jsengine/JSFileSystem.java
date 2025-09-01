@@ -106,7 +106,7 @@ public class JSFileSystem implements FileSystem {
    */
   @Override
   public Path parsePath(URI uri) {
-    throw new UnsupportedOperationException("Unimplemented method 'parsePath'");
+    throw new UnsupportedOperationException("Import not supported: " + uri.toString());
   }
 
   // Other methods are not involved in the resolution process
