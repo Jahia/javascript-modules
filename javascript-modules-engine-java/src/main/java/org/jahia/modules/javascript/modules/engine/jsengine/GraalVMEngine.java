@@ -64,7 +64,7 @@ public class GraalVMEngine {
     /**
      * Mimetype used by Graal to identify ESM source code.
      *
-     * @see https://www.graalvm.org/latest/reference-manual/js/Modules/#ecmascript-modules-esm
+     * @see <a href="https://www.graalvm.org/latest/reference-manual/js/Modules/#ecmascript-modules-esm">ECMAScript Modules</a>
      */
     private static final String JS_MODULE_MIMETYPE = "application/javascript+module";
 
