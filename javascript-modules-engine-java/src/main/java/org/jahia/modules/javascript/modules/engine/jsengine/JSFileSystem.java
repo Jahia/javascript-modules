@@ -21,7 +21,8 @@ import org.apache.commons.compress.utils.SeekableInMemoryByteChannel;
 import org.apache.commons.io.IOUtils;
 
 /**
- * This class defines a virtual filesystem used to resolve `import statements`.
+ * This class defines a virtual filesystem used to resolve
+ * <code>import statements</code>.
  *
  * For now it's really basic but it opens the door for more advanced features in
  * the future.
@@ -38,17 +39,19 @@ public class JSFileSystem implements FileSystem {
   // Methods are in the same order as the execution order
 
   /**
-   * parsePath is called on non-path imports (e.g. `import "react"` but not
-   * `import "./react.js"`). It's the first step in the resolution process.
+   * parsePath is called on non-path imports (e.g. <code>import "react"</code> but
+   * not <code>import "./react.js"</code>). It's the first step in the resolution
+   * process.
    *
    * However, parsePath, for reasons foreign to me, might be called
    * with the stringified version of an already parsed path. And for internal
    * implementation-specific imports.
    *
-   * For instance, it might receive `/META-INF/js/libs/react-i18next.js`
-   * (stringified output of the method) or `/usr/local/graalvm/languages/js`
-   * (internal import). This is safe-guarded by this `path.startsWith("/")` check
-   * until someone comes with a better solution.
+   * For instance, it might receive
+   * <code>/META-INF/js/libs/react-i18next.js</code> (stringified output of the
+   * method) or <code>/usr/local/graalvm/languages/js</code> (internal import).
+   * This is safe-guarded by this <code>path.startsWith("/")</code> check until
+   * someone comes with a better solution.
    */
   @Override
   public Path parsePath(String path) {
@@ -70,10 +73,10 @@ public class JSFileSystem implements FileSystem {
   }
 
   /**
-   * This method is called for every path, like outputs of {@link #parsePath(String)}}
-   * and valid relative imports after they were resolved, like
-   * `/META-INF/js/libs/I18nextProvider-BnrOfLKR.js`. All paths are valid at this
-   * point, so we just return them.
+   * This method is called for every path, like outputs of
+   * {@link #parsePath(String)}} and valid relative imports after they were
+   * resolved, like <code>/META-INF/js/libs/I18nextProvider-BnrOfLKR.js</code>.
+   * All paths are valid at this point, so we just return them.
    */
   @Override
   public Path toRealPath(Path path, LinkOption... linkOptions) throws IOException {
@@ -104,9 +107,9 @@ public class JSFileSystem implements FileSystem {
   }
 
   /**
-   * This method is called for imports with a protocol (e.g. `import
-   * "http://example.com"` or `import "node:http"`). We might be able to build
-   * cool things in the future with this!
+   * This method is called for imports with a protocol (e.g.
+   * <code>import "http://example.com"</code> or <code>import "node:http"</code>).
+   * We might be able to build cool things in the future with this!
    */
   @Override
   public Path parsePath(URI uri) {
