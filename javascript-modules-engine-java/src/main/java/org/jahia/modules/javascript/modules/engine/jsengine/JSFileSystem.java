@@ -66,7 +66,7 @@ public class JSFileSystem implements FileSystem {
   }
 
   /**
-   * This method is called for every path, like outputs of {@link #parsePath()}
+   * This method is called for every path, like outputs of {@link #parsePath(String)}}
    * and valid relative imports after they were resolved, like
    * `/META-INF/js/libs/I18nextProvider-BnrOfLKR.js`. All paths are valid at this
    * point, so we just return them.
