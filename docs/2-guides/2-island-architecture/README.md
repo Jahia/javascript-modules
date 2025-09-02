@@ -4,7 +4,7 @@ page:
   jcr:title: Island Architure
   j:templateName: documentation
 content:
-  $subpath: page-area/content
+  $subpath: document-area/content
 ---
 
 Jahia JavaScript Modules offers a first-class support for the Island Architecture pattern, allowing interactivity without compromising on performance.

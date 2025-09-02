@@ -4,7 +4,7 @@ page:
   jcr:title: Making a Blog
   j:templateName: documentation
 content:
-  $subpath: page-area/content
+  $subpath: document-area/content
 ---
 
 So far we only considered contributing pages visually, directly in Page Builder. This is great for individual, unique pages but it's not the best way to manage a blog. In a blog, you want all your articles to have the same structure and style, and you want to be able to manage them all in one place.

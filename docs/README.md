@@ -4,7 +4,7 @@ page:
   jcr:title: Tutorials Home
   j:templateName: documentation
 content:
-  $subpath: page-area/content
+  $subpath: document-area/content
 ---
 
 Depending on who you are, you'll get started with Jahia in different ways.
