@@ -204,11 +204,11 @@ __metadata:
   linkType: soft
 
 "@jahia/jcontent-cypress@npm:^3.4.0-tests.2":
-  version: 3.4.0-tests.3
-  resolution: "@jahia/jcontent-cypress@npm:3.4.0-tests.3"
+  version: 3.4.0-tests.5
+  resolution: "@jahia/jcontent-cypress@npm:3.4.0-tests.5"
   dependencies:
     cypress-real-events: "npm:^1.14.0"
-  checksum: 10c0/63dc56e289cd29340ebbe40062f85f0e3b8da9babb7c99ad0a7035709f8f9890cc6a56bcba027f877357034211493c42e518811ffedb8c708e3edfc55988d63e
+  checksum: 10c0/84b557ab1a1c6e8d9751c232b2d065ab223c16de1e6b2ad56dd95d94e94f1399f54835c093b239e81b9e3baa28e5d5844ea86d38b644f40358b157b7ef58eebe
   languageName: node
   linkType: hard
 
