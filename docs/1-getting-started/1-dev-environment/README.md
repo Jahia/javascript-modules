@@ -4,7 +4,7 @@ page:
   jcr:title: Setting Up Your Dev Environment
   j:templateName: documentation
 content:
-  $subpath: page-area/content
+  $subpath: document-area/content
 ---
 
 This tutorial will guide you through the setup of your development environment to start a local Jahia instance and create a new project. We assume you have some familiarity with JavaScript and React, if that's not the case, we recommend you to follow a few tutorials to learn the basics:

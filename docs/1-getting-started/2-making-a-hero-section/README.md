@@ -4,7 +4,7 @@ page:
   jcr:title: Making a Hero Section
   j:templateName: documentation
 content:
-  $subpath: page-area/content
+  $subpath: document-area/content
 ---
 
 In this section, we'll create a hero section for our website. A hero section is a large, full-width section at the top of a page. It usually contains a title, a subtitle, and a background image.

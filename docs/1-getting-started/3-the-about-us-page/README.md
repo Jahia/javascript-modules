@@ -4,7 +4,7 @@ page:
   jcr:title: The "About Us" Page
   j:templateName: documentation
 content:
-  $subpath: page-area/content
+  $subpath: document-area/content
 ---
 
 Our homepage is based on a "basic" layout: take a look at `src/templates/Page/basic.server.tsx`. It's a single column layout defined by an `<Area>` without any constraints. If a user wants to place many Hero sections on the page, they can do it. Most websites have a slightly more controlled layout: a navbar, a title, a footer, optional sidebars, etc. In this section, we'll create a page layout that suits a typical "About Us" page.

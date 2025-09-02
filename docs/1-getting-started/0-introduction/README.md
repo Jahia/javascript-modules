@@ -4,7 +4,7 @@ page:
   jcr:title: Introduction
   j:templateName: documentation
 content:
-  $subpath: page-area/content
+  $subpath: document-area/content
 ---
 
 Welcome to the JavaScript Modules documentation!
