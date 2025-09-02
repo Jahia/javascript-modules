@@ -1,7 +1,6 @@
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 import type React from "react";
 import { createElement } from "react";
-import server from "virtual:jahia-server";
 import { useServerContext } from "../../hooks/useServerContext.js";
 
 /**

@@ -15,11 +15,9 @@
  */
 package org.jahia.modules.javascript.modules.engine.js.server;
 
-
 import org.graalvm.polyglot.proxy.ProxyObject;
 import org.jahia.data.templates.JahiaTemplatesPackage;
 import org.jahia.modules.javascript.modules.engine.js.injector.OSGiService;
-import org.jahia.modules.javascript.modules.engine.jsengine.ContextProvider;
 import org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine;
 import org.jahia.osgi.BundleUtils;
 import org.jahia.services.render.RenderException;
@@ -36,18 +34,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Helper class to make it possible to access OSGi bundle resources from the JavaScript engine
+ * Helper class to make it possible to access OSGi bundle resources from the
+ * JavaScript engine
  */
 public class OSGiHelper {
     private static final Logger logger = LoggerFactory.getLogger(OSGiHelper.class);
 
-    private final ContextProvider contextProvider;
-
     private JahiaTemplateManagerService templateManagerService;
-
-    public OSGiHelper(ContextProvider contextProvider) {
-        this.contextProvider = contextProvider;
-    }
 
     @Inject
     @OSGiService
@@ -72,7 +65,7 @@ public class OSGiHelper {
      * An interface name can be used as long as a service properly declares
      * implementing it.
      *
-     * @param clazz the fully qualified class name of the OSGi service
+     * @param clazz  the fully qualified class name of the OSGi service
      * @param filter the filter to apply to the service
      * @return the OSGi instance associated to the fully qualified class name
      */
@@ -82,6 +75,7 @@ public class OSGiHelper {
 
     /**
      * Get the Osgi Bundle by symbolic name
+     *
      * @param symbolicName the symbolic name for the bundle
      * @return if successful, the Bundle, otherwise null
      */
@@ -95,17 +89,19 @@ public class OSGiHelper {
 
     /**
      * Load a resource from an OSGi bundle
-     * @param bundle the bundle to load the resource from
-     * @param path the path to the resource in the bundle
-     * @param optional if false an error message will be logged if the resource is not found, otherwise null will be returned
-     * @return a String containing the content of the resource if it was found, null otherwise
+     *
+     * @param bundle   the bundle to load the resource from
+     * @param path     the path to the resource in the bundle
+     * @param optional if false an error message will be logged if the resource is
+     *                 not found, otherwise null will be returned
+     * @return a String containing the content of the resource if it was found, null
+     *         otherwise
      * @throws RenderException
      */
     public String loadResource(Bundle bundle, String path, boolean optional) throws RenderException {
         String result = GraalVMEngine.loadResource(bundle, path);
         if (!optional && result == null) {
             // todo (BACKLOG-21263) handle exception correctly in javascript views
-            //throw new RenderException(String.format("Unable to load resource: %s from bundle: %s", path, bundle.getSymbolicName()));
             logger.error("Unable to load resource: {} from bundle: {}", path, bundle.getSymbolicName());
         }
         return result;
@@ -113,8 +109,9 @@ public class OSGiHelper {
 
     /**
      * Load a properties resource from an OSGi bundle
+     *
      * @param bundle the bundle to load the resource from
-     * @param path the path to the resource in the bundle
+     * @param path   the path to the resource in the bundle
      * @return A Map&lt;String,String&gt; containing the properties
      * @throws RenderException
      */
@@ -128,8 +125,7 @@ public class OSGiHelper {
                         Collectors.toMap(
                                 e -> String.valueOf(e.getKey()),
                                 e -> String.valueOf(e.getValue()),
-                                (prev, next) -> next
-                        )));
+                                (prev, next) -> next)));
             } catch (IOException e) {
                 logger.error("Error while loading properties {} for bundle {}", path, bundle.getSymbolicName(), e);
             }

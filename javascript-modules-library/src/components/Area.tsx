@@ -1,5 +1,4 @@
 import { createElement, type JSX } from "react";
-import server from "virtual:jahia-server";
 import { useServerContext } from "../hooks/useServerContext.js";
 
 /**
@@ -33,7 +32,6 @@ export function Area({
    */
   readOnly?: boolean;
 
-  areaType?: string;
   /**
    * Node type to be used to create the area (if the node does not exist yet)
    *

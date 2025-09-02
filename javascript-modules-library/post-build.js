@@ -27,7 +27,7 @@ fs.writeFileSync(
   relative("./dist/index.js"),
   `console.error(
   "You cannot import and run '@jahia/javascript-modules-library' because it's a virtual module.\\n" +
-  "Something is wrong with your build configuration: instead of bundling '@jahia/javascript-modules-library', it should be replaced with 'javascriptModulesLibraryBuilder.getSharedLibrary(\\"@jahia/javascript-modules-library\\")'."
+  "Ensure the library is marked as *external* in your build configuration."
 );
 export {};
 `,

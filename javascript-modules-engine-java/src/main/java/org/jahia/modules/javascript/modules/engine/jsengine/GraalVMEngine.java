@@ -25,6 +25,15 @@ import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.graalvm.home.Version;
 import org.graalvm.polyglot.*;
+import org.graalvm.polyglot.io.IOAccess;
+import org.graalvm.polyglot.proxy.ProxyObject;
+import org.jahia.modules.javascript.modules.engine.js.injector.OSGiServiceInjector;
+import org.jahia.modules.javascript.modules.engine.js.server.ConfigHelper;
+import org.jahia.modules.javascript.modules.engine.js.server.JcrHelper;
+import org.jahia.modules.javascript.modules.engine.js.server.OSGiHelper;
+import org.jahia.modules.javascript.modules.engine.js.server.RegistryHelper;
+import org.jahia.modules.javascript.modules.engine.js.server.RenderHelper;
+import org.jahia.modules.javascript.modules.engine.js.server.gql.GQLHelper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.*;
@@ -52,9 +61,14 @@ public class GraalVMEngine {
     public static final String JS = "js";
     private static final String UNKNOWN_SYS_PROP = "Unknown";
 
-    private Engine sharedEngine;
+    /**
+     * Mimetype used by Graal to identify ESM source code.
+     *
+     * @see <a href="https://www.graalvm.org/latest/reference-manual/js/Modules/#ecmascript-modules-esm">ECMAScript Modules</a>
+     */
+    private static final String JS_MODULE_MIMETYPE = "application/javascript+module";
 
-    private JSGlobalVariableFactory globals;
+    private Engine sharedEngine;
 
     private GenericObjectPool<ContextProvider> pool;
     private final ThreadLocal<Stack<ContextProvider>> currentContext = ThreadLocal.withInitial(Stack::new);
@@ -68,14 +82,10 @@ public class GraalVMEngine {
         return bundleContext;
     }
 
-    @Reference(service = JSGlobalVariableFactory.class, cardinality = ReferenceCardinality.MANDATORY)
-    public void bindVariable(JSGlobalVariableFactory globals) {
-        this.globals = globals;
-    }
-
     public void enableJavascriptModule(Bundle bundle) {
         try {
-            initScripts.put(bundle, getGraalSource(bundle, bundle.getHeaders().get(BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT)));
+            initScripts.put(bundle,
+                    getGraalSource(bundle, bundle.getHeaders().get(BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT)));
             version.incrementAndGet();
             logger.info("Registered bundle {} in GraalVM engine", bundle.getSymbolicName());
         } catch (IOException ioe) {
@@ -97,13 +107,15 @@ public class GraalVMEngine {
 
         initialEngineCheckup();
         try {
-            initScripts.put(bundleContext.getBundle(), getGraalSource(bundleContext.getBundle(), "META-INF/js/main.js"));
+            initScripts.put(bundleContext.getBundle(),
+                    getGraalSource(bundleContext.getBundle(), "META-INF/js/main.js"));
         } catch (IOException e) {
             logger.error("Cannot execute main init script", e);
         }
         Engine.Builder builder = Engine.newBuilder();
         Map<String, String> poolOptions = new HashMap<>();
-        boolean experimental = props.containsKey("experimental") && Boolean.parseBoolean(props.get("experimental").toString());
+        boolean experimental = props.containsKey("experimental")
+                && Boolean.parseBoolean(props.get("experimental").toString());
         builder.allowExperimentalOptions(experimental);
         for (Map.Entry<String, ?> entry : props.entrySet()) {
             if (entry.getKey().startsWith("polyglot.")) {
@@ -156,7 +168,9 @@ public class GraalVMEngine {
         if (resource == null) {
             throw new IOException("Cannot get resource " + bundle.getSymbolicName() + " / " + script);
         }
-        return Source.newBuilder(JS, resource, bundle.getSymbolicName() + "/" + script).build();
+        return Source.newBuilder(JS, resource, bundle.getSymbolicName() + "/" + script)
+                .mimeType(JS_MODULE_MIMETYPE)
+                .build();
     }
 
     public static String loadResource(Bundle bundle, String path) {
@@ -175,14 +189,16 @@ public class GraalVMEngine {
             String specVersion = System.getProperty("java.specification.version", UNKNOWN_SYS_PROP);
             String vendorVersion = System.getProperty("java.vendor.version", specVersion);
             String vendor = System.getProperty("java.vendor", UNKNOWN_SYS_PROP);
-            logger.warn("Javascript Modules Engine requires GraalVM for production usage, detected {} (vendor: {}).", vendorVersion, vendor);
+            logger.warn("Javascript Modules Engine requires GraalVM for production usage, detected {} (vendor: {}).",
+                    vendorVersion, vendor);
             return;
         }
 
         // Check if the 'js' extension is installed
         try (Context context = Context.create()) {
             if (!context.getEngine().getLanguages().containsKey(JS)) {
-                logger.error("Javascript Modules Engine detected GraalVM, but the 'js' extension is not installed. You can install it by running: gu install js");
+                logger.error(
+                        "Javascript Modules Engine detected GraalVM, but the 'js' extension is not installed. You can install it by running: gu install js");
             }
         }
     }
@@ -206,23 +222,23 @@ public class GraalVMEngine {
                     .allowHostClassLookup(s -> true)
                     .allowHostAccess(HostAccess.ALL)
                     .allowPolyglotAccess(PolyglotAccess.ALL)
-                    .allowIO(true)
+                    .allowIO(IOAccess.newBuilder().fileSystem(new JSFileSystem(bundleContext)).build())
                     .engine(sharedEngine).build();
-
             ContextProvider contextProvider = new ContextProvider(context, version.get());
 
-            // Inject globals object into the context
-            if (globals != null) {
-                context.getBindings(JS).putMember(globals.getName(), globals.getObject(contextProvider));
-            }
+            // Add the global "server" variable to the context
+            context.getBindings(JS).putMember("server", getServer(contextProvider));
 
             // Initialize context with available Server side JS from bundles
             for (Map.Entry<Bundle, Source> entry : initScripts.entrySet()) {
                 try {
-                    // Here we inject the bundle because registry is keeping track of witch bundle is registering stuff.
-                    context.getBindings(JS).putMember("bundle", entry.getKey());
+                    // Expose the current bundle during the execution of its entry point
+                    Bundle bundle = entry.getKey();
+                    contextProvider.setActiveBundle(bundle);
+                    context.getBindings(JS).putMember("bundleKey", bundle.getSymbolicName());
                     context.eval(entry.getValue());
-                    context.getBindings(JS).removeMember("bundle");
+                    contextProvider.setActiveBundle(null);
+                    context.getBindings(JS).removeMember("bundleKey");
                 } catch (Exception e) {
                     logger.error("Cannot execute init script {} in bundle {}", entry.getValue(), entry.getKey(), e);
                 }
@@ -264,5 +280,34 @@ public class GraalVMEngine {
             logger.debug("ContextPoolFactory.destroyObject");
             p.getObject().close();
         }
+    }
+
+    /**
+     * Creates the global js variable named `server` in js context. It holds a
+     * reference to several
+     * server-side helpers.
+     */
+    public ProxyObject getServer(ContextProvider contextProvider) {
+        // Because JS is single-threaded but Java is not, Graal enforces strict safety
+        // constraints during the execution of scripts. The first one being that objects
+        // shared between threads cannot be accessed in JS (more or less). To mitigate
+        // this, we create a new `server` global variable for each execution.
+        Map<String, Object> server = new HashMap<>();
+        server.put("config", new ConfigHelper());
+        server.put("registry", new RegistryHelper(contextProvider.getRegistry()));
+        server.put("render", new RenderHelper());
+        server.put("gql", new GQLHelper());
+        server.put("osgi", new OSGiHelper());
+        server.put("jcr", new JcrHelper());
+
+        for (Map.Entry<String, Object> entry : server.entrySet()) {
+            try {
+                OSGiServiceInjector.handleMethodInjection(entry.getValue());
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                logger.error("Cannot inject services for {} helper", entry.getKey(), e);
+            }
+        }
+
+        return ProxyObject.fromMap(server);
     }
 }

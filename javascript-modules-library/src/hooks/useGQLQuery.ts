@@ -1,6 +1,5 @@
 import type { GraphQLFormattedError } from "graphql";
 import { useServerContext } from "./useServerContext.js";
-import server from "virtual:jahia-server";
 
 /**
  * Execute a GraphQL query synchronously
@@ -22,10 +21,12 @@ export const useGQLQuery = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }): { data: any; errors?: GraphQLFormattedError[] } => {
   const { renderContext } = useServerContext();
-  return server.gql.executeQuerySync({
-    query,
-    variables,
-    operationName,
-    renderContext,
-  });
+  return JSON.parse(
+    server.gql.executeQuerySync({
+      query,
+      variables,
+      operationName,
+      renderContext,
+    }),
+  );
 };

@@ -24,7 +24,6 @@ import org.graalvm.polyglot.proxy.ProxyObject;
 import org.jahia.modules.javascript.modules.engine.js.injector.OSGiService;
 import org.jahia.modules.javascript.modules.engine.js.mock.MockBodyContent;
 import org.jahia.modules.javascript.modules.engine.js.mock.MockPageContext;
-import org.jahia.modules.javascript.modules.engine.jsengine.ContextProvider;
 import org.jahia.modules.javascript.modules.engine.jsengine.JSNodeMapper;
 import org.jahia.services.content.JCRContentUtils;
 import org.jahia.services.content.JCRNodeWrapper;
@@ -40,6 +39,7 @@ import org.jahia.taglibs.template.include.*;
 import org.jahia.taglibs.uicomponents.Functions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.jahia.api.Constants;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -59,21 +59,20 @@ import java.util.stream.Collectors;
  */
 public class RenderHelper {
     private static final Logger logger = LoggerFactory.getLogger(RenderHelper.class);
-    private static final Set<String> ABSOLUTEAREA_ALLOWED_ATTRIBUTES = Set.of("name", "parent", "view", "allowedNodeTypes", "numberOfItems", "nodeType", "editable", "areaType", "limitedAbsoluteAreaEdit", "parameters");
-    private static final Set<String> AREA_ALLOWED_ATTRIBUTES = Set.of("name", "view", "allowedNodeTypes", "numberOfItems", "nodeType", "editable", "parameters");
+    private static final Set<String> ABSOLUTEAREA_ALLOWED_ATTRIBUTES = Set.of("name", "parent", "view",
+            "allowedNodeTypes", "numberOfItems", "nodeType", "editable", "areaType", "limitedAbsoluteAreaEdit",
+            "parameters");
+    private static final Set<String> AREA_ALLOWED_ATTRIBUTES = Set.of("name", "view", "allowedNodeTypes",
+            "numberOfItems", "nodeType", "editable", "parameters");
 
     private JCRSessionFactory jcrSessionFactory;
     private JCRTemplate jcrTemplate;
     private RenderService renderService;
 
-    private final ContextProvider context;
-
-    public RenderHelper(ContextProvider context) {
-        this.context = context;
-    }
-
-    public ProxyObject transformToJsNode(JCRNodeWrapper node, boolean includeChildren, boolean includeDescendants, boolean includeAllTranslations) throws RepositoryException {
-        return recursiveProxyMap(JSNodeMapper.toJSNode(node, includeChildren, includeDescendants, includeAllTranslations));
+    public ProxyObject transformToJsNode(JCRNodeWrapper node, boolean includeChildren, boolean includeDescendants,
+            boolean includeAllTranslations) throws RepositoryException {
+        return recursiveProxyMap(
+                JSNodeMapper.toJSNode(node, includeChildren, includeDescendants, includeAllTranslations));
     }
 
     /**
@@ -102,7 +101,8 @@ public class RenderHelper {
     }
 
     /**
-     * Find the first displayable node in the given node's hierarchy. A displayable node is a node that has a content
+     * Find the first displayable node in the given node's hierarchy. A displayable
+     * node is a node that has a content
      * or page template associated with it.
      *
      * @param node          the node at which to start the resolution
@@ -110,12 +110,14 @@ public class RenderHelper {
      * @param contextSite   the site in which to resolve the template
      * @return the first displayable {@link JCRNodeWrapper} found in the hierarchy
      */
-    public JCRNodeWrapper findDisplayableNode(JCRNodeWrapper node, RenderContext renderContext, @Nullable JCRSiteNode contextSite) {
+    public JCRNodeWrapper findDisplayableNode(JCRNodeWrapper node, RenderContext renderContext,
+            @Nullable JCRSiteNode contextSite) {
         return JCRContentUtils.findDisplayableNode(node, renderContext, contextSite);
     }
 
     /**
-     * Returns the node which corresponds to the bound component of the j:bindedComponent property in the specified node.
+     * Returns the node which corresponds to the bound component of the
+     * j:bindedComponent property in the specified node.
      *
      * @param node    the node to get the bound component for
      * @param context current render context
@@ -126,7 +128,8 @@ public class RenderHelper {
     }
 
     public String renderComponent(Map<String, ?> attr, RenderContext renderContext) throws RepositoryException {
-        // first try to get the aliased user from the session (when using customized preview for instance), otherwise use the current user
+        // first try to get the aliased user from the session (when using customized
+        // preview for instance), otherwise use the current user
         JahiaUser user = jcrSessionFactory.getCurrentAliasedUser();
         if (user == null) {
             user = jcrSessionFactory.getCurrentUser();
@@ -134,8 +137,11 @@ public class RenderHelper {
         return jcrTemplate.doExecuteWithSystemSessionAsUser(user, renderContext.getWorkspace(),
                 renderContext.getMainResource().getLocale(), session -> {
 
-                    JCRNodeWrapper node = JSNodeMapper.toVirtualNode((Map<String, ?>) attr.get("content"), session, renderContext);
-                    String renderConfig = attr.get("advanceRenderingConfig") != null ? (String) attr.get("advanceRenderingConfig") : "";
+                    JCRNodeWrapper node = JSNodeMapper.toVirtualNode((Map<String, ?>) attr.get("content"), session,
+                            renderContext);
+                    String renderConfig = attr.get("advanceRenderingConfig") != null
+                            ? (String) attr.get("advanceRenderingConfig")
+                            : "";
                     String templateType = attr.get("templateType") != null ? (String) attr.get("templateType") : "html";
 
                     if ("OPTION".equals(renderConfig)) {
@@ -153,8 +159,7 @@ public class RenderHelper {
                     } else {
                         Resource r = new Resource(node, templateType, (String) attr.get("view"),
                                 "INCLUDE".equals(renderConfig) ? "include" : "module");
-                        // TODO TECH-1335 use TO_CACHE_WITH_PARENT_FRAGMENT constant once minimal jahia version >= 8.2.0.0
-                        r.getModuleParams().put("toCacheWithParentFragment", true);
+                        r.getModuleParams().put(Constants.TO_CACHE_WITH_PARENT_FRAGMENT, true);
 
                         try {
                             // handle render parameters for JSON rendering
@@ -162,7 +167,8 @@ public class RenderHelper {
                             if (renderParameters != null && !renderParameters.isEmpty()) {
                                 String charset = renderContext.getResponse().getCharacterEncoding();
                                 for (Map.Entry<String, Object> renderParam : renderParameters.entrySet()) {
-                                    // only allow String params for compatibility reasons due to JSP ParamParent parameters being a <String,String> map
+                                    // only allow String params for compatibility reasons due to JSP ParamParent
+                                    // parameters being a <String,String> map
                                     if (renderParam.getValue() instanceof String) {
                                         r.getModuleParams().put(URLDecoder.decode(renderParam.getKey(), charset),
                                                 URLDecoder.decode((String) renderParam.getValue(), charset));
@@ -178,7 +184,9 @@ public class RenderHelper {
                 });
     }
 
-    public String createContentButtons(String childName, String nodeTypes, boolean editCheck, RenderContext renderContext, Resource currentResource) throws JspException, InvocationTargetException, IllegalAccessException, RepositoryException, IOException {
+    public String createContentButtons(String childName, String nodeTypes, boolean editCheck,
+            RenderContext renderContext, Resource currentResource)
+            throws JspException, InvocationTargetException, IllegalAccessException, RepositoryException, IOException {
         boolean childExists = !"*".equals(childName) && currentResource.getNode().hasNode(childName);
         if (!childExists && (!editCheck || renderContext.isEditMode())) {
             Map<String, Object> attr = new HashMap<>();
@@ -189,14 +197,16 @@ public class RenderHelper {
         return "";
     }
 
-    public String render(Map<String, Object> attr, RenderContext renderContext, Resource currentResource) throws JspException, InvocationTargetException, IllegalAccessException, RepositoryException, IOException {
+    public String render(Map<String, Object> attr, RenderContext renderContext, Resource currentResource)
+            throws JspException, InvocationTargetException, IllegalAccessException, RepositoryException, IOException {
 
         // handle json node
         if (attr.get("content") != null) {
             return renderComponent(attr, renderContext);
         }
         // if the child node requested is not available, return an empty string
-        // This make the path parameter mandatory, that's why is passed as a dedicated param.
+        // This make the path parameter mandatory, that's why is passed as a dedicated
+        // param.
         String path = (String) attr.get("path");
         if (path != null) {
             JCRNodeWrapper currentNode = currentResource.getNode();
@@ -213,7 +223,8 @@ public class RenderHelper {
             }
         }
 
-        String renderConfig = attr.get("advanceRenderingConfig") != null ? (String) attr.get("advanceRenderingConfig") : "";
+        String renderConfig = attr.get("advanceRenderingConfig") != null ? (String) attr.get("advanceRenderingConfig")
+                : "";
         switch (renderConfig) {
             case "INCLUDE": {
                 return renderTag(new IncludeTag(), attr, renderContext);
@@ -228,48 +239,71 @@ public class RenderHelper {
     }
 
     /**
-     * Render a tag that adds resources to the page. Resources might for example be CSS files, Javascript files or inline
+     * Render a tag that adds resources to the page. Resources might for example be
+     * CSS files, Javascript files or inline
      *
      * @param attr          may contain the following:
      *                      <ul>
-     *                      <li> insert (boolean) : If true, the resource will be inserted into the document. Typically used
-     *                      for on-demand loading of resources. </li>
-     *                      <li> async (boolean) : If true, the resource will be loaded asynchronously. For scripts, this means
+     *                      <li>insert (boolean) : If true, the resource will be
+     *                      inserted into the document. Typically used
+     *                      for on-demand loading of resources.</li>
+     *                      <li>async (boolean) : If true, the resource will be
+     *                      loaded asynchronously. For scripts, this means
      *                      the script
-     *                      will be executed as soon as it's available, without blocking the rest of the page. </li>
-     *                      <li> defer (boolean) : If true, the resource will be deferred, i.e., loaded after the document
+     *                      will be executed as soon as it's available, without
+     *                      blocking the rest of the page.</li>
+     *                      <li>defer (boolean) : If true, the resource will be
+     *                      deferred, i.e., loaded after the document
      *                      has been parsed.
-     *                      For scripts, this means the script will not be executed until after the page has loaded. </li>
-     *                      <li> type (string) : The type of the resource. This could be 'javascript' for .js files, 'css' for
+     *                      For scripts, this means the script will not be executed
+     *                      until after the page has loaded.</li>
+     *                      <li>type (string) : The type of the resource. This could
+     *                      be 'javascript' for .js files, 'css' for
      *                      .css files, etc.
-     *                      The type will be used to resolve the directory in the module where the resources are located. For example
-     *                      for the 'css' type it will look for the resources in the css directory of the module. </li>
-     *                      <li> resources (string) : The path to the resource file, relative to the module. It is also allowed to
-     *                      specify multiple resources by separating them with commas. It is also allowed to use absolute URLs to
-     *                      include remote resources. </li>
-     *                      <li> inlineResource (string) : Inline HTML that markup will be considered as a resource. </li>
-     *                      <li> title (string) : The title of the resource. This is typically not used for scripts or stylesheets,
-     *                      but may be used for other types of resources. </li>
-     *                      <li> key (string) : A unique key for the resource. This could be used to prevent duplicate resources
-     *                      from being added to the document. </li>
-     *                      <li> targetTag (string): The HTML tag where the resource should be added. This could be 'head' for
-     *                      resources that should be added to the &lt;head&gt; tag, 'body' for resources that should be added to
+     *                      The type will be used to resolve the directory in the
+     *                      module where the resources are located. For example
+     *                      for the 'css' type it will look for the resources in the
+     *                      css directory of the module.</li>
+     *                      <li>resources (string) : The path to the resource file,
+     *                      relative to the module. It is also allowed to
+     *                      specify multiple resources by separating them with
+     *                      commas. It is also allowed to use absolute URLs to
+     *                      include remote resources.</li>
+     *                      <li>inlineResource (string) : Inline HTML that markup
+     *                      will be considered as a resource.</li>
+     *                      <li>title (string) : The title of the resource. This is
+     *                      typically not used for scripts or stylesheets,
+     *                      but may be used for other types of resources.</li>
+     *                      <li>key (string) : A unique key for the resource. This
+     *                      could be used to prevent duplicate resources
+     *                      from being added to the document.</li>
+     *                      <li>targetTag (string): The HTML tag where the resource
+     *                      should be added. This could be 'head' for
+     *                      resources that should be added to the &lt;head&gt; tag,
+     *                      'body' for resources that should be added to
      *                      the &lt;body&gt; tag, etc.</li>
-     *                      <li> rel (string) : The relationship of the resource to the document. This is typically 'stylesheet'
-     *                      for CSS files. </li>
-     *                      <li> media (string) : The media for which the resource is intended. This is typically used for CSS
-     *                      files, with values like 'screen', 'print', etc. </li>
-     *                      <li> condition (string) : A condition that must be met for the resource to be loaded. This could be
+     *                      <li>rel (string) : The relationship of the resource to
+     *                      the document. This is typically 'stylesheet'
+     *                      for CSS files.</li>
+     *                      <li>media (string) : The media for which the resource is
+     *                      intended. This is typically used for CSS
+     *                      files, with values like 'screen', 'print', etc.</li>
+     *                      <li>condition (string) : A condition that must be met
+     *                      for the resource to be loaded. This could be
      *                      used for conditional comments in IE, for example.</li>
      *                      </ul>
      * @param renderContext the current rendering context
-     * @return a String containing the rendered HTML tags for the provided resources.
+     * @return a String containing the rendered HTML tags for the provided
+     *         resources.
      * @throws IllegalAccessException    if the underlying tag cannot be accessed
      * @throws InvocationTargetException if the underlying tag cannot be invoked
-     * @throws JspException              if the underlying tag throws a JSP exception
-     * @throws IOException               if the underlying tag throws an IO exception
+     * @throws JspException              if the underlying tag throws a JSP
+     *                                   exception
+     * @throws IOException               if the underlying tag throws an IO
+     *                                   exception
      */
-    public String addResources(Map<String, Object> attr, RenderContext renderContext) throws IllegalAccessException, InvocationTargetException, JspException, IOException {
+    public String addResources(Map<String, Object> attr, RenderContext renderContext)
+            throws IllegalAccessException, InvocationTargetException, JspException, IOException {
         Map<String, Object> ressourcesAttrs = new HashMap<>(attr);
 
         if (attr.containsKey("inlineResource")) {
@@ -279,33 +313,45 @@ public class RenderHelper {
     }
 
     /**
-     * Add a cache dependency to the current resource. This will be used to flush the current resource when the
+     * Add a cache dependency to the current resource. This will be used to flush
+     * the current resource when the
      * dependencies are modified.
      *
      * @param attr          may be the following:
      *                      <ul>
-     *                      <li> node (JCRNodeWrapper) : The node to add as a dependency. </li>
-     *                      <li> uuid (String) : The UUID of the node to add as a dependency. </li>
-     *                      <li> path (String) : The path of the node to add as a dependency. </li>
-     *                      <li> flushOnPathMatchingRegexp (String) : A regular expression that will be used to flush the cache
-     *                      when the path of the modified nodes matches the regular expression. </li>
+     *                      <li>node (JCRNodeWrapper) : The node to add as a
+     *                      dependency.</li>
+     *                      <li>uuid (String) : The UUID of the node to add as a
+     *                      dependency.</li>
+     *                      <li>path (String) : The path of the node to add as a
+     *                      dependency.</li>
+     *                      <li>flushOnPathMatchingRegexp (String) : A regular
+     *                      expression that will be used to flush the cache
+     *                      when the path of the modified nodes matches the regular
+     *                      expression.</li>
      *                      </ul>
      * @param renderContext the current rendering context
      * @throws IllegalAccessException    if the underlying tag cannot be accessed
      * @throws InvocationTargetException if the underlying tag cannot be invoked
-     * @throws JspException              if the underlying tag throws a JSP exception
-     * @throws IOException               if the underlying tag throws an IO exception
+     * @throws JspException              if the underlying tag throws a JSP
+     *                                   exception
+     * @throws IOException               if the underlying tag throws an IO
+     *                                   exception
      */
-    public void addCacheDependency(Map<String, Object> attr, RenderContext renderContext) throws IllegalAccessException, InvocationTargetException, JspException, IOException {
+    public void addCacheDependency(Map<String, Object> attr, RenderContext renderContext)
+            throws IllegalAccessException, InvocationTargetException, JspException, IOException {
         renderTag(new AddCacheDependencyTag(), attr, renderContext);
     }
 
     /**
      * Calculate the relative path from one node to another node.
      *
-     * @param currentPath the path of the current node from which to calculate the relative path
-     * @param basePath    the path of the base node to which to calculate the relative path
-     * @return the relative path from <code>currentPath</code> to <code>basePath</code>
+     * @param currentPath the path of the current node from which to calculate the
+     *                    relative path
+     * @param basePath    the path of the base node to which to calculate the
+     *                    relative path
+     * @return the relative path from <code>currentPath</code> to
+     *         <code>basePath</code>
      */
     static String calculateRelativePath(String currentPath, String basePath) {
         // special case when the parent is the current node
@@ -322,7 +368,8 @@ public class RenderHelper {
             commonLength++;
         }
 
-        // Calculate the number of steps to go up from the current node to the common prefix
+        // Calculate the number of steps to go up from the current node to the common
+        // prefix
         int stepsUp = currentPathParts.length - commonLength;
 
         // Build the relative path
@@ -348,7 +395,8 @@ public class RenderHelper {
         return name;
     }
 
-    public String renderAbsoluteArea(Map<String, Object> attr, RenderContext renderContext) throws JspException, InvocationTargetException, IllegalAccessException, IOException {
+    public String renderAbsoluteArea(Map<String, Object> attr, RenderContext renderContext)
+            throws JspException, InvocationTargetException, IllegalAccessException, IOException {
         checkAttributes(attr, ABSOLUTEAREA_ALLOWED_ATTRIBUTES);
         // path handling
         String name = readMandatoryAttribute(attr, "name");
@@ -358,21 +406,28 @@ public class RenderHelper {
         return internalRenderArea(attr, "absoluteArea", renderContext);
     }
 
-    public String renderArea(Map<String, Object> attr, RenderContext renderContext) throws IllegalAccessException, InvocationTargetException, JspException, IOException {
+    public String renderArea(Map<String, Object> attr, RenderContext renderContext)
+            throws IllegalAccessException, InvocationTargetException, JspException, IOException {
         checkAttributes(attr, AREA_ALLOWED_ATTRIBUTES);
-        // This is actually expected, the path of an area is relative by default, so the name is directly mapped to: path
-        // the AreaTag will resolve the area content using template inheritance hierarchy.
-        // Even if it's not used in the javascript engine, we need to respect this concept for compatibility with existing system relying on this behavior.
-        // (jExperience for example is using this behavior, for page perso/opti, by pushing the page variant node as parent template)
+        // This is actually expected, the path of an area is relative by default, so the
+        // name is directly mapped to: path
+        // the AreaTag will resolve the area content using template inheritance
+        // hierarchy.
+        // Even if it's not used in the javascript engine, we need to respect this
+        // concept for compatibility with existing system relying on this behavior.
+        // (jExperience for example is using this behavior, for page perso/opti, by
+        // pushing the page variant node as parent template)
         attr.put("path", readMandatoryAttribute(attr, "name"));
         return internalRenderArea(attr, "area", renderContext);
     }
 
-    private String internalRenderArea(Map<String, Object> attr, String moduleType, RenderContext renderContext) throws IllegalAccessException, InvocationTargetException, JspException, IOException {
+    private String internalRenderArea(Map<String, Object> attr, String moduleType, RenderContext renderContext)
+            throws IllegalAccessException, InvocationTargetException, JspException, IOException {
         // We copy the attributes to avoid modifying the original map
         Map<String, Object> areaAttr = new HashMap<>(attr);
         areaAttr.put("moduleType", moduleType);
-        // We now have to transform the attr properties into something that the AreaTag can understand
+        // We now have to transform the attr properties into something that the AreaTag
+        // can understand
         Object allowedTypes = areaAttr.get("allowedNodeTypes");
         if (allowedTypes != null) {
             if (allowedTypes instanceof List) {
@@ -391,9 +446,11 @@ public class RenderHelper {
             areaAttr.remove("numberOfItems");
         }
         areaAttr.put("areaType", areaAttr.remove("nodeType"));
-        areaAttr.put("level", -1); // force the "path" parameter to be computed against the root node of the site (ex: /sites/<my-site>)
+        areaAttr.put("level", -1); // force the "path" parameter to be computed against the root node of the site
+                                   // (ex: /sites/<my-site>)
 
-        // Now we remove any null attribute to make sure they don't override default tag attributes
+        // Now we remove any null attribute to make sure they don't override default tag
+        // attributes
         areaAttr = cleanupNullValues(areaAttr);
 
         return renderTag(new AreaTag(), areaAttr, renderContext);
@@ -405,11 +462,13 @@ public class RenderHelper {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private String renderTag(TagSupport tag, Map<String, Object> attr, RenderContext renderContext) throws IllegalAccessException, InvocationTargetException, JspException, IOException {
+    private String renderTag(TagSupport tag, Map<String, Object> attr, RenderContext renderContext)
+            throws IllegalAccessException, InvocationTargetException, JspException, IOException {
         Map<String, Serializable> renderParameters = (Map<String, Serializable>) attr.get("parameters");
         if (renderParameters != null && !renderParameters.isEmpty() && tag instanceof ParamParent) {
             for (Map.Entry<String, Serializable> tagParam : renderParameters.entrySet()) {
-                // only allow String params due to ParamParent parameters being a <String,String> map
+                // only allow String params due to ParamParent parameters being a
+                // <String,String> map
                 if (tagParam.getValue() instanceof String) {
                     ((ParamParent) tag).addParameter(tagParam.getKey(), (String) tagParam.getValue());
                 }
@@ -448,19 +507,20 @@ public class RenderHelper {
                 mapToProxy.put(entry.getKey(), recursiveProxyMap((Map<String, Object>) entry.getValue()));
             }
             if (entry.getValue() instanceof Collection) {
-                mapToProxy.put(entry.getKey(), ProxyArray.fromList((List<Object>) ((Collection) entry.getValue()).stream().map(o -> {
-                    if (o instanceof Map) {
-                        return recursiveProxyMap((Map<String, Object>) o);
-                    }
-                    return o;
-                }).collect(Collectors.toList())));
+                mapToProxy.put(entry.getKey(),
+                        ProxyArray.fromList((List<Object>) ((Collection) entry.getValue()).stream().map(o -> {
+                            if (o instanceof Map) {
+                                return recursiveProxyMap((Map<String, Object>) o);
+                            }
+                            return o;
+                        }).collect(Collectors.toList())));
             }
         }
         return ProxyObject.fromMap(mapToProxy);
     }
 
-
-    // Utility method to populate a tag with attributes ignoring any missing attributes.
+    // Utility method to populate a tag with attributes ignoring any missing
+    // attributes.
     private void safePopulate(Object tag, Map<String, Object> attr) {
         for (Map.Entry<String, Object> entry : attr.entrySet()) {
             try {

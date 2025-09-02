@@ -40,8 +40,7 @@
     "i18next": "^25.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-i18next": "^15.4.0",
-    "styled-jsx": "^5.0.0"
+    "react-i18next": "^15.4.0"
   },
   "peerDependenciesMeta": {
     "i18next": {
@@ -54,9 +53,6 @@
       "optional": true
     },
     "react-i18next": {
-      "optional": true
-    },
-    "styled-jsx": {
       "optional": true
     }
   }

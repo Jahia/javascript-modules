@@ -7,7 +7,7 @@ import typescript from "@rollup/plugin-typescript";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "rollup";
 import sbom from "rollup-plugin-sbom";
-import sharedLibs from "./shared-libs.mjs";
+import { clientLibs, serverLibs } from "./shared-libs.mjs";
 
 /**
  * The build environment is either "development" or "production".
@@ -17,10 +17,10 @@ import sharedLibs from "./shared-libs.mjs";
 const buildEnv = process.env.BUILD || "development";
 
 /**
- * List of files generated during the shared client libs build (2nd phase).
+ * List of files generated during the shared client libs build.
  *
- * This list is then re-injected in the server-side build (3rd phase) to add performance
- * optimizations to `<InBrowser />`.
+ * This list is then re-injected in the server-side build to add performance optimizations to
+ * `<Island />`.
  *
  * The goal of all this is to flatten the network dependency graph of the hydrated code, by using
  * `<link rel="modulepreload" />` hints.
@@ -48,30 +48,16 @@ const plugins = [
 ];
 
 export default defineConfig([
-  // Build the main client-side script
-  // It takes care of hydrating server-side rendered components
+  //#region Client build
+  // Bundle the shared libraries for browser use (exposed by an importmap)
+  // They are used by both the main client script and client-side module scripts
   {
-    input: "./src/client-javascript/index.ts",
-    output: {
-      file: "src/main/resources/javascript/index.js",
-    },
-    external: Object.keys(sharedLibs),
-    plugins: [
-      ...plugins,
-      // Minify client files in production
-      buildEnv === "production" && terser(),
-    ],
-  },
-  // Bundle the shared libraries
-  // They are used by both the main client-side script and module scripts
-  {
-    input: sharedLibs,
+    input: clientLibs,
     output: {
       dir: "./src/main/resources/javascript/shared-libs/",
     },
     plugins: [
       ...plugins,
-      // Minify client files in production
       buildEnv === "production" && terser(),
       {
         name: "extract-shared-lib-files",
@@ -84,18 +70,28 @@ export default defineConfig([
       },
     ],
   },
-  // Build the server-side script
-  // It takes care of rendering JSX components on the server
+  // Build the main client script: the script that hydrates server-rendered components
   {
-    input: "./src/javascript/index.ts",
+    input: "./src/client/index.ts",
     output: {
-      file: "./src/main/resources/META-INF/js/main.js",
-      format: "iife",
-      globals: {
-        "virtual:jahia-server": "javascriptModulesLibraryBuilder.getServer()",
-      },
+      file: "src/main/resources/javascript/index.js",
     },
-    external: ["virtual:jahia-server"],
+    external: Object.keys(clientLibs),
+    plugins: [
+      ...plugins,
+      // Minify client files in production
+      buildEnv === "production" && terser(),
+    ],
+  },
+  //#endregion
+
+  //#region Server build
+  // Bundle the shared libraries for server use
+  {
+    input: serverLibs,
+    output: {
+      dir: "./src/main/resources/META-INF/js/libs/",
+    },
     plugins: [
       {
         /**
@@ -131,4 +127,15 @@ export default defineConfig([
       ...plugins,
     ],
   },
+  // Build the server-side script
+  // It takes care of rendering JSX components on the server
+  {
+    input: "./src/server/index.ts",
+    output: {
+      file: "./src/main/resources/META-INF/js/main.js",
+    },
+    external: Object.keys(serverLibs),
+    plugins,
+  },
+  //#endregion
 ]);

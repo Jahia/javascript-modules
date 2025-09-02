@@ -30,11 +30,14 @@ export {
   buildEndpointUrl,
   buildNodeUrl,
   buildModuleFileUrl,
-  initUrlBuilder,
 } from "./utils/urlBuilder/urlBuilder.js";
 
 // I18n
 export { getSiteLocales } from "./utils/i18n.js";
 
 // Re-export Java helpers
-export { default as server } from "virtual:jahia-server";
+// `server` is a global variable, but it is less surprising to be able to import it from the library
+// ...and removing it would be a breaking change...
+// We need the intermediate variable because only local vars can be exported
+const localServer = server;
+export { localServer as server };
