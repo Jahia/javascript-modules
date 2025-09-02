@@ -1,4 +1,11 @@
-# Setting Up Your Dev Environment
+---
+page:
+  $path: /sites/academy/home/get-started/front-end-developer/setting-up-your-dev-environment
+  jcr:title: Setting Up Your Dev Environment
+  j:templateName: documentation
+content:
+  $subpath: page-area/content
+---
 
 This tutorial will guide you through the setup of your development environment to start a local Jahia instance and create a new project. We assume you have some familiarity with JavaScript and React, if that's not the case, we recommend you to follow a few tutorials to learn the basics:
 
@@ -96,4 +103,4 @@ Now that your _template set_ (that's how we call a module that provides page tem
 
 Congratulations! You have successfully set up your development environment and created a new project in Jahia. In the next sections, we'll start building the project.
 
-Next: [Making a Hero Section](../2-making-a-hero-section/)
+Next: [Making a Hero Section](making-a-hero-section)

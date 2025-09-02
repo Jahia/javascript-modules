@@ -1,3 +1,5 @@
+<!-- too incomplete to publish on the academy -->
+
 # CND file format
 
 CND, which stands for "Compact Node Definition", is a file format used to define node types in Jackrabbit, the storage layer of Jahia. It is a simple and human-readable format that allows you to define node types and their properties, child nodes, and mixins.

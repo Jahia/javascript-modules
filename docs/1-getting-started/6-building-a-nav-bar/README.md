@@ -1,4 +1,11 @@
-# Building a Navigation Bar
+---
+page:
+  $path: /sites/academy/home/get-started/front-end-developer/building-a-navigation-bar
+  jcr:title: Building a Navigation Bar
+  j:templateName: documentation
+content:
+  $subpath: page-area/content
+---
 
 A navigation bar is a common component in web development. It allows users to navigate between different pages of a website. In this section, we will build a navigation bar for our blog site.
 

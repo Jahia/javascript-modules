@@ -1,4 +1,11 @@
-# Island Architecture
+---
+page:
+  $path: /sites/academy/home/documentation/jahia/8_2/developer/javascript-module-development/client-side-javascript
+  jcr:title: Client-side JavaScript
+  j:templateName: documentation
+content:
+  $subpath: page-area/content
+---
 
 Jahia JavaScript Modules offers a first-class support for this architectural pattern, allowing interactivity without compromising on performance.
 
