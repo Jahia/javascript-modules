@@ -1,8 +1,8 @@
 # Welcome!
 
-Your JavaScript module was successfully created. If this is your first time creating a module, you may want to consult the [Getting Started guide](https://github.com/Jahia/javascript-modules/tree/main/docs/1-getting-started/1-dev-environment#create-a-new-project).
+Your JavaScript module was successfully created. If this is your first time creating a module, you may want to consult the [Getting Started guide](https://academy.jahia.com/tutorials-get-started/front-end-developer/setting-up-your-dev-environment#create-a-new-project).
 
-This README assumes you have a working development environment with Node.js, Yarn and Docker installed and configured. Please refer to the [Getting Started](https://github.com/Jahia/javascript-modules/tree/main/docs/1-getting-started/1-dev-environment#pre-requisites) guide if you need help setting up your environment.
+This README assumes you have a working development environment with Node.js, Yarn and Docker installed and configured. Please refer to the [Getting Started](https://academy.jahia.com/tutorials-get-started/front-end-developer/setting-up-your-dev-environment) guide if you need help setting up your environment.
 
 ## Getting Started
 

@@ -4,7 +4,7 @@
 
 # Javascript Modules
 
-You want to build a JavaScript Module? [Read the documentation 📖](docs/)
+You want to build a JavaScript Module? [Read the documentation 📖](https://academy.jahia.com/tutorials-get-started/frontend-developer/introduction)
 
 This project is designed to support Javascript developers working with _Jahia_. It consists of two components:
 

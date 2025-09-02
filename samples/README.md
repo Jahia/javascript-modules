@@ -1,10 +1,10 @@
 # Samples
 
-Hydrogen is a sample project that contains a JavaScript module with a pre-configured site. It is the result of the [Getting Started tutorial](https://github.com/Jahia/javascript-modules/tree/main/docs/1-getting-started).
+Hydrogen is a sample project that contains a JavaScript module with a pre-configured site. It is the result of the [Getting Started tutorial](https://academy.jahia.com/tutorials-get-started/front-end-developer/setting-up-your-dev-environment#create-a-new-project).
 
 You can test it by following those steps:
 
-1. Make sure you meet [the pre-requisites](https://github.com/Jahia/javascript-modules/tree/main/docs/1-getting-started/1-dev-environment#pre-requisites)
+1. Make sure you meet [the pre-requisites](https://academy.jahia.com/tutorials-get-started/front-end-developer/setting-up-your-dev-environment)
 2. Start a Jahia instance using Docker:
 
 ```
