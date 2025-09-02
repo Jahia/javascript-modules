@@ -11,9 +11,9 @@
 export const clientLibs = {
   // React ships as CJS, so we need our own shims
   // See src/esm-shims/README.md for details
-  "react": "./src/esm-shims/react.ts",
-  "react/jsx-runtime": "./src/esm-shims/react/jsx-runtime.ts",
-  "react-dom/client": "./src/esm-shims/react-dom/client.ts",
+  "react": "./src/shared/react.ts",
+  "react/jsx-runtime": "./src/shared/react/jsx-runtime.ts",
+  "react-dom/client": "./src/shared/react-dom/client.ts",
 
   // Packages already in ESM can be copied as-is from node_modules
   "i18next": "i18next",
@@ -26,8 +26,8 @@ export const clientLibs = {
  * @type {Record<string, string>}
  */
 export const serverLibs = {
-  "react": "./src/esm-shims/react.ts",
-  "react/jsx-runtime": "./src/esm-shims/react/jsx-runtime.ts",
+  "react": "./src/shared/react.ts",
+  "react/jsx-runtime": "./src/shared/react/jsx-runtime.ts",
 
   // Packages already in ESM can be copied as-is from node_modules
   "i18next": "i18next",

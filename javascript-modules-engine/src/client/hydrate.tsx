@@ -72,9 +72,7 @@ const hydrateReactComponent = async (root: HTMLElement) => {
   }
 };
 
-/** Hydrates all React components of `root`. */
-export const hydrateReactComponents = () => {
-  for (const element of document.querySelectorAll("jsm-island")) {
-    hydrateReactComponent(element as HTMLElement);
-  }
-};
+/** Hydrates all React components on the page. */
+for (const element of document.querySelectorAll("jsm-island")) {
+  hydrateReactComponent(element as HTMLElement);
+}

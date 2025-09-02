@@ -72,7 +72,7 @@ export default defineConfig([
   },
   // Build the main client script: the script that hydrates server-rendered components
   {
-    input: "./src/client-javascript/index.ts",
+    input: "./src/client/index.ts",
     output: {
       file: "src/main/resources/javascript/index.js",
     },
@@ -130,7 +130,7 @@ export default defineConfig([
   // Build the server-side script
   // It takes care of rendering JSX components on the server
   {
-    input: "./src/javascript/index.ts",
+    input: "./src/server/index.ts",
     output: {
       file: "./src/main/resources/META-INF/js/main.js",
     },
