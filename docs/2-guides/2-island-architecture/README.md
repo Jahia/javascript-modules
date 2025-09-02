@@ -1,7 +1,7 @@
 ---
 page:
   $path: /sites/academy/home/documentation/jahia/8_2/developer/javascript-module-development/client-side-javascript
-  jcr:title: Island Architure
+  jcr:title: Island Architecture
   j:templateName: documentation
 content:
   $subpath: document-area/content
