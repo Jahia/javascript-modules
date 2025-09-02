@@ -1,4 +1,11 @@
-# View Content in Full Page
+---
+page:
+  $path: /sites/academy/home/get-started/front-end-developer/view-content-in-full-page
+  jcr:title: View Content in Full Page
+  j:templateName: documentation
+content:
+  $subpath: page-area/content
+---
 
 The goal of this section is to render a full-page view of a content node. We'll continue with our blog example, and instead of a 404 page, we'll create a page to display a single blog post.
 
@@ -141,4 +148,4 @@ In JCR, everything is a node, i.e. an entity of a tree designated by a path. The
 
 There is a lot more to learn about URL building and JCR exploration, and it's the topic of the next section.
 
-Next: [Building a Navigation Bar](../6-building-a-nav-bar/)
+Next: [Building a Navigation Bar](building-a-nav-bar)

@@ -1,4 +1,11 @@
-# Making a Hero Section
+---
+page:
+  $path: /sites/academy/home/get-started/front-end-developer/making-a-hero-section
+  jcr:title: Making a Hero Section
+  j:templateName: documentation
+content:
+  $subpath: page-area/content
+---
 
 In this section, we'll create a hero section for our website. A hero section is a large, full-width section at the top of a page. It usually contains a title, a subtitle, and a background image.
 
@@ -264,4 +271,4 @@ You can add as many CTAs as you want to your hero section. This is why we haven'
 > For instance, you should be able to find the content you created at the `sites/<site key>/home/main` path.
 > It can be useful to remove buggy nodes or to understand how your data is persisted.
 
-Next: [The "About Us" Page](../3-the-about-us-page/)
+Next: [The "About Us" Page](the-about-us-page)

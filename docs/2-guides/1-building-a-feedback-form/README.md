@@ -1,4 +1,11 @@
-# Building a Feedback Form
+---
+page:
+  $path: /sites/academy/home/documentation/jahia/8_2/developer/javascript-module-development/building-a-feedback-form
+  jcr:title: Building a Feedback Form
+  j:templateName: documentation
+content:
+  $subpath: page-area/content
+---
 
 The goal of this self-contained guide is to create a feedback form that uses client-side JavaScript to send data to a server. This first half will be about building the form, the second half about collecting the data on the server with jCustomer.
 
@@ -6,7 +13,7 @@ We will build something very similar to the widget that can be found on many doc
 
 ![Sample Feedback Forms](./samples.png)
 
-This guide assumes you have followed the [Getting Started](../1-getting-started/1-dev-environment/) guide and have a working Jahia instance with a JavaScript Module running on it. If you haven't done so, please follow the instructions in that guide before continuing.
+This guide assumes you have followed the [Getting Started](/cms/{mode}/{lang}/sites/academy/home/get-started/front-end-developer/introduction.html) guide and have a working Jahia instance with a JavaScript Module running on it. If you haven't done so, please follow the instructions in that guide before continuing.
 
 ## Client-Side JavaScript
 
@@ -369,5 +376,3 @@ You will get a `.ndjson` file that contains the dashboard and all the visualizat
 Now, when your module is deployed, the dashboard will be automatically imported into Jahia. You can check that it works by deploying your module to a new Jahia instance and checking that the dashboard is available in the jExperience tab.
 
 This is it for this guide! We hope you enjoyed it and found it useful. If you have any questions or feedback, please let us know on [GitHub](https://github.com/Jahia/javascript-modules/issues/new?template=other.md).
-
-[Back to Guides](../..)

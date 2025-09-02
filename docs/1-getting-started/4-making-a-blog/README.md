@@ -1,4 +1,11 @@
-# Making a Blog
+---
+page:
+  $path: /sites/academy/home/get-started/front-end-developer/making-a-blog
+  jcr:title: Making a Blog
+  j:templateName: documentation
+content:
+  $subpath: page-area/content
+---
 
 So far we only considered contributing pages visually, directly in Page Builder. This is great for individual, unique pages but it's not the best way to manage a blog. In a blog, you want all your articles to have the same structure and style, and you want to be able to manage them all in one place.
 
@@ -205,4 +212,4 @@ We used `currentResource.getLocale().toString()` to get the locale of the curren
 
 There are a lot of things to discover about JCR queries, as it allows you to query, filter, order and paginate contents in a tree-like structure. You can find more information in the [Jahia documentation](https://academy.jahia.com/documentation/jahia-cms/jahia-8.2/developer/leveraging-jahia-backend-capabilities/jcrsql2-query-cheat-sheet).
 
-Next: [View Content in Full Page](../5-view-content-in-full-page/)
+Next: [View Content in Full Page](view-content-in-full-page)

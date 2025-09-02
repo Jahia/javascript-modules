@@ -1,4 +1,11 @@
-# The "About Us" Page
+---
+page:
+  $path: /sites/academy/home/get-started/front-end-developer/the-about-us-page
+  jcr:title: The "About Us" Page
+  j:templateName: documentation
+content:
+  $subpath: page-area/content
+---
 
 Our homepage is based on a "basic" layout: take a look at `src/templates/Page/basic.server.tsx`. It's a single column layout defined by an `<Area>` without any constraints. If a user wants to place many Hero sections on the page, they can do it. Most websites have a slightly more controlled layout: a navbar, a title, a footer, optional sidebars, etc. In this section, we'll create a page layout that suits a typical "About Us" page.
 
@@ -263,4 +270,4 @@ Try adding a few links to the footer that should be created at the end of the `s
 
 If you create another page with **Single column**, you should be able to create a new Hero section, but the footer will be the same as the one on the "About Us" page.
 
-Next: [Making a Blog](../4-making-a-blog/)
+Next: [Making a Blog](making-a-blog)
