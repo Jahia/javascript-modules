@@ -10,14 +10,14 @@ const pre = "_pre_1cbxx_3";
 const classes = {
   pre
 };
-const Foo = function(v) {
+const Foo = (function(v) {
   if (typeof v === "function" || typeof v === "object" && v)
     Object.defineProperty(v, "__filename", {
       value: "dist/client/foo.client.tsx",
       enumerable: false
     });
   return v;
-}(function Foo2() {
+})(function Foo2() {
   return /* @__PURE__ */ jsx("pre", { className: classes.pre, children: "Hello World!" });
 });
 jahiaComponent(
