@@ -25,16 +25,16 @@
     "lint": "yarn run --top-level lint"
   },
   "dependencies": {
-    "dotenv": "^17.0.0"
+    "dotenv": "^17.2.2"
   },
   "devDependencies": {
-    "@types/react": "^19.1.8",
-    "devalue": "^5.1.1",
+    "@types/react": "^19.1.12",
+    "devalue": "^5.3.2",
     "graphql": "^16.11.0",
-    "i18next": "^25.0.2",
+    "i18next": "^25.4.2",
     "publint": "^0.3.12",
-    "react-i18next": "^15.5.1",
-    "typescript": "^5.8.3"
+    "react-i18next": "^15.7.3",
+    "typescript": "^5.9.2"
   },
   "peerDependencies": {
     "i18next": "^25.0.0",
