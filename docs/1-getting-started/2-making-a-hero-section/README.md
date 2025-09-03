@@ -62,8 +62,10 @@ _Picture by [Appolinary Kalashnikova](https://unsplash.com/@appolinary_kalashnik
 
 Click **Save** and see the new hero section in the content tree:
 
-> No rendering set for node: herosection<br>
-> Types: [hydrogen:heroSection]
+```
+No rendering set for node: herosection
+Types: [hydrogen:heroSection]
+```
 
 This error message means that Jahia doesn't know how to render the `heroSection` node type: we haven't implemented the rendering logic yet. We'll do that next.
 

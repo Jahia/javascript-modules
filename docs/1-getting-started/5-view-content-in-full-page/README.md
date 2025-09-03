@@ -148,4 +148,4 @@ In JCR, everything is a node, i.e. an entity of a tree designated by a path. The
 
 There is a lot more to learn about URL building and JCR exploration, and it's the topic of the next section.
 
-Next: [Building a Navigation Bar](building-a-nav-bar)
+Next: [Building a Navigation Bar](building-a-navigation-bar)
