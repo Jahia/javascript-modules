@@ -48,8 +48,9 @@ You can stop and restart `yarn dev` to push this definition to your Jahia instan
 
 Click **New content** and select **heroSection** to create a new hero section:
 
-> [!WARNING]
-> Jahia will refuse your type definition if it contains a breaking change. During development, you can use the [Installed definitions browser](http://localhost:8080/modules/tools/definitionsBrowser.jsp) tool to remove your type definition and push a new one.
+:::warning
+Jahia will refuse your type definition if it contains a breaking change. During development, you can use the [Installed definitions browser](http://localhost:8080/modules/tools/definitionsBrowser.jsp) tool to remove your type definition and push a new one.
+:::
 
 ![Content insertion interface](create-hero-section.png)
 
@@ -266,9 +267,10 @@ Once pushed to your Jahia instance, if you create a CTA button in your hero sect
 
 You can add as many CTAs as you want to your hero section. This is why we haven't defined our CTA properties on `heroSection` directly: it allows for more flexibility and reusability.
 
-> [!TIP]
-> You can, at all times, take a look at your data tree with the [JCR repository browser](http://localhost:8080/modules/tools/jcrBrowser.jsp).
-> For instance, you should be able to find the content you created at the `sites/<site key>/home/main` path.
-> It can be useful to remove buggy nodes or to understand how your data is persisted.
+:::info
+You can, at all times, take a look at your data tree with the [JCR repository browser](http://localhost:8080/modules/tools/jcrBrowser.jsp).
+For instance, you should be able to find the content you created at the `sites/<site key>/home/main` path.
+It can be useful to remove buggy nodes or to understand how your data is persisted.
+:::
 
 Next: [The "About Us" Page](the-about-us-page)
