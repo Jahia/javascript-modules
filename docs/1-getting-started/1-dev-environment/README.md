@@ -31,8 +31,9 @@ Docker version 27.5.1, build 9f9e405
 
 It might work with other versions but we can't guarantee it. If you encounter any issues, please refer to the official documentation of the tools.
 
-> [!IMPORTANT]
-> Make sure you are running **Node 22.14 or later** by running `node -v`. You will need **Yarn 4.9** or later, which **should be managed by [Corepack](https://github.com/nodejs/corepack)**. Make sure to run `corepack enable yarn` to enable it. [You don't need a global installation of Yarn.](https://yarnpkg.com/getting-started/install)
+:::warning
+Make sure you are running **Node 22.14 or later** by running `node -v`. You will need **Yarn 4.9** or later, which **should be managed by [Corepack](https://github.com/nodejs/corepack)**. Make sure to run `corepack enable yarn` to enable it. [You don't need a global installation of Yarn.](https://yarnpkg.com/getting-started/install)
+:::
 
 ## Create a New Project
 

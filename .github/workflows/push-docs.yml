@@ -1,3 +1,5 @@
+name: Push Docs to the Academy
+
 on:
   release:
     types: [published]
