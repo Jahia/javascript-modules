@@ -99,8 +99,10 @@ In `Header/default.server.tsx`, replace the current `<RenderChild name="hero" />
 
 This additional property, `view`, defines the view that should be used when Jahia renders the `heroSection` component. We haven't created the `small` view yet, if you refresh your page right now you will see an error message instead:
 
-> No rendering set for node: herosection<br/>
-> Types: [hydrogen:heroSection]
+```
+No rendering set for node: herosection
+Types: [hydrogen:heroSection]
+```
 
 Start by adding a file named `src/components/Hero/Section/types.ts` and move `Props` to it:
 
