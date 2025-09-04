@@ -3230,6 +3230,7 @@ __metadata:
     react-i18next: "npm:^15.7.3"
     rollup: "npm:^4.50.0"
     rollup-plugin-sbom: "npm:^2.1.2"
+    web-streams-polyfill: "npm:^4.2.0"
   languageName: unknown
   linkType: soft
 
@@ -5590,6 +5591,13 @@ __metadata:
   version: 3.1.0
   resolution: "void-elements@npm:3.1.0"
   checksum: 10c0/0b8686f9f9aa44012e9bd5eabf287ae0cde409b9a2854c5a2335cb83920c957668ac5876e3f0d158dd424744ac411a7270e64128556b451ed3bec875ef18534d
+  languageName: node
+  linkType: hard
+
+"web-streams-polyfill@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "web-streams-polyfill@npm:4.2.0"
+  checksum: 10c0/d7a5ece7a073f4a687b193d8bc39610347179241a16a5591af6c7059f440242b9caf2fcf87b04d23e23c7d52c1cc1a2ef8470ab6d792d8150bf09beaf880fd36
   languageName: node
   linkType: hard
 
