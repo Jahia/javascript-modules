@@ -15,10 +15,17 @@ on:
 jobs:
   static-analysis:
     name: Static Analysis (linting, vulns)
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    env:
+      NEXUS_INTERNAL_URL: ${{ secrets.NEXUS_INTERNAL_URL }}
+    container:
+      image: jahia/cimg-mvn-cache:ga_cimg_openjdk_17.0.9-node
+      credentials:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
-      - uses: jahia/jahia-modules-action/static-analysis@v2
+      - uses: jahia/jahia-modules-action/static-analysis@add-checkstyle-to-static-analysis
         with:
           node_version: 20
           yarn_version: 4.7.0
