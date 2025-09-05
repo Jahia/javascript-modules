@@ -365,6 +365,33 @@
                     <timezone>UTC</timezone>
                 </configuration>
             </plugin>
+
+            <!-- TODO eventually move it to the parent pom -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.6.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>11.0.1</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <!-- TODO eventually use main branch -->
+                    <configLocation>https://raw.githubusercontent.com/Jahia/jahia-dev-private/refs/heads/guild-day-checkstyle/ide-configuration/checkstyle.xml</configLocation>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <profiles>
