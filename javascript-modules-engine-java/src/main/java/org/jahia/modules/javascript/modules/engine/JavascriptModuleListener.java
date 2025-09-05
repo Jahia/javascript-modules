@@ -38,80 +38,80 @@ import static org.jahia.modules.javascript.modules.engine.jshandler.JavascriptPr
  */
 @Component(immediate = true)
 public class JavascriptModuleListener implements BundleListener {
-    private static final Logger logger = LoggerFactory.getLogger(JavascriptModuleListener.class);
-    private GraalVMEngine engine;
-    private final Queue<Registrar> registrars = new ConcurrentLinkedQueue<>();
+	private static final Logger logger = LoggerFactory.getLogger(JavascriptModuleListener.class);
+	private GraalVMEngine engine;
+	private final Queue<Registrar> registrars = new ConcurrentLinkedQueue<>();
 
-    @Reference(cardinality = ReferenceCardinality.MANDATORY)
-    public void setEngine(GraalVMEngine engine) {
-        this.engine = engine;
-    }
+	@Reference(cardinality = ReferenceCardinality.MANDATORY)
+	public void setEngine(GraalVMEngine engine) {
+		this.engine = engine;
+	}
 
-    @Reference(service = Registrar.class, policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MULTIPLE, policyOption = ReferencePolicyOption.GREEDY)
-    public void addRegistrar(Registrar registrar) {
-        for (Bundle bundle : getJavascriptModules()) {
-            registrar.register(bundle);
-        }
+	@Reference(service = Registrar.class, policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MULTIPLE, policyOption = ReferencePolicyOption.GREEDY)
+	public void addRegistrar(Registrar registrar) {
+		for (Bundle bundle : getJavascriptModules()) {
+			registrar.register(bundle);
+		}
 
-        registrars.add(registrar);
-    }
+		registrars.add(registrar);
+	}
 
-    public void removeRegistrar(Registrar registrar) {
-        registrars.remove(registrar);
+	public void removeRegistrar(Registrar registrar) {
+		registrars.remove(registrar);
 
-        for (Bundle bundle : getJavascriptModules()) {
-            registrar.unregister(bundle);
-        }
-    }
+		for (Bundle bundle : getJavascriptModules()) {
+			registrar.unregister(bundle);
+		}
+	}
 
-    @Activate
-    public void activate(BundleContext context) {
-        for (Bundle bundle : getJavascriptModules()) {
-            engine.enableJavascriptModule(bundle);
-        }
+	@Activate
+	public void activate(BundleContext context) {
+		for (Bundle bundle : getJavascriptModules()) {
+			engine.enableJavascriptModule(bundle);
+		}
 
-        context.addBundleListener(this);
-    }
+		context.addBundleListener(this);
+	}
 
-    @Deactivate
-    public void deactivate(BundleContext context) {
-        context.removeBundleListener(this);
+	@Deactivate
+	public void deactivate(BundleContext context) {
+		context.removeBundleListener(this);
 
-        for (Bundle bundle : getJavascriptModules()) {
-            engine.disableJavascriptModule(bundle);
-        }
-    }
+		for (Bundle bundle : getJavascriptModules()) {
+			engine.disableJavascriptModule(bundle);
+		}
+	}
 
-    @Override
-    public void bundleChanged(BundleEvent event) {
-        try {
-            Bundle bundle = event.getBundle();
-            if (isJavascriptModule(bundle)) {
-                if (event.getType() == BundleEvent.STARTED) {
-                    engine.enableJavascriptModule(bundle);
-                    for (Registrar registrar : registrars) {
-                        registrar.register(bundle);
-                    }
-                } else if (event.getType() == BundleEvent.STOPPED) {
-                    for (Registrar registrar : registrars) {
-                        registrar.unregister(bundle);
-                    }
-                    engine.disableJavascriptModule(bundle);
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Cannot handle event {}", event.toString(), e);
-        }
-    }
+	@Override
+	public void bundleChanged(BundleEvent event) {
+		try {
+			Bundle bundle = event.getBundle();
+			if (isJavascriptModule(bundle)) {
+				if (event.getType() == BundleEvent.STARTED) {
+					engine.enableJavascriptModule(bundle);
+					for (Registrar registrar : registrars) {
+						registrar.register(bundle);
+					}
+				} else if (event.getType() == BundleEvent.STOPPED) {
+					for (Registrar registrar : registrars) {
+						registrar.unregister(bundle);
+					}
+					engine.disableJavascriptModule(bundle);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("Cannot handle event {}", event.toString(), e);
+		}
+	}
 
-    public List<Bundle> getJavascriptModules() {
-        return Arrays.stream(engine.getBundleContext().getBundles())
-                .filter(bundle -> bundle.getState() == Bundle.ACTIVE && isJavascriptModule(bundle))
-                .collect(Collectors.toList());
-    }
+	public List<Bundle> getJavascriptModules() {
+		return Arrays.stream(engine.getBundleContext().getBundles())
+				.filter(bundle -> bundle.getState() == Bundle.ACTIVE && isJavascriptModule(bundle))
+				.collect(Collectors.toList());
+	}
 
-    public boolean isJavascriptModule(Bundle bundle) {
-        return bundle.getBundleId() != engine.getBundleContext().getBundle().getBundleId() &&
-                bundle.getHeaders().get(BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT) != null;
-    }
+	public boolean isJavascriptModule(Bundle bundle) {
+		return bundle.getBundleId() != engine.getBundleContext().getBundle().getBundleId() &&
+				bundle.getHeaders().get(BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT) != null;
+	}
 }
