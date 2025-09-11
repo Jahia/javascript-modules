@@ -13,9 +13,8 @@ test("@jahia/vite-plugin output snapshot", () => {
       continue;
     }
 
-    // Building on Windows produces CRLF line endings, normalize all line endings
-    const expectedContent = fs.readFileSync(expected, "utf8").replaceAll("\r\n", "\n");
-    const actualContent = fs.readFileSync(actual, "utf8").replaceAll("\r\n", "\n");
+    const expectedContent = fs.readFileSync(expected, "utf8");
+    const actualContent = fs.readFileSync(actual, "utf8");
     try {
       assert.strictEqual(actualContent, expectedContent, `File content mismatch for ${entry.name}`);
     } catch (error) {
