@@ -117,3 +117,29 @@ jobs:
           path: javascript-modules-engine/tests/artifacts/results/xml_reports/**/*.xml
           reporter: java-junit
           fail-on-error: "false"
+
+  # This workflow ensures that Windows builds are exactly the same as on other platforms
+  test-on-windows:
+    name: Test on Windows
+    runs-on: windows-latest
+    steps:
+      - # https://github.com/actions/checkout/issues/135
+        name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: latest
+          check-latest: true
+
+      - name: Install and build dependencies
+        run: yarn && yarn workspace "@jahia/vite-plugin" build
+
+      - name: Run tests
+        run: yarn workspace "@jahia/vite-plugin" test
