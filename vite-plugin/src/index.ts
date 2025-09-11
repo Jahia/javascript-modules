@@ -234,7 +234,7 @@ export default function jahia(
                       path.posix.join(
                         options.outputDir ?? "dist",
                         options.client?.outputDir ?? "client",
-                        path.relative(clientBaseDir, id),
+                        path.posix.relative(clientBaseDir, id),
                       ),
                   ),
                 ],
@@ -248,10 +248,10 @@ export default function jahia(
             // In SSR, resolve the full path to the file in the server output directory
             if (ssr) {
               // In JS mode, resolve to the full output path
-              if (hostType === "js") return path.join(options.outputDir ?? "dist", filename);
+              if (hostType === "js") return path.posix.join(options.outputDir ?? "dist", filename);
 
               // In CSS mode, resolve to the relative path from the assets directory
-              return path.relative(assetsDir, filename);
+              return path.posix.relative(assetsDir, filename);
             }
             return { relative: true };
           },
