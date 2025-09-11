@@ -25,4 +25,6 @@ jobs:
           yarn workspace "@jahia/vite-plugin" build
 
       - name: Run tests
-        run: FORCE_COLOR=1 yarn workspace "@jahia/vite-plugin" test
+        run: |
+          set FORCE_COLOR=1
+          yarn workspace "@jahia/vite-plugin" test
