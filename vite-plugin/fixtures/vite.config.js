@@ -11,4 +11,11 @@ export default defineConfig({
     }),
     jahia(),
   ],
+  css: {
+    modules: {
+      // Use a dummy hashing function for scoped CSS class names so that
+      // it behaves the same on all platforms
+      generateScopedName: (name) => name,
+    },
+  },
 });
