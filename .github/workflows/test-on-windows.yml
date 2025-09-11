@@ -1,0 +1,28 @@
+# This workflow ensures that Windows builds are exactly the same as on other platforms
+
+name: Test on Windows
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: latest
+          check-latest: true
+
+      - name: Install and build dependencies
+        run: |
+          corepack enable
+          yarn install
+          yarn workspaces foreach -Rt --from "@jahia/vite-plugin-fixtures" run build
+
+      - name: Run tests
+        run: yarn workspace "@jahia/vite-plugin-fixtures" run test
