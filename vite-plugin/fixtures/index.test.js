@@ -15,7 +15,12 @@ test("@jahia/vite-plugin output snapshot", () => {
 
     const expectedContent = fs.readFileSync(expected, "utf8");
     const actualContent = fs.readFileSync(actual, "utf8");
-    assert.strictEqual(actualContent, expectedContent, `File content mismatch for ${entry.name}`);
+    try {
+      assert.strictEqual(actualContent, expectedContent, `File content mismatch for ${entry.name}`);
+    } catch (error) {
+      console.log({ actual: btoa(actualContent), expected: btoa(expectedContent) });
+      throw error;
+    }
   }
 
   // Check if the assets are present
