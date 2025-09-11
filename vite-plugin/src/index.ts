@@ -1,5 +1,5 @@
 import { clientLibs, serverLibs } from "javascript-modules-engine/shared-libs.mjs";
-import path from "node:path/posix";
+import path from "node:path";
 import { styleText } from "node:util";
 import type { Plugin } from "rollup";
 import { globSync } from "tinyglobby";
@@ -157,13 +157,16 @@ export default function jahia(
               assetsDir,
               rollupOptions: {
                 input: Object.fromEntries(
-                  clientEntries.map((file) => [file, path.join(clientBaseDir, file)]),
+                  clientEntries.map((file) => [file, path.posix.join(clientBaseDir, file)]),
                 ),
                 output: {
                   dir: options.outputDir ?? "dist",
                   // Preserve the filenames of the entry points, to allow the hydration code
                   // to import the correct files
-                  entryFileNames: path.join(options.client?.outputDir ?? "client", "[name].js"),
+                  entryFileNames: path.posix.join(
+                    options.client?.outputDir ?? "client",
+                    "[name].js",
+                  ),
                 },
                 // By default, Vite only keep side effects, but entry points work by exporting a
                 // default function component. Ensure entry points keep their "signature" (i.e.
@@ -194,7 +197,7 @@ export default function jahia(
               cssCodeSplit: false,
               emptyOutDir: false,
               rollupOptions: {
-                input: path.join(
+                input: path.posix.join(
                   options.inputDir ?? "src",
                   options.server?.inputGlob ?? "**/*.server.{jsx,tsx}",
                 ),
@@ -203,7 +206,7 @@ export default function jahia(
                   chunkFileNames: "server/[name]-[hash].js",
                   // Produce a consistent name for the style file, hash other assets
                   assetFileNames: ({ originalFileNames }) =>
-                    path.join(
+                    path.posix.join(
                       assetsDir,
                       // `style.css` is hardcoded in Vite when CSS Code Splitting is disabled
                       originalFileNames.includes("style.css")
@@ -228,7 +231,7 @@ export default function jahia(
                     options.client?.inputGlob ?? "**/*.client.{jsx,tsx}",
                     // Convert a client source filename into a client production filename
                     (id: string) =>
-                      path.join(
+                      path.posix.join(
                         options.outputDir ?? "dist",
                         options.client?.outputDir ?? "client",
                         path.relative(clientBaseDir, id),
