@@ -6,7 +6,7 @@ const Layout = ({ children }) => /* @__PURE__ */ jsxs("body", { children: [
   children,
   /* @__PURE__ */ jsx(AddResources, { type: "css", resources: buildModuleFileUrl("dist/assets/style.css") })
 ] });
-const pre = "_pre_1cbxx_3";
+const pre = "pre";
 const classes = {
   pre
 };
