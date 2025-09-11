@@ -22,7 +22,7 @@ jobs:
         run: |
           corepack enable
           yarn install
-          yarn workspaces foreach -Rt --from "@jahia/vite-plugin-fixtures" run build
+          yarn workspace "@jahia/vite-plugin" build
 
       - name: Run tests
-        run: yarn workspace "@jahia/vite-plugin-fixtures" run test
+        run: yarn workspace "@jahia/vite-plugin" test
