@@ -9,7 +9,7 @@ jobs:
   test:
     runs-on: windows-latest
     steps:
-      - # https://github.com/actions/checkout/issues/135#issuecomment-602171132
+      - # https://github.com/actions/checkout/issues/135
         name: Set git to use LF
         run: |
           git config --global core.autocrlf false
@@ -25,10 +25,7 @@ jobs:
           check-latest: true
 
       - name: Install and build dependencies
-        run: |
-          corepack enable
-          yarn install
-          yarn workspace "@jahia/vite-plugin" build
+        run: yarn && yarn workspace "@jahia/vite-plugin" build
 
       - name: Run tests
         run: yarn workspace "@jahia/vite-plugin" test

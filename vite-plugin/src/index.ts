@@ -234,6 +234,7 @@ export default function jahia(
                       path.posix.join(
                         options.outputDir ?? "dist",
                         options.client?.outputDir ?? "client",
+                        // Compute the relative path platform-specifically to support Windows
                         path.relative(clientBaseDir, id),
                       ),
                   ),
