@@ -18,7 +18,8 @@ test("@jahia/vite-plugin output snapshot", () => {
     try {
       assert.strictEqual(actualContent, expectedContent, `File content mismatch for ${entry.name}`);
     } catch (error) {
-      console.log({ actual: btoa(actualContent), expected: btoa(expectedContent) });
+      console.log(btoa(actualContent));
+      console.log(btoa(expectedContent));
       throw error;
     }
   }
