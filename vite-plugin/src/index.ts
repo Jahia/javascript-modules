@@ -234,7 +234,7 @@ export default function jahia(
                       path.posix.join(
                         options.outputDir ?? "dist",
                         options.client?.outputDir ?? "client",
-                        path.posix.relative(clientBaseDir, id),
+                        path.relative(clientBaseDir, id),
                       ),
                   ),
                 ],
