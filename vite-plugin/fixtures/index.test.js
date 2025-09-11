@@ -13,9 +13,9 @@ test("@jahia/vite-plugin output snapshot", () => {
       continue;
     }
 
-    const expectedContent = fs.readFileSync(expected, "utf8");
-    // Building on Windows produces CRLF line endings
-    const actualContent = fs.readFileSync(actual, "utf8");
+    // Building on Windows produces CRLF line endings, normalize all line endings
+    const expectedContent = fs.readFileSync(expected, "utf8").replaceAll("\r\n", "\n");
+    const actualContent = fs.readFileSync(actual, "utf8").replaceAll("\r\n", "\n");
     try {
       assert.strictEqual(actualContent, expectedContent, `File content mismatch for ${entry.name}`);
     } catch (error) {
