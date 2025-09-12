@@ -3,8 +3,11 @@ import i18n from "i18next";
 import type { RenderContext, Resource } from "org.jahia.services.render";
 import type { Bundle } from "org.osgi.framework";
 import type { ComponentType } from "react";
-import ReactDOMServer from "react-dom/server.edge";
+import { renderToReadableStream } from "react-dom/server.edge";
 import { I18nextProvider } from "react-i18next";
+
+// @ts-expect-error Retrieve a Java object
+const CompletableFuture = Java.type("java.util.concurrent.CompletableFuture");
 
 server.registry.add("view", "react", {
   viewRenderer: "react",
@@ -30,7 +33,7 @@ server.registry.add("viewRenderer", "react", {
     const currentNode = currentResource.getNode();
     const mainNode = renderContext.getMainResource().getNode();
     const View = view.component;
-    const element = (
+    const tree = (
       <ServerContextProvider
         renderContext={renderContext}
         currentResource={currentResource}
@@ -45,15 +48,29 @@ server.registry.add("viewRenderer", "react", {
       </ServerContextProvider>
     );
 
-    return (
-      // In page mode, prepend the rendered HTML with the HTML5 doctype
-      (currentResource.getContextConfiguration() === "page" ? "<!DOCTYPE html>" : "") +
-      // We use a `<jsm-raw-html>` element to wrap raw HTML output because React does not allow
-      // directly returning raw HTML strings. These elements are removed there, to avoid
-      // having them in the final output.
-      // `<jsm-raw-html>` SHOULD NOT be used in userland code, it is an internal implementation
-      // detail.
-      ReactDOMServer.renderToString(element).replaceAll(/<\/?jsm-raw-html>/g, "")
-    );
+    const completable = new CompletableFuture();
+
+    // Render the tree to a stream, then collect the stream in a string
+    renderToReadableStream(tree).then(async (stream) => {
+      console.log("Stream created");
+      // Wait for all nested components to be rendered
+      await stream.allReady;
+
+      const reader = stream.getReader();
+      const decoder = new TextDecoder();
+      let { done, value } = await reader.read();
+
+      let html = "";
+      while (!done) {
+        html += decoder.decode(value);
+        ({ done, value } = await reader.read());
+      }
+
+      console.log("Rendered HTML:", html);
+      completable.complete(html);
+    });
+
+    // @ts-expect-error Oops
+    return completable.get(5, Java.type("java.util.concurrent.TimeUnit").SECONDS);
   },
 });

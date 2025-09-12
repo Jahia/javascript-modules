@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import pl.touk.throwing.ThrowingFunction;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class JSScript implements Script {
     private static final Logger logger = LoggerFactory.getLogger(JSScript.class);
@@ -52,7 +53,8 @@ public class JSScript implements Script {
             String viewRendererStr = viewValues.get("viewRenderer").toString();
             Map<String, Object> viewRenderer = contextProvider.getRegistry().get("viewRenderer", viewRendererStr);
             if (viewRenderer == null) {
-                throw new RenderException(String.format("Unknown view renderer: %s for view: %s", viewRendererStr, jsView.getRegistryKey()));
+                throw new RenderException(String.format("Unknown view renderer: %s for view: %s", viewRendererStr,
+                        jsView.getRegistryKey()));
             }
 
             if (logger.isDebugEnabled()) {
@@ -60,15 +62,25 @@ public class JSScript implements Script {
             }
 
             viewValues.put("bundle", Value.asValue(jsView.getModule().getBundle()));
-            Object executionResult = Value.asValue(viewRenderer.get("render")).execute(resource, renderContext, ProxyObject.fromMap(viewValues));
-            Value value = Value.asValue(executionResult);
-            return value.asString();
+            String value = Value
+                    .asValue(viewRenderer.get("render"))
+                    .execute(resource, renderContext,
+                            ProxyObject.fromMap(viewValues))
+                    .asHostObject();
+
+            // value is a Promise<string> JS object
+            logger.info("Resource: {} -> {}", resource, value);
+
+            return value;
         }));
 
         if (jsView.isTemplate()) {
-            // Jahia core TemplateNodeFilter is using this attribute to store the template in request for sub fragment cache entries
-            // We need to clean it after template output, in order for cache keys to be generated correctly for the main resource
-            // (part of code necessary to make template inheritance hierarchy and relatives areas working correctly)
+            // Jahia core TemplateNodeFilter is using this attribute to store the template
+            // in request for sub fragment cache entries
+            // We need to clean it after template output, in order for cache keys to be
+            // generated correctly for the main resource
+            // (part of code necessary to make template inheritance hierarchy and relatives
+            // areas working correctly)
             renderContext.getRequest().setAttribute("previousTemplate", null);
         }
 
