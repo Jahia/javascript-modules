@@ -1,4 +1,4 @@
-import { Plugin } from "vite";
+import type { Plugin } from "vite";
 
 /**
  * List of environments still being built.
