@@ -3,7 +3,7 @@ import path from "node:path";
 import { styleText } from "node:util";
 import { globSync } from "tinyglobby";
 import type { PluginOption } from "vite";
-import { buildSuccessPlugin } from "./build-success.js";
+import { buildSuccessful } from "./build-successful.js";
 import { insertFilename } from "./insert-filename.js";
 import { multiEntry } from "./multi-entry.js";
 
@@ -177,7 +177,7 @@ export default function jahia(
                   // Only add the callback plugin in watch mode
                   config.build?.watch &&
                     options.watchCallback &&
-                    buildSuccessPlugin(options.watchCallback),
+                    buildSuccessful(options.watchCallback),
                 ],
               },
             },
@@ -218,7 +218,7 @@ export default function jahia(
                   // Only add the callback plugin in watch mode
                   config.build?.watch &&
                     options.watchCallback &&
-                    buildSuccessPlugin(options.watchCallback),
+                    buildSuccessful(options.watchCallback),
                   // Insert filenames in client-side components
                   insertFilename(
                     clientBaseDir,

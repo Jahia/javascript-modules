@@ -14,7 +14,7 @@ const building = new Set<string>();
  *
  * It tracks the completion of builds in watch mode.
  */
-export function buildSuccessPlugin(callback: () => void | Promise<void>): Plugin {
+export function buildSuccessful(callback: () => void | Promise<void>): Plugin {
   return {
     name: "build-successful-callback",
     buildStart() {
