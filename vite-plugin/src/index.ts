@@ -1,21 +1,11 @@
 import { clientLibs, serverLibs } from "javascript-modules-engine/shared-libs.mjs";
 import path from "node:path";
 import { styleText } from "node:util";
-import type { Plugin } from "rollup";
 import { globSync } from "tinyglobby";
 import type { PluginOption } from "vite";
+import { buildSuccessful } from "./build-successful.js";
 import { insertFilename } from "./insert-filename.js";
 import { multiEntry } from "./multi-entry.js";
-
-/** Plugin to execute a callback when a build succeeds. */
-function buildSuccessPlugin(callback: () => void | Promise<void>): Plugin {
-  return {
-    name: "build-success-callback",
-    async closeBundle(error) {
-      if (!error) await callback();
-    },
-  };
-}
 
 export default function jahia(
   options: {
@@ -184,6 +174,10 @@ export default function jahia(
                       }
                     },
                   },
+                  // Only add the callback plugin in watch mode
+                  config.build?.watch &&
+                    options.watchCallback &&
+                    buildSuccessful(options.watchCallback),
                 ],
               },
             },
@@ -224,7 +218,7 @@ export default function jahia(
                   // Only add the callback plugin in watch mode
                   config.build?.watch &&
                     options.watchCallback &&
-                    buildSuccessPlugin(options.watchCallback),
+                    buildSuccessful(options.watchCallback),
                   // Insert filenames in client-side components
                   insertFilename(
                     clientBaseDir,
