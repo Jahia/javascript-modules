@@ -30,7 +30,7 @@ services:
       POSTGRES_USER: jahia
       POSTGRES_PASSWORD: dbpassword
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "jahia"]
+      test: ["CMD", "pg_isready"]
       interval: 5s
       timeout: 1s
       retries: 30
