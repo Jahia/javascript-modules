@@ -25,17 +25,6 @@ jobs:
           yarn_test_version: 4.7.0
           auditci_level: critical
 
-  update-signature:
-    name: Update module signature
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jahia/jahia-modules-action/update-signature@v2
-        with:
-          nexus_username: ${{ secrets.NEXUS_USERNAME }}
-          nexus_password: ${{ secrets.NEXUS_PASSWORD }}
-          force_signature: true
-
   build:
     name: Build Module
     runs-on: self-hosted
