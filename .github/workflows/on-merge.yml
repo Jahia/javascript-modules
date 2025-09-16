@@ -26,6 +26,7 @@ jobs:
         with:
           nexus_username: ${{ secrets.NEXUS_USERNAME }}
           nexus_password: ${{ secrets.NEXUS_PASSWORD }}
+          force_signature: true
 
   build:
     name: Build Module
