@@ -68,7 +68,7 @@ const hydrateReactComponent = async (root: HTMLElement) => {
     }
     root.dataset.hydrated = "true";
   } catch (error) {
-    console.error("Hydration failed for element", root, error);
+    console.error("<Island> failed to load", root, error);
   }
 };
 
