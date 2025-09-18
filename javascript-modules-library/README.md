@@ -22,30 +22,6 @@ It takes an optional `clientOnly` prop:
   rendering step. This is useful for components that cannot be rendered on the server. In this
   case, children are used as a placeholder until the component is hydrated.
 
-### `RenderInBrowser` (deprecated)
-
-This component is used to render a React component in the browser. It is used to render a component in the browser, skipping the server-side rendering step. Provided children, if any, will be rendered on the server and replaced by the component in the browser.
-
-```tsx
-<RenderInBrowser child={MyComponent} props={{ foo: "bar" }}>
-  <div>Loading...</div>
-</RenderInBrowser>
-```
-
-This component is deprecated and will be removed in the future major version. Use the `Island` component with the `clientOnly` prop instead.
-
-### `HydrateInBrowser` (deprecated)
-
-This component is used to hydrate a React component in the browser. It will be rendered on the server then hydrated in the browser. Provided children, if any, will be children of the component.
-
-```tsx
-<HydrateInBrowser child={MyComponent} props={{ foo: "bar" }}>
-  <div>I'm a child of MyComponent</div>
-</HydrateInBrowser>
-```
-
-This component is deprecated and will be removed in the future major version. Use the `Island` component instead.
-
 ### `Render`
 
 This component renders a Jahia component out of a node or a JS object.
