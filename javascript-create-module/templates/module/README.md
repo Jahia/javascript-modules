@@ -19,7 +19,7 @@ docker compose up --wait
 yarn dev
 ```
 
-These commands will start a Jahia instance in a Docker container, build your module and start a watcher that will rebuild the module every time you make changes to the source code.
+These commands will start a Jahia instance in a Docker container and start a watcher that will automatically build your module every time you make changes to the source code.
 
 ## Commands
 
