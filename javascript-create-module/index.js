@@ -123,7 +123,7 @@ Run the following commands to get started:
   )}
   ${styleText("dim", "4.")} ${styleText("cyanBright", "code .")}  ${styleText("dim", "# Open the project in VSCode")}
   ${styleText("dim", "5.")} ${styleText("blueBright", "docker compose up --wait")}  ${styleText("dim", "# Start Jahia")}
-  ${styleText("dim", "6.")} ${styleText("magentaBright", "yarn dev")}  ${styleText("dim", "# Build and start the dev mode")}
+  ${styleText("dim", "6.")} ${styleText("magentaBright", "yarn dev")}  ${styleText("dim", "# Start the dev mode")}
 `);
 } catch (error) {
   prompts.cancel(
