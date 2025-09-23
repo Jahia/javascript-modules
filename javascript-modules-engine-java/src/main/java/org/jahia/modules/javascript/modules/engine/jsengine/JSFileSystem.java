@@ -2,6 +2,7 @@ package org.jahia.modules.javascript.modules.engine.jsengine;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.channels.SeekableByteChannel;
@@ -30,7 +31,9 @@ import org.apache.commons.io.IOUtils;
  * See each method for explanations on the import resolution process.
  */
 public class JSFileSystem implements FileSystem {
-  private BundleContext bundleContext;
+  private static final String ROOT_JS_LIBS_DIR = "/META-INF/js/libs/";
+
+  final private BundleContext bundleContext;
 
   JSFileSystem(BundleContext bundleContext) {
     this.bundleContext = bundleContext;
@@ -59,7 +62,7 @@ public class JSFileSystem implements FileSystem {
       return Path.of(path);
     }
 
-    return Path.of("/META-INF/js/libs", path + ".js");
+    return Path.of(ROOT_JS_LIBS_DIR, path + ".js");
   }
 
   /**
@@ -67,8 +70,9 @@ public class JSFileSystem implements FileSystem {
    */
   @Override
   public void checkAccess(Path path, Set<? extends AccessMode> modes, LinkOption... linkOptions) throws IOException {
-    if (!path.startsWith("/META-INF/js/libs/")) {
-      throw new IOException("Access refused to import " + path);
+    String resource = pathToResource(path);
+    if (!resource.startsWith(ROOT_JS_LIBS_DIR)) {
+      throw new IOException("Access refused to import " + resource);
     }
   }
 
@@ -97,13 +101,17 @@ public class JSFileSystem implements FileSystem {
    * to say "read the file".
    */
   @Override
-  public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options,
-      FileAttribute<?>... attrs) throws IOException {
-    URL url = bundleContext.getBundle().getResource(path.toString());
+  public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs)
+      throws IOException {
+    String resource = pathToResource(path);
+    URL url = bundleContext.getBundle().getResource(resource);
     if (url == null) {
-      throw new FileNotFoundException("Cannot import " + path + ", the file does not exist");
+      throw new FileNotFoundException("Cannot import " + resource + ", the file does not exist");
     }
-    return new SeekableInMemoryByteChannel(IOUtils.toByteArray(url.openStream()));
+
+    try (InputStream inputStream = url.openStream()) {
+      return new SeekableInMemoryByteChannel(IOUtils.toByteArray(inputStream));
+    }
   }
 
   /**
@@ -138,5 +146,19 @@ public class JSFileSystem implements FileSystem {
   public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options)
       throws IOException {
     throw new UnsupportedOperationException("Unimplemented method 'readAttributes'");
+  }
+
+  // Helper methods
+
+  /**
+   * The {@link FileSystem} interface enforces the use of {@link Path} which is
+   * platform-dependent (uses \ on Windows, / on Unix). But OSGi bundle resources
+   * always use forward slashes.
+   *
+   * 1. Normalize (resolve . and ..)
+   * 2. Convert system-specific separators into OSGi-compatible forward slashes
+   */
+  private String pathToResource(Path path) {
+    return path.normalize().toString().replace('\\', '/');
   }
 }
