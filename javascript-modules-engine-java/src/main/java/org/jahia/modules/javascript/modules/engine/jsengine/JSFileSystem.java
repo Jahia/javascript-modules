@@ -70,9 +70,9 @@ public class JSFileSystem implements FileSystem {
    */
   @Override
   public void checkAccess(Path path, Set<? extends AccessMode> modes, LinkOption... linkOptions) throws IOException {
-    String resource = pathToResource(path);
-    if (!resource.startsWith(ROOT_JS_LIBS_DIR)) {
-      throw new IOException("Access refused to import " + resource);
+    String resourceName = pathToResourceName(path);
+    if (!resourceName.startsWith(ROOT_JS_LIBS_DIR)) {
+      throw new IOException("Access refused to import " + resourceName);
     }
   }
 
@@ -103,10 +103,10 @@ public class JSFileSystem implements FileSystem {
   @Override
   public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs)
       throws IOException {
-    String resource = pathToResource(path);
-    URL url = bundleContext.getBundle().getResource(resource);
+    String resourceName = pathToResourceName(path);
+    URL url = bundleContext.getBundle().getResource(resourceName);
     if (url == null) {
-      throw new FileNotFoundException("Cannot import " + resource + ", the file does not exist");
+      throw new FileNotFoundException("Cannot import " + resourceName + ", the file does not exist");
     }
 
     try (InputStream inputStream = url.openStream()) {
@@ -158,7 +158,7 @@ public class JSFileSystem implements FileSystem {
    * 1. Normalize (resolve . and ..)
    * 2. Convert system-specific separators into OSGi-compatible forward slashes
    */
-  private String pathToResource(Path path) {
+  private String pathToResourceName(Path path) {
     return path.normalize().toString().replace('\\', '/');
   }
 }
