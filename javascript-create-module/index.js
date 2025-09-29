@@ -115,15 +115,12 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
   prompts.outro(`${styleText("greenBright", "Successfully created a new Jahia module project!")}
 
 Run the following commands to get started:
-  ${styleText("dim", "1.")} ${styleText("redBright", `cd ${output}`)}
-  ${styleText("dim", "2.")} ${styleText("yellowBright", "yarn install")}  ${styleText("dim", "# Install dependencies")}
-  ${styleText("dim", "3.")} ${styleText("greenBright", 'git init && git add . && git commit -m "chore: create module"')}  ${styleText(
-    "dim",
-    "# Commit all files",
-  )}
-  ${styleText("dim", "4.")} ${styleText("cyanBright", "code .")}  ${styleText("dim", "# Open the project in VSCode")}
-  ${styleText("dim", "5.")} ${styleText("blueBright", "docker compose up --wait")}  ${styleText("dim", "# Start Jahia")}
-  ${styleText("dim", "6.")} ${styleText("magentaBright", "yarn build && yarn dev")}  ${styleText("dim", "# Build and start the dev mode")}
+  ${styleText("dim", "1.")} ${styleText("greenBright", `cd ${output}`)}
+  ${styleText("dim", "2.")} ${styleText("cyanBright", "yarn install")}              ${styleText("dim", "# Install dependencies")}
+  ${styleText("dim", "3.")} ${styleText("blueBright", "docker compose up --wait")}  ${styleText("dim", "# Start Jahia in Docker")}
+  ${styleText("dim", "4.")} ${styleText("magentaBright", "yarn dev")}                  ${styleText("dim", "# Start the dev mode")}
+
+The ${styleText("underline", "README.md")} file contains a reminder of all commands.
 `);
 } catch (error) {
   prompts.cancel(

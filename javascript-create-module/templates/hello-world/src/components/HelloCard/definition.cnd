@@ -1,3 +1,0 @@
-[$NAMESPACE:helloCard] > jnt:content, $NAMESPACEmix:component
- - illustration (string, choicelist[resourceBundle]) mandatory < code, coffee, interface, read, write
- - title (string) i18n mandatory primary

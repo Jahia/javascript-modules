@@ -1,2 +1,6 @@
-JAHIA_USER=root:root1234
-JAHIA_HOST=http://localhost:8080
+# The `yarn jahia-deploy` will load environment variables from this file
+# if it exists. You can see the default values below:
+# JAHIA_USER=root:root1234
+# JAHIA_HOST=http://localhost:8080
+# We recommend creating a dedicated user for CI/CD deployments, with only the
+# necessary permissions.
