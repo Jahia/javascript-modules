@@ -6,11 +6,11 @@ __metadata:
   cacheKey: 10c0
 
 "@4tw/cypress-drag-drop@npm:^2.3.0":
-  version: 2.3.0
-  resolution: "@4tw/cypress-drag-drop@npm:2.3.0"
+  version: 2.3.1
+  resolution: "@4tw/cypress-drag-drop@npm:2.3.1"
   peerDependencies:
-    cypress: 2 - 14
-  checksum: 10c0/f9eaa966443cdaa7f50d37012e23ffd3e74796b0a5b087a8b63b44d10ca73727ff542e96a81ca7fb97a895672caeb8ade3928ba1ec58962fb185feb17650cb1f
+    cypress: ">=2"
+  checksum: 10c0/dd283d29ff4f5693ae50e99f95806965bf8900caf5b589ed761226b20aa41d81ceb2f7fe2d33f48aca336aa499faade0fc6c83c8a09b947dd2efb1b4d08d1bbe
   languageName: node
   linkType: hard
 
