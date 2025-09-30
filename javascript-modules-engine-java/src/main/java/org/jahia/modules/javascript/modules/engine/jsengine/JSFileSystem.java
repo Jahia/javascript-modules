@@ -52,13 +52,15 @@ public class JSFileSystem implements FileSystem {
    *
    * For instance, it might receive
    * <code>/META-INF/js/libs/react-i18next.js</code> (stringified output of the
-   * method) or <code>/usr/local/graalvm/languages/js</code> (internal import).
+   * method) or <code>/usr/local/graalvm/languages/js</code> (internal import) or
+   * even worse <code>d:\jdk17\languages\js</code> on Windows.
+   *
    * This is safe-guarded by this <code>path.startsWith("/")</code> check until
    * someone comes with a better solution.
    */
   @Override
   public Path parsePath(String path) {
-    if (path.startsWith("/")) {
+    if (path.startsWith("/") || path.contains(":\\")) {
       return Path.of(path);
     }
 
