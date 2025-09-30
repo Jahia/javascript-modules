@@ -55,12 +55,12 @@ public class JSFileSystem implements FileSystem {
    * method) or <code>/usr/local/graalvm/languages/js</code> (internal import) or
    * even worse <code>d:\jdk17\languages\js</code> on Windows.
    *
-   * This is safe-guarded by this <code>path.startsWith("/")</code> check until
+   * This is safe-guarded by this <code>path.startsWith</code> check until
    * someone comes with a better solution.
    */
   @Override
   public Path parsePath(String path) {
-    if (path.startsWith("/") || path.contains(":\\")) {
+    if (path.startsWith("/") || path.startsWith("\\") || path.contains(":\\")) {
       return Path.of(path);
     }
 
