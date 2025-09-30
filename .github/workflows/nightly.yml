@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         # For the time being testing on the release has been desactived since there is no release yet
-        # jahia_image: ["ghcr.io/jahia/jahia-ee-dev:8", "ghcr.io/jahia/jahia-ee-dev:8-SNAPSHOT"]
+        # jahia_image: ["jahia/jahia-ee-dev:8", "ghcr.io/jahia/jahia-ee-dev:8-SNAPSHOT"]
         jahia_image: ["ghcr.io/jahia/jahia-ee-dev:8-SNAPSHOT"]
     timeout-minutes: 45
     steps:
