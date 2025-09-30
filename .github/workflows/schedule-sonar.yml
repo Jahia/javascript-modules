@@ -21,6 +21,6 @@ jobs:
       tests_module_type: javascript
       git_branch: ${{ matrix.git_branch }}
       incident_service: javascript-modules-engine-sonar
-      job_container: jahia/cimg-mvn-cache:ga_cimg_openjdk_17.0.9-node
+      job_container: ghcr.io/jahia/jahia-docker-mvn-cache:17-jdk-noble-mvn-loaded
       java_distribution: temurin
       java_version: 17.0.9
