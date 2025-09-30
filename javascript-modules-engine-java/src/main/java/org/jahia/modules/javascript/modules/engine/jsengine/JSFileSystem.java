@@ -60,7 +60,7 @@ public class JSFileSystem implements FileSystem {
    */
   @Override
   public Path parsePath(String path) {
-    if (path.startsWith("/") || path.startsWith("\\") || path.contains(":\\")) {
+    if (path.startsWith("/") || path.contains("\\")) {
       return Path.of(path);
     }
 
