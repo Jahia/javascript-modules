@@ -45,6 +45,7 @@
     "node": ">=22.0.0"
   },
   "jahia": {
+    "name": "$MODULE",
     "snapshot": true,
     "module-dependencies": "default",
     "module-type": "templatesSet",

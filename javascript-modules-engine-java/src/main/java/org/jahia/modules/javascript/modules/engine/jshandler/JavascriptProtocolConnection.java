@@ -190,11 +190,10 @@ public class JavascriptProtocolConnection extends URLConnection {
         // First let's setup Bundle headers
         instructions.put("Bundle-Category", jahiaProps.getOrDefault("category", "jahia-javascript-module"));
         setIfPresent(properties, "description", instructions, "Bundle-Description");
-        String name = (String) properties.get("name");
+        String name = StringUtils.defaultString((String) jahiaProps.get("name"), (String) properties.get("name"));
         instructions.put("Bundle-Name", name + " (javascript module)");
-        instructions.put("Bundle-SymbolicName", name.replace("@", "")
-                .replace('/', '-')
-                .replaceAll("[^a-zA-Z0-9\\-\\.\\s]", "_"));
+        instructions.put("Bundle-SymbolicName",
+                ((String) properties.get("name")).replace("@", "").replace('/', '-').replaceAll("[^a-zA-Z0-9\\-\\.\\s]", "_"));
         setIfPresent(properties, "author", instructions, "Bundle-Vendor");
         instructions.put("Bundle-Version", getBundleVersion(properties, jahiaProps));
         instructions.put("Implementation-Version", getImplementationVersion(properties, jahiaProps));
