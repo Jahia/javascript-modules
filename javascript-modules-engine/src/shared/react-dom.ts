@@ -11,4 +11,6 @@ export {
   unstable_batchedUpdates,
   useFormState,
   useFormStatus,
+  // Default export too
+  default,
 } from "react-dom";
