@@ -1,5 +1,6 @@
 import * as devalue from "devalue";
 import i18n from "i18next";
+import { clientLibs } from "javascript-modules-engine/shared-libs.mjs";
 import { createElement, type ComponentType, type ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
 import sharedLibFiles from "virtual:shared-lib-files";
@@ -149,16 +150,9 @@ export function Island({
                  *
                  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
                  */
-                imports: {
-                  // Explicitly exposed:
-                  "react": `${base}/shared-libs/react.js`,
-                  "i18next": `${base}/shared-libs/i18next.js`,
-                  "react-i18next": `${base}/shared-libs/react-i18next.js`,
-                  // Implicitly exposed, referenced after compilation:
-                  "react/jsx-runtime": `${base}/shared-libs/react/jsx-runtime.js`,
-                  // For internal use:
-                  "react-dom/client": `${base}/shared-libs/react-dom/client.js`,
-                },
+                imports: Object.fromEntries(
+                  Object.keys(clientLibs).map((lib) => [lib, `${base}/shared-libs/${lib}.js`]),
+                ),
               })}
             </script>
             ${

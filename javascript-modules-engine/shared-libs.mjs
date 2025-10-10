@@ -13,6 +13,7 @@ export const clientLibs = {
   // See src/esm-shims/README.md for details
   "react": "./src/shared/react.ts",
   "react/jsx-runtime": "./src/shared/react/jsx-runtime.ts",
+  "react-dom": "./src/shared/react-dom.ts",
   "react-dom/client": "./src/shared/react-dom/client.ts",
 
   // Packages already in ESM can be copied as-is from node_modules
@@ -28,6 +29,7 @@ export const clientLibs = {
 export const serverLibs = {
   "react": "./src/shared/react.ts",
   "react/jsx-runtime": "./src/shared/react/jsx-runtime.ts",
+  "react-dom": "./src/shared/react-dom.ts",
 
   // Packages already in ESM can be copied as-is from node_modules
   "i18next": "i18next",
