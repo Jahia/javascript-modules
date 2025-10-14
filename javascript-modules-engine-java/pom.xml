@@ -215,7 +215,8 @@
                         <configuration>
                             <target>
                                 <mkdir dir="${project.build.directory}/java-ts-bind/sources" />
-                                <get src="https://codeload.github.com/openjdk/jdk17u/zip/refs/heads/master" dest="${project.build.directory}/java-ts-bind/sources/jdk17u-master.zip" />
+                                <get src="https://codeload.github.com/openjdk/jdk17u/zip/refs/heads/master"
+                                     dest="${project.build.directory}/java-ts-bind/sources/jdk17u-master.zip" skipexisting="true"/>
                                 <unzip src="${project.build.directory}/java-ts-bind/sources/jdk17u-master.zip" dest="${project.build.directory}/java-ts-bind/sources">
                                     <patternset>
                                         <include name="jdk17u-master/src/java.base/share/classes/**" />
