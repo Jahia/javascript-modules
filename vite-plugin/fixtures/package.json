@@ -13,5 +13,5 @@
     "vite": "^7.1.4",
     "vite-plugin-inspect": "^11.3.3"
   },
-  "packageManager": "yarn@4.9.4"
+  "packageManager": "yarn@4.10.3"
 }
