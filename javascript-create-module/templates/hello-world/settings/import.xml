@@ -44,12 +44,12 @@
               <j:translation_en
                 jcr:language="en"
                 jcr:primaryType="jnt:translation"
-                title="Read the documentation"
+                jcr:title="Read the documentation"
                 />
               <j:translation_fr
                 jcr:language="fr"
                 jcr:primaryType="jnt:translation"
-                title="Lire la documentation"
+                jcr:title="Lire la documentation"
                 />
             </read-the-documentation>
             <code-a-new-component
@@ -59,12 +59,12 @@
               <j:translation_en
                 jcr:language="en"
                 jcr:primaryType="jnt:translation"
-                title="Code a new component"
+                jcr:title="Code a new component"
                 />
               <j:translation_fr
                 jcr:language="fr"
                 jcr:primaryType="jnt:translation"
-                title="Coder un nouveau composant"
+                jcr:title="Coder un nouveau composant"
                 />
             </code-a-new-component>
             <explore-the-interface
@@ -74,12 +74,12 @@
               <j:translation_en
                 jcr:language="en"
                 jcr:primaryType="jnt:translation"
-                title="Explore the interface"
+                jcr:title="Explore the interface"
                 />
               <j:translation_fr
                 jcr:language="fr"
                 jcr:primaryType="jnt:translation"
-                title="Explorer l'interface"
+                jcr:title="Explorer l'interface"
                 />
             </explore-the-interface>
             <create-content
@@ -89,12 +89,12 @@
               <j:translation_en
                 jcr:language="en"
                 jcr:primaryType="jnt:translation"
-                title="Create content"
+                jcr:title="Create content"
                 />
               <j:translation_fr
                 jcr:language="fr"
                 jcr:primaryType="jnt:translation"
-                title="Créer du contenu"
+                jcr:title="Créer du contenu"
                 />
             </create-content>
           </hello-world>
