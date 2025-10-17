@@ -1,5 +1,5 @@
 import type { Node } from "javax.jcr";
-import type { JCRSessionWrapper } from "org.jahia.services.content";
+import type { JCRNodeWrapper, JCRSessionWrapper } from "org.jahia.services.content";
 
 /**
  * Execute a JCR SQL2 query and return the result as an array of nodes
@@ -17,8 +17,8 @@ export function getNodesByJCRQuery(
   query: string,
   limit: number | undefined = undefined,
   offset = 0,
-): Node[] {
-  const result: Node[] = [];
+): JCRNodeWrapper[] {
+  const result: JCRNodeWrapper[] = [];
 
   if (!session || !query || !limit) {
     console.warn(
@@ -38,7 +38,7 @@ export function getNodesByJCRQuery(
 
   const iterator = sql2Query.execute().getNodes();
   while (iterator.hasNext()) {
-    result.push(iterator.nextNode());
+    result.push(iterator.nextNode() as JCRNodeWrapper);
   }
 
   return result;
