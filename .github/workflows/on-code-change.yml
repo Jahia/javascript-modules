@@ -18,13 +18,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: jahia/jahia-modules-action/static-analysis@v2
+      - uses: jahia/jahia-modules-action/static-analysis@add-checkstyle-to-static-analysis-github-action
         with:
           node_version: 20
           yarn_version: 4.7.0
           yarn_test_version: 4.7.0
           auditci_level: critical
-
+          github_token: ${{ secrets.GH_API_TOKEN }}
   build:
     name: Build Module
     runs-on: self-hosted
