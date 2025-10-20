@@ -40,7 +40,7 @@
     "i18next": "^25.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-i18next": "^15.4.0"
+    "react-i18next": "^15.4.0 || ^16.0.0"
   },
   "peerDependenciesMeta": {
     "i18next": {
