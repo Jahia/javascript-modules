@@ -533,9 +533,9 @@ __metadata:
     devalue: "npm:^5.3.2"
     dotenv: "npm:^17.2.2"
     graphql: "npm:^16.11.0"
-    i18next: "npm:^25.4.2"
+    i18next: "npm:^25.6.0"
     publint: "npm:^0.3.12"
-    react-i18next: "npm:^15.7.3"
+    react-i18next: "npm:^16.1.0"
     typescript: "npm:^5.9.2"
   peerDependencies:
     i18next: ^25.0.0
@@ -2914,11 +2914,11 @@ __metadata:
     clsx: "npm:^2.1.1"
     eslint: "npm:^9.34.0"
     globals: "npm:^16.3.0"
-    i18next: "npm:^25.4.2"
+    i18next: "npm:^25.6.0"
     modern-normalize: "npm:^3.0.1"
     prettier: "npm:^3.6.2"
     react: "npm:^19.1.1"
-    react-i18next: "npm:^15.7.3"
+    react-i18next: "npm:^16.1.0"
     typescript: "npm:^5.9.2"
     typescript-eslint: "npm:^8.42.0"
     typescript-plugin-css-modules: "npm:^5.2.0"
@@ -2926,9 +2926,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"i18next@npm:^25.4.2":
-  version: 25.4.2
-  resolution: "i18next@npm:25.4.2"
+"i18next@npm:^25.6.0":
+  version: 25.6.0
+  resolution: "i18next@npm:25.6.0"
   dependencies:
     "@babel/runtime": "npm:^7.27.6"
   peerDependencies:
@@ -2936,7 +2936,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/f4f4e75f55c48f4af2036e0b03f2e3b141c60c441ef882f2ddf7f87c71352c25190472fe5414295f9a762faea926b1288c65ba782e4bead45855bb7aff159140
+  checksum: 10c0/35f7e4b8fa45fe2d6fd9fe267fde9101d7b502672f4fdf8439a7f0483a12c8a22a966e8f2b616480599057c804f553e594b9eb3c9ccb33fd4dfb57e5dee80636
   languageName: node
   linkType: hard
 
@@ -3203,8 +3203,8 @@ __metadata:
     "@jahia/javascript-modules-library": "workspace:^"
     "@jahia/vite-plugin": "workspace:^"
     "@types/react": "npm:^19.1.12"
-    i18next: "npm:^25.4.2"
-    react-i18next: "npm:^15.7.3"
+    i18next: "npm:^25.6.0"
+    react-i18next: "npm:^16.1.0"
     typescript: "npm:^5.9.2"
     vite: "npm:^7.1.4"
   languageName: unknown
@@ -3224,10 +3224,10 @@ __metadata:
     "@types/react-dom": "npm:^19.1.9"
     devalue: "npm:^5.3.2"
     fast-text-encoding: "npm:^1.0.6"
-    i18next: "npm:^25.4.2"
+    i18next: "npm:^25.6.0"
     react: "npm:^19.1.1"
     react-dom: "npm:^19.1.1"
-    react-i18next: "npm:^15.7.3"
+    react-i18next: "npm:^16.1.0"
     rollup: "npm:^4.50.0"
     rollup-plugin-sbom: "npm:^2.1.2"
   languageName: unknown
@@ -4545,14 +4545,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-i18next@npm:^15.7.3":
-  version: 15.7.4
-  resolution: "react-i18next@npm:15.7.4"
+"react-i18next@npm:^16.1.0":
+  version: 16.1.0
+  resolution: "react-i18next@npm:16.1.0"
   dependencies:
     "@babel/runtime": "npm:^7.27.6"
     html-parse-stringify: "npm:^3.0.1"
   peerDependencies:
-    i18next: ">= 23.4.0"
+    i18next: ">= 25.5.2"
     react: ">= 16.8.0"
     typescript: ^5
   peerDependenciesMeta:
@@ -4562,7 +4562,7 @@ __metadata:
       optional: true
     typescript:
       optional: true
-  checksum: 10c0/643c5d3ced4b44084c871a55e876159561c14f378f90bf53286c1291082703e293573da18ad692b43b357b60d2f7251bc417feb0b522de8cec5c414e5ebdf6c1
+  checksum: 10c0/fa64c933705651ef96e80a520ee0c96e946a78af6415f5a79c98938e551c6b4728a726c9d6632472689d6377c89e5b9f877d51088cc79ee2730f031e0743141c
   languageName: node
   linkType: hard
 
