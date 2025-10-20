@@ -21,7 +21,7 @@
     <parent>
         <artifactId>javascript-modules</artifactId>
         <groupId>org.jahia.modules</groupId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.1</version>
     </parent>
     <artifactId>javascript-modules-engine-java</artifactId>
     <name>Javascript Modules Engine Java</name>
@@ -215,8 +215,7 @@
                         <configuration>
                             <target>
                                 <mkdir dir="${project.build.directory}/java-ts-bind/sources" />
-                                <get src="https://codeload.github.com/openjdk/jdk17u/zip/refs/heads/master"
-                                     dest="${project.build.directory}/java-ts-bind/sources/jdk17u-master.zip" skipexisting="true"/>
+                                <get src="https://codeload.github.com/openjdk/jdk17u/zip/refs/heads/master" dest="${project.build.directory}/java-ts-bind/sources/jdk17u-master.zip" skipexisting="true" />
                                 <unzip src="${project.build.directory}/java-ts-bind/sources/jdk17u-master.zip" dest="${project.build.directory}/java-ts-bind/sources">
                                     <patternset>
                                         <include name="jdk17u-master/src/java.base/share/classes/**" />
