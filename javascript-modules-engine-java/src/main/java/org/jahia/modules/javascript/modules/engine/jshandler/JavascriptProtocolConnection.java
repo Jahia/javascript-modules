@@ -116,9 +116,8 @@ public class JavascriptProtocolConnection extends URLConnection {
                         jos.putNextEntry(new ZipEntry("images/template-preview/" + StringUtils.substringAfter(packageRelativePath, "settings/")));
                     }
                     // Map everything else in settings/ to META-INF/
-                    else {
+                    else
                         jos.putNextEntry(new ZipEntry("META-INF/" + StringUtils.substringAfter(packageRelativePath, "settings/")));
-                    }
                 } else if (packageRelativePath.startsWith("components") && packageRelativePath.endsWith(".png")) {
                     String[] parts = StringUtils.split(packageRelativePath, "/");
                     String nodeTypeName = parts[2];
