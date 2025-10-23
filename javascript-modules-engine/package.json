@@ -28,6 +28,6 @@
     "@types/node": "^22.15.3",
     "devalue": "^5.3.2",
     "rollup": "^4.50.0",
-    "rollup-plugin-sbom": "^2.1.2"
+    "rollup-plugin-sbom": "^3.0.0"
   }
 }
