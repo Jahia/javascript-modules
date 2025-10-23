@@ -4457,8 +4457,8 @@ __metadata:
   linkType: hard
 
 "publint@npm:^0.3.12":
-  version: 0.3.14
-  resolution: "publint@npm:0.3.14"
+  version: 0.3.15
+  resolution: "publint@npm:0.3.15"
   dependencies:
     "@publint/pack": "npm:^0.1.2"
     package-manager-detector: "npm:^1.3.0"
@@ -4466,7 +4466,7 @@ __metadata:
     sade: "npm:^1.8.1"
   bin:
     publint: src/cli.js
-  checksum: 10c0/d9fb5e0b28b4e76365e00b382c12b00af21c210c8d5c64e7b7846be031580961914aa169d5caf2844c8cdb89637d8fd5f71fe778adbc493273d4f8d986a033cc
+  checksum: 10c0/2f54a88201c068a4713b431c85c71d4adb4f3e026b97b7682706ebf73d2a52306911f230672819cfe73be8f0ff6185f52f20ed10a65326b58dbf7abff8ad7a45
   languageName: node
   linkType: hard
 
@@ -4546,8 +4546,8 @@ __metadata:
   linkType: hard
 
 "react-i18next@npm:^16.1.0":
-  version: 16.1.0
-  resolution: "react-i18next@npm:16.1.0"
+  version: 16.1.5
+  resolution: "react-i18next@npm:16.1.5"
   dependencies:
     "@babel/runtime": "npm:^7.27.6"
     html-parse-stringify: "npm:^3.0.1"
@@ -4562,7 +4562,7 @@ __metadata:
       optional: true
     typescript:
       optional: true
-  checksum: 10c0/fa64c933705651ef96e80a520ee0c96e946a78af6415f5a79c98938e551c6b4728a726c9d6632472689d6377c89e5b9f877d51088cc79ee2730f031e0743141c
+  checksum: 10c0/9a90c8d19297e3c5cd82efbd5f06ededdfa51ee3f42695e6224fc0dd138c00b6be44958b204b19bbc538f2bdea7ceef57ac0607a0df88825ec6fe311f4a9801e
   languageName: node
   linkType: hard
 
@@ -5532,8 +5532,8 @@ __metadata:
   linkType: hard
 
 "vite@npm:^7.1.4":
-  version: 7.1.10
-  resolution: "vite@npm:7.1.10"
+  version: 7.1.12
+  resolution: "vite@npm:7.1.12"
   dependencies:
     esbuild: "npm:^0.25.0"
     fdir: "npm:^6.5.0"
@@ -5582,7 +5582,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: 10c0/ea296971a3094b0e463a91af58de64dca56c8c5c563237e59d158641f8ad7f600f624c4f7c05c18fad68f414e23d50d7145118169b8dcd4bc85283c63c7185bb
+  checksum: 10c0/cef4d4b4a84e663e09b858964af36e916892ac8540068df42a05ced637ceeae5e9ef71c72d54f3cfc1f3c254af16634230e221b6e2327c2a66d794bb49203262
   languageName: node
   linkType: hard
 
