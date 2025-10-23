@@ -4254,8 +4254,8 @@ __metadata:
   linkType: hard
 
 "pkgroll@npm:^2.15.3":
-  version: 2.15.4
-  resolution: "pkgroll@npm:2.15.4"
+  version: 2.20.1
+  resolution: "pkgroll@npm:2.20.1"
   dependencies:
     "@rollup/plugin-alias": "npm:^5.1.1"
     "@rollup/plugin-commonjs": "npm:^28.0.6"
@@ -4269,6 +4269,7 @@ __metadata:
     magic-string: "npm:^0.30.17"
     rollup: "npm:^4.46.2"
     rollup-pluginutils: "npm:^2.8.2"
+    yaml: "npm:^2.8.1"
   peerDependencies:
     typescript: ^4.1 || ^5.0
   peerDependenciesMeta:
@@ -4276,7 +4277,7 @@ __metadata:
       optional: true
   bin:
     pkgroll: dist/cli.mjs
-  checksum: 10c0/cc35bcbb13d3df52e10d4d7f2d798b386b42981f4adac5930ded8b3ebaded039238c953b98916c6c6c186c737f89b28553c5f14d700c31a5c91ff2a325035d91
+  checksum: 10c0/1d78ec33199c2fd239e78914b2542526b3ca76c38e5ad71f3dfe3dbdf28d3ae870ab46ab2b784f12c4e66c8cea596d0e2570f03f2b9b2936638e7e8d5a846e6b
   languageName: node
   linkType: hard
 
@@ -5683,6 +5684,15 @@ __metadata:
   version: 1.10.2
   resolution: "yaml@npm:1.10.2"
   checksum: 10c0/5c28b9eb7adc46544f28d9a8d20c5b3cb1215a886609a2fd41f51628d8aaa5878ccd628b755dbcd29f6bb4921bd04ffbc6dcc370689bb96e594e2f9813d2605f
+  languageName: node
+  linkType: hard
+
+"yaml@npm:^2.8.1":
+  version: 2.8.1
+  resolution: "yaml@npm:2.8.1"
+  bin:
+    yaml: bin.mjs
+  checksum: 10c0/7c587be00d9303d2ae1566e03bc5bc7fe978ba0d9bf39cc418c3139d37929dfcb93a230d9749f2cb578b6aa5d9ebebc322415e4b653cb83acd8bc0bc321707f3
   languageName: node
   linkType: hard
 
