@@ -3012,6 +3012,7 @@ __metadata:
     "@jahia/javascript-modules-library": "workspace:^"
     "@jahia/vite-plugin": "workspace:^"
     "@types/react": "npm:^19.1.12"
+    graphql: "npm:^16.11.0"
     i18next: "npm:^25.6.0"
     react-i18next: "npm:^16.1.0"
     typescript: "npm:^5.9.2"

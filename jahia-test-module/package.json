@@ -24,6 +24,7 @@
     "@jahia/javascript-modules-library": "workspace:^",
     "@jahia/vite-plugin": "workspace:^",
     "@types/react": "^19.1.12",
+    "graphql": "^16.11.0",
     "i18next": "^25.6.0",
     "react-i18next": "^16.1.0",
     "typescript": "^5.9.2",
