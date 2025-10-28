@@ -31,6 +31,8 @@ export function buildNodeUrl(
      * the current resource
      */
     extension?: string;
+    /** Additional parameters used for building the URL, through `node.getUrl` overloads. */
+    decorations?: string[];
   } = {},
   context: {
     /** Provided in react context, but you need to provide one otherwise. * */
@@ -41,28 +43,48 @@ export function buildNodeUrl(
 ): string {
   if (!node) throw new Error("Expected a node in buildNodeUrl, received undefined");
 
-  // Use context values if not provided
-  const mode = config.mode ?? context.renderContext?.getMode();
-  const language = config.language ?? context.currentResource?.getLocale().toString();
-  const extension = config.extension ?? `.${context.currentResource?.getTemplateType()}`;
-  if (!mode || !language || !extension) {
-    throw new Error(
-      `Mode, language, and extension must not be empty, mode: ${mode}, language: ${language} extension: ${extension}`,
-    );
-  }
-  // Lookiup for the matching url build in the registry.
-  const urlBuilders = server.registry.find({ type: "urlBuilder" }, "priority");
-  for (const urlBuilder of urlBuilders) {
-    if (urlBuilder.key === "*" || node.isNodeType(urlBuilder.key)) {
-      return buildEndpointUrl(
-        urlBuilder.buildURL({ node, mode, language, extension, context }),
-        { parameters: config.parameters },
-        { renderContext: context.renderContext },
+  // URL building is an old thing in Jahia, with a lot of branches and special cases:
+  // - if any of mode, language or extension is provided, we need to build the URL manually
+  // - otherwise, we can use node.getUrl() with decorations if provided
+
+  // Manual URL building: concatenate various parts together to get a URL
+  // like `<c:url value="${url.base}${node.path}.html" />` in JSP
+  if (config.mode || config.language || config.extension) {
+    if (config.decorations) {
+      throw new Error(
+        "You cannot use decorations with mode, language or extension in buildNodeUrl.",
       );
     }
+
+    if (!context.renderContext || !context.currentResource) {
+      throw new Error(
+        "You cannot use mode, language or extension in buildNodeUrl outside of a RenderContext.",
+      );
+    }
+
+    const mode = config.mode ?? context.renderContext.getMode();
+    const language = config.language ?? context.currentResource?.getLocale().toString();
+    const extension = config.extension ?? `.html`;
+
+    return buildEndpointUrl(
+      (mode === "edit"
+        ? "/cmd/edit/default/"
+        : mode === "preview"
+          ? "/cmd/render/default/"
+          : "/cms/render/live/") +
+        language +
+        node.getPath() +
+        extension,
+      { parameters: config.parameters },
+      context,
+    );
   }
-  // No build has been found
-  throw new Error(`Unable to build url for ${JSON.stringify(config)}, no registered builder found`);
+
+  return buildEndpointUrl(
+    config.decorations ? node.getUrl(config.decorations) : node.getUrl(),
+    { parameters: config.parameters },
+    context,
+  );
 }
 
 /**
