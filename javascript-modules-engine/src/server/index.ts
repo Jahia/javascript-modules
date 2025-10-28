@@ -5,7 +5,6 @@
  * - Register a `TextEncoder` polyfill
  * - Initialize i18next
  * - Initialize a React view renderer
- * - Initialize `buildNodeUrl` under lying url builders
  *
  * @module
  */

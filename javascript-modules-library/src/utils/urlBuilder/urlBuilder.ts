@@ -64,13 +64,13 @@ export function buildNodeUrl(
 
     const mode = config.mode ?? context.renderContext.getMode();
     const language = config.language ?? context.currentResource?.getLocale().toString();
-    const extension = config.extension ?? `.html`;
+    const extension = config.extension ?? `.${context.currentResource?.getTemplateType()}`;
 
     return buildEndpointUrl(
       (mode === "edit"
-        ? "/cmd/edit/default/"
+        ? "/cms/edit/default/"
         : mode === "preview"
-          ? "/cmd/render/default/"
+          ? "/cms/render/default/"
           : "/cms/render/live/") +
         language +
         node.getPath() +
