@@ -20,22 +20,18 @@ server.registry.add("urlBuilder", "*", {
     language: string;
     extension: string;
   }) => {
-    let workspace: string;
-    let servletPath: string;
+    let base: string;
     switch (mode) {
       case "edit":
-        servletPath = "/cms/edit";
-        workspace = "default";
+        base = "/cms/edit/default";
         break;
       case "preview":
-        servletPath = "/cms/render";
-        workspace = "default";
+        base = "/cms/render/default";
         break;
       default:
-        servletPath = "/cms/render";
-        workspace = "live";
+        base = "/cms/render/live";
         break;
     }
-    return `${servletPath}/${workspace}/${language}${server.render.escapePath(node.getPath())}${extension ? extension : ".html"}`;
+    return `${base}/${language}${server.render.escapePath(node.getPath())}${extension ? extension : ".html"}`;
   },
 });
