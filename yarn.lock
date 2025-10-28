@@ -5,6 +5,18 @@ __metadata:
   version: 8
   cacheKey: 10c0
 
+"@0no-co/graphql.web@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@0no-co/graphql.web@npm:1.2.0"
+  peerDependencies:
+    graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+  peerDependenciesMeta:
+    graphql:
+      optional: true
+  checksum: 10c0/4eed600962bfab42afb49cddcfb31a47b00502f59707609cf160559920ce0f5cf8874791e4cafc465ede30ae291992f3f892bc757b2a989e80e50e358f71c518
+  languageName: node
+  linkType: hard
+
 "@adobe/css-tools@npm:~4.3.1":
   version: 4.3.3
   resolution: "@adobe/css-tools@npm:4.3.3"
@@ -463,6 +475,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@graphql-typed-document-node/core@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "@graphql-typed-document-node/core@npm:3.2.0"
+  peerDependencies:
+    graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
+  checksum: 10c0/94e9d75c1f178bbae8d874f5a9361708a3350c8def7eaeb6920f2c820e82403b7d4f55b3735856d68e145e86c85cbfe2adc444fdc25519cd51f108697e99346c
+  languageName: node
+  linkType: hard
+
 "@humanfs/core@npm:^0.19.1":
   version: 0.19.1
   resolution: "@humanfs/core@npm:0.19.1"
@@ -530,6 +551,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@jahia/javascript-modules-library@workspace:javascript-modules-library"
   dependencies:
+    "@0no-co/graphql.web": "npm:^1.2.0"
+    "@graphql-typed-document-node/core": "npm:^3.2.0"
     "@types/react": "npm:^19.1.12"
     devalue: "npm:^5.3.2"
     dotenv: "npm:^17.2.2"
@@ -539,11 +562,17 @@ __metadata:
     react-i18next: "npm:^16.1.0"
     typescript: "npm:^5.9.2"
   peerDependencies:
+    "@graphql-typed-document-node/core": ^3.2.0
+    graphql: "*"
     i18next: ^25.0.0
     react: ^19.0.0
     react-dom: ^19.0.0
     react-i18next: ^15.4.0 || ^16.0.0
   peerDependenciesMeta:
+    "@graphql-typed-document-node/core":
+      optional: true
+    graphql:
+      optional: true
     i18next:
       optional: true
     react:
