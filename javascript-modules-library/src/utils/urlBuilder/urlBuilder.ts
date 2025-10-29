@@ -76,15 +76,13 @@ export function buildNodeUrl(
       );
     }
 
-    if (!context.renderContext || !context.currentResource) {
-      throw new Error(
-        "You cannot use mode, language or extension in buildNodeUrl outside of a RenderContext.",
-      );
-    }
+    const mode = config.mode ?? context.renderContext?.getMode();
+    const language = config.language ?? context.currentResource?.getLocale().toString();
+    const extension =
+      config.extension ?? `.${context.currentResource?.getTemplateType() ?? "html"}`;
 
-    const mode = config.mode ?? context.renderContext.getMode();
-    const language = config.language ?? context.currentResource.getLocale().toString();
-    const extension = config.extension ?? `.${context.currentResource.getTemplateType()}`;
+    if (!mode) throw new Error("buildNodeUrl: mode is not defined and cannot be inferred.");
+    if (!language) throw new Error("buildNodeUrl: language is not defined and cannot be inferred.");
 
     return buildEndpointUrl(
       (mode === "edit"
