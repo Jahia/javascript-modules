@@ -45,8 +45,8 @@ export function buildNodeUrl(
     | {
         /** The query string parameters to append to the URL */
         parameters?: Record<string, string>;
-        /** Additional parameters used for building the URL, through `node.getUrl` overloads. */
-        decorations?: string[];
+        /** Additional arguments used for building the URL, through `node.getUrl` overloads. */
+        args?: Record<string, string | number | boolean>;
       },
   context?: {
     /** Provided in react context, but you need to provide one otherwise. * */
@@ -62,7 +62,7 @@ export function buildNodeUrl(
     mode?: "edit" | "preview" | "live";
     language?: string;
     extension?: string;
-    decorations?: string[];
+    args?: Record<string, string | number | boolean>;
   } = {},
   context: {
     renderContext?: RenderContext;
@@ -78,10 +78,8 @@ export function buildNodeUrl(
   // Manual URL building: concatenate various parts together to get a URL
   // like `<c:url value="${url.base}${node.path}.html" />` in JSP
   if (config.mode || config.language || config.extension) {
-    if (config.decorations) {
-      throw new Error(
-        "You cannot use decorations with mode, language or extension in buildNodeUrl.",
-      );
+    if (config.args) {
+      throw new Error("You cannot use args with mode, language or extension in buildNodeUrl.");
     }
 
     const mode = config.mode ?? context.renderContext?.getMode();
@@ -107,7 +105,9 @@ export function buildNodeUrl(
   }
 
   // `/context` is covered by .getUrl, no need to run through buildEndpointUrl
-  let url = config.decorations ? node.getUrl(config.decorations) : node.getUrl();
+  let url = config.args
+    ? node.getUrl(Object.entries(config.args).map(([k, v]) => `${k}:${v}`))
+    : node.getUrl();
   if (context.renderContext) url = context.renderContext.getResponse().encodeURL(url);
   if (config.parameters) url = appendParameters(url, config.parameters);
   return url;
