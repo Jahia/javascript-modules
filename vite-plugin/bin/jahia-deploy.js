@@ -44,17 +44,17 @@ body.append(
 body.append("file", new File([fs.readFileSync("./dist/package.tgz")], "package.tgz"));
 
 // Send the payload to the Jahia provisioning API
-console.log("Deploying the package to Jahia...");
-const response = await fetch(
-  new URL("/modules/api/provisioning", process.env.JAHIA_HOST || "http://localhost:8080"),
-  {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${Buffer.from(process.env.JAHIA_USER || "root:root1234").toString("base64")}`,
-    },
-    body,
+const host = process.env.JAHIA_HOST || "http://localhost:8080";
+// use a relative path to the base URL that should end with a slash (to support custom context paths)
+const provisioningUrl = new URL("modules/api/provisioning", host.endsWith("/") ? host : `${host}/`);
+console.log(`Deploying the package to Jahia (${styleText("underline", "%s")})...`, provisioningUrl);
+const response = await fetch(provisioningUrl, {
+  method: "POST",
+  headers: {
+    Authorization: `Basic ${Buffer.from(process.env.JAHIA_USER || "root:root1234").toString("base64")}`,
   },
-);
+  body,
+});
 
 if (!response.ok) {
   console.error(styleText("red", "%d: %s"), response.status, response.statusText);
