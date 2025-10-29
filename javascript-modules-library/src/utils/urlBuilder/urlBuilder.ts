@@ -13,31 +13,51 @@ const absoluteUrlRegExp = /^(?:[a-z+]+:)?\/\//i;
 export function buildNodeUrl(
   /** The node to build the URL for */
   node: JCRNodeWrapper,
-  config: {
-    /** The querystring parameters to append to the URL */
-    parameters?: Record<string, string>;
-    /**
-     * The mode to use to build the URL. Defines the mode or override the one provided by the
-     * renderContext.
-     */
-    mode?: "edit" | "preview" | "live";
-    /**
-     * The language to use to build the URL. Defines the languages or overrides the one provided by
-     * the current resource
-     */
-    language?: string;
-    /**
-     * The extension to use to build the URL. Defines the extension or overrides the one provided by
-     * the current resource
-     */
-    extension?: string;
-    /** Additional parameters used for building the URL, through `node.getUrl` overloads. */
-    decorations?: string[];
-  } = {},
-  context: {
+  // Prevent providing both mode/language/extension and decorations at the same time
+  config?:
+    | {
+        /** The query string parameters to append to the URL */
+        parameters?: Record<string, string>;
+        /**
+         * The mode to use to build the URL. Defines the mode or override the one provided by the
+         * renderContext.
+         */
+        mode?: "edit" | "preview" | "live";
+        /**
+         * The language to use to build the URL. Defines the languages or overrides the one provided
+         * by the current resource
+         */
+        language?: string;
+        /**
+         * The extension to use to build the URL. Defines the extension or overrides the one
+         * provided by the current resource
+         */
+        extension?: string;
+      }
+    | {
+        /** The query string parameters to append to the URL */
+        parameters?: Record<string, string>;
+        /** Additional parameters used for building the URL, through `node.getUrl` overloads. */
+        decorations?: string[];
+      },
+  context?: {
     /** Provided in react context, but you need to provide one otherwise. * */
     renderContext?: RenderContext;
     /** Provided in react context, you need to provide one otherwise. * */
+    currentResource?: Resource;
+  },
+): string;
+export function buildNodeUrl(
+  node: JCRNodeWrapper,
+  config: {
+    parameters?: Record<string, string>;
+    mode?: "edit" | "preview" | "live";
+    language?: string;
+    extension?: string;
+    decorations?: string[];
+  } = {},
+  context: {
+    renderContext?: RenderContext;
     currentResource?: Resource;
   } = useServerContext(),
 ): string {
@@ -63,8 +83,8 @@ export function buildNodeUrl(
     }
 
     const mode = config.mode ?? context.renderContext.getMode();
-    const language = config.language ?? context.currentResource?.getLocale().toString();
-    const extension = config.extension ?? `.${context.currentResource?.getTemplateType()}`;
+    const language = config.language ?? context.currentResource.getLocale().toString();
+    const extension = config.extension ?? `.${context.currentResource.getTemplateType()}`;
 
     return buildEndpointUrl(
       (mode === "edit"
