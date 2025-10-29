@@ -5,6 +5,14 @@ import { useServerContext } from "../../hooks/useServerContext";
 // Regex that checks if the first word contains colon (http:, mail:, ftp: ..)
 const absoluteUrlRegExp = /^(?:[a-z+]+:)?\/\//i;
 
+/** URLSearchParams is not supported by Graal, this is our polyfill in the meantime */
+function appendParameters(url: string, parameters: Record<string, string>): string {
+  const querystring = Object.entries(parameters)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join("&");
+  return `${url}${url.includes("?") ? "&" : "?"}${querystring}`;
+}
+
 /**
  * Generate a Jahia url for the provided node.
  *
@@ -98,11 +106,11 @@ export function buildNodeUrl(
     );
   }
 
-  return buildEndpointUrl(
-    config.decorations ? node.getUrl(config.decorations) : node.getUrl(),
-    { parameters: config.parameters },
-    context,
-  );
+  // `/context` is covered by .getUrl, no need to run through buildEndpointUrl
+  let url = config.decorations ? node.getUrl(config.decorations) : node.getUrl();
+  if (context.renderContext) url = context.renderContext.getResponse().encodeURL(url);
+  if (config.parameters) url = appendParameters(url, config.parameters);
+  return url;
 }
 
 /**
@@ -164,17 +172,5 @@ export function buildEndpointUrl(
     url = url.startsWith("/") ? context.renderContext.getRequest().getContextPath() + url : url;
     url = context.renderContext.getResponse().encodeURL(url);
   }
-  // Handle parameters
-  if (!config.parameters) {
-    return url;
-  }
-  const separator = url.includes("?") ? "&" : "?";
-  const URLParameters = Object.keys(config.parameters)
-    .map(
-      (key) =>
-        `${encodeURIComponent(key)}=${encodeURIComponent(config.parameters ? config.parameters[key] : "")}`,
-    )
-    .join("&");
-
-  return `${url}${separator}${URLParameters}`;
+  return config.parameters ? appendParameters(url, config.parameters) : url;
 }
