@@ -125,6 +125,13 @@ const { data, errors } = useGQLQuery({
 });
 ```
 
+`useGQLQuery` supports typed document nodes from [@graphql-typed-document-node/core](https://github.com/dotansimha/graphql-typed-document-node), but the JavaScript Modules Library is not prescriptive regarding GraphQL type generation and client-side usage. Here are some tools that can be used to generate types for your GraphQL queries:
+
+- [gql.tada](https://gql-tada.0no.co/)
+- [GraphQL Codegen](https://the-guild.dev/graphql/codegen/docs/getting-started)
+
+On the client, you can use your favorite GraphQL client, such as [Apollo Client](https://www.apollographql.com/docs/react/) or [urql](https://nearform.com/open-source/urql/docs/).
+
 ### `useJCRQuery`
 
 This hook is used to execute a JCR query on the current Jahia instance.
