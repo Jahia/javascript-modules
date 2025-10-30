@@ -18,13 +18,17 @@ jahiaComponent(
     const base = currentResource.getNode().getPropertyAsString("j:baselineNode");
     const baseNode = useBaseNode(base, renderContext, renderContext.isLiveMode() ? "LIVE" : "EDIT");
 
-    const staticMenu = server.jcr.doExecuteAsGuest(((session: JCRSessionWrapper) =>
-      buildNode(
-        baseNode,
-        session,
-        renderContext,
-        currentResource,
-      )) as unknown as JCRCallback<unknown>);
+    const staticMenu = server.jcr.doExecuteAsGuest(
+      ((session: JCRSessionWrapper) =>
+        buildNode(
+          baseNode,
+          session,
+          renderContext,
+          currentResource,
+        )) as unknown as JCRCallback<unknown>,
+      baseNode.getSession().getLocale(),
+      baseNode.getSession().getWorkspace().getName(),
+    );
 
     return (
       <Island component={SampleHydratedMenu} props={{ staticMenu, rootPath: baseNode.getPath() }} />

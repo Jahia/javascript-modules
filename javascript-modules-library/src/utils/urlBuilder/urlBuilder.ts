@@ -5,6 +5,14 @@ import { useServerContext } from "../../hooks/useServerContext";
 // Regex that checks if the first word contains colon (http:, mail:, ftp: ..)
 const absoluteUrlRegExp = /^(?:[a-z+]+:)?\/\//i;
 
+/** URLSearchParams is not supported by Graal, this is our polyfill in the meantime */
+function appendParameters(url: string, parameters: Record<string, string>): string {
+  const querystring = Object.entries(parameters)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join("&");
+  return `${url}${url.includes("?") ? "&" : "?"}${querystring}`;
+}
+
 /**
  * Generate a Jahia url for the provided node.
  *
@@ -13,56 +21,96 @@ const absoluteUrlRegExp = /^(?:[a-z+]+:)?\/\//i;
 export function buildNodeUrl(
   /** The node to build the URL for */
   node: JCRNodeWrapper,
-  config: {
-    /** The querystring parameters to append to the URL */
-    parameters?: Record<string, string>;
-    /**
-     * The mode to use to build the URL. Defines the mode or override the one provided by the
-     * renderContext.
-     */
-    mode?: "edit" | "preview" | "live";
-    /**
-     * The language to use to build the URL. Defines the languages or overrides the one provided by
-     * the current resource
-     */
-    language?: string;
-    /**
-     * The extension to use to build the URL. Defines the extension or overrides the one provided by
-     * the current resource
-     */
-    extension?: string;
-  } = {},
-  context: {
+  // Prevent providing both mode/language/extension and decorations at the same time
+  config?:
+    | {
+        /** The query string parameters to append to the URL */
+        parameters?: Record<string, string>;
+        /**
+         * The mode to use to build the URL. Defines the mode or override the one provided by the
+         * renderContext.
+         */
+        mode?: "edit" | "preview" | "live";
+        /**
+         * The language to use to build the URL. Defines the languages or overrides the one provided
+         * by the current resource
+         */
+        language?: string;
+        /**
+         * The extension to use to build the URL. Defines the extension or overrides the one
+         * provided by the current resource
+         */
+        extension?: string;
+      }
+    | {
+        /** The query string parameters to append to the URL */
+        parameters?: Record<string, string>;
+        /** Additional arguments used for building the URL, through `node.getUrl` overloads. */
+        args?: Record<string, string | number | boolean>;
+      },
+  context?: {
     /** Provided in react context, but you need to provide one otherwise. * */
     renderContext?: RenderContext;
     /** Provided in react context, you need to provide one otherwise. * */
+    currentResource?: Resource;
+  },
+): string;
+export function buildNodeUrl(
+  node: JCRNodeWrapper,
+  config: {
+    parameters?: Record<string, string>;
+    mode?: "edit" | "preview" | "live";
+    language?: string;
+    extension?: string;
+    args?: Record<string, string | number | boolean>;
+  } = {},
+  context: {
+    renderContext?: RenderContext;
     currentResource?: Resource;
   } = useServerContext(),
 ): string {
   if (!node) throw new Error("Expected a node in buildNodeUrl, received undefined");
 
-  // Use context values if not provided
-  const mode = config.mode ?? context.renderContext?.getMode();
-  const language = config.language ?? context.currentResource?.getLocale().toString();
-  const extension = config.extension ?? `.${context.currentResource?.getTemplateType()}`;
-  if (!mode || !language || !extension) {
-    throw new Error(
-      `Mode, language, and extension must not be empty, mode: ${mode}, language: ${language} extension: ${extension}`,
+  // URL building is an old thing in Jahia, with a lot of branches and special cases:
+  // - if any of mode, language or extension is provided, we need to build the URL manually
+  // - otherwise, we can use node.getUrl() with decorations if provided
+
+  // Manual URL building: concatenate various parts together to get a URL
+  // like `<c:url value="${url.base}${node.path}.html" />` in JSP
+  if (config.mode || config.language || config.extension) {
+    if (config.args) {
+      throw new Error("You cannot use args with mode, language or extension in buildNodeUrl.");
+    }
+
+    const mode = config.mode ?? context.renderContext?.getMode();
+    const language = config.language ?? context.currentResource?.getLocale().toString();
+    const extension =
+      config.extension ?? `.${context.currentResource?.getTemplateType() ?? "html"}`;
+
+    if (!mode) throw new Error("buildNodeUrl: mode is not defined and cannot be inferred.");
+    if (!language) throw new Error("buildNodeUrl: language is not defined and cannot be inferred.");
+
+    return buildEndpointUrl(
+      (mode === "edit"
+        ? "/cms/edit/default/"
+        : mode === "preview"
+          ? "/cms/render/default/"
+          : "/cms/render/live/") +
+        language +
+        node.getPath() +
+        extension,
+      { parameters: config.parameters },
+      context,
     );
   }
-  // Lookiup for the matching url build in the registry.
-  const urlBuilders = server.registry.find({ type: "urlBuilder" }, "priority");
-  for (const urlBuilder of urlBuilders) {
-    if (urlBuilder.key === "*" || node.isNodeType(urlBuilder.key)) {
-      return buildEndpointUrl(
-        urlBuilder.buildURL({ node, mode, language, extension, context }),
-        { parameters: config.parameters },
-        { renderContext: context.renderContext },
-      );
-    }
-  }
-  // No build has been found
-  throw new Error(`Unable to build url for ${JSON.stringify(config)}, no registered builder found`);
+
+  // `/context` is covered by .getUrl, no need to run through buildEndpointUrl
+  let url = config.args
+    ? node.getUrl(Object.entries(config.args).map(([k, v]) => `${k}:${v}`))
+    : node.getUrl();
+  if (context.renderContext) url = context.renderContext.getResponse().encodeURL(url);
+  if (config.parameters) url = appendParameters(url, config.parameters);
+  return url;
 }
 
 /**
@@ -124,17 +172,5 @@ export function buildEndpointUrl(
     url = url.startsWith("/") ? context.renderContext.getRequest().getContextPath() + url : url;
     url = context.renderContext.getResponse().encodeURL(url);
   }
-  // Handle parameters
-  if (!config.parameters) {
-    return url;
-  }
-  const separator = url.includes("?") ? "&" : "?";
-  const URLParameters = Object.keys(config.parameters)
-    .map(
-      (key) =>
-        `${encodeURIComponent(key)}=${encodeURIComponent(config.parameters ? config.parameters[key] : "")}`,
-    )
-    .join("&");
-
-  return `${url}${separator}${URLParameters}`;
+  return config.parameters ? appendParameters(url, config.parameters) : url;
 }
