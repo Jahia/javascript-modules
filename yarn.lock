@@ -902,8 +902,8 @@ __metadata:
   linkType: hard
 
 "@rollup/plugin-commonjs@npm:^28.0.6":
-  version: 28.0.8
-  resolution: "@rollup/plugin-commonjs@npm:28.0.8"
+  version: 28.0.9
+  resolution: "@rollup/plugin-commonjs@npm:28.0.9"
   dependencies:
     "@rollup/pluginutils": "npm:^5.0.1"
     commondir: "npm:^1.0.1"
@@ -917,7 +917,7 @@ __metadata:
   peerDependenciesMeta:
     rollup:
       optional: true
-  checksum: 10c0/c558aa97a6f774bdecddce77fc8225cfff7f3062f1919e8322ecfe47d4e1ca11511574338cafc26972687d64d92c70285ed9206d82e356e20a162a2f089577c1
+  checksum: 10c0/b7af70614a53c549a1ba1e9647879b644bcf44ec78850f04018b929f4ee414274f867fa438308409a06ef8a3a179ed24c25e4f8ef77eb341dfddd2b0cb88c389
   languageName: node
   linkType: hard
 
@@ -988,8 +988,8 @@ __metadata:
   linkType: hard
 
 "@rollup/plugin-replace@npm:^6.0.2":
-  version: 6.0.2
-  resolution: "@rollup/plugin-replace@npm:6.0.2"
+  version: 6.0.3
+  resolution: "@rollup/plugin-replace@npm:6.0.3"
   dependencies:
     "@rollup/pluginutils": "npm:^5.0.1"
     magic-string: "npm:^0.30.3"
@@ -998,7 +998,7 @@ __metadata:
   peerDependenciesMeta:
     rollup:
       optional: true
-  checksum: 10c0/71c0dea46f560c8dff59853446d43fa0e8258139a74d2af09fce5790d0540ff3d874c8fd9962cb049577d25327262bfc97485ef90b2a0a21bf28a9d3bd8c6d44
+  checksum: 10c0/93217c52fe86b03363bc534b5f07963ac4fd6b91f19f6070a66809b0c65a036b3b234624a65a8bfcc01a8dc0e42838feae03c021b0d1e5e91753c503c4d70cd6
   languageName: node
   linkType: hard
 
@@ -1658,9 +1658,9 @@ __metadata:
   linkType: hard
 
 "canvas-confetti@npm:^1.9.3":
-  version: 1.9.3
-  resolution: "canvas-confetti@npm:1.9.3"
-  checksum: 10c0/94c6f16591660d5ed4a48afb8da65902826ce6b38edc7644d62521aa9bf9ef5b950aa4396e980e7fe0a38e5f41a991a6d984721412a54c9fba4de3682c1eead0
+  version: 1.9.4
+  resolution: "canvas-confetti@npm:1.9.4"
+  checksum: 10c0/08f11b5fa20b365922108828d7488f9b3eac2afdf39bc478339268c1250b5215df82682d7074520a3f0f72f4728f9703bbc937dcfe793f196b44e6e8ac0b1f7b
   languageName: node
   linkType: hard
 
@@ -2750,8 +2750,8 @@ __metadata:
   linkType: soft
 
 "i18next@npm:^25.6.0":
-  version: 25.6.0
-  resolution: "i18next@npm:25.6.0"
+  version: 25.6.2
+  resolution: "i18next@npm:25.6.2"
   dependencies:
     "@babel/runtime": "npm:^7.27.6"
   peerDependencies:
@@ -2759,7 +2759,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/35f7e4b8fa45fe2d6fd9fe267fde9101d7b502672f4fdf8439a7f0483a12c8a22a966e8f2b616480599057c804f553e594b9eb3c9ccb33fd4dfb57e5dee80636
+  checksum: 10c0/8e9ac1c4ea8efb04209733e595a4be86361466a2ea2ac7d244770cc73ffad80224da132b38de50aa7cb2b23d4061ce562f81e0e00abad8efd539d9a0c0e19ba2
   languageName: node
   linkType: hard
 
@@ -3201,11 +3201,11 @@ __metadata:
   linkType: hard
 
 "magic-string@npm:^0.30.17, magic-string@npm:^0.30.18, magic-string@npm:^0.30.3":
-  version: 0.30.19
-  resolution: "magic-string@npm:0.30.19"
+  version: 0.30.21
+  resolution: "magic-string@npm:0.30.21"
   dependencies:
     "@jridgewell/sourcemap-codec": "npm:^1.5.5"
-  checksum: 10c0/db23fd2e2ee98a1aeb88a4cdb2353137fcf05819b883c856dd79e4c7dfb25151e2a5a4d5dbd88add5e30ed8ae5c51bcf4accbc6becb75249d924ec7b4fbcae27
+  checksum: 10c0/299378e38f9a270069fc62358522ddfb44e94244baa0d6a8980ab2a9b2490a1d03b236b447eee309e17eb3bddfa482c61259d47960eb018a904f0ded52780c4a
   languageName: node
   linkType: hard
 
