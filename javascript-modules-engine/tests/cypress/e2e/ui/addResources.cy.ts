@@ -1,6 +1,6 @@
 import { addNode } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY, JAHIA_CONTEXT } from '../../support/constants';
 
 describe("Test on add resources component/helper", () => {
   const pageName = "testAddResources";
@@ -42,17 +42,17 @@ describe("Test on add resources component/helper", () => {
 
   it(`${pageName} : should contain a link tag in the head tag to load the CSS styles`, () => {
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
-    cy.get('head link[href="/modules/javascript-modules-engine-test-module/css/styles.css"]').then(
-      ($link: JQuery<HTMLLinkElement>) => {
-        expect($link.attr("id")).to.match(/^staticAssetCSS/);
-      },
-    );
+    cy.get(
+      `head link[href="${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/css/styles.css"]`
+    ).then(($link: JQuery<HTMLLinkElement>) => {
+      expect($link.attr("id")).to.match(/^staticAssetCSS/);
+    });
   });
 
   it(`${pageName} : should contain a script tag under the body tag`, () => {
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     cy.get(
-      'body script[src="/modules/javascript-modules-engine-test-module/javascript/body-script.js"]',
+      `body script[src="${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/javascript/body-script.js"]`,
     )
       .should("exist")
       .then(($script: JQuery<HTMLScriptElement>) => {
@@ -68,7 +68,7 @@ describe("Test on add resources component/helper", () => {
   it(`${pageName} : should contain a script tag under the head tag`, () => {
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     cy.get(
-      `head script[src="${"/modules/javascript-modules-engine-test-module/javascript/head-script.js"}"]`,
+      `head script[src="${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/javascript/head-script.js"]`,
     )
       .should("exist")
       .then(($script: JQuery<HTMLScriptElement>) => {

@@ -1,6 +1,6 @@
 import { publishAndWaitJobEnding, revokeRoles } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY, JAHIA_CONTEXT } from '../../support/constants';
 
 const homePage = "homePageHydratedMenu";
 
@@ -17,8 +17,8 @@ const pages = [
   { path: "page_3/page3_2", title: "Page 3.2", restricted: false },
 ];
 
-function buildLink(page) {
-  return `/sites/${GENERIC_SITE_KEY}/${homePage}/${page.path}.html`;
+function buildLink(page: { path: string }) {
+  return `${JAHIA_CONTEXT}/sites/${GENERIC_SITE_KEY}/${homePage}/${page.path}.html`;
 }
 
 describe("Test hydration of the navigation menu", () => {
