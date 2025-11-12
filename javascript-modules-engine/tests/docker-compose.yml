@@ -12,6 +12,7 @@ services:
       - SUPER_USER_PASSWORD=${SUPER_USER_PASSWORD}
       - JAHIA_LICENSE=${JAHIA_LICENSE}
       - JPDA=true
+      - CATALINA_CONTEXT=the/context
     extra_hosts:
       - jahia:127.0.0.1
     networks:
