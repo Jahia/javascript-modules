@@ -1,4 +1,4 @@
-import { HYDROGEN_SITE_KEY, HYDROGEN_POSTS } from '../../support/constants';
+import { HYDROGEN_SITE_KEY, HYDROGEN_POSTS, JAHIA_CONTEXT } from "../../support/constants";
 
 describe("Validate the concepts of the tutorial: 4 - Making a Blog", () => {
   it("the blog home page should only list published posts in the right order", () => {
@@ -24,7 +24,13 @@ describe("Validate the concepts of the tutorial: 4 - Making a Blog", () => {
           cy.get("a")
             .should("have.attr", "href")
             .then((href) => {
-              cy.request(href.toString()).its("status").should("eq", 200);
+              cy.request(
+                // cy.request already prepends the context, we need to remove it from the href
+                href.toString().slice(JAHIA_CONTEXT.length),
+                {},
+              )
+                .its("status")
+                .should("eq", 200);
             });
         });
     });
