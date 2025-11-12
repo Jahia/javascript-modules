@@ -18,4 +18,6 @@ export const HYDROGEN_POSTS = [
       '<b>Hydrogen</b>&nbsp;is a&nbsp;<a href="https://en.wikipedia.org/wiki/Chemical_element" title="Chemical element">chemical element</a>;',
   },
 ];
-export const JAHIA_CONTEXT = new URL(process.env.JAHIA_URL ?? 'http://localhost:8080').pathname
+export const JAHIA_CONTEXT = new URL(
+  Cypress.env('JAHIA_URL') ?? "http://localhost:8080"
+).pathname.replace(/\/$/, "");
