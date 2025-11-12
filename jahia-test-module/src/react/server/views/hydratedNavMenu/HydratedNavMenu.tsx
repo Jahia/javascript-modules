@@ -1,4 +1,9 @@
-import { Island, jahiaComponent, server } from "@jahia/javascript-modules-library";
+import {
+  buildEndpointUrl,
+  Island,
+  jahiaComponent,
+  server,
+} from "@jahia/javascript-modules-library";
 import SampleHydratedMenu from "$client/menu components/SampleHydratedMenu";
 import { buildNode } from "../../../../helpers/menu.js";
 import { useBaseNode } from "../../../../hooks/useBaseNode.js";
@@ -27,7 +32,14 @@ jahiaComponent(
       )) as unknown as JCRCallback<unknown>);
 
     return (
-      <Island component={SampleHydratedMenu} props={{ staticMenu, rootPath: baseNode.getPath() }} />
+      <Island
+        component={SampleHydratedMenu}
+        props={{
+          staticMenu,
+          rootPath: baseNode.getPath(),
+          graphqlApi: buildEndpointUrl("/modules/graphql"),
+        }}
+      />
     );
   },
 );

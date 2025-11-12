@@ -87,15 +87,20 @@ const buildHierarchy: BuildHierarchy = (nodes, rootPath) => {
 interface SampleHydratedMenuProps {
   staticMenu: NavigationItem;
   rootPath: string;
+  graphqlApi: string;
 }
 
-const SampleHydratedMenu: React.FC<SampleHydratedMenuProps> = ({ staticMenu, rootPath }) => {
+const SampleHydratedMenu: React.FC<SampleHydratedMenuProps> = ({
+  staticMenu,
+  rootPath,
+  graphqlApi,
+}) => {
   const [menu, setMenu] = useState<NavigationItem>(staticMenu);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     async function fetchMenu() {
-      const response = await fetch("/modules/graphql", {
+      const response = await fetch(graphqlApi, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
