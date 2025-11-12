@@ -13,17 +13,6 @@ export const login = {
   nodeType: "jnt:loginForm",
 };
 
-export const hydratedNavMenu = {
-  name: "hydratedNavMenu",
-  nodeType: "javascriptExample:hydratedNavMenu",
-  mixins: ["jmix:renderable"],
-  properties: {
-    "j:maxDepth": "10",
-    "j:baselineNode": "hydratedNavMenu",
-    "j:menuItemView": "menuElement",
-  },
-};
-
 export const calendar = {
   name: "calendar",
   nodeType: "jnt:calendar",
