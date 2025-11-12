@@ -1,4 +1,4 @@
-import { HYDROGEN_SITE_KEY } from '../../support/constants';
+import { HYDROGEN_SITE_KEY, JAHIA_CONTEXT } from "../../support/constants";
 
 describe('Validate the concepts of the tutorial: 3 - The "About Us" Page', () => {
   it("a node type can be rendered using different views", () => {
@@ -24,8 +24,10 @@ describe('Validate the concepts of the tutorial: 3 - The "About Us" Page', () =>
     it(`${page}.html: the footer should exist (shared template)`, () => {
       cy.visit(`/sites/${HYDROGEN_SITE_KEY}/${page}.html`);
       cy.get("body footer nav").within(() => {
-        cy.get(`a[href="/sites/${HYDROGEN_SITE_KEY}/home.html"]`).should("exist").and("have.text", "Home");
-        cy.get(`a[href="/sites/${HYDROGEN_SITE_KEY}/about-us.html"]`)
+        cy.get(`a[href="${JAHIA_CONTEXT}/sites/${HYDROGEN_SITE_KEY}/home.html"]`)
+          .should("exist")
+          .and("have.text", "Home");
+        cy.get(`a[href="${JAHIA_CONTEXT}/sites/${HYDROGEN_SITE_KEY}/about-us.html"]`)
           .should("exist")
           .and("have.text", "About Us");
       });
