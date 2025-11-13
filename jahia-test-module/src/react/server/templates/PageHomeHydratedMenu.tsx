@@ -1,5 +1,5 @@
 import { AddResources, Area, jahiaComponent, Render } from "@jahia/javascript-modules-library";
-import { footer, header, hydratedNavMenu, login } from "./pageComponents";
+import { footer, header, login } from "./pageComponents";
 
 jahiaComponent(
   {
@@ -22,9 +22,6 @@ jahiaComponent(
             <div className="headerLogin">
               <Render content={login} />
             </div>
-          </div>
-          <div className="nav">
-            <Render content={hydratedNavMenu} />
           </div>
           <div className="main">
             <div className="article">

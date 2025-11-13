@@ -79,13 +79,6 @@
 
 [javascriptExample:testI18n] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title, jmix:bindedComponent
 
-[javascriptExample:hydratedNavMenu] > jnt:content, mix:title, jmix:navMenuComponent, javascriptExampleMix:javascriptExampleComponent
- orderable
- - j:baselineNode (string,choicelist) nofulltext < 'home', 'currentPage'
- - j:maxDepth (long) = 2 mandatory
- - j:startLevel (long) = 0
- - j:menuItemView (string,choicelist[templates='jmix:navMenuItem,menuItem',resourceBundle,image]) = menuElement nofulltext
-
 [javascriptExample:test] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
  - prop1 (string)
  - prop2 (string)
