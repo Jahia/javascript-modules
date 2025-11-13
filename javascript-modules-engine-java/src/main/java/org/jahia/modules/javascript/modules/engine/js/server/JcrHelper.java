@@ -1,5 +1,7 @@
 package org.jahia.modules.javascript.modules.engine.js.server;
 
+import java.util.Locale;
+
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRTemplate;
 import org.jahia.services.usermanager.JahiaUserManagerService;
@@ -14,8 +16,10 @@ public class JcrHelper {
     private static final Logger logger = LoggerFactory.getLogger(JcrHelper.class);
 
     /**
-     * Execute JCR operations on a JCR session authenticated using the guest user and the "live" workspace.
+     * Execute JCR operations on a JCR session authenticated using the guest user
+     * and the "live" workspace.
      * This is intended for server-side use. Example:
+     *
      * <pre>
      *     import {server, useServerContext} from '@jahia/javascript-modules-library';
      *     ...
@@ -27,11 +31,14 @@ public class JcrHelper {
      * @return the result of the callback
      */
     public Object doExecuteAsGuest(JCRCallback<Object> callback) {
+        return doExecuteAsGuest(callback, null, "live");
+    }
+
+    public Object doExecuteAsGuest(JCRCallback<Object> callback, Locale locale, String workspace) {
         JCRTemplate template = JCRTemplate.getInstance();
         Object result = null;
         try {
-            String workspace = "live";
-            result = template.doExecute(JahiaUserManagerService.GUEST_USERNAME, null, workspace, null, callback);
+            result = template.doExecute(JahiaUserManagerService.GUEST_USERNAME, null, workspace, locale, callback);
         } catch (Exception e) {
             logger.error("Error while executing callback as guest", e);
         }
