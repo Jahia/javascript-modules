@@ -12,7 +12,7 @@ services:
       - SUPER_USER_PASSWORD=${SUPER_USER_PASSWORD}
       - JAHIA_LICENSE=${JAHIA_LICENSE}
       - JPDA=true
-      - CATALINA_CONTEXT=the-context
+      - CATALINA_CONTEXT=${CATALINA_CONTEXT}
     extra_hosts:
       - jahia:127.0.0.1
     networks:
@@ -28,7 +28,7 @@ services:
     environment:
       - MANIFEST=${MANIFEST}
       - SUPER_USER_PASSWORD=${SUPER_USER_PASSWORD}
-      - JAHIA_URL=http://jahia:8080/the-context
+      - JAHIA_URL=${JAHIA_URL:-http://jahia:8080}
       - NEXUS_USERNAME=${NEXUS_USERNAME}
       - NEXUS_PASSWORD=${NEXUS_PASSWORD}
     networks:
