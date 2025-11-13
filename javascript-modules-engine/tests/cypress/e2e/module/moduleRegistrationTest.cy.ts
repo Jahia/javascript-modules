@@ -1,6 +1,6 @@
 import { addNode, getNodeTypes, publishAndWaitJobEnding } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY, JAHIA_CONTEXT } from "../../support/constants";
 
 describe("Check that components of a module are correctly registered", () => {
   it("Create a page with .hbs template", function () {
@@ -43,7 +43,7 @@ describe("Check that components of a module are correctly registered", () => {
           ).length,
         ).to.eq(1);
         expect(simpleType.icon).to.eq(
-          "/modules/javascript-modules-engine-test-module/icons/javascriptExample_test",
+          `${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/icons/javascriptExample_test`,
         );
       });
     cy.logout();

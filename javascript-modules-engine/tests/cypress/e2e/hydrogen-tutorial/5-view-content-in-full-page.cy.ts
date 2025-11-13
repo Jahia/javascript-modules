@@ -1,4 +1,4 @@
-import { HYDROGEN_SITE_KEY, HYDROGEN_POSTS } from '../../support/constants';
+import { HYDROGEN_SITE_KEY, HYDROGEN_POSTS, JAHIA_CONTEXT } from "../../support/constants";
 
 describe("Validate the concepts of the tutorial: 5 - View Content in Full Page", () => {
   HYDROGEN_POSTS.forEach(({ page, title, subTitle, details, extract }) => {
@@ -28,7 +28,7 @@ describe("Validate the concepts of the tutorial: 5 - View Content in Full Page",
         .first()
         .within(() => {
           cy.get("a")
-            .should("have.attr", "href", `/sites/${HYDROGEN_SITE_KEY}/blog.html`)
+            .should("have.attr", "href", `${JAHIA_CONTEXT}/sites/${HYDROGEN_SITE_KEY}/blog.html`)
             .and("have.text", "Back to blog home");
         });
     });
