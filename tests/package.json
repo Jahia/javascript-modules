@@ -12,6 +12,7 @@
     "e2e:ci": "cypress run --browser chrome",
     "e2e:debug": "cypress open",
     "instrument": "nyc instrument --compact=false cypress instrumented",
+    "lint": "echo 'linting is available at the monorepo root'",
     "publish-tests": "yarn version --prerelease --preid=tests && git push --follow-tags && npm publish --access public",
     "report:html": "marge --inline results/reports/report.json --reportDir results/reports/",
     "report:merge": "mochawesome-merge results/reports/mochawesome*.json > results/reports/report.json && rm results/reports/mochawesome*.json"

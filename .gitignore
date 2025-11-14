@@ -16,5 +16,6 @@ node_modules/
 **/.yarn/cache/
 javascript-modules-engine/src/main/resources/javascript/
 javascript-modules-engine/src/main/resources/META-INF/js/
-javascript-modules-engine/tests/artifacts/
-javascript-modules-engine/tests/results/
+tests/artifacts/
+tests/run-artifacts/
+tests/results/
