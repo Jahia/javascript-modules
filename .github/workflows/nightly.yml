@@ -18,10 +18,10 @@ jobs:
           - jahia_image: ghcr.io/jahia/jahia-ee-dev:8-SNAPSHOT
             incident_service_suffix: SN
     with:
-      jahia_image: ${matrix.jahia_image}
+      jahia_image: ${{ matrix.jahia_image }}
       module_id: javascript-modules-engine
       testrail_project: Javascript Modules Engine
-      pagerduty_incident_service: javascript-modules-engine-{{ matrix.incident_service_suffix }}
+      pagerduty_incident_service: javascript-modules-engine-${{ matrix.incident_service_suffix }}
       provisioning_manifest: provisioning-manifest-snapshot.yml
       artifact_prefix: js-eng
       module_branch: ${{ github.ref }}
