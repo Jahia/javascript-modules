@@ -22,7 +22,7 @@ jobs:
       jahia_image: ${{ github.event.inputs.jahia_image }}
       module_id: javascript-modules-engine
       testrail_project: Javascript Modules Engine
-      module_branch: 'main'
+      module_branch: ${{ github.ref }}
       pagerduty_skip_notification: true
       provisioning_manifest: ${{ github.event.inputs.manifest }}
       artifact_prefix: js-eng
