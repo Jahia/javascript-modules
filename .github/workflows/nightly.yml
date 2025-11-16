@@ -13,15 +13,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - jahia_image: jahia/jahia-ee:8
-            incident_service_suffix: RL
           - jahia_image: ghcr.io/jahia/jahia-ee-dev:8-SNAPSHOT
-            incident_service_suffix: SN
+            suffix: SN
     with:
       jahia_image: ${{ matrix.jahia_image }}
       module_id: javascript-modules-engine
       testrail_project: Javascript Modules Engine
-      pagerduty_incident_service: javascript-modules-engine-${{ matrix.incident_service_suffix }}
+      pagerduty_incident_service: javascript-modules-engine-${{ matrix.suffix }}
       provisioning_manifest: provisioning-manifest-snapshot.yml
-      artifact_prefix: js-eng
+      artifact_prefix: tests-${{ matrix.suffix }}
       module_branch: ${{ github.ref }}
