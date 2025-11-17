@@ -7,7 +7,8 @@ on:
 
 jobs:
   integration-tests-standalone:
-    uses: Jahia/jahia-modules-action/.github/workflows/reusable-integration-tests.yml@v2
+    # TODO temp use custom branch for testing
+    uses: Jahia/jahia-modules-action/.github/workflows/reusable-integration-tests.yml@feat-pass-catalina-context-as-env-variable
     secrets: inherit
     strategy:
       fail-fast: false
