@@ -69,6 +69,7 @@ jobs:
       jahia_image: ghcr.io/jahia/jahia-ee-dev:8-SNAPSHOT
       module_id: javascript-modules-engine
       testrail_project: Javascript Modules Engine
+      module_branch: ${{ github.ref }}
       provisioning_manifest: provisioning-manifest-build.yml
       artifact_prefix: js-eng
 
