@@ -15,6 +15,9 @@ jobs:
         include:
           - jahia_image: ghcr.io/jahia/jahia-ee-dev:8-SNAPSHOT
             suffix: SN
+          - jahia_image: ghcr.io/jahia/jahia-ee-dev:8-SNAPSHOT
+            suffix: SN
+            context: custom-context
     with:
       jahia_image: ${{ matrix.jahia_image }}
       module_id: javascript-modules-engine
@@ -23,3 +26,5 @@ jobs:
       provisioning_manifest: provisioning-manifest-snapshot.yml
       artifact_prefix: tests-${{ matrix.suffix }}
       module_branch: ${{ github.ref }}
+    env:
+      CUSTOM_CONTEXT: ${{ matrix.context }}
