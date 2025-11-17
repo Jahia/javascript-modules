@@ -1,4 +1,4 @@
-name: Nightly Test run
+name: Nightly Tests
 
 on:
   workflow_dispatch:
@@ -17,7 +17,7 @@ jobs:
           - jahia_image: ghcr.io/jahia/jahia-ee-dev:8-SNAPSHOT
             suffix: SN
           - jahia_image: ghcr.io/jahia/jahia-ee-dev:8-SNAPSHOT
-            suffix: SN
+            suffix: SN-custom-context
             context: custom-context
     with:
       jahia_image: ${{ matrix.jahia_image }}
@@ -27,3 +27,4 @@ jobs:
       provisioning_manifest: provisioning-manifest-snapshot.yml
       artifact_prefix: tests-${{ matrix.suffix }}
       module_branch: ${{ github.ref }}
+      catalina_context: ${{ matrix.context }}
