@@ -27,7 +27,6 @@ describe("Validate the concepts of the tutorial: 4 - Making a Blog", () => {
               cy.request(
                 // cy.request already prepends the context, we need to remove it from the href
                 href.toString().slice(JAHIA_CONTEXT.length),
-                {},
               )
                 .its("status")
                 .should("eq", 200);
