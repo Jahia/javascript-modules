@@ -27,5 +27,3 @@ jobs:
       provisioning_manifest: provisioning-manifest-snapshot.yml
       artifact_prefix: tests-${{ matrix.suffix }}
       module_branch: ${{ github.ref }}
-    env:
-      CUSTOM_CONTEXT: ${{ matrix.context }}
