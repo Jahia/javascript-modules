@@ -1,4 +1,4 @@
-name: Nightly Test run
+name: Nightly Tests
 
 on:
   workflow_dispatch:
@@ -7,7 +7,8 @@ on:
 
 jobs:
   integration-tests-standalone:
-    uses: Jahia/jahia-modules-action/.github/workflows/reusable-integration-tests.yml@v2
+    # TODO temp use custom branch for testing
+    uses: Jahia/jahia-modules-action/.github/workflows/reusable-integration-tests.yml@feat-pass-catalina-context-as-env-variable
     secrets: inherit
     strategy:
       fail-fast: false
@@ -15,6 +16,10 @@ jobs:
         include:
           - jahia_image: ghcr.io/jahia/jahia-ee-dev:8-SNAPSHOT
             suffix: SN
+            catalina_context : '' # Root context
+          - jahia_image: ghcr.io/jahia/jahia-ee-dev:8-SNAPSHOT
+            suffix: SN-custom-context
+            catalina_context: custom-context
     with:
       jahia_image: ${{ matrix.jahia_image }}
       module_id: javascript-modules-engine
@@ -23,3 +28,4 @@ jobs:
       provisioning_manifest: provisioning-manifest-snapshot.yml
       artifact_prefix: tests-${{ matrix.suffix }}
       module_branch: ${{ github.ref }}
+      catalina_context: ${{ matrix.catalina_context }}
