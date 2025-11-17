@@ -28,10 +28,8 @@ services:
     environment:
       - MANIFEST=${MANIFEST}
       - SUPER_USER_PASSWORD=${SUPER_USER_PASSWORD}
-      # Use shell parameter expansion to build JAHIA_URL
-      # If CATALINA_CONTEXT='' → http://jahia:8080
-      # If CATALINA_CONTEXT='my-context' → http://jahia:8080/my-context
-      - JAHIA_URL=${JAHIA_URL:-http://jahia:8080}${CATALINA_CONTEXT:+/}${CATALINA_CONTEXT}
+      # CONTEXT_PATH can be '' (empty string, default) or '/my-context'
+      - JAHIA_URL=${JAHIA_URL:-http://jahia:8080}${CONTEXT_PATH}
       - NEXUS_USERNAME=${NEXUS_USERNAME}
       - NEXUS_PASSWORD=${NEXUS_PASSWORD}
     networks:
