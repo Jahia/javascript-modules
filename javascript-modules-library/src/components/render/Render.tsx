@@ -103,7 +103,7 @@ export function Render(
 ): React.JSX.Element;
 
 /**
- * Render virtual a content node.
+ * Render a virtual content node.
  *
  * @returns The rendered output of the view for the specified content
  */
@@ -123,7 +123,7 @@ export function Render(
     /** The name of the view variant to use */
     view?: string;
     /** The parameters to pass to the view */
-    parameters?: unknown;
+    parameters?: Record<string, unknown>;
   }>,
 ): React.JSX.Element;
 
@@ -162,7 +162,7 @@ export function Render({
   advanceRenderingConfig?: "INCLUDE" | "OPTION";
   templateType?: string;
   view?: string;
-  parameters?: unknown;
+  parameters?: Record<string, unknown>;
 }>): React.JSX.Element {
   const { renderContext, currentResource } = useServerContext();
   return createElement("jsm-raw-html", {
