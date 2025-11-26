@@ -35,7 +35,7 @@ export interface VirtualJCRNode {
    *     "fr": { "title": "Bonjour" }
    *   }
    */
-  i18nProperties?: Record<string, Record<string, unknown>>;
+  i18nProperties?: Record<string, Record<string, unknown> | undefined>;
 
   /**
    * If the virtual node is meant to be [bound to a specific component][0], this is the relative
@@ -53,10 +53,98 @@ export interface VirtualJCRNode {
 }
 
 /**
- * Render a content node
+ * Render a content node directly from a JCR node.
  *
  * @returns The rendered output of the view for the specified content
  */
+export function Render(
+  props: Readonly<{
+    /** The node to render. */
+    node: JCRNodeWrapper;
+    /**
+     * Makes the child read-only.
+     *
+     * @default false
+     */
+    readOnly?: boolean;
+    advanceRenderingConfig?: "OPTION";
+    /** The template type to use (html, json, ...) */
+    templateType?: string;
+    /** The name of the view variant to use */
+    view?: string;
+    /** The parameters to pass to the view */
+    parameters?: Record<string, unknown>;
+  }>,
+): React.JSX.Element;
+
+/**
+ * Render a content node from its path.
+ *
+ * @returns The rendered output of the view for the specified content
+ */
+export function Render(
+  props: Readonly<{
+    /** The path node to render. If relative, it will be resolved against the current resource. */
+    path: string;
+    /**
+     * Makes the child read-only.
+     *
+     * @default false
+     */
+    readOnly?: boolean;
+    advanceRenderingConfig?: "OPTION";
+    /** The template type to use (html, json, ...) */
+    templateType?: string;
+    /** The name of the view variant to use */
+    view?: string;
+    /** The parameters to pass to the view */
+    parameters?: Record<string, unknown>;
+  }>,
+): React.JSX.Element;
+
+/**
+ * Render virtual a content node.
+ *
+ * @returns The rendered output of the view for the specified content
+ */
+export function Render(
+  props: Readonly<{
+    /** The content node to render */
+    content: VirtualJCRNode;
+    /**
+     * Makes the child read-only.
+     *
+     * @default false
+     */
+    readOnly?: boolean;
+    advanceRenderingConfig?: "OPTION";
+    /** The template type to use (html, json, ...) */
+    templateType?: string;
+    /** The name of the view variant to use */
+    view?: string;
+    /** The parameters to pass to the view */
+    parameters?: unknown;
+  }>,
+): React.JSX.Element;
+
+/**
+ * Render the current content node, in read only mode.
+ *
+ * @returns The rendered output of the view for the specified content
+ */
+export function Render(
+  props: Readonly<{
+    advanceRenderingConfig: "INCLUDE";
+    /** The template type to use (html, json, ...) */
+    templateType?: string;
+    /** The name of the view variant to use */
+    view?: string;
+    /** The parameters to pass to the view */
+    parameters?: Record<string, unknown>;
+  }>,
+): React.JSX.Element;
+
+// Implementation, all overloads merged as one signature with optional params
 export function Render({
   content,
   node,
@@ -67,28 +155,13 @@ export function Render({
   view,
   parameters,
 }: Readonly<{
-  /** The content node to render */
   content?: VirtualJCRNode;
-  /** The node to render */
   node?: JCRNodeWrapper;
-  /** The path to render */
   path?: string;
-  /**
-   * Makes the child read-only.
-   *
-   * @default false
-   */
   readOnly?: boolean;
-  /**
-   * Specifies if we should render a node or simply include a view. Acceptable values are : none,
-   * INCLUDE or OPTION
-   */
   advanceRenderingConfig?: "INCLUDE" | "OPTION";
-  /** The template type to use (html, json, ...) */
   templateType?: string;
-  /** The name of the view variant to use */
   view?: string;
-  /** The parameters to pass to the view */
   parameters?: unknown;
 }>): React.JSX.Element {
   const { renderContext, currentResource } = useServerContext();

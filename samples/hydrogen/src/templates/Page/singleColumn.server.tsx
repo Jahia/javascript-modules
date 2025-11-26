@@ -11,7 +11,7 @@ jahiaComponent(
   },
   ({ "jcr:title": title }, { renderContext }) => (
     <Layout title={title}>
-      <Render content={{ nodeType: "hydrogen:navBar" }} />
+      <Render content={{ name: "navbar", nodeType: "hydrogen:navBar" }} />
       <Area name="header" nodeType="hydrogen:header" />
       <main style={{ maxWidth: "40rem", margin: "0 auto" }}>
         <Area name="main" />
