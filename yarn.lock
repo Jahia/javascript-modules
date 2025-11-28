@@ -3504,7 +3504,7 @@ __metadata:
   resolution: "javascript-modules-engine@workspace:javascript-modules-engine"
   dependencies:
     "@jahia/javascript-modules-library": "workspace:^"
-    "@rollup/plugin-commonjs": "npm:^28.0.6"
+    "@rollup/plugin-commonjs": "npm:^29.0.0"
     "@rollup/plugin-node-resolve": "npm:^16.0.1"
     "@rollup/plugin-replace": "npm:^6.0.2"
     "@rollup/plugin-terser": "npm:^0.4.4"
