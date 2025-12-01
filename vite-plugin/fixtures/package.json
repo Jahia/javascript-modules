@@ -10,7 +10,7 @@
     "@jahia/javascript-modules-library": "workspace:*",
     "@jahia/vite-plugin": "workspace:*",
     "modern-normalize": "^3.0.1",
-    "vite": "^7.1.4",
+    "vite": "^7.2.6",
     "vite-plugin-inspect": "^11.3.3"
   },
   "packageManager": "yarn@4.10.3"
