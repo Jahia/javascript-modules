@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@rollup/pluginutils": "^5.2.0",
+    "dotenv": "^17.2.3",
     "magic-string": "^0.30.18",
     "tinyglobby": "^0.2.14"
   },
