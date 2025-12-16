@@ -89,7 +89,7 @@
                             <goal>yarn</goal>
                         </goals>
                         <configuration>
-                            <arguments>npm publish --tag alpha --access public</arguments>
+                            <arguments>npm publish --tag alpha --access public --provenance</arguments>
                         </configuration>
                     </execution>
                     <execution>
@@ -149,7 +149,7 @@
                                     <goal>yarn</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>npm publish --access public</arguments>
+                                    <arguments>npm publish --access public --provenance</arguments>
                                 </configuration>
                             </execution>
                         </executions>
