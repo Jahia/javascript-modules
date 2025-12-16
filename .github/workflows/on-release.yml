@@ -6,6 +6,9 @@ on:
   release:
     types: [published]
 
+permissions:
+  id-token: write
+
 jobs:
   on-release:
     if: ${{ github.event.release.prerelease == true }}

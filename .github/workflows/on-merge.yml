@@ -11,6 +11,9 @@ on:
     tags-ignore:
       - "**"
 
+permissions:
+  id-token: write
+
 concurrency:
   # ensure there is at most one execution of this workflow at any time
   # if another workflow is "in progress", the queued workflow will be "pending"
