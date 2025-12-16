@@ -32,6 +32,11 @@
         <jahia-module-signature>MCwCFF8pa94JvEWuLD2l0KT+RNNju5DRAhRc+JBdlQszeM1vze59Md6GmEAb5A==</jahia-module-signature>
         <require-capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version&gt;=17))"</require-capability>
         <yarn-build>build</yarn-build>
+        <Export-Package>
+            org.graalvm.*;version="${graalvm.version}",
+            com.oracle.truffle.*;version="${graalvm.version}",
+            com.oracle.js.*;version="${graalvm.version}"
+        </Export-Package>
     </properties>
 
     <dependencies>
@@ -44,6 +49,22 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>javascript-modules-engine-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>graal-sdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.truffle</groupId>
+            <artifactId>truffle-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.regex</groupId>
+            <artifactId>regex</artifactId>
         </dependency>
     </dependencies>
 

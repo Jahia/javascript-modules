@@ -66,8 +66,7 @@
         <exec-maven-plugin.version>3.5.0</exec-maven-plugin.version>
         <cyclonedx-maven-plugin.version>2.9.1</cyclonedx-maven-plugin.version>
         <!-- Graalvm libs -->
-        <graalvm.sdk.version>17.0.12</graalvm.sdk.version>
-        <graalvm.languages.version>23.0.5</graalvm.languages.version>
+        <graalvm.version>23.0.5</graalvm.version>
     </properties>
 
     <dependencyManagement>
@@ -106,6 +105,28 @@
                 <artifactId>vite-plugin</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
+            </dependency>
+
+            <!-- GraalVM dependencies: -->
+            <dependency>
+                <groupId>org.graalvm.sdk</groupId>
+                <artifactId>graal-sdk</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.truffle</groupId>
+                <artifactId>truffle-api</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.js</groupId>
+                <artifactId>js</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.regex</groupId>
+                <artifactId>regex</artifactId>
+                <version>${graalvm.version}</version>
             </dependency>
 
             <!-- Jahia dependencies: -->
@@ -173,11 +194,6 @@
                 <groupId>org.apache.jackrabbit</groupId>
                 <artifactId>jackrabbit-spi-commons</artifactId>
                 <version>${jackrabbit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.graalvm.sdk</groupId>
-                <artifactId>graal-sdk</artifactId>
-                <version>${graalvm.languages.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jahia.server</groupId>

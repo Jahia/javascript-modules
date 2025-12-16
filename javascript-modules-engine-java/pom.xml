@@ -92,27 +92,7 @@
         <dependency>
             <groupId>org.graalvm.sdk</groupId>
             <artifactId>graal-sdk</artifactId>
-            <version>${graalvm.languages.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.graalvm.truffle</groupId>
-            <artifactId>truffle-api</artifactId>
-            <version>${graalvm.languages.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.graalvm.js</groupId>
-            <artifactId>js</artifactId>
-            <version>${graalvm.languages.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ibm.icu</groupId>
-            <artifactId>icu4j</artifactId>
-            <version>72.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.graalvm.regex</groupId>
-            <artifactId>regex</artifactId>
-            <version>${graalvm.languages.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jahia.server</groupId>
@@ -325,10 +305,6 @@
                                 <ignoredUnusedDeclaredDependency>org.apache.jackrabbit:jackrabbit-spi-commons</ignoredUnusedDeclaredDependency>
                                 <ignoredUnusedDeclaredDependency>org.jboss.spec.javax.servlet:jboss-servlet-api_3.1_spec</ignoredUnusedDeclaredDependency>
                                 <ignoredUnusedDeclaredDependency>org.osgi:osgi.annotation</ignoredUnusedDeclaredDependency>
-                                <ignoredUnusedDeclaredDependency>org.graalvm.truffle:truffle-api</ignoredUnusedDeclaredDependency>
-                                <ignoredUnusedDeclaredDependency>org.graalvm.js:js</ignoredUnusedDeclaredDependency>
-                                <ignoredUnusedDeclaredDependency>org.graalvm.regex:regex</ignoredUnusedDeclaredDependency>
-                                <ignoredUnusedDeclaredDependency>com.ibm.icu:icu4j</ignoredUnusedDeclaredDependency>
                                 <ignoredUnusedDeclaredDependency>xml-apis:xml-apis</ignoredUnusedDeclaredDependency>
                             </ignoredUnusedDeclaredDependencies>
                         </configuration>
