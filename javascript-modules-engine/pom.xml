@@ -32,6 +32,11 @@
         <jahia-module-signature>MCwCFF8pa94JvEWuLD2l0KT+RNNju5DRAhRc+JBdlQszeM1vze59Md6GmEAb5A==</jahia-module-signature>
         <require-capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version&gt;=17))"</require-capability>
         <yarn-build>build</yarn-build>
+        <Export-Package>
+            org.graalvm.*;version="${graalvm.version}",
+            com.oracle.truffle.*;version="${graalvm.version}",
+            com.oracle.js.*;version="${graalvm.version}"
+        </Export-Package>
     </properties>
 
     <dependencies>
@@ -45,6 +50,22 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>javascript-modules-engine-java</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>graal-sdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.truffle</groupId>
+            <artifactId>truffle-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.regex</groupId>
+            <artifactId>regex</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -57,7 +78,7 @@
                     <instructions>
                         <_dsannotations>*</_dsannotations>
                         <!-- those OSGI dependencies are not provided by Jahia and should be embedded in the bundle -->
-                        <Embed-Dependency>bndlib,commons-pool2,pax-swissbox-bnd</Embed-Dependency>
+                        <Embed-Dependency>bndlib,commons-pool2,pax-swissbox-bnd,graal-sdk,truffle-api,js,icu4j,regex</Embed-Dependency>
                     </instructions>
                     <!-- because the Java classes of javascript-modules-engine-java are unpacked into the target/classes folder, -->
                     <!-- the dependency can and should be excluded to avoid duplicates -->
