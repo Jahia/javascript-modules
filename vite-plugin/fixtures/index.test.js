@@ -22,11 +22,11 @@ test("@jahia/vite-plugin output snapshot", () => {
   const assets = [
     "vite-DrFLeNov.png",
     "fira-code-cyrillic-ext-wght-normal-DhYMMuQd.woff2",
-    "fira-code-cyrillic-wght-normal-9QsI0tO3.woff2",
+    "fira-code-cyrillic-wght-normal-Y3u8pIsh.woff2",
     "fira-code-greek-ext-wght-normal-wWus70Ix.woff2",
     "fira-code-greek-wght-normal-B2SviObF.woff2",
     "fira-code-latin-ext-wght-normal-Dvfvaomy.woff2",
-    "fira-code-latin-wght-normal-mEl1RKBN.woff2",
+    "fira-code-latin-wght-normal-CHoedHDv.woff2",
     "fira-code-symbols2-wght-normal-CE6EOz_n.woff2",
   ];
 
