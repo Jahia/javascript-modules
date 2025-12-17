@@ -12,6 +12,9 @@ on:
       - "**"
 
 permissions:
+  actions: read
+  checks: write
+  contents: read
   id-token: write
 
 concurrency:
