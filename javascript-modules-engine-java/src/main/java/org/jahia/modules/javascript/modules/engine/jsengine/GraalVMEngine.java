@@ -23,7 +23,6 @@ import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.graalvm.home.Version;
 import org.graalvm.polyglot.*;
 import org.graalvm.polyglot.io.IOAccess;
 import org.graalvm.polyglot.proxy.ProxyObject;
@@ -105,7 +104,6 @@ public class GraalVMEngine {
         logger.debug("GraalVMEngine.activate");
         this.bundleContext = bundleContext;
 
-        initialEngineCheckup();
         try {
             initScripts.put(bundleContext.getBundle(),
                     getGraalSource(bundleContext.getBundle(), "META-INF/js/main.js"));
@@ -181,26 +179,6 @@ public class GraalVMEngine {
             logger.error("Cannot get resource: " + path, e);
         }
         return null;
-    }
-
-    private void initialEngineCheckup() {
-        // check VM
-        if (!Version.getCurrent().isRelease()) {
-            String specVersion = System.getProperty("java.specification.version", UNKNOWN_SYS_PROP);
-            String vendorVersion = System.getProperty("java.vendor.version", specVersion);
-            String vendor = System.getProperty("java.vendor", UNKNOWN_SYS_PROP);
-            logger.warn("Javascript Modules Engine requires GraalVM for production usage, detected {} (vendor: {}).",
-                    vendorVersion, vendor);
-            return;
-        }
-
-        // Check if the 'js' extension is installed
-        try (Context context = Context.create()) {
-            if (!context.getEngine().getLanguages().containsKey(JS)) {
-                logger.error(
-                        "Javascript Modules Engine detected GraalVM, but the 'js' extension is not installed. You can install it by running: gu install js");
-            }
-        }
     }
 
     private void initializePool(Map<String, String> poolOptions) {
