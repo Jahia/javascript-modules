@@ -7,12 +7,16 @@ jobs:
   build-and-upload:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
       - run: corepack enable
       - run: yarn install
       - run: yarn build
-      - uses: actions/upload-artifact@v4
+      - name: Prepare Artifact
+        run: |
+          echo name=$(yarn node -p process.env.npm_package_name) >> $GITHUB_ENV
+          echo version=$(yarn node -p process.env.npm_package_version) >> $GITHUB_ENV
+      - uses: actions/upload-artifact@v6
         with:
-          name: package.tgz
+          name: ${{ env.name }}-${{ env.version }}.tgz
           path: dist/package.tgz
