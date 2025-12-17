@@ -24,9 +24,6 @@
     "clean": "rm -rf dist",
     "lint": "yarn run --top-level lint"
   },
-  "dependencies": {
-    "dotenv": "^17.2.2"
-  },
   "devDependencies": {
     "@0no-co/graphql.web": "^1.2.0",
     "@graphql-typed-document-node/core": "^3.2.0",
