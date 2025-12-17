@@ -83,7 +83,7 @@ jobs:
     name: Publish module
     needs: [integration-tests-standalone]
     if: github.ref == 'refs/heads/main'
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/jahia/jahia-docker-mvn-cache:17-jdk-noble-mvn-loaded
       credentials:
