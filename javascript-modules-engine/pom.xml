@@ -32,7 +32,7 @@
         <jahia-module-signature>MCwCFF8pa94JvEWuLD2l0KT+RNNju5DRAhRc+JBdlQszeM1vze59Md6GmEAb5A==</jahia-module-signature>
         <require-capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version&gt;=17))"</require-capability>
         <yarn-build>build</yarn-build>
-        <Export-Package>
+        <export-package>
             com.oracle.js.parser.ir.visitor;version="${graalvm.version}",
             com.oracle.js.parser.ir;version="${graalvm.version}",
             com.oracle.js.parser.resources;version="${graalvm.version}",
@@ -172,7 +172,7 @@
             org.graalvm.shadowed.org.jcodings;version="${graalvm.version}",
             org.graalvm.word.impl;version="${graalvm.version}",
             org.graalvm.word;version="${graalvm.version}"
-        </Export-Package>
+        </export-package>
     </properties>
 
     <dependencies>
