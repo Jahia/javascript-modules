@@ -32,11 +32,11 @@
         <jahia-module-signature>MCwCFF8pa94JvEWuLD2l0KT+RNNju5DRAhRc+JBdlQszeM1vze59Md6GmEAb5A==</jahia-module-signature>
         <require-capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version&gt;=17))"</require-capability>
         <yarn-build>build</yarn-build>
-        <Export-Package>
+        <export-package>
             org.graalvm.*;version="${graalvm.version}",
             com.oracle.truffle.*;version="${graalvm.version}",
             com.oracle.js.*;version="${graalvm.version}"
-        </Export-Package>
+        </export-package>
     </properties>
 
     <dependencies>
