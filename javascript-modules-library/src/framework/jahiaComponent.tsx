@@ -1,4 +1,4 @@
-import type { JSX } from "react";
+import type { ReactNode } from "react";
 import { type ServerContext, useServerContext } from "../hooks/useServerContext.js";
 import { getNodeProps } from "../utils/jcr/getNodeProps.js";
 
@@ -43,7 +43,7 @@ export interface JahiaComponent {
  * @param definitions The definitions of the component
  * @param Component The component to register
  */
-export const jahiaComponent = <T extends (props: never, context: ServerContext) => JSX.Element>(
+export const jahiaComponent = <T extends (props: never, context: ServerContext) => ReactNode>(
   { id, ...definitions }: JahiaComponent,
   Component: T,
 ): T => {
@@ -68,7 +68,7 @@ export const jahiaComponent = <T extends (props: never, context: ServerContext) 
 };
 
 /** Wraps `Component` to retrieve props from the JCR layer and pass them as usual component props. */
-const wrap = (Component: (props: never, context: ServerContext) => JSX.Element) => () => {
+const wrap = (Component: (props: never, context: ServerContext) => ReactNode) => () => {
   // Retrieve the current context
   const context = useServerContext();
 
