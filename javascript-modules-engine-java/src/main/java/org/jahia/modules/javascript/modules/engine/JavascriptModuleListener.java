@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
 
 import static org.jahia.modules.javascript.modules.engine.jshandler.JavascriptProtocolConnection.BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT;
 
@@ -100,14 +99,14 @@ public class JavascriptModuleListener implements BundleListener {
                 }
             }
         } catch (Exception e) {
-            logger.error("Cannot handle event {}", event.toString(), e);
+            logger.error("Cannot handle event {}", event, e);
         }
     }
 
     public List<Bundle> getJavascriptModules() {
         return Arrays.stream(engine.getBundleContext().getBundles())
                 .filter(bundle -> bundle.getState() == Bundle.ACTIVE && isJavascriptModule(bundle))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public boolean isJavascriptModule(Bundle bundle) {
