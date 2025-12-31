@@ -8,6 +8,9 @@
   "major": {
     "dependencyDashboardApproval": true
   },
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
+  "prCreation": "not-pending",
   "minor": {
     "dependencyDashboardApproval": true
   },
