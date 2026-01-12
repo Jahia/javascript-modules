@@ -1,4 +1,3 @@
-version: "3.3"
 services:
   jahia:
     image: "${JAHIA_IMAGE}"

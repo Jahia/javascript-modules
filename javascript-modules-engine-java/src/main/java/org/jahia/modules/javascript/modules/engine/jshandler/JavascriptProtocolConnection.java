@@ -19,6 +19,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jahia.utils.osgi.parsers.AbstractFileParser;
+import org.jahia.utils.osgi.parsers.CndFileParser;
+import org.jahia.utils.osgi.parsers.JCRImportXmlFileParser;
+import org.jahia.utils.osgi.parsers.ParsingContext;
 import org.ops4j.pax.swissbox.bnd.BndUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +59,24 @@ public class JavascriptProtocolConnection extends URLConnection {
         }
     }
 
+    static String getBundleVersion(Map<String, Object> properties, Map<String, Object> jahiaProps) {
+        return getVersionWithSnapshotSuffix(properties, jahiaProps, ".SNAPSHOT");
+    }
+
+    static String getImplementationVersion(Map<String, Object> properties, Map<String, Object> jahiaProps) {
+        return getVersionWithSnapshotSuffix(properties, jahiaProps, "-SNAPSHOT");
+    }
+
+    private static String getVersionWithSnapshotSuffix(Map<String, Object> properties, Map<String, Object> jahiaProps, String snapshotSuffix) {
+        Object snapshotModeObj = jahiaProps.getOrDefault("snapshot", false);
+        String version = (String) properties.get("version");
+        if (version.endsWith("-SNAPSHOT")) {
+            version = version.substring(0, version.length() - "-SNAPSHOT".length());
+            snapshotModeObj = true;
+        }
+        return version + (Boolean.parseBoolean(String.valueOf(snapshotModeObj)) ? snapshotSuffix : "");
+    }
+
     @Override
     public void connect() throws IOException {
         // Do nothing
@@ -67,16 +89,23 @@ public class JavascriptProtocolConnection extends URLConnection {
         logger.info("Handling JS module using javascript protocol wrapper for package: {}", wrappedUrl);
         File outputDir = Files.createTempDirectory("javascript.").toFile();
         TarUtils.unTar(new GZIPInputStream(wrappedUrl.openStream()), outputDir);
-        Properties instructions = new Properties();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         File packageDir = new File(outputDir, "package");
         Collection<File> files = FileUtils.listFiles(packageDir, null, true);
+        // Capabilities context and parsers
+        ParsingContext parsingContext = new ParsingContext();
+        CndFileParser cndFileParser = new CndFileParser();
+        cndFileParser.setLogger(logger);
+        JCRImportXmlFileParser importXmlFileParser = new JCRImportXmlFileParser();
+        importXmlFileParser.setLogger(logger);
+        Map<String, Object> packageJson = null;
+        List<File> cndFiles = new ArrayList<>();
+        File cndFile = null;
         try (JarOutputStream jos = new JarOutputStream(byteArrayOutputStream)) {
             Set<ZipEntry> processedImages = new HashSet<>();
 
             // Process files of the packages
-            List<File> cndFiles = new ArrayList<>();
             for (File file : files) {
                 if (file.getName().endsWith(".cnd")) {
                     // Postpone processing of CND files
@@ -87,16 +116,14 @@ public class JavascriptProtocolConnection extends URLConnection {
                 // Calculate relative path of the file in the package
                 String packageRelativePath = packageDir.toURI().relativize(file.toURI()).getPath();
 
-                // Extract instructions from package.json
+                // Copy file path (try to detect good path for file in the final package jar.)
                 if (packageRelativePath.equals("package.json")) {
                     ObjectMapper mapper = new ObjectMapper();
-                    Map<String, Object> properties = mapper.readValue(file, Map.class);
-                    Map<String, Object> jahiaProps = (Map<String, Object>) properties.getOrDefault("jahia", new HashMap<>());
-                    instructions.putAll(generateInstructions(properties, jahiaProps));
-                }
-
-                // Copy file path (try to detect good path for file in the final package jar.)
-                if (packageRelativePath.equals("import.xml")) {
+                    packageJson = mapper.readValue(file, Map.class);
+                    jos.putNextEntry(new ZipEntry(packageRelativePath));
+                } else if (packageRelativePath.equals("import.xml")) {
+                    // Extract required nodetypes from xml
+                    extractNodetypes(file, parsingContext, importXmlFileParser);
                     jos.putNextEntry(new ZipEntry("META-INF/" + packageRelativePath));
                 } else if (packageRelativePath.startsWith("settings/")) {
                     // Special mapping settings/content-editor-forms to META-INF/jahia-content-editor-forms
@@ -117,6 +144,10 @@ public class JavascriptProtocolConnection extends URLConnection {
                     }
                     // Map everything else in settings/ to META-INF/
                     else {
+                        // Extract required nodetypes from imported xml files.
+                        if (packageRelativePath.endsWith(".xml")) {
+                           extractNodetypes(file, parsingContext, importXmlFileParser);
+                        }
                         jos.putNextEntry(new ZipEntry("META-INF/" + StringUtils.substringAfter(packageRelativePath, "settings/")));
                     }
                 } else if (packageRelativePath.startsWith("components") && packageRelativePath.endsWith(".png")) {
@@ -144,6 +175,9 @@ public class JavascriptProtocolConnection extends URLConnection {
                 }
             }
 
+            if (packageJson == null) {
+                throw new IOException("Invalid package: package.json not found");
+            }
             // Process CND files (merging them in a single file if necessary)
             if (!cndFiles.isEmpty()) {
                 if (cndFiles.size() == 1) {
@@ -151,40 +185,55 @@ public class JavascriptProtocolConnection extends URLConnection {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Single CND file detected in the package.");
                     }
-                    File cndFile = cndFiles.get(0);
-                    jos.putNextEntry(new ZipEntry("META-INF/definitions.cnd"));
-                    try (FileInputStream input = new FileInputStream(cndFile)) {
-                        IOUtils.copy(input, jos);
-                    }
+                    cndFile = cndFiles.get(0);
+
                 } else {
                     // Multiple cnd files, merge them
                     if (logger.isDebugEnabled()) {
                         logger.debug("Multiple CND files detected in the package, they will be merged into a single file");
                     }
-                    File mergedDefinitionFile = mergeDefinitionFiles(cndFiles, packageDir);
-                    if (mergedDefinitionFile != null) {
-                        jos.putNextEntry(new ZipEntry("META-INF/definitions.cnd"));
-                        try (FileInputStream input = new FileInputStream(mergedDefinitionFile)) {
-                            IOUtils.copy(input, jos);
-                        } finally {
-                            FileUtils.delete(mergedDefinitionFile);
-                        }
-                    }
+                    cndFile = mergeDefinitionFiles(cndFiles, packageDir);
+                }
+
+                // Extract nodetype capabilities from the CND file
+                extractNodetypes(cndFile, parsingContext, cndFileParser);
+
+                jos.putNextEntry(new ZipEntry("META-INF/definitions.cnd"));
+                try (FileInputStream input = new FileInputStream(cndFile)) {
+                    IOUtils.copy(input, jos);
                 }
             }
-
-        } catch (Exception e) {
-            logger.error("An error occurred during JS module transformation", e);
+        } finally {
+            if (cndFile != null) {
+                // cndFile may be generated when merged, clean it up
+                FileUtils.deleteQuietly(cndFile);
+            }
+            // Clean up work dir
+            FileUtils.deleteDirectory(outputDir);
         }
 
-        FileUtils.deleteDirectory(outputDir);
+
+        Properties instructions = new Properties();
+        // Extract instructions from package.json and nodetype capabilities
+        instructions.putAll(generateInstructions(packageJson, parsingContext));
         if (logger.isDebugEnabled()) {
             logger.debug("JS module transformed to bundle using instructions: {}", instructions);
         }
+
         return BndUtils.createBundle(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()), instructions, wrappedUrl.toExternalForm());
     }
 
-    private Properties generateInstructions(Map<String, Object> properties, Map<String, Object> jahiaProps) {
+    private void extractNodetypes(File xmlFile, ParsingContext parsingContext, AbstractFileParser parser) {
+        try (InputStream inputStream = new FileInputStream(xmlFile)) {
+            parser.parse(xmlFile.getName(), inputStream, xmlFile.getParent(), false, false, null, parsingContext);
+        } catch (IOException e) {
+            logger.error("An error occurred while extractring nodestypes from import file: {}", e.getMessage());
+            logger.debug(e.getMessage(), e);
+        }
+    }
+
+    private Properties generateInstructions(Map<String, Object> properties, ParsingContext parsingContext) {
+        Map<String, Object> jahiaProps = (Map<String, Object>) properties.getOrDefault("jahia", new HashMap<>());
         Properties instructions = new Properties();
 
         // First let's setup Bundle headers
@@ -213,6 +262,16 @@ public class JavascriptProtocolConnection extends URLConnection {
         // always include "/static" as folder for the static resources
         instructions.put("Jahia-Static-Resources", StringUtils.defaultIfEmpty((String) jahiaProps.get("static-resources"), "/css,/icons,/images,/img,/javascript") + ",/static");
         instructions.put("-removeheaders", "Private-Package, Export-Package");
+        // Add Provide-Capability for provided node types
+        if (!parsingContext.getContentTypeDefinitions().isEmpty()) {
+            String provideCapability = String.join(",", parsingContext.getContentTypeDefinitions());
+            instructions.put("Provide-Capability", "com.jahia.services.content; nodetypes:List<String>=\"" + provideCapability + "\"");
+        }
+        // Add Require-Capability for required node types
+        if (!parsingContext.getContentTypeReferences().isEmpty()) {
+            String nodeTypeRequirements = String.join("\"),com.jahia.services.content; filter:=\"(nodetypes=", parsingContext.getContentTypeReferences());
+            instructions.put("Require-Capability", "com.jahia.services.content; filter:=\"(nodetypes=" + nodeTypeRequirements + "\")");
+        }
         return instructions;
     }
 
@@ -223,24 +282,6 @@ public class JavascriptProtocolConnection extends URLConnection {
             logger.warn("The 'maven' section is expected to be a map! The whole section will be ignored.");
             return Collections.emptyMap();
         }
-    }
-
-    static String getBundleVersion(Map<String, Object> properties, Map<String, Object> jahiaProps) {
-        return getVersionWithSnapshotSuffix(properties, jahiaProps, ".SNAPSHOT");
-    }
-
-    static String getImplementationVersion(Map<String, Object> properties, Map<String, Object> jahiaProps) {
-        return getVersionWithSnapshotSuffix(properties, jahiaProps, "-SNAPSHOT");
-    }
-
-    private static String getVersionWithSnapshotSuffix(Map<String, Object> properties, Map<String, Object> jahiaProps, String snapshotSuffix) {
-        Object snapshotModeObj = jahiaProps.getOrDefault("snapshot", false);
-        String version = (String) properties.get("version");
-        if (version.endsWith("-SNAPSHOT")) {
-            version = version.substring(0, version.length() - "-SNAPSHOT".length());
-            snapshotModeObj = true;
-        }
-        return version + (Boolean.parseBoolean(String.valueOf(snapshotModeObj)) ? snapshotSuffix : "");
     }
 
     private void setIfPresent(Map<String, Object> inputProperties, String propertyName, Properties instructions, String instructionName) {
