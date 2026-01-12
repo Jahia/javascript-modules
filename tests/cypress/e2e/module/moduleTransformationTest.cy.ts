@@ -28,6 +28,27 @@ describe("Check that the Javascript module has been transformed properly and has
       expect(result).to.contain(
         "Jahia-Static-Resources: /css,/javascript,/icons,/dist/client,/static"
       );
+      // expect for  Provide-Capability
+      expect(result).to.contain("Provide-Capability:");
+      expect(result).to.contain("com.jahia.services.content;nodetypes:List<String>");
+      expect(result).to.contain('moduleIdentifier="javascript-modules-engine-test-module"');
+      expect(result).to.contain('moduleIdentifier="JS Modules Engine Test Module (javascript module)"');
+      expect(result).to.contain("javascriptExample:simpleText");
+      expect(result).to.contain("javascriptExample:simpleText");
+      expect(result).to.contain("javascriptExample:simpleText");
+      // expect for Require-Capability
+      expect(result).to.contain("Require-Capability:");
+      // nodetypes from cnd file
+      expect(result).to.contain('com.jahia.services.content;filter:="(nodetypes=jmix:accessControllableContent)"');
+      expect(result).to.contain('com.jahia.services.content;filter:="(nodetypes=jmix:bindedComponent)"');
+      expect(result).to.contain('com.jahia.services.content;filter:="(nodetypes=jmix:droppableContent)"');
+      expect(result).to.contain('com.jahia.services.content;filter:="(nodetypes=jnt:content)"');
+      // Node types from import.xml
+      expect(result).to.contain('com.jahia.services.content;filter:="(nodetypes=jnt:page)"');
+      expect(result).to.contain('com.jahia.modules.dependencies;filter:="(moduleIdentifier=default)"');
+      expect(result).to.contain('com.jahia.modules.dependencies;filter:="(moduleIdentifier=legacy-default-components)"');
+      expect(result).to.contain('com.jahia.modules.dependencies;filter:="(moduleIdentifier=javascript-modules-engine)"');
+
     });
   });
 });
