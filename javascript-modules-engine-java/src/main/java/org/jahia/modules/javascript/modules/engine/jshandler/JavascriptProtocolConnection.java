@@ -227,7 +227,7 @@ public class JavascriptProtocolConnection extends URLConnection {
         try (InputStream inputStream = new FileInputStream(xmlFile)) {
             parser.parse(xmlFile.getName(), inputStream, xmlFile.getParent(), false, false, null, parsingContext);
         } catch (IOException e) {
-            logger.error("An error occurred while extractring nodestypes from import file: {}", e.getMessage());
+            logger.error("An error occurred while extracting nodestypes from import file: {}", e.getMessage());
             logger.debug(e.getMessage(), e);
         }
     }
