@@ -59,24 +59,6 @@ public class JavascriptProtocolConnection extends URLConnection {
         }
     }
 
-    static String getBundleVersion(Map<String, Object> properties, Map<String, Object> jahiaProps) {
-        return getVersionWithSnapshotSuffix(properties, jahiaProps, ".SNAPSHOT");
-    }
-
-    static String getImplementationVersion(Map<String, Object> properties, Map<String, Object> jahiaProps) {
-        return getVersionWithSnapshotSuffix(properties, jahiaProps, "-SNAPSHOT");
-    }
-
-    private static String getVersionWithSnapshotSuffix(Map<String, Object> properties, Map<String, Object> jahiaProps, String snapshotSuffix) {
-        Object snapshotModeObj = jahiaProps.getOrDefault("snapshot", false);
-        String version = (String) properties.get("version");
-        if (version.endsWith("-SNAPSHOT")) {
-            version = version.substring(0, version.length() - "-SNAPSHOT".length());
-            snapshotModeObj = true;
-        }
-        return version + (Boolean.parseBoolean(String.valueOf(snapshotModeObj)) ? snapshotSuffix : "");
-    }
-
     @Override
     public void connect() throws IOException {
         // Do nothing
@@ -101,7 +83,7 @@ public class JavascriptProtocolConnection extends URLConnection {
         importXmlFileParser.setLogger(logger);
         Map<String, Object> packageJson = null;
         List<File> cndFiles = new ArrayList<>();
-        File cndFile = null;
+        File finalCndFile = null;
         try (JarOutputStream jos = new JarOutputStream(byteArrayOutputStream)) {
             Set<ZipEntry> processedImages = new HashSet<>();
 
@@ -185,28 +167,28 @@ public class JavascriptProtocolConnection extends URLConnection {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Single CND file detected in the package.");
                     }
-                    cndFile = cndFiles.get(0);
+                    finalCndFile = cndFiles.get(0);
 
                 } else {
                     // Multiple cnd files, merge them
                     if (logger.isDebugEnabled()) {
                         logger.debug("Multiple CND files detected in the package, they will be merged into a single file");
                     }
-                    cndFile = mergeDefinitionFiles(cndFiles, packageDir);
+                    finalCndFile = mergeDefinitionFiles(cndFiles, packageDir);
                 }
 
                 // Extract nodetype capabilities from the CND file
-                extractNodetypes(cndFile, parsingContext, cndFileParser);
+                extractNodetypes(finalCndFile, parsingContext, cndFileParser);
 
                 jos.putNextEntry(new ZipEntry("META-INF/definitions.cnd"));
-                try (FileInputStream input = new FileInputStream(cndFile)) {
+                try (FileInputStream input = new FileInputStream(finalCndFile)) {
                     IOUtils.copy(input, jos);
                 }
             }
         } finally {
-            if (cndFile != null) {
+            if (finalCndFile != null) {
                 // cndFile may be generated when merged, clean it up
-                FileUtils.deleteQuietly(cndFile);
+                FileUtils.deleteQuietly(finalCndFile);
             }
             // Clean up work dir
             FileUtils.deleteDirectory(outputDir);
@@ -223,12 +205,10 @@ public class JavascriptProtocolConnection extends URLConnection {
         return BndUtils.createBundle(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()), instructions, wrappedUrl.toExternalForm());
     }
 
-    private void extractNodetypes(File xmlFile, ParsingContext parsingContext, AbstractFileParser parser) {
-        try (InputStream inputStream = new FileInputStream(xmlFile)) {
-            parser.parse(xmlFile.getName(), inputStream, xmlFile.getParent(), false, false, null, parsingContext);
-        } catch (IOException e) {
-            logger.error("An error occurred while extracting nodestypes from import file: {}", e.getMessage());
-            logger.debug(e.getMessage(), e);
+    private void extractNodetypes(File fileToBeParsed, ParsingContext parsingContext, AbstractFileParser parser) throws IOException {
+        try (InputStream inputStream = new FileInputStream(fileToBeParsed)) {
+            logger.info("Extracting node types from {}", fileToBeParsed.getAbsolutePath());
+            parser.parse(fileToBeParsed.getName(), inputStream, fileToBeParsed.getParent(), false, false, null, parsingContext);
         }
     }
 
@@ -282,6 +262,24 @@ public class JavascriptProtocolConnection extends URLConnection {
             logger.warn("The 'maven' section is expected to be a map! The whole section will be ignored.");
             return Collections.emptyMap();
         }
+    }
+
+    static String getBundleVersion(Map<String, Object> properties, Map<String, Object> jahiaProps) {
+        return getVersionWithSnapshotSuffix(properties, jahiaProps, ".SNAPSHOT");
+    }
+
+    static String getImplementationVersion(Map<String, Object> properties, Map<String, Object> jahiaProps) {
+        return getVersionWithSnapshotSuffix(properties, jahiaProps, "-SNAPSHOT");
+    }
+
+    private static String getVersionWithSnapshotSuffix(Map<String, Object> properties, Map<String, Object> jahiaProps, String snapshotSuffix) {
+        Object snapshotModeObj = jahiaProps.getOrDefault("snapshot", false);
+        String version = (String) properties.get("version");
+        if (version.endsWith("-SNAPSHOT")) {
+            version = version.substring(0, version.length() - "-SNAPSHOT".length());
+            snapshotModeObj = true;
+        }
+        return version + (Boolean.parseBoolean(String.valueOf(snapshotModeObj)) ? snapshotSuffix : "");
     }
 
     private void setIfPresent(Map<String, Object> inputProperties, String propertyName, Properties instructions, String instructionName) {
