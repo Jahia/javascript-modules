@@ -34,8 +34,8 @@ describe("Check that the Javascript module has been transformed properly and has
       expect(result).to.contain('moduleIdentifier="javascript-modules-engine-test-module"');
       expect(result).to.contain('moduleIdentifier="JS Modules Engine Test Module (javascript module)"');
       expect(result).to.contain("javascriptExample:simpleText");
-      expect(result).to.contain("javascriptExample:simpleText");
-      expect(result).to.contain("javascriptExample:simpleText");
+      expect(result).to.contain("javascriptExample:testReactClientSide");
+      expect(result).to.contain("javascriptExampleMix:javascriptExampleComponent");
       // expect for Require-Capability
       expect(result).to.contain("Require-Capability:");
       // nodetypes from cnd file
