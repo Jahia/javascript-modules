@@ -75,15 +75,15 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
-                    <instructions>
-                        <_dsannotations>*</_dsannotations>
-                        <!-- those OSGI dependencies are not provided by Jahia and should be embedded in the bundle -->
-                        <Embed-Dependency>bndlib,commons-pool2,pax-swissbox-bnd,graal-sdk,truffle-api,js,icu4j,regex</Embed-Dependency>
-                    </instructions>
-                    <!-- because the Java classes of javascript-modules-engine-java are unpacked into the target/classes folder, -->
-                    <!-- the dependency can and should be excluded to avoid duplicates -->
-                    <excludeDependencies>javascript-modules-engine-java</excludeDependencies>
-                </configuration>
+                <instructions>
+                    <_dsannotations>*</_dsannotations>
+                    <!-- those OSGI dependencies are not provided by Jahia and should be embedded in the bundle -->
+                    <Embed-Dependency>bndlib,commons-pool2,pax-swissbox-bnd,graal-sdk,truffle-api,js,icu4j,regex</Embed-Dependency>
+                </instructions>
+                <!-- because the Java classes of javascript-modules-engine-java are unpacked into the target/classes folder, -->
+                <!-- the dependency can and should be excluded to avoid duplicates -->
+                <excludeDependencies>javascript-modules-engine-java</excludeDependencies>
+            </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>

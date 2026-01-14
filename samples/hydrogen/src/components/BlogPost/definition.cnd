@@ -1,3 +1,4 @@
+<mix = 'http://www.jcp.org/jcr/mix/1.0'>
 [hydrogen:blogPost] > jnt:content, mix:title, jmix:mainResource, hydrogenmix:component
  - subtitle (string) i18n mandatory
  - authors (string) multiple
