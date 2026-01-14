@@ -208,7 +208,9 @@ public class JavascriptProtocolConnection extends URLConnection {
     private void extractNodetypes(File fileToBeParsed, ParsingContext parsingContext, AbstractFileParser parser) throws IOException {
         try (InputStream inputStream = new FileInputStream(fileToBeParsed)) {
             logger.info("Extracting node types from {}", fileToBeParsed.getAbsolutePath());
-            parser.parse(fileToBeParsed.getName(), inputStream, fileToBeParsed.getParent(), false, false, null, parsingContext);
+            if (parser.parse(fileToBeParsed.getName(), inputStream, fileToBeParsed.getParent(), false, false, null, parsingContext)) {
+                logger.info("Successfully extracted node types from {}", fileToBeParsed.getAbsolutePath());
+            };
         }
     }
 

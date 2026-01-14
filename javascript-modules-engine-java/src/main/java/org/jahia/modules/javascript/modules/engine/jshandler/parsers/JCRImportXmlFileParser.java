@@ -37,11 +37,7 @@ public class JCRImportXmlFileParser extends AbstractXmlFileParser {
 
     @Override
     public boolean canParse(String fileName, Element rootElement) {
-        boolean canParse = hasNamespaceURI(rootElement, "http://www.jcp.org/jcr/1.0");
-        if (!canParse) {
-            getLogger().warn("Can't parse JCR Import XML file at " + fileName + " missing namespace http://www.jcp.org/jcr/1.0 in root element");
-        }
-        return canParse;
+        return hasNamespaceURI(rootElement, "http://www.jcp.org/jcr/1.0");
     }
 
     @Override
