@@ -128,6 +128,11 @@
                 <artifactId>regex</artifactId>
                 <version>${graalvm.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.graalvm.tools</groupId>
+                <artifactId>chromeinspector</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
 
             <!-- Jahia dependencies: -->
             <dependency>
