@@ -82,7 +82,7 @@
                 <instructions>
                     <_dsannotations>*</_dsannotations>
                     <!-- those OSGI dependencies are not provided by Jahia and should be embedded in the bundle -->
-                    <Embed-Dependency>bndlib,chromeinspector,commons-pool2,pax-swissbox-bnd,graal-sdk,truffle-api,js,icu4j, regex</Embed-Dependency>
+                    <Embed-Dependency>bndlib,chromeinspector,commons-pool2,pax-swissbox-bnd,graal-sdk,truffle-api,js,icu4j,regex</Embed-Dependency>
                 </instructions>
                 <!-- because the Java classes of javascript-modules-engine-java are unpacked into the target/classes folder, -->
                 <!-- the dependency can and should be excluded to avoid duplicates -->
