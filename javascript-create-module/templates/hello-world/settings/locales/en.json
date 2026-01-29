@@ -6,6 +6,7 @@
   "89D3xFLMZmCAencaqw68C": "Click this button to add a new content node",
   "hBBhbeE0-a4KS9HVFPsOz": "Hydrated client-side",
   "AI95bg1EJsr48SR-4f_pl": "Rendered server-side",
+  "0yvhe06c8uhrPuqm15zq6": "Rendered client-side only",
   "OfBsezopuIko8aJ6X3kpw": "Despite being written with React, this page is fully rendered server-side. No JavaScript is sent to the client by default! This does not mean you cannot use client-side code:",
   "nr31fYHB-RqO06BCl4rYO": "This pattern is named <a>Islands Architecture.</a>"
 }

@@ -1,7 +1,8 @@
 import * as devalue from "devalue";
-import i18next from "i18next";
+import i18n from "i18next";
 import type { ComponentType } from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
+import { I18nextProvider } from "react-i18next";
 
 /** Ensures the component is hydrated with the right i18next context */
 const ComponentWrapper = ({
@@ -19,14 +20,16 @@ const ComponentWrapper = ({
   /** Props object for the app component */
   props: Record<string, unknown>;
 }) => {
-  i18next.setDefaultNamespace(ns);
-  i18next.changeLanguage(lang);
-
+  // Not thread-safe if multiple hydrated components use different languages on the same page.
+  // But assumes a single language per page, so i18n.changeLanguage(lang) is safe in this context.
+  i18n.changeLanguage(lang);
   return (
-    <Component {...props}>
-      {/* @ts-expect-error This is an hydration border: hydration will stop here */}
-      <jsm-children dangerouslySetInnerHTML={{ __html: "" }} suppressHydrationWarning />
-    </Component>
+    <I18nextProvider i18n={i18n} defaultNS={ns}>
+      <Component {...props}>
+        {/* @ts-expect-error This is an hydration border: hydration will stop here */}
+        <jsm-children dangerouslySetInnerHTML={{ __html: "" }} suppressHydrationWarning />
+      </Component>
+    </I18nextProvider>
   );
 };
 

@@ -1,4 +1,10 @@
-import { addNode, createSite, deleteSite, publishAndWaitJobEnding } from "@jahia/cypress";
+import {
+  addNode,
+  createSite,
+  deleteSite,
+  enableModule,
+  publishAndWaitJobEnding,
+} from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
 
 const testData = {
@@ -23,30 +29,24 @@ const testData = {
 };
 
 describe("Test i18n", () => {
-  before("Create test site/contents", () => {
-    createSite("javascriptI18NTestSite", {
+  const createSiteWithContent = (siteKey: string) => {
+    deleteSite(siteKey); // cleanup from previous test runs
+    createSite(siteKey, {
       languages: "en,fr_LU,fr,de",
       templateSet: "javascript-modules-engine-test-module",
       locale: "en",
       serverName: "localhost",
     });
 
-    addSimplePage(
-      "/sites/javascriptI18NTestSite/home",
-      "testPageI18N",
-      "Test i18n en",
-      "en",
-      "simple",
-      [
-        {
-          name: "pagecontent",
-          primaryNodeType: "jnt:contentList",
-        },
-      ],
-    ).then(() => {
+    addSimplePage(`/sites/${siteKey}/home`, "testPageI18N", "Test i18n en", "en", "simple", [
+      {
+        name: "pagecontent",
+        primaryNodeType: "jnt:contentList",
+      },
+    ]).then(() => {
       cy.apollo({
         variables: {
-          pathOrId: "/sites/javascriptI18NTestSite/home/testPageI18N",
+          pathOrId: `/sites/${siteKey}/home/testPageI18N`,
           properties: [
             { name: "jcr:title", value: "Test i18n fr_LU", language: "fr_LU" },
             { name: "jcr:title", value: "Test i18n fr", language: "fr" },
@@ -57,57 +57,45 @@ describe("Test i18n", () => {
       });
 
       addNode({
-        parentPathOrId: "/sites/javascriptI18NTestSite/home/testPageI18N/pagecontent",
+        parentPathOrId: `/sites/${siteKey}/home/testPageI18N/pagecontent`,
         name: "test",
         primaryNodeType: "javascriptExample:testI18n",
       });
     });
 
-    publishAndWaitJobEnding("/sites/javascriptI18NTestSite/home/testPageI18N", [
-      "en",
-      "fr_LU",
-      "fr",
-      "de",
-    ]);
-  });
+    publishAndWaitJobEnding(`/sites/${siteKey}/home/testPageI18N`, ["en", "fr_LU", "fr", "de"]);
+  };
 
   it("Test I18n values in various workspace/locales and various type of usage SSR/hydrate/rendered client side", () => {
+    const siteKey = "javascriptI18NTestSite";
+    createSiteWithContent(siteKey);
+
     cy.login();
     ["live", "default"].forEach((workspace) => {
       ["en", "fr_LU", "fr", "de"].forEach((locale) => {
-        cy.visit(
-          `/cms/render/${workspace}/${locale}/sites/javascriptI18NTestSite/home/testPageI18N.html`,
-        );
+        cy.visit(`/cms/render/${workspace}/${locale}/sites/${siteKey}/home/testPageI18N.html`);
+        testI18n(locale, 'div[data-testid="i18n-server-side"]', "We are server side !", false);
         testI18n(
-          workspace,
-          locale,
-          'div[data-testid="i18n-server-side"]',
-          "We are server side !",
-          false,
-        );
-        testI18n(
-          workspace,
           locale,
           'div[data-testid="i18n-hydrated-client-side"]',
           "We are hydrated client side !",
           true,
         );
         testI18n(
-          workspace,
           locale,
           'div[data-testid="i18n-rendered-client-side"]',
           "We are rendered client side !",
           true,
         );
       });
-
       cy.get('[data-testid="getSiteLocales"]').should("contain", "de,en,fr,fr_LU");
     });
     cy.logout();
+
+    deleteSite(siteKey);
   });
 
   const testI18n = (
-    workspace: string,
     locale: string,
     mainSelector: string,
     placeholderIntialValue: string,
@@ -141,8 +129,46 @@ describe("Test i18n", () => {
     }
   };
 
-  after("Cleanup", () => {
-    cy.visit("/start", { failOnStatusCode: false });
-    deleteSite("javascriptI18NTestSite");
+  it("Support client-side i18n with components from multiple JS modules on the same page", () => {
+    const siteKey = "javascriptI18NMultiModuleTestSite";
+    createSiteWithContent(siteKey);
+    // add a component from another JS module
+    enableModule("hydrogen", siteKey);
+    addNode({
+      parentPathOrId: `/sites/${siteKey}/home/testPageI18N/pagecontent`,
+      name: "testOtherModule",
+      primaryNodeType: "hydrogen:helloWorld",
+      properties: [{ name: "name", value: "John Doe", language: "en" }],
+    });
+    publishAndWaitJobEnding(`/sites/${siteKey}/home/testPageI18N`, ["en"]);
+
+    cy.login();
+    ["live", "default"].forEach((workspace) => {
+      cy.visit(`/cms/render/${workspace}/en/sites/${siteKey}/home/testPageI18N.html`);
+
+      // make sure the 2 modules are present on the page with their i18n store
+      cy.get('script[data-i18n-store="javascript-modules-engine-test-module"]').should("exist");
+      cy.get('script[data-i18n-store="hydrogen"]').should("exist");
+      cy.get("jsm-island").then(($islands) => {
+        // get unique "data-bundle" values from all islands elements
+        const bundles = new Set($islands.get().map((el) => el.getAttribute("data-bundle")));
+        expect(bundles.size).to.eq(2);
+        expect(bundles).to.contain("javascript-modules-engine-test-module");
+        expect(bundles).to.contain("hydrogen");
+      });
+
+      // make sure the translations are rendered client-side
+      cy.get(
+        'jsm-island[data-bundle="javascript-modules-engine-test-module"] [data-testid="i18n-simple"]',
+      ).should("contain", testData.translations.en.simple);
+      cy.get('jsm-island[data-bundle="hydrogen"] [data-testid="i18n-client-only"]').should(
+        "contain",
+        "Rendered client-side only", // the translated content
+      );
+    });
+
+    cy.logout();
+
+    deleteSite(siteKey);
   });
 });
