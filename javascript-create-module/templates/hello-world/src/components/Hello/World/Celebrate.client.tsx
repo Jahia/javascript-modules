@@ -1,26 +1,17 @@
 import clsx from "clsx";
 import { useEffect, useState } from "react";
-import classes from "./component.module.css";
+import classes from "./styles.module.css";
 import { useTranslation } from "react-i18next";
 
 export default function () {
   const [confetti, setConfetti] = useState<typeof import("canvas-confetti")>();
-  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    let mounted = true;
     // This library only works client-side, import it dynamically in an effect
     import("canvas-confetti").then(({ default: confetti }) => {
-      if (mounted) setConfetti(() => confetti);
+      setConfetti(() => confetti);
     });
-    // Use a microtask to avoid direct setState in useEffect
-    Promise.resolve().then(() => {
-      if (mounted) setIsClient(true);
-    });
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  });
 
   // IMPORTANT: Always use useTranslation() (not { t } from "i18next") in React components.
   // This ensures translations are context-aware, update on language/namespace changes,
@@ -39,10 +30,6 @@ export default function () {
     >
       <span className={classes.before}>{t("AI95bg1EJsr48SR-4f_pl")}</span>
       <span className={classes.after}>{t("hBBhbeE0-a4KS9HVFPsOz")}</span>
-      {/*add a client-side-only text for testing and demo purposes*/}
-      <span hidden data-testid="i18n-client-only">
-        {isClient ? t("0yvhe06c8uhrPuqm15zq6") : ""}
-      </span>
     </button>
   );
 }
