@@ -416,7 +416,8 @@
                             <includes>
                                 javascript-modules-engine/yarn.lock,jahia-test-module/yarn.lock
                             </includes>
-                            <message>chore(release): Prepare release ${project.version}</message>
+                            <!-- important to use "skip ci" to prevent the "on merge to main" workflow to be triggered halfway during the release process -->
+                            <message>chore(release): Prepare release ${project.version} [skip ci]</message>
                         </configuration>
                     </plugin>
                 </plugins>
