@@ -4,18 +4,14 @@ import * as devalue from "devalue";
 
 i18n.use(initReactI18next).init({
   fallbackLng: "en",
-  ns: "javascript-modules-engine",
-  defaultNS: "javascript-modules-engine",
   initImmediate: false,
   react: { useSuspense: false },
 });
 
 const initialI18nStore: Record<string, Record<string, unknown>> = {};
-const namespaces: string[] = [];
 
 for (const store of document.querySelectorAll<HTMLScriptElement>("script[data-i18n-store]")) {
   const namespace = store.dataset.i18nStore;
-  namespaces.push(namespace);
 
   const allTranslations = devalue.parse(store.textContent);
   for (const [lang, translations] of Object.entries(allTranslations)) {
@@ -26,4 +22,3 @@ for (const store of document.querySelectorAll<HTMLScriptElement>("script[data-i1
 
 // Init i18n internal store
 i18n.services.resourceStore.data = initialI18nStore;
-i18n.options.ns = namespaces;
