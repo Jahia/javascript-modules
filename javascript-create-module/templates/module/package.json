@@ -43,6 +43,7 @@
   },
   "jahia": {
     "name": "$MODULE",
+    "required-version": "8.2.1.0",
     "snapshot": true,
     "module-dependencies": "default",
     "module-type": "module",
