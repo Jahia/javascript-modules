@@ -560,16 +560,16 @@ __metadata:
   linkType: hard
 
 "@eslint/compat@npm:^2.0.0":
-  version: 2.0.1
-  resolution: "@eslint/compat@npm:2.0.1"
+  version: 2.0.2
+  resolution: "@eslint/compat@npm:2.0.2"
   dependencies:
-    "@eslint/core": "npm:^1.0.1"
+    "@eslint/core": "npm:^1.1.0"
   peerDependencies:
-    eslint: ^8.40 || 9
+    eslint: ^8.40 || 9 || 10
   peerDependenciesMeta:
     eslint:
       optional: true
-  checksum: 10c0/5b3e4e7d2fca2a86a59182e9afec1b8c5f9d8ae970c22f17bf8fc02ef5263df4b2844074caf1346f0ea93e86856da1e4cc57d28b80e89123b20c8effc05e6816
+  checksum: 10c0/176df611bcb54ff7d9c3ac440df6844e552a4ed5de30eba28edbeebb68ccc7f19111fdd4c10780101ee5f871bd03ec0457f38c67834c285751c2bdb37d8ae73c
   languageName: node
   linkType: hard
 
@@ -602,12 +602,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/core@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "@eslint/core@npm:1.0.1"
+"@eslint/core@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@eslint/core@npm:1.1.0"
   dependencies:
     "@types/json-schema": "npm:^7.0.15"
-  checksum: 10c0/acfa7b046f94cd1fa0cc17095500e08f2bccdfcc686e4602276861c351d5badd63f3382813727357fdd475057cdd393f4cf68fc26bd8f6d6e1faa657c537a9ba
+  checksum: 10c0/0f875d6f24fbf67cc796e01c2ca82884f755488052ed84183e56377c5b90fe10b491a26e600642db4daea1d5d8ab7906ec12f2bd5cbdb5004b0ef73c802bdb57
   languageName: node
   linkType: hard
 
@@ -1431,11 +1431,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:^22.19.3":
-  version: 22.19.7
-  resolution: "@types/node@npm:22.19.7"
+  version: 22.19.10
+  resolution: "@types/node@npm:22.19.10"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10c0/0a4b13fd51306a72393f145693063e074be1bf884bdc642c879436d2c053ac9d573cc0a0d69867f60b14d3f1b9d03317e8ec0e4377f7527cb645e7b2a5d34045
+  checksum: 10c0/fb1484f68c259abb73b018e6a521dba2ffe7846128d3aacc7fba5672f354ddb364cb4c81b5a0e686cf58ea0067df4d68d4159f668c864238a0c3fe7fee603341
   languageName: node
   linkType: hard
 
@@ -3431,7 +3431,7 @@ __metadata:
     i18next: "npm:25.7.3"
     react: "npm:19.2.3"
     react-dom: "npm:19.2.3"
-    react-i18next: "npm:16.5.3"
+    react-i18next: "npm:16.5.4"
     rollup: "npm:^4.53.5"
     rollup-plugin-sbom: "npm:^3.0.0"
   languageName: unknown
@@ -4572,9 +4572,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-i18next@npm:16.5.3, react-i18next@npm:^16.5.0":
-  version: 16.5.3
-  resolution: "react-i18next@npm:16.5.3"
+"react-i18next@npm:16.5.4, react-i18next@npm:^16.5.0":
+  version: 16.5.4
+  resolution: "react-i18next@npm:16.5.4"
   dependencies:
     "@babel/runtime": "npm:^7.28.4"
     html-parse-stringify: "npm:^3.0.1"
@@ -4590,7 +4590,7 @@ __metadata:
       optional: true
     typescript:
       optional: true
-  checksum: 10c0/8c54fa935b892f01022beca6f402580890429f95ebf1df4d8003e328403eb1ba8855682edc0fc730d34f134e6b93feee580773fae22c8d287caa2dce3e13b427
+  checksum: 10c0/41d0b76873addfa3abe0c6b8a10a796e01f205f3636bc2d090d0078b42222f2949c4303f18d7a80cc26cf1298918cb6220d96e39ae2b8644abfdbec3bb504b37
   languageName: node
   linkType: hard
 
@@ -4663,8 +4663,8 @@ __metadata:
   linkType: hard
 
 "rollup-plugin-sbom@npm:^3.0.0":
-  version: 3.0.1
-  resolution: "rollup-plugin-sbom@npm:3.0.1"
+  version: 3.0.2
+  resolution: "rollup-plugin-sbom@npm:3.0.2"
   dependencies:
     "@cyclonedx/cyclonedx-library": "npm:9.4.1"
     normalize-package-data: "npm:8.0.0"
@@ -4679,7 +4679,7 @@ __metadata:
       optional: true
     xmlbuilder2:
       optional: true
-  checksum: 10c0/53f914befe23dcb6ad92258cd4bfbb99e9305ce1842446b6e0014f94a6415877f24f6f49f8118719b18c14df9a44d2717caab98c9806d114545adf4e9186e7bb
+  checksum: 10c0/5ea0610bbf4636b278416cd9215c530253558ee77abb5b34927d5e51a2af3d8fbde077b28adc00657d2361bdeaa913d4c55825e3b05f4f31c1b33b35e2fa0d82
   languageName: node
   linkType: hard
 
