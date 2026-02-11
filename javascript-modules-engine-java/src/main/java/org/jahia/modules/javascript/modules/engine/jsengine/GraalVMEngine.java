@@ -53,7 +53,7 @@ import static org.jahia.modules.javascript.modules.engine.jshandler.JavascriptPr
 /**
  * Base JS engine based on GraalVM
  */
-@Component(service = GraalVMEngine.class, immediate = true)
+@Component(service = GraalVMEngine.class, immediate = true, configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class GraalVMEngine {
     private static final Logger logger = LoggerFactory.getLogger(GraalVMEngine.class);
 
@@ -101,7 +101,7 @@ public class GraalVMEngine {
 
     @Activate
     public void activate(BundleContext bundleContext, Map<String, ?> props) {
-        logger.debug("GraalVMEngine.activate");
+        logger.info("Registering GraalVMEngine");
         this.bundleContext = bundleContext;
 
         try {
@@ -126,6 +126,7 @@ public class GraalVMEngine {
         }
         sharedEngine = builder.build();
         initializePool(poolOptions);
+        logger.info("Registered GraalVMEngine");
     }
 
     @Deactivate
@@ -134,6 +135,7 @@ public class GraalVMEngine {
         pool.close();
         sharedEngine.close(true);
         currentContext.remove();
+        logger.info("Unregistered GraalVMEngine");
     }
 
     public <T> T doWithContext(Function<ContextProvider, T> callback) {

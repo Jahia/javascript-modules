@@ -30,6 +30,8 @@ import org.jahia.services.templates.JahiaTemplateManagerService;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.nodetype.NoSuchNodeTypeException;
@@ -39,6 +41,8 @@ import java.util.stream.Collectors;
 
 @Component(immediate = true, service = {ViewsRegistrar.class, Registrar.class, ScriptResolver.class, JahiaEventListener.class})
 public class ViewsRegistrar implements ScriptResolver, TemplateResolver, Registrar, JahiaEventListener<EventObject> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ViewsRegistrar.class);
 
     private static final Class<EventObject>[] ACCEPTED_EVENT_TYPES = new Class[] {
             JahiaTemplateManagerService.TemplatePackageRedeployedEvent.class,
@@ -65,6 +69,7 @@ public class ViewsRegistrar implements ScriptResolver, TemplateResolver, Registr
 
     @Activate
     public void activate(BundleContext context) {
+        logger.info("Registering ViewsRegistrar");
         List<ScriptResolver> scriptResolvers = new ArrayList<>(renderService.getScriptResolvers());
         scriptResolvers.add(0, this);
         renderService.setScriptResolvers(scriptResolvers);
@@ -72,6 +77,7 @@ public class ViewsRegistrar implements ScriptResolver, TemplateResolver, Registr
         List<TemplateResolver> templateResolvers = new ArrayList<>(renderService.getTemplateResolvers());
         templateResolvers.add(0, this);
         renderService.setTemplateResolvers(templateResolvers);
+        logger.info("Registered ViewsRegistrar");
     }
 
     @Deactivate
@@ -83,6 +89,7 @@ public class ViewsRegistrar implements ScriptResolver, TemplateResolver, Registr
         List<TemplateResolver> templateResolvers = new ArrayList<>(renderService.getTemplateResolvers());
         templateResolvers.remove(this);
         renderService.setTemplateResolvers(templateResolvers);
+        logger.info("Unregistered ViewsRegistrar");
     }
     @Override
     public void register(Bundle bundle) {
