@@ -121,20 +121,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jahia/cypress@npm:^6.2.0":
-  version: 6.2.0
-  resolution: "@jahia/cypress@npm:6.2.0"
+"@jahia/cypress@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "@jahia/cypress@npm:7.0.0"
   dependencies:
     "@apollo/client": "npm:^3.4.9"
     cypress-real-events: "npm:^1.11.0"
     graphql: "npm:^15.5.0"
     graphql-tag: "npm:^2.11.0"
   bin:
-    ci.build: ci.build.sh
-    ci.startup: ci.startup.sh
-    env.debug: env.debug.sh
-    env.run: env.run.sh
-  checksum: 10c0/cbcd7c8115a7fd14f57e1a72751e2d2577eaeccc5998f84e039f4971ed1c5437fd37aeb16287c9d28f95a284942f05d13dbd25ca86f08c81e31619936c138828
+    ci.build: ./ci.build.sh
+    ci.startup: ./ci.startup.sh
+    env.debug: ./env.debug.sh
+    env.run: ./env.run.sh
+  checksum: 10c0/9569ebc04139b9d6e160a763367db1e096951c0442e531837a2582b82c7f7a45d21bbf940241b94eec81f8e2b6cf1a23cce57ab0133cfc9ca7604d0efbb5870f
   languageName: node
   linkType: hard
 
@@ -180,7 +180,7 @@ __metadata:
   resolution: "@jahia/javascript-modules-engine-cypress@workspace:."
   dependencies:
     "@4tw/cypress-drag-drop": "npm:^2.3.0"
-    "@jahia/cypress": "npm:^6.2.0"
+    "@jahia/cypress": "npm:^7.0.0"
     "@jahia/jahia-reporter": "npm:^1.6.0"
     "@jahia/jcontent-cypress": "npm:^3.4.0-tests.2"
     "@types/decompress": "npm:^4.2.7"
