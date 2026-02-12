@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@4tw/cypress-drag-drop": "^2.3.0",
-    "@jahia/cypress": "^6.2.0",
+    "@jahia/cypress": "^7.0.0",
     "@jahia/jahia-reporter": "^1.6.0",
     "@jahia/jcontent-cypress": "^3.4.0-tests.2",
     "@types/decompress": "^4.2.7",
