@@ -1,7 +1,7 @@
 import { buildNodeUrl, getSiteLocales, jahiaComponent } from "@jahia/javascript-modules-library";
-import { t } from "i18next";
 import { Fragment } from "react";
 import classes from "./component.module.css";
+import { useTranslation } from "react-i18next";
 
 jahiaComponent(
   {
@@ -12,6 +12,10 @@ jahiaComponent(
     properties: { "cache.timeout": "0" },
   },
   (_, { mainNode, currentResource }) => {
+    // IMPORTANT: Always use useTranslation() (not { t } from "i18next") in React components.
+    // This ensures translations are context-aware, update on language/namespace changes,
+    // and avoid hydration mismatches between server and client.
+    const { t } = useTranslation();
     const currentLanguage = currentResource.getLocale().toString();
     return (
       <p style={{ textAlign: "center" }}>
