@@ -1,11 +1,10 @@
 import {
-  Island,
-  RenderChildren,
   buildModuleFileUrl,
+  Island,
   jahiaComponent,
+  RenderChildren,
 } from "@jahia/javascript-modules-library";
-import { t } from "i18next";
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import Celebrate from "./Celebrate.client.jsx";
 import classes from "./component.module.css";
 
@@ -16,6 +15,10 @@ jahiaComponent(
     componentType: "view",
   },
   ({ name }: { name: string }, { renderContext }) => {
+    // IMPORTANT: Always use useTranslation() (not { t } from "i18next") in React components.
+    // This ensures translations are context-aware, update on language/namespace changes,
+    // and avoid hydration mismatches between server and client.
+    const { t } = useTranslation();
     return (
       <>
         <section className={classes.section}>

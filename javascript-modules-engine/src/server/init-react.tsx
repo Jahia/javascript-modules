@@ -22,8 +22,8 @@ server.registry.add("viewRenderer", "react", {
     const language = currentResource.getLocale().getLanguage();
     i18n.loadNamespaces(bundleKey);
     i18n.loadLanguages(language);
-    // Set module namespace and current language
-    i18n.setDefaultNamespace(bundleKey);
+    // Not safe if multiple components use different languages on the same page.
+    // But assumes a single language per page, so i18n.changeLanguage(lang) is safe in this context.
     i18n.changeLanguage(language);
 
     // SSR
@@ -39,7 +39,7 @@ server.registry.add("viewRenderer", "react", {
         jcrSession={currentNode.getSession()}
         bundleKey={bundleKey}
       >
-        <I18nextProvider i18n={i18n}>
+        <I18nextProvider i18n={i18n} defaultNS={bundleKey}>
           <View />
         </I18nextProvider>
       </ServerContextProvider>
