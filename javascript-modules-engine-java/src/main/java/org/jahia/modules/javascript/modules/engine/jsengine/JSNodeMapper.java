@@ -10,14 +10,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Maps JSON structures into virtual JCR nodes. This used by userland code
+ * Maps JSON structures into virtual JCR nodes. This is used by userland code
  * through the <code>&lt;Render></code> component:
  * <code>&lt;Render content={{ nodeType: "nt:thing", properties: { foo: "bar" } }} /></code>.
  */
 public class JSNodeMapper {
     /**
      * Transform a JS node into a virtual JCR Node
-     * "Virtual" because this node is not means to be saved, it will be used by
+     * "Virtual" because this node is not meant to be saved, it will be used by
      * Jahia rendering system to be rendered only.
      *
      * @param jsonNode      the JS Node
