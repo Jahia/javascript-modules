@@ -62,7 +62,7 @@ export function Island<Props>(
         }
       : "children" extends keyof Props
         ? // If the component has optional children, it may be client-only or not
-          | {
+            | {
                 // In SSR mode, the children are passed to the component and must be of the correct type
                 /**
                  * If false or undefined, the component will be rendered on the server. If true,
@@ -83,7 +83,7 @@ export function Island<Props>(
                 children?: ReactNode;
               }
         : // If the component has no children, it may be client-only or not
-          | {
+            | {
                 // In SSR mode, the component cannot have children
                 /**
                  * If false or undefined, the component will be rendered on the server. If true,
@@ -205,7 +205,7 @@ export function Island({
             clientOnly ? (
               children
             ) : (
-              <I18nextProvider i18n={i18n}>
+              <I18nextProvider i18n={i18n} defaultNS={bundleKey}>
                 <Component
                   {...props}
                   children={createElement("jsm-children", {

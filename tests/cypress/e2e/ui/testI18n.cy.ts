@@ -29,7 +29,14 @@ const testData = {
 };
 
 describe("Test i18n", () => {
-  const createSiteWithContent = (siteKey: string) => {
+  const createSiteWithContent = (
+    siteKey: string,
+    childrenNodes: {
+      name: string;
+      primaryNodeType: string;
+      properties?: { name: string; value: string; language: string }[];
+    }[],
+  ) => {
     deleteSite(siteKey); // cleanup from previous test runs
     createSite(siteKey, {
       languages: "en,fr_LU,fr,de",
@@ -37,6 +44,7 @@ describe("Test i18n", () => {
       locale: "en",
       serverName: "localhost",
     });
+    enableModule("hydrogen", siteKey); // allow adding components from the "hydrogen" module
 
     addSimplePage(`/sites/${siteKey}/home`, "testPageI18N", "Test i18n en", "en", "simple", [
       {
@@ -56,10 +64,13 @@ describe("Test i18n", () => {
         mutationFile: "graphql/setProperties.graphql",
       });
 
-      addNode({
-        parentPathOrId: `/sites/${siteKey}/home/testPageI18N/pagecontent`,
-        name: "test",
-        primaryNodeType: "javascriptExample:testI18n",
+      childrenNodes.forEach((childNode) => {
+        addNode({
+          parentPathOrId: `/sites/${siteKey}/home/testPageI18N/pagecontent`,
+          name: childNode.name,
+          primaryNodeType: childNode.primaryNodeType,
+          properties: childNode.properties ?? [],
+        });
       });
     });
 
@@ -68,7 +79,9 @@ describe("Test i18n", () => {
 
   it("Test I18n values in various workspace/locales and various type of usage SSR/hydrate/rendered client side", () => {
     const siteKey = "javascriptI18NTestSite";
-    createSiteWithContent(siteKey);
+    createSiteWithContent(siteKey, [
+      { name: "test", primaryNodeType: "javascriptExample:testI18n" },
+    ]);
 
     cy.login();
     ["live", "default"].forEach((workspace) => {
@@ -129,18 +142,23 @@ describe("Test i18n", () => {
     }
   };
 
-  it("Support client-side i18n with components from multiple JS modules on the same page", () => {
+  it("Support i18n with components from multiple JS modules on the same page", () => {
     const siteKey = "javascriptI18NMultiModuleTestSite";
-    createSiteWithContent(siteKey);
-    // add a component from another JS module
-    enableModule("hydrogen", siteKey);
-    addNode({
-      parentPathOrId: `/sites/${siteKey}/home/testPageI18N/pagecontent`,
-      name: "testOtherModule",
-      primaryNodeType: "hydrogen:helloWorld",
-      properties: [{ name: "name", value: "John Doe", language: "en" }],
-    });
-    publishAndWaitJobEnding(`/sites/${siteKey}/home/testPageI18N`, ["en"]);
+    // create a page with alternating components from two different JS modules
+    createSiteWithContent(siteKey, [
+      {
+        name: "hydrogen_1",
+        primaryNodeType: "hydrogen:helloWorld",
+        properties: [{ name: "name", value: "John Doe", language: "en" }],
+      },
+      { name: "javascriptExample_1", primaryNodeType: "javascriptExample:testI18n" },
+      {
+        name: "hydrogen_2",
+        primaryNodeType: "hydrogen:helloWorld",
+        properties: [{ name: "name", value: "Jane Smith", language: "en" }],
+      },
+      { name: "javascriptExample_2", primaryNodeType: "javascriptExample:testI18n" },
+    ]);
 
     cy.login();
     ["live", "default"].forEach((workspace) => {
@@ -157,14 +175,29 @@ describe("Test i18n", () => {
         expect(bundles).to.contain("hydrogen");
       });
 
+      // make sure the translations are rendered server-side
+      // - for hydrogen:helloWorld :
+      cy.get(
+        'p:contains("Welcome to Jahia! You successfully created a new JavaScript Module and a Jahia Website built with it. Here are a few things you can do now:")',
+      ).should("have.length", 2);
+      // - for javascriptExample:testI18n :
+      cy.get('div[data-testid="i18n-server-side"] div[data-testid="i18n-simple"]')
+        .should("contain", testData.translations.en.simple)
+        .should("have.length", 2);
+
       // make sure the translations are rendered client-side
       cy.get(
-        'jsm-island[data-bundle="javascript-modules-engine-test-module"] [data-testid="i18n-simple"]',
-      ).should("contain", testData.translations.en.simple);
-      cy.get('jsm-island[data-bundle="hydrogen"] [data-testid="i18n-client-only"]').should(
-        "contain",
-        "Rendered client-side only", // the translated content
-      );
+        'div[data-testid="i18n-hydrated-client-side"] jsm-island[data-bundle="javascript-modules-engine-test-module"]' +
+          ' [data-testid="i18n-simple"]',
+      )
+        .should("contain", testData.translations.en.simple)
+        .should("have.length", 2);
+      cy.get('jsm-island[data-bundle="hydrogen"] [data-testid="i18n-client-only"]')
+        .should(
+          "contain",
+          "Rendered client-side only", // the translated content
+        )
+        .should("have.length", 2);
     });
 
     cy.logout();
