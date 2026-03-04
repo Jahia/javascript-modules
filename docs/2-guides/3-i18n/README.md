@@ -25,7 +25,7 @@ To make a field translatable, you only need to add the `i18n` attribute to the f
  - body (string, richtext) i18n
 ```
 
-There is no such thing as i18n child nodes: the content structure is the same for all languages. The escape hatch for this is per-language visibility conditions (Advanced Editing > Visibility > Languages).
+As for child nodes (e.g. `+ * (jmix:droppableContent)`), there is no such `i18n` attribute: the content tree is the same for all languages. The escape hatch for this is per-language visibility conditions (Advanced Editing > Visibility > Languages).
 
 We recommend that you add the `i18n` attribute to:
 
@@ -34,49 +34,35 @@ We recommend that you add the `i18n` attribute to:
 
 Under the hood, non-i18n fields will be stored on the node itself, while i18n fields will be stored as properties of `jnt:translation` child nodes named `j:translation_<language>`. You don't need to worry about this, but it is useful to know for debugging purposes.
 
-## Edition Interfaces
-
-Jahia maintains almost all of the translations for the edition interfaces. The only thing we cannot translate for you is the display name of node types, fields, and choice list options.
-
-To offer a multilingual edition interface, provide translations in `<module>_<language>.properties` (or `<module>.properties` in English) files in your module in the `settings/resources/` directory.
-
-```properties
-# Example for the `luxe:header` node type
-# luxe-jahia-demo.properties
-luxe_header=Page Header
-luxe_header.title=Title
-luxe_header.subtitle=Subtitle
-luxe_header.subtitle.ui.tooltip=The subtitle is only shown with certain views.
-
-# luxe-jahia-demo_fr.properties
-luxe_header=En-tête de page
-luxe_header.title=Titre
-luxe_header.subtitle=Sous-titre
-luxe_header.subtitle.ui.tooltip=Le sous-titre n'est affiché qu'avec certaines vues.
-```
-
-![Edition interface in English](header_en.png) ![Edition interface in French](header_fr.png)
-
-:::info
-`.ui.tooltip` supports basic HTML tags, such as `<strong>`. This also means you need to escape `<` and `>` as `&lt;` and `&gt;` if you want to display them as text.
-:::
-
-To provide translations for choice list options, use the following format:
-
-```properties
-# The field is declared as
-# - type (string, choicelist[resourceBundle]) < 'house', 'apartment', 'building'
-luxe_estate.type=Type of Real Estate
-luxe_estate.type.house=House
-luxe_estate.type.apartment=Apartment
-luxe_estate.type.building=Building
-```
-
-![Choice list interface in English](choicelist_en.png)
-
-Don't forget the `[resourceBundle]` suffix in the field declaration, otherwise the translations will be ignored.
-
 ## Views and Templates
+
+For editor-written content, you don't have anything special to do, `i18n` properties are handled the exact same way as classic properties. Given the following Compact Node Definition (CND):
+
+```cnd
+[example:title] > jnt:content
+ - title (string) i18n
+ - color (string)
+```
+
+The `title` field is translatable, while the `color` field is not. As a developer, you'll retrieve them in the same way in your views and templates:
+
+```tsx
+interface Props {
+  title: string; // Translatable string field
+  color: string; // Non-translatable string field
+}
+
+jahiaComponent(
+  {
+    componentType: "view",
+    nodeType: "example:title",
+  },
+  ({ title, color }: Props) => <h1 style={{ color }}>{title}</h1>,
+  // ^ retrieve `title` and `color` the same way
+);
+```
+
+### Static Text
 
 When creating views and templates, you may want to include basic text such as `<a href="...">Read more</a>` links or `Written by {{author}}` labels. For all user-facing translations, we use the [`i18next`](https://www.i18next.com/) and [`react-i18next`](https://react.i18next.com/) libraries. For convenience, we cover the basics in this guide, but you can refer to the official documentation for more details.
 
@@ -118,7 +104,7 @@ function MyComponent() {
 }
 ```
 
-## IDE Integration
+### IDE Integration
 
 The `npm init @jahia/module@latest` automatically configures the [i18n ally](https://github.com/lokalise/i18n-ally#readme) extension for VS Code. When installed, it allows you to display and edit translations directly from the code, without having to open the JSON files:
 
@@ -172,7 +158,7 @@ This may sound counter-intuitive, but using semantic keys like `read-more` or `w
 
 i18n Ally will generate a random key when using the extract command.
 
-## Building a Language Switcher
+### Building a Language Switcher
 
 Building a production-ready language switcher requires combining four pieces:
 
@@ -214,6 +200,57 @@ function languageSwitcher(node: JCRNodeWrapper) {
   }
 }
 ```
+
+## Edition Interfaces
+
+Jahia maintains almost all of the translations for the edition interfaces. The only thing we cannot translate for you is the display name of node types, fields, and choice list options.
+
+To offer a multilingual edition interface, provide translations in `<module>_<language>.properties` (or `<module>.properties` in English) files in your module in the `settings/resources/` directory.
+
+```properties
+# Example for the `luxe:header` node type
+# luxe-jahia-demo.properties
+luxe_header=Page Header
+luxe_header.title=Title
+luxe_header.subtitle=Subtitle
+luxe_header.subtitle.ui.tooltip=The subtitle is only shown with certain views.
+
+# luxe-jahia-demo_fr.properties
+luxe_header=En-tête de page
+luxe_header.title=Titre
+luxe_header.subtitle=Sous-titre
+luxe_header.subtitle.ui.tooltip=Le sous-titre n'est affiché qu'avec certaines vues.
+```
+
+`field.ui.tooltip` supports basic HTML tags, such as `<strong>`. This also means you need to escape `<` and `>` as `&lt;` and `&gt;` if you want to display them as text.
+
+![Edition interface in English](header_en.png) ![Edition interface in French](header_fr.png)
+
+:::info
+Contrarty to what these screenshots may suggest, the edition interface language and the edited content language are independent:
+
+- Edited content language can be changed at the top of the edition interface:
+
+  ![jContent language switcher](jcontent-language-switcher.png)
+
+- Edition interface language is determined by the user's language preferences (👤 > Other information > Preferred Language).
+
+:::
+
+To provide translations for choice list options, use the following format:
+
+```properties
+# The field is declared as
+# - type (string, choicelist[resourceBundle]) < 'house', 'apartment', 'building'
+luxe_estate.type=Type of Real Estate
+luxe_estate.type.house=House
+luxe_estate.type.apartment=Apartment
+luxe_estate.type.building=Building
+```
+
+![Choice list interface in English](choicelist_en.png)
+
+Don't forget the `[resourceBundle]` suffix in the field declaration, otherwise the translations will be ignored.
 
 ## Reference
 
