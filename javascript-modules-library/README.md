@@ -223,7 +223,7 @@ If the path has a protocol (e.g. `data:` URI), it will be returned as is, pairin
 
 ### `getSiteLocales`
 
-This function returns the list of locales available on the current site.
+This function returns the list of locales available on the current site, taking into account the current rendering mode (EDIT or LIVE).
 
 ```tsx
 const locales = getSiteLocales();
