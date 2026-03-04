@@ -36,7 +36,7 @@ Under the hood, non-i18n fields will be stored on the node itself, while i18n fi
 
 ## Views and Templates
 
-For editor-written content, you don't have anything special to do, `i18n` properties are handled the exact same way as classic properties. Given the following Compact Node Definition (CND):
+For editor-written content, you don't need to do anything special: `i18n` properties are handled the exact same way as classic properties. Given the following Compact Node Definition (CND):
 
 ```cnd
 [example:title] > jnt:content
@@ -106,7 +106,7 @@ function MyComponent() {
 
 ### IDE Integration
 
-The `npm init @jahia/module@latest` automatically configures the [i18n ally](https://github.com/lokalise/i18n-ally#readme) extension for VS Code. When installed, it allows you to display and edit translations directly from the code, without having to open the JSON files:
+The `npm init @jahia/module@latest` command automatically configures the [i18n ally](https://github.com/lokalise/i18n-ally#readme) extension for VS Code. When installed, it allows you to display and edit translations directly from the code, without having to open the JSON files:
 
 ![VS Code i18n ally extension showing inline translation keys and values](i18n-ally-display.png)
 
@@ -116,7 +116,7 @@ It also provides a VS Code command to extract hardcoded strings into the transla
 
 The `Extract text into i18n messages` command will automatically replace the selected string with a `t("...")` call.
 
-It can also list missing or unused translations and enables collaboration features.
+It can also list missing or unused translations, and enables collaboration features.
 
 Check out the [i18n ally documentation](https://github.com/lokalise/i18n-ally/wiki) for a complete list of features and configuration options.
 
@@ -124,7 +124,7 @@ Check out the [i18n ally documentation](https://github.com/lokalise/i18n-ally/wi
 
 #### Don't use concatenation
 
-It could be tempting to write something like this: `t("key") + " " + author` to append dynamic data to a translation, but this will make translation impossible in languages with different word order.
+It can be tempting to write something like this: `t("key") + " " + author` to append dynamic data to a translation, but this will make translation impossible in languages with different word order.
 
 For simple use cases, use [interpolation](https://www.i18next.com/translation-function/interpolation): `"key": "Written by {{author}}"` and `t("key", { author })`.
 
@@ -144,7 +144,7 @@ import { Trans } from "react-i18next";
 
 #### Use random keys
 
-This may sound counter-intuitive, but using semantic keys like `read-more` or `written-by-author` [is an anti-pattern](https://inlang.com/blog/human-readable-message-ids). Here is a summary of the reasons invoked in the article:
+This may sound counterintuitive, but using semantic keys like `read-more` or `written-by-author` [is an anti-pattern](https://inlang.com/blog/human-readable-message-ids). Here is a summary of the reasons cited in the article:
 
 - Discourage renaming keys, therefore preserving history
 
@@ -227,7 +227,7 @@ luxe_header.subtitle.ui.tooltip=Le sous-titre n'est affiché qu'avec certaines v
 ![Edition interface in English](header_en.png) ![Edition interface in French](header_fr.png)
 
 :::info
-Contrarty to what these screenshots may suggest, the edition interface language and the edited content language are independent:
+Contrary to what these screenshots may suggest, the edition interface language and the edited content language are independent:
 
 - Edited content language can be changed at the top of the edition interface:
 
