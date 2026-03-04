@@ -82,7 +82,7 @@ When creating views and templates, you may want to include basic text such as `<
 
 Translations are stored in JSON files located in the `settings/locales` directory, named `<language>.json`. Their structure is a JSON object (potentially nested), with key-value pairs where the key is used in the code and the value is displayed to the user. For example:
 
-```json
+```js
 // en.json
 {
   "key1": "Read more",
