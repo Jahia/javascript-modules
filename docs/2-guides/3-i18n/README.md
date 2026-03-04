@@ -7,7 +7,7 @@ content:
   $subpath: document-area/content
 ---
 
-Jahia is a multilingual CMS, the goal of this guide is to explain how to properly prepare your module for internationalization (i18n).
+Jahia is a multilingual CMS. This guide explains how to properly prepare your module for internationalization (i18n).
 
 ## Content Definition
 
@@ -128,9 +128,9 @@ It also provides a VS Code command to extract hardcoded strings into the transla
 
 ![alt text](i18n-ally-extract.png)
 
-The `🌍 Extract text into i18n messages` command will automatically replace the selected string with a `t("...")` call.
+The `Extract text into i18n messages` command will automatically replace the selected string with a `t("...")` call.
 
-It can also be used to list missing or unused translations and enables collaboration features.
+It can also list missing or unused translations and enables collaboration features.
 
 Check out the [i18n ally documentation](https://github.com/lokalise/i18n-ally/wiki) for a complete list of features and configuration options.
 
@@ -170,11 +170,11 @@ This may sound counter-intuitive, but using semantic keys like `read-more` or `w
 
 - Avoid bikeshedding over key names and nesting
 
-i18n ally will generate a random key when using the extract command.
+i18n Ally will generate a random key when using the extract command.
 
 ## Building a Language Switcher
 
-Building a production-ready language switcher requires combining four different pieces:
+Building a production-ready language switcher requires combining four pieces:
 
 - [`getSiteLocales`](https://github.com/Jahia/javascript-modules/blob/main/javascript-modules-library/README.md#getsitelocales) to retrieve the list of available languages on the current site
 - The `j:invalidLanguages` property to check if a translation is usable (e.g. not hidden by a visibility condition)
@@ -182,30 +182,36 @@ Building a production-ready language switcher requires combining four different 
 - [`buildNodeUrl`](https://github.com/Jahia/javascript-modules/blob/main/javascript-modules-library/README.md#buildnodeurl) to construct URLs for nodes in different languages
 
 ```ts
-// For a given `node` variable (e.g. the current page node)
+// This example is meant for server-side rendering
+import { buildNodeUrl, getSiteLocales } from "@jahia/javascript-modules-library";
+import type { JCRNodeWrapper } from "org.jahia.services.content";
 
-// Retrieve all available languages on the current site
-const locales = getSiteLocales();
+// `node` is the JCR node for which we want to build the language switcher
+// (e.g. the current page node)
+function languageSwitcher(node: JCRNodeWrapper) {
+  // Retrieve all available languages on the current site
+  const locales = getSiteLocales();
 
-// Get the list of languages for which the node is not valid
-const invalidLanguages = new Set(
-  node.hasProperty("j:invalidLanguages")
-    ? node
-        .getProperty("j:invalidLanguages")
-        .getValues()
-        .map((value) => value.getString())
-    : [],
-);
+  // Get the list of languages for which the node is not valid
+  const invalidLanguages = new Set(
+    node.hasProperty("j:invalidLanguages")
+      ? node
+          .getProperty("j:invalidLanguages")
+          .getValues()
+          .map((value) => value.getString())
+      : [],
+  );
 
-const validLanguages = Object.entries(locales).filter(([code, locale]) => {
-  // A language is valid if it's not in the invalidLanguages list and the node has a translation for it
-  return !invalidLanguages.has(code) && node.hasI18N(locale);
-});
+  const validLanguages = Object.entries(locales).filter(([code, locale]) => {
+    // A language is valid if it's not in the invalidLanguages list and the node has a translation for it
+    return !invalidLanguages.has(code) && node.hasI18N(locale);
+  });
 
-for (const [code, locale] of validLanguages) {
-  const url = buildNodeUrl(node, { language: code });
-  // Display each language in its own language (e.g. "English", "français"...)
-  console.log(`${locale.getDisplayLanguage(locale)} is available at ${url}`);
+  for (const [code, locale] of validLanguages) {
+    const url = buildNodeUrl(node, { language: code });
+    // Display each language in its own language (e.g. "English", "français"...)
+    console.log(`${locale.getDisplayLanguage(locale)} is available at: ${url}`);
+  }
 }
 ```
 
