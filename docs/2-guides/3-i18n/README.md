@@ -140,7 +140,7 @@ Check out the [i18n ally documentation](https://github.com/lokalise/i18n-ally/wi
 
 It could be tempting to write something like this: `t("key") + " " + author` to append dynamic data to a translation, but this will make translation impossible in languages with different word order.
 
-For simple use cases, use [interpolation](https://www.i18next.com/translation-function/interpolation): `"Written by {{author}}"` and `t("key", { author })`.
+For simple use cases, use [interpolation](https://www.i18next.com/translation-function/interpolation): `"key": "Written by {{author}}"` and `t("key", { author })`.
 
 For complex use cases involving HTML tags, use the [`Trans` component](https://react.i18next.com/latest/trans-component):
 
