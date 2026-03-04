@@ -122,11 +122,11 @@ function MyComponent() {
 
 The `npm init @jahia/module@latest` automatically configures the [i18n ally](https://github.com/lokalise/i18n-ally#readme) extension for VS Code. When installed, it allows you to display and edit translations directly from the code, without having to open the JSON files:
 
-![alt text](i18n-ally-display.png)
+![VS Code i18n ally extension showing inline translation keys and values](i18n-ally-display.png)
 
 It also provides a VS Code command to extract hardcoded strings into the translation files:
 
-![alt text](i18n-ally-extract.png)
+![VS Code i18n Ally command palette entry for extracting text into i18n messages](i18n-ally-extract.png)
 
 The `Extract text into i18n messages` command will automatically replace the selected string with a `t("...")` call.
 
