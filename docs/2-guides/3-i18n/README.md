@@ -172,6 +172,43 @@ This may sound counter-intuitive, but using semantic keys like `read-more` or `w
 
 i18n ally will generate a random key when using the extract command.
 
+## Building a Language Switcher
+
+Building a production-ready language switcher requires combining four different pieces:
+
+- [`getSiteLocales`](https://github.com/Jahia/javascript-modules/blob/main/javascript-modules-library/README.md#getsitelocales) to retrieve the list of available languages on the current site
+- The `j:invalidLanguages` property to check if a translation is usable (e.g. not hidden by a visibility condition)
+- `node.hasI18N(Locale locale)` to check if a node has a translation in a given language
+- [`buildNodeUrl`](https://github.com/Jahia/javascript-modules/blob/main/javascript-modules-library/README.md#buildnodeurl) to construct URLs for nodes in different languages
+
+```ts
+// For a given `node` variable (e.g. the current page node)
+
+// Retrieve all available languages on the current site
+const locales = getSiteLocales();
+
+// Get the list of languages for which the node is not valid
+const invalidLanguages = new Set(
+  node.hasProperty("j:invalidLanguages")
+    ? node
+        .getProperty("j:invalidLanguages")
+        .getValues()
+        .map((value) => value.getString())
+    : [],
+);
+
+const validLanguages = Object.entries(locales).filter(([code, locale]) => {
+  // A language is valid if it's not in the invalidLanguages list and the node has a translation for it
+  return !invalidLanguages.has(code) && node.hasI18N(locale);
+});
+
+for (const [code, locale] of validLanguages) {
+  const url = buildNodeUrl(node, { language: code });
+  // Display each language in its own language (e.g. "English", "français"...)
+  console.log(`${locale.getDisplayLanguage(locale)} is available at ${url}`);
+}
+```
+
 ## Reference
 
 For further reference, you can check out the documentation of the libraries and tools we use for i18n:
