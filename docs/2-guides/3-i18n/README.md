@@ -226,7 +226,9 @@ luxe_header.subtitle.ui.tooltip=Le sous-titre n'est affiché qu'avec certaines v
 
 `field.ui.tooltip` supports basic HTML tags, such as `<strong>`. This also means you need to escape `<` and `>` as `&lt;` and `&gt;` if you want to display them as text.
 
-![Edition interface in English](header_en.png) ![Edition interface in French](header_fr.png)
+![Edition interface in English](header_en.png)
+
+![Edition interface in French](header_fr.png)
 
 :::info
 Contrary to what these screenshots may suggest, the edition interface language and the edited content language are independent:
