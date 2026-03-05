@@ -15,16 +15,13 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd;
 
-import javax.jcr.PropertyType;
 import java.util.HashMap;
 import java.util.Map;
+import javax.jcr.PropertyType;
 
 /**
  *
- * User: toto
- * Date: 14 mars 2008
- * Time: 17:06:46
- *
+ * User: toto Date: 14 mars 2008 Time: 17:06:46
  */
 class SelectorType {
     public static final int SMALLTEXT = 1;

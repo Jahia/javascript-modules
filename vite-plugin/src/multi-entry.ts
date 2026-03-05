@@ -1,5 +1,5 @@
-import { globSync } from "tinyglobby";
 import type { Plugin } from "rollup";
+import { globSync } from "tinyglobby";
 
 const VIRTUAL_ENTRY_ID = "\0virtual:entry";
 

@@ -21,19 +21,15 @@ import org.jdom2.JDOMException;
 /**
  * JCR Import file parser
  *
- * TEMPORARY WORKAROUND - DO NOT USE
- * This class duplicates poor legacy code to provide backward compatibility.
- * Marked for immediate replacement and removal.
+ * TEMPORARY WORKAROUND - DO NOT USE This class duplicates poor legacy code to provide backward compatibility. Marked
+ * for immediate replacement and removal.
  *
  * @deprecated since 1.0.0 Technical debt. Will be removed in next major version.
  */
 @Deprecated(since = "1.0.0")
 public class JCRImportXmlFileParser extends AbstractXmlFileParser {
 
-    private final static String[] JCR_IMPORT_XPATH_QUERIES = {
-            "//@jcr:primaryType",
-            "//@jcr:mixinTypes"
-    };
+    private static final String[] JCR_IMPORT_XPATH_QUERIES = {"//@jcr:primaryType", "//@jcr:mixinTypes"};
 
     @Override
     public boolean canParse(String fileName, Element rootElement) {
@@ -41,9 +37,26 @@ public class JCRImportXmlFileParser extends AbstractXmlFileParser {
     }
 
     @Override
-    public void parse(String fileName, Element rootElement, String fileParent, boolean externalDependency, boolean optionalDependency, String version, ParsingContext parsingContext) throws JDOMException {
+    public void parse(
+            String fileName,
+            Element rootElement,
+            String fileParent,
+            boolean externalDependency,
+            boolean optionalDependency,
+            String version,
+            ParsingContext parsingContext) throws JDOMException {
         getLogger().debug("Processing JCR import file " + fileParent + " / " + fileName + "...");
 
-        getRefsUsingXPathQueries(fileName, rootElement, false, false, JCR_IMPORT_XPATH_QUERIES, "xp", fileParent, version, optionalDependency, parsingContext);
+        getRefsUsingXPathQueries(
+                fileName,
+                rootElement,
+                false,
+                false,
+                JCR_IMPORT_XPATH_QUERIES,
+                "xp",
+                fileParent,
+                version,
+                optionalDependency,
+                parsingContext);
     }
 }

@@ -15,6 +15,16 @@
  */
 package org.jahia.modules.javascript.modules.engine.jsengine;
 
+import static org.jahia.modules.javascript.modules.engine.jshandler.JavascriptProtocolConnection.BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,17 +49,6 @@ import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
-import static org.jahia.modules.javascript.modules.engine.jshandler.JavascriptProtocolConnection.BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT;
-
 /**
  * Base JS engine based on GraalVM
  */
@@ -63,7 +62,8 @@ public class GraalVMEngine {
     /**
      * Mimetype used by Graal to identify ESM source code.
      *
-     * @see <a href="https://www.graalvm.org/latest/reference-manual/js/Modules/#ecmascript-modules-esm">ECMAScript Modules</a>
+     * @see <a href="https://www.graalvm.org/latest/reference-manual/js/Modules/#ecmascript-modules-esm">ECMAScript
+     * Modules</a>
      */
     private static final String JS_MODULE_MIMETYPE = "application/javascript+module";
 
@@ -83,8 +83,8 @@ public class GraalVMEngine {
 
     public void enableJavascriptModule(Bundle bundle) {
         try {
-            initScripts.put(bundle,
-                    getGraalSource(bundle, bundle.getHeaders().get(BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT)));
+            initScripts.put(
+                    bundle, getGraalSource(bundle, bundle.getHeaders().get(BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT)));
             version.incrementAndGet();
             logger.info("Registered bundle {} in GraalVM engine", bundle.getSymbolicName());
         } catch (IOException ioe) {
@@ -105,8 +105,8 @@ public class GraalVMEngine {
         this.bundleContext = bundleContext;
 
         try {
-            initScripts.put(bundleContext.getBundle(),
-                    getGraalSource(bundleContext.getBundle(), "META-INF/js/main.js"));
+            initScripts.put(
+                    bundleContext.getBundle(), getGraalSource(bundleContext.getBundle(), "META-INF/js/main.js"));
         } catch (IOException e) {
             logger.error("Cannot execute main init script", e);
         }
@@ -202,8 +202,11 @@ public class GraalVMEngine {
                     .allowHostClassLookup(s -> true)
                     .allowHostAccess(HostAccess.ALL)
                     .allowPolyglotAccess(PolyglotAccess.ALL)
-                    .allowIO(IOAccess.newBuilder().fileSystem(new JSFileSystem(bundleContext)).build())
-                    .engine(sharedEngine).build();
+                    .allowIO(IOAccess.newBuilder()
+                            .fileSystem(new JSFileSystem(bundleContext))
+                            .build())
+                    .engine(sharedEngine)
+                    .build();
             ContextProvider contextProvider = new ContextProvider(context, version.get());
 
             // Add the global "server" variable to the context
@@ -263,9 +266,7 @@ public class GraalVMEngine {
     }
 
     /**
-     * Creates the global js variable named `server` in js context. It holds a
-     * reference to several
-     * server-side helpers.
+     * Creates the global js variable named `server` in js context. It holds a reference to several server-side helpers.
      */
     public ProxyObject getServer(ContextProvider contextProvider) {
         // Because JS is single-threaded but Java is not, Graal enforces strict safety

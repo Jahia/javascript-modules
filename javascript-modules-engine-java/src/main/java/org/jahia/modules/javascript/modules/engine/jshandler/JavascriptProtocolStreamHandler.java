@@ -15,13 +15,12 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.url.AbstractURLStreamHandlerService;
-import org.osgi.service.url.URLStreamHandlerService;
-
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.url.AbstractURLStreamHandlerService;
+import org.osgi.service.url.URLStreamHandlerService;
 
 /**
  * Javascript protocol handler

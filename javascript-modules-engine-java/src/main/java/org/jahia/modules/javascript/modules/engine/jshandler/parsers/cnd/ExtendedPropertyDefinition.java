@@ -15,23 +15,20 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.jcr.PropertyType;
-import javax.jcr.RepositoryException;
-import javax.jcr.Value;
-import javax.jcr.nodetype.PropertyDefinition;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.jcr.PropertyType;
+import javax.jcr.RepositoryException;
+import javax.jcr.Value;
+import javax.jcr.nodetype.PropertyDefinition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * User: toto
- * Date: 4 janv. 2008
- * Time: 14:02:49
+ * User: toto Date: 4 janv. 2008 Time: 14:02:49
  */
 class ExtendedPropertyDefinition extends ExtendedItemDefinition implements PropertyDefinition {
     private static Logger logger = LoggerFactory.getLogger(ExtendedPropertyDefinition.class);
@@ -94,7 +91,7 @@ class ExtendedPropertyDefinition extends ExtendedItemDefinition implements Prope
         List<Value> res = new ArrayList<Value>();
         for (int i = 0; i < valueConstraints.length; i++) {
             if (valueConstraints[i] instanceof DynamicValueImpl) {
-                Value[] v = ((DynamicValueImpl)valueConstraints[i]).expand();
+                Value[] v = ((DynamicValueImpl) valueConstraints[i]).expand();
                 for (Value value : v) {
                     res.add(value);
                 }
@@ -111,8 +108,7 @@ class ExtendedPropertyDefinition extends ExtendedItemDefinition implements Prope
         for (int i = 0; i < value.length; i++) {
             try {
                 res[i] = value[i].getString();
-            } catch (RepositoryException e) {
-            }
+            } catch (RepositoryException e) {}
         }
         return res;
     }
@@ -127,7 +123,7 @@ class ExtendedPropertyDefinition extends ExtendedItemDefinition implements Prope
         List<Value> res = new ArrayList<Value>();
         for (int i = 0; i < defaultValues.length; i++) {
             if (defaultValues[i] instanceof DynamicValueImpl) {
-                Value[] v = ((DynamicValueImpl)defaultValues[i]).expand();
+                Value[] v = ((DynamicValueImpl) defaultValues[i]).expand();
                 for (Value value : v) {
                     res.add(value);
                 }

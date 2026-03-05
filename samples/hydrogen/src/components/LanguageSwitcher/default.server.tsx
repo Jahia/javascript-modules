@@ -1,7 +1,7 @@
 import { buildNodeUrl, getSiteLocales, jahiaComponent } from "@jahia/javascript-modules-library";
 import { Fragment } from "react";
-import classes from "./component.module.css";
 import { useTranslation } from "react-i18next";
+import classes from "./component.module.css";
 
 jahiaComponent(
   {
@@ -19,8 +19,7 @@ jahiaComponent(
     const currentLanguage = currentResource.getLocale().toString();
     return (
       <p style={{ textAlign: "center" }}>
-        {t("JI87mYV8J5pAEST4RIUcb")}{" "}
-        {Object.entries(getSiteLocales()).map(([language, locale], i, { length }) => {
+        {t("JI87mYV8J5pAEST4RIUcb")} {Object.entries(getSiteLocales()).map(([language, locale], i, { length }) => {
           const href = buildNodeUrl(mainNode, { language });
           return (
             <Fragment key={language}>

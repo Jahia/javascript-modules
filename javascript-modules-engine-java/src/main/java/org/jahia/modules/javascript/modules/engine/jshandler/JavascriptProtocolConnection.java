@@ -16,6 +16,15 @@
 package org.jahia.modules.javascript.modules.engine.jshandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.jar.JarOutputStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipEntry;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,19 +36,8 @@ import org.ops4j.pax.swissbox.bnd.BndUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.file.Files;
-import java.util.*;
-import java.util.jar.JarOutputStream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipEntry;
-
 /**
- * javascript protocol handler
- * Transform javascript module into bundle
+ * javascript protocol handler Transform javascript module into bundle
  */
 public class JavascriptProtocolConnection extends URLConnection {
     public static final String BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT = "Jahia-javascript-InitScript";
@@ -96,7 +94,8 @@ public class JavascriptProtocolConnection extends URLConnection {
                 }
 
                 // Calculate relative path of the file in the package
-                String packageRelativePath = packageDir.toURI().relativize(file.toURI()).getPath();
+                String packageRelativePath =
+                        packageDir.toURI().relativize(file.toURI()).getPath();
 
                 // Copy file path (try to detect good path for file in the final package jar.)
                 if (packageRelativePath.equals("package.json")) {
@@ -110,27 +109,32 @@ public class JavascriptProtocolConnection extends URLConnection {
                 } else if (packageRelativePath.startsWith("settings/")) {
                     // Special mapping settings/content-editor-forms to META-INF/jahia-content-editor-forms
                     if (packageRelativePath.startsWith("settings/content-editor-forms/")) {
-                        jos.putNextEntry(new ZipEntry("META-INF/jahia-content-editor-forms/" + StringUtils.substringAfter(packageRelativePath, "settings/content-editor-forms/")));
-                    }
-                    // Special mapping settings/content-types-icons to icons/
+                        jos.putNextEntry(new ZipEntry("META-INF/jahia-content-editor-forms/"
+                                + StringUtils.substringAfter(packageRelativePath, "settings/content-editor-forms/")));
+                    }// Special mapping settings/content-types-icons to icons/
+
                     else if (packageRelativePath.startsWith("settings/content-types-icons/")) {
-                        jos.putNextEntry(new ZipEntry("icons/" + StringUtils.substringAfter(packageRelativePath, "content-types-icons/")));
-                    }
-                    // Special mapping settings/resources/*.properties to resources/*.properties
-                    else if (packageRelativePath.startsWith("settings/resources/") && packageRelativePath.endsWith(".properties")) {
+                        jos.putNextEntry(new ZipEntry("icons/"
+                                + StringUtils.substringAfter(packageRelativePath, "content-types-icons/")));
+                    }// Special mapping settings/resources/*.properties to resources/*.properties
+
+                    else if (packageRelativePath.startsWith("settings/resources/")
+                            && packageRelativePath.endsWith(".properties")) {
                         jos.putNextEntry(new ZipEntry(StringUtils.substringAfter(packageRelativePath, "settings/")));
-                    }
-                    // Special mapping settings/template-thumbnail.png to images/template-preview/template-thumbnail.png
+                    }// Special mapping settings/template-thumbnail.png to images/template-preview/template-thumbnail.png
+
                     else if (packageRelativePath.equals("settings/template-thumbnail.png")) {
-                        jos.putNextEntry(new ZipEntry("images/template-preview/" + StringUtils.substringAfter(packageRelativePath, "settings/")));
-                    }
-                    // Map everything else in settings/ to META-INF/
+                        jos.putNextEntry(new ZipEntry("images/template-preview/"
+                                + StringUtils.substringAfter(packageRelativePath, "settings/")));
+                    }// Map everything else in settings/ to META-INF/
+
                     else {
                         // Extract required nodetypes from imported xml files.
                         if (packageRelativePath.endsWith(".xml")) {
-                           extractNodetypes(file, parsingContext, importXmlFileParser);
+                            extractNodetypes(file, parsingContext, importXmlFileParser);
                         }
-                        jos.putNextEntry(new ZipEntry("META-INF/" + StringUtils.substringAfter(packageRelativePath, "settings/")));
+                        jos.putNextEntry(new ZipEntry("META-INF/"
+                                + StringUtils.substringAfter(packageRelativePath, "settings/")));
                     }
                 } else if (packageRelativePath.startsWith("components") && packageRelativePath.endsWith(".png")) {
                     String[] parts = StringUtils.split(packageRelativePath, "/");
@@ -143,7 +147,9 @@ public class JavascriptProtocolConnection extends URLConnection {
                             jos.putNextEntry(entry);
                             processedImages.add(entry);
                         } else {
-                            logger.warn("File with the name {} already copied into the /images folder, the current file won't be copied", file.getName());
+                            logger.warn(
+                                    "File with the name {} already copied into the /images folder, the current file won't be copied",
+                                    file.getName());
                             continue;
                         }
                     }
@@ -172,7 +178,8 @@ public class JavascriptProtocolConnection extends URLConnection {
                 } else {
                     // Multiple cnd files, merge them
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Multiple CND files detected in the package, they will be merged into a single file");
+                        logger.debug(
+                                "Multiple CND files detected in the package, they will be merged into a single file");
                     }
                     finalCndFile = mergeDefinitionFiles(cndFiles, packageDir);
                 }
@@ -194,7 +201,6 @@ public class JavascriptProtocolConnection extends URLConnection {
             FileUtils.deleteDirectory(outputDir);
         }
 
-
         Properties instructions = new Properties();
         // Extract instructions from package.json and nodetype capabilities
         instructions.putAll(generateInstructions(packageJson, parsingContext));
@@ -202,15 +208,26 @@ public class JavascriptProtocolConnection extends URLConnection {
             logger.debug("JS module transformed to bundle using instructions: {}", instructions);
         }
 
-        return BndUtils.createBundle(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()), instructions, wrappedUrl.toExternalForm());
+        return BndUtils.createBundle(
+                new ByteArrayInputStream(byteArrayOutputStream.toByteArray()),
+                instructions,
+                wrappedUrl.toExternalForm());
     }
 
-    private void extractNodetypes(File fileToBeParsed, ParsingContext parsingContext, AbstractFileParser parser) throws IOException {
+    private void extractNodetypes(File fileToBeParsed, ParsingContext parsingContext, AbstractFileParser parser)
+            throws IOException {
         try (InputStream inputStream = new FileInputStream(fileToBeParsed)) {
             logger.info("Extracting node types from {}", fileToBeParsed.getAbsolutePath());
-            if (parser.parse(fileToBeParsed.getName(), inputStream, fileToBeParsed.getParent(), false, false, null, parsingContext)) {
+            if (parser.parse(
+                    fileToBeParsed.getName(),
+                    inputStream,
+                    fileToBeParsed.getParent(),
+                    false,
+                    false,
+                    null,
+                    parsingContext)) {
                 logger.info("Successfully extracted node types from {}", fileToBeParsed.getAbsolutePath());
-            };
+            }
         }
     }
 
@@ -223,15 +240,22 @@ public class JavascriptProtocolConnection extends URLConnection {
         setIfPresent(properties, "description", instructions, "Bundle-Description");
         String name = StringUtils.defaultString((String) jahiaProps.get("name"), (String) properties.get("name"));
         instructions.put("Bundle-Name", name + " (javascript module)");
-        instructions.put("Bundle-SymbolicName",
-                ((String) properties.get("name")).replace("@", "").replace('/', '-').replaceAll("[^a-zA-Z0-9\\-\\.\\s]", "_"));
+        instructions.put(
+                "Bundle-SymbolicName",
+                ((String) properties.get("name"))
+                        .replace("@", "")
+                        .replace('/', '-')
+                        .replaceAll("[^a-zA-Z0-9\\-\\.\\s]", "_"));
         setIfPresent(properties, "author", instructions, "Bundle-Vendor");
         instructions.put("Bundle-Version", getBundleVersion(properties, jahiaProps));
         instructions.put("Implementation-Version", getImplementationVersion(properties, jahiaProps));
         setIfPresent(properties, "license", instructions, "Bundle-License");
 
         // Next lets setup Jahia headers
-        instructions.put("Jahia-Depends", StringUtils.defaultIfEmpty((String) jahiaProps.get("module-dependencies"), "default") + ",javascript-modules-engine");
+        instructions.put(
+                "Jahia-Depends",
+                StringUtils.defaultIfEmpty((String) jahiaProps.get("module-dependencies"), "default")
+                        + ",javascript-modules-engine");
         setIfPresent(jahiaProps, "deploy-on-site", instructions, "Jahia-Deploy-On-Site");
         Map<String, Object> mavenProps = getMavenProps(jahiaProps);
         instructions.put("Jahia-GroupId", mavenProps.getOrDefault("groupId", "org.example.javascript"));
@@ -242,17 +266,26 @@ public class JavascriptProtocolConnection extends URLConnection {
         instructions.put("Jahia-Required-Version", jahiaProps.getOrDefault("required-version", "8.2.1.0"));
         setIfPresent(jahiaProps, "server", instructions, BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT);
         // always include "/static" as folder for the static resources
-        instructions.put("Jahia-Static-Resources", StringUtils.defaultIfEmpty((String) jahiaProps.get("static-resources"), "/css,/icons,/images,/img,/javascript") + ",/static");
+        instructions.put(
+                "Jahia-Static-Resources",
+                StringUtils.defaultIfEmpty(
+                        (String) jahiaProps.get("static-resources"), "/css,/icons,/images,/img,/javascript")
+                        + ",/static");
         instructions.put("-removeheaders", "Private-Package, Export-Package");
         // Add Provide-Capability for provided node types
         if (!parsingContext.getContentTypeDefinitions().isEmpty()) {
             String provideCapability = String.join(",", parsingContext.getContentTypeDefinitions());
-            instructions.put("Provide-Capability", "com.jahia.services.content; nodetypes:List<String>=\"" + provideCapability + "\"");
+            instructions.put(
+                    "Provide-Capability",
+                    "com.jahia.services.content; nodetypes:List<String>=\"" + provideCapability + "\"");
         }
         // Add Require-Capability for required node types
         if (!parsingContext.getContentTypeReferences().isEmpty()) {
-            String nodeTypeRequirements = String.join("\"),com.jahia.services.content; filter:=\"(nodetypes=", parsingContext.getContentTypeReferences());
-            instructions.put("Require-Capability", "com.jahia.services.content; filter:=\"(nodetypes=" + nodeTypeRequirements + "\")");
+            String nodeTypeRequirements = String.join(
+                    "\"),com.jahia.services.content; filter:=\"(nodetypes=", parsingContext.getContentTypeReferences());
+            instructions.put(
+                    "Require-Capability",
+                    "com.jahia.services.content; filter:=\"(nodetypes=" + nodeTypeRequirements + "\")");
         }
         return instructions;
     }
@@ -274,7 +307,8 @@ public class JavascriptProtocolConnection extends URLConnection {
         return getVersionWithSnapshotSuffix(properties, jahiaProps, "-SNAPSHOT");
     }
 
-    private static String getVersionWithSnapshotSuffix(Map<String, Object> properties, Map<String, Object> jahiaProps, String snapshotSuffix) {
+    private static String getVersionWithSnapshotSuffix(
+            Map<String, Object> properties, Map<String, Object> jahiaProps, String snapshotSuffix) {
         Object snapshotModeObj = jahiaProps.getOrDefault("snapshot", false);
         String version = (String) properties.get("version");
         if (version.endsWith("-SNAPSHOT")) {
@@ -284,7 +318,8 @@ public class JavascriptProtocolConnection extends URLConnection {
         return version + (Boolean.parseBoolean(String.valueOf(snapshotModeObj)) ? snapshotSuffix : "");
     }
 
-    private void setIfPresent(Map<String, Object> inputProperties, String propertyName, Properties instructions, String instructionName) {
+    private void setIfPresent(
+            Map<String, Object> inputProperties, String propertyName, Properties instructions, String instructionName) {
         if (inputProperties.containsKey(propertyName)) {
             instructions.put(instructionName, inputProperties.get(propertyName));
         }
@@ -334,10 +369,10 @@ public class JavascriptProtocolConnection extends URLConnection {
             logger.error("Error creating temporary definitions.cnd file", e);
             return null;
         }
-        try (FileWriter writer = new FileWriter(mergedDefinitions);
-             BufferedWriter bw = new BufferedWriter(writer)) {
+        try (FileWriter writer = new FileWriter(mergedDefinitions); BufferedWriter bw = new BufferedWriter(writer)) {
 
-            String mergedNamespaces = namespaces.stream().reduce("", (partialString, element) -> partialString + element + System.lineSeparator());
+            String mergedNamespaces = namespaces.stream()
+                    .reduce("", (partialString, element) -> partialString + element + System.lineSeparator());
             bw.write(mergedNamespaces);
             bw.write(allDefinitionLines);
             if (logger.isDebugEnabled()) {

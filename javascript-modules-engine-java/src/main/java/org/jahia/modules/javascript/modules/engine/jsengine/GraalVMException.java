@@ -16,8 +16,7 @@
 package org.jahia.modules.javascript.modules.engine.jsengine;
 
 public class GraalVMException extends RuntimeException {
-    public GraalVMException() {
-    }
+    public GraalVMException() {}
 
     public GraalVMException(String message) {
         super(message);

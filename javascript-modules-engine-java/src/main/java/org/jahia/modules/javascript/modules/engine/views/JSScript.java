@@ -15,6 +15,7 @@
  */
 package org.jahia.modules.javascript.modules.engine.views;
 
+import java.util.Map;
 import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyObject;
 import org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine;
@@ -26,8 +27,6 @@ import org.jahia.services.render.scripting.Script;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.touk.throwing.ThrowingFunction;
-
-import java.util.Map;
 
 public class JSScript implements Script {
     private static final Logger logger = LoggerFactory.getLogger(JSScript.class);
@@ -52,7 +51,8 @@ public class JSScript implements Script {
             String viewRendererStr = viewValues.get("viewRenderer").toString();
             Map<String, Object> viewRenderer = contextProvider.getRegistry().get("viewRenderer", viewRendererStr);
             if (viewRenderer == null) {
-                throw new RenderException(String.format("Unknown view renderer: %s for view: %s", viewRendererStr, jsView.getRegistryKey()));
+                throw new RenderException(String.format(
+                        "Unknown view renderer: %s for view: %s", viewRendererStr, jsView.getRegistryKey()));
             }
 
             if (logger.isDebugEnabled()) {
@@ -60,7 +60,8 @@ public class JSScript implements Script {
             }
 
             viewValues.put("bundle", Value.asValue(jsView.getModule().getBundle()));
-            Object executionResult = Value.asValue(viewRenderer.get("render")).execute(resource, renderContext, ProxyObject.fromMap(viewValues));
+            Object executionResult = Value.asValue(viewRenderer.get("render"))
+                    .execute(resource, renderContext, ProxyObject.fromMap(viewValues));
             Value value = Value.asValue(executionResult);
             return value.asString();
         }));

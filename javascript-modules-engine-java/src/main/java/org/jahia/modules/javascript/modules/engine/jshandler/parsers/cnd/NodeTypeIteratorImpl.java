@@ -15,16 +15,13 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd;
 
+import java.util.Iterator;
 import javax.jcr.nodetype.NodeType;
 import javax.jcr.nodetype.NodeTypeIterator;
-import java.util.Iterator;
 
 /**
  *
- * User: toto
- * Date: Sep 21, 2009
- * Time: 5:32:24 PM
- *
+ * User: toto Date: Sep 21, 2009 Time: 5:32:24 PM
  */
 class NodeTypeIteratorImpl extends RangeIteratorAdapter implements NodeTypeIterator {
 
@@ -35,5 +32,4 @@ class NodeTypeIteratorImpl extends RangeIteratorAdapter implements NodeTypeItera
     public NodeType nextNodeType() {
         return (NodeType) next();
     }
-
 }

@@ -1,4 +1,4 @@
-import { HYDROGEN_SITE_KEY, HYDROGEN_POSTS, JAHIA_CONTEXT } from "../../support/constants";
+import { HYDROGEN_POSTS, HYDROGEN_SITE_KEY, JAHIA_CONTEXT } from "../../support/constants";
 
 describe("Validate the concepts of the tutorial: 5 - View Content in Full Page", () => {
   HYDROGEN_POSTS.forEach(({ page, title, subTitle, details, extract }) => {

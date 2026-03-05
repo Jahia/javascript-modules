@@ -1,6 +1,6 @@
 import { addNode } from "@jahia/cypress";
+import { GENERIC_SITE_KEY } from "../../support/constants";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Render should be editable", () => {
   before("Create test contents", () => {
@@ -44,24 +44,24 @@ describe("Render should be editable", () => {
 
   it("Without parameter, text should be editable", () => {
     cy.iframe("#page-builder-frame-1").within(() => {
-      cy.get('div[data-testid="react-render-editable-default"]')
-        .find('div[class="childs"]>div[jahiatype="module"]')
+      cy.get("div[data-testid=\"react-render-editable-default\"]")
+        .find("div[class=\"childs\"]>div[jahiatype=\"module\"]")
         .should("exist");
     });
   });
 
   it("With parameter set to false, text should not be editable", () => {
     cy.iframe("#page-builder-frame-1").within(() => {
-      cy.get('div[data-testid="react-render-not-editable"]')
-        .find('div[class="childs"]>div[jahiatype="module"]')
+      cy.get("div[data-testid=\"react-render-not-editable\"]")
+        .find("div[class=\"childs\"]>div[jahiatype=\"module\"]")
         .should("not.exist");
     });
   });
 
   it("With parameter set to true, text should be editable", () => {
     cy.iframe("#page-builder-frame-1").within(() => {
-      cy.get('div[data-testid="react-render-editable"]')
-        .find('div[class="childs"]>div[jahiatype="module"]')
+      cy.get("div[data-testid=\"react-render-editable\"]")
+        .find("div[class=\"childs\"]>div[jahiatype=\"module\"]")
         .should("exist");
     });
   });

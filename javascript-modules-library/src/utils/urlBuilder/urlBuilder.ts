@@ -24,30 +24,30 @@ export function buildNodeUrl(
   // Prevent providing both mode/language/extension and decorations at the same time
   config?:
     | {
-        /** The query string parameters to append to the URL */
-        parameters?: Record<string, string>;
-        /**
-         * The mode to use to build the URL. Defines the mode or override the one provided by the
-         * renderContext.
-         */
-        mode?: "edit" | "preview" | "live";
-        /**
-         * The language to use to build the URL. Defines the languages or overrides the one provided
-         * by the current resource
-         */
-        language?: string;
-        /**
-         * The extension to use to build the URL. Defines the extension or overrides the one
-         * provided by the current resource
-         */
-        extension?: string;
-      }
+      /** The query string parameters to append to the URL */
+      parameters?: Record<string, string>;
+      /**
+       * The mode to use to build the URL. Defines the mode or override the one provided by the
+       * renderContext.
+       */
+      mode?: "edit" | "preview" | "live";
+      /**
+       * The language to use to build the URL. Defines the languages or overrides the one provided
+       * by the current resource
+       */
+      language?: string;
+      /**
+       * The extension to use to build the URL. Defines the extension or overrides the one
+       * provided by the current resource
+       */
+      extension?: string;
+    }
     | {
-        /** The query string parameters to append to the URL */
-        parameters?: Record<string, string>;
-        /** Additional arguments used for building the URL, through `node.getUrl` overloads. */
-        args?: Record<string, string | number | boolean>;
-      },
+      /** The query string parameters to append to the URL */
+      parameters?: Record<string, string>;
+      /** Additional arguments used for building the URL, through `node.getUrl` overloads. */
+      args?: Record<string, string | number | boolean>;
+    },
   context?: {
     /** Provided in react context, but you need to provide one otherwise. * */
     renderContext?: RenderContext;
@@ -84,8 +84,7 @@ export function buildNodeUrl(
 
     const mode = config.mode ?? context.renderContext?.getMode();
     const language = config.language ?? context.currentResource?.getLocale().toString();
-    const extension =
-      config.extension ?? `.${context.currentResource?.getTemplateType() ?? "html"}`;
+    const extension = config.extension ?? `.${context.currentResource?.getTemplateType() ?? "html"}`;
 
     if (!mode) throw new Error("buildNodeUrl: mode is not defined and cannot be inferred.");
     if (!language) throw new Error("buildNodeUrl: language is not defined and cannot be inferred.");
@@ -94,11 +93,11 @@ export function buildNodeUrl(
       (mode === "edit"
         ? "/cms/edit/default/"
         : mode === "preview"
-          ? "/cms/render/default/"
-          : "/cms/render/live/") +
-        language +
-        node.getPath() +
-        extension,
+        ? "/cms/render/default/"
+        : "/cms/render/live/")
+        + language
+        + node.getPath()
+        + extension,
       { parameters: config.parameters },
       context,
     );

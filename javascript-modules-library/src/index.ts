@@ -16,7 +16,7 @@ export { jahiaComponent } from "./framework/jahiaComponent.js";
 // Hooks
 export { useGQLQuery } from "./hooks/useGQLQuery.js";
 export { useJCRQuery } from "./hooks/useJCRQuery.js";
-export { useServerContext, ServerContextProvider } from "./hooks/useServerContext.js";
+export { ServerContextProvider, useServerContext } from "./hooks/useServerContext.js";
 
 // JCR utils
 export { getChildNodes } from "./utils/jcr/getChildNodes.js";
@@ -24,11 +24,7 @@ export { getNodeProps } from "./utils/jcr/getNodeProps.js";
 export { getNodesByJCRQuery } from "./utils/jcr/getNodesByJCRQuery.js";
 
 // URL builder
-export {
-  buildEndpointUrl,
-  buildNodeUrl,
-  buildModuleFileUrl,
-} from "./utils/urlBuilder/urlBuilder.js";
+export { buildEndpointUrl, buildModuleFileUrl, buildNodeUrl } from "./utils/urlBuilder/urlBuilder.js";
 
 // I18n
 export { getSiteLocales } from "./utils/i18n.js";

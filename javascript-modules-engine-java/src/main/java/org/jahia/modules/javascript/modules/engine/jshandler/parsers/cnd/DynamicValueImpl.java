@@ -15,26 +15,22 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-
-import javax.jcr.Binary;
-import javax.jcr.RepositoryException;
-import javax.jcr.Value;
-import javax.jcr.ValueFormatException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import javax.jcr.Binary;
+import javax.jcr.RepositoryException;
+import javax.jcr.Value;
+import javax.jcr.ValueFormatException;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 /**
  *
- * User: toto
- * Date: Apr 3, 2008
- * Time: 12:26:22 PM
- *
+ * User: toto Date: Apr 3, 2008 Time: 12:26:22 PM
  */
 class DynamicValueImpl implements Value {
 
@@ -46,7 +42,12 @@ class DynamicValueImpl implements Value {
     protected int type;
     private boolean isConstraint;
 
-    public DynamicValueImpl(String fn, List<String> params, int type, boolean isConstraint, ExtendedPropertyDefinition declaringPropertyDefinition) {
+    public DynamicValueImpl(
+            String fn,
+            List<String> params,
+            int type,
+            boolean isConstraint,
+            ExtendedPropertyDefinition declaringPropertyDefinition) {
         this.type = type;
         this.fn = fn;
         this.params = params;
@@ -98,27 +99,27 @@ class DynamicValueImpl implements Value {
         return params;
     }
 
-//    public String getString() {
-//        if (fn.equals("now")) {
-//            return ISO8601.format(new GregorianCalendar());
-//        } else if (fn.equals("resourceKey")) {
-//            String bundleId = ((ExtendedNodeType) declaringPropertyDefinition.getDeclaringNodeType()).getResourceBundleId();
-//            return ResourceBundleMarker.drawMarker(bundleId,declaringPropertyDefinition.getResourceBundleKey()+"."+getParams().get(0),getParams().get(0));
-//        } else if (fn.equals("useClass")) {
-//            String classname = getParams().get(0);
-//            try {
-//                ValueInitializer init = (ValueInitializer) Class.forName(classname).newInstance();
-//                return init.getValue(Jahia.getThreadParamBean());
-//            } catch (InstantiationException e) {
-//                logger.error(e.getMessage(), e);
-//            } catch (IllegalAccessException e) {
-//                logger.error(e.getMessage(), e);
-//            } catch (ClassNotFoundException e) {
-//                logger.error(e.getMessage(), e);
-//            }
-//        }
-//        return null;
-//    }
+    //    public String getString() {
+    //        if (fn.equals("now")) {
+    //            return ISO8601.format(new GregorianCalendar());
+    //        } else if (fn.equals("resourceKey")) {
+    //            String bundleId = ((ExtendedNodeType) declaringPropertyDefinition.getDeclaringNodeType()).getResourceBundleId();
+    //            return ResourceBundleMarker.drawMarker(bundleId,declaringPropertyDefinition.getResourceBundleKey()+"."+getParams().get(0),getParams().get(0));
+    //        } else if (fn.equals("useClass")) {
+    //            String classname = getParams().get(0);
+    //            try {
+    //                ValueInitializer init = (ValueInitializer) Class.forName(classname).newInstance();
+    //                return init.getValue(Jahia.getThreadParamBean());
+    //            } catch (InstantiationException e) {
+    //                logger.error(e.getMessage(), e);
+    //            } catch (IllegalAccessException e) {
+    //                logger.error(e.getMessage(), e);
+    //            } catch (ClassNotFoundException e) {
+    //                logger.error(e.getMessage(), e);
+    //            }
+    //        }
+    //        return null;
+    //    }
 
     public Value[] expand() {
         Value[] v = null;
@@ -126,7 +127,7 @@ class DynamicValueImpl implements Value {
         if (fn.equals("useClass")) {
             classname = getParams().get(0);
         } else {
-            classname = "org.jahia.services.content.nodetypes.initializers."+ StringUtils.capitalize(fn);
+            classname = "org.jahia.services.content.nodetypes.initializers." + StringUtils.capitalize(fn);
         }
         try {
             ValueInitializer init = (ValueInitializer) Class.forName(classname).newInstance();
@@ -143,7 +144,7 @@ class DynamicValueImpl implements Value {
             for (int i = 0; i < v.length; i++) {
                 Value value = v[i];
                 if (value instanceof DynamicValueImpl) {
-                    res.addAll(Arrays.asList(((DynamicValueImpl)value).expand()));
+                    res.addAll(Arrays.asList(((DynamicValueImpl) value).expand()));
                 } else {
                     res.add(value);
                 }
@@ -157,7 +158,7 @@ class DynamicValueImpl implements Value {
         if (v.length == 1) {
             return v[0];
         } else {
-            throw new ValueFormatException("Dynamic value expanded to none/multiple values : "+v.length );
+            throw new ValueFormatException("Dynamic value expanded to none/multiple values : " + v.length);
         }
     }
 }

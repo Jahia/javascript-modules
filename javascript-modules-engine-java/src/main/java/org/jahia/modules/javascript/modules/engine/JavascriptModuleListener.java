@@ -15,6 +15,13 @@
  */
 package org.jahia.modules.javascript.modules.engine;
 
+import static org.jahia.modules.javascript.modules.engine.jshandler.JavascriptProtocolConnection.BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 import org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine;
 import org.jahia.modules.javascript.modules.engine.registrars.Registrar;
 import org.osgi.framework.Bundle;
@@ -24,14 +31,6 @@ import org.osgi.framework.BundleListener;
 import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
-
-import static org.jahia.modules.javascript.modules.engine.jshandler.JavascriptProtocolConnection.BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT;
 
 /**
  * Listener to execute scripts at activate/deactivate time
@@ -47,7 +46,11 @@ public class JavascriptModuleListener implements BundleListener {
         this.engine = engine;
     }
 
-    @Reference(service = Registrar.class, policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MULTIPLE, policyOption = ReferencePolicyOption.GREEDY)
+    @Reference(
+            service = Registrar.class,
+            policy = ReferencePolicy.DYNAMIC,
+            cardinality = ReferenceCardinality.MULTIPLE,
+            policyOption = ReferencePolicyOption.GREEDY)
     public void addRegistrar(Registrar registrar) {
         for (Bundle bundle : getJavascriptModules()) {
             registrar.register(bundle);
@@ -111,7 +114,7 @@ public class JavascriptModuleListener implements BundleListener {
     }
 
     public boolean isJavascriptModule(Bundle bundle) {
-        return bundle.getBundleId() != engine.getBundleContext().getBundle().getBundleId() &&
-                bundle.getHeaders().get(BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT) != null;
+        return bundle.getBundleId() != engine.getBundleContext().getBundle().getBundleId()
+                && bundle.getHeaders().get(BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT) != null;
     }
 }

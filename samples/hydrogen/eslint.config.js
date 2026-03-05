@@ -1,10 +1,10 @@
 // @ts-check
+import eslintReact from "@eslint-react/eslint-plugin";
 import { includeIgnoreFile } from "@eslint/compat";
 import eslint from "@eslint/js";
-import tseslint from "typescript-eslint";
-import path from "node:path";
 import globals from "globals";
-import eslintReact from "@eslint-react/eslint-plugin";
+import path from "node:path";
+import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
@@ -12,14 +12,11 @@ export default tseslint.config(
       globals: { ...globals.browser, ...globals.node },
     },
   },
-
   // JS/TS recommended
   eslint.configs.recommended,
   { files: ["**/*.ts", "**/*.tsx"], extends: tseslint.configs.recommended },
-
   // React
   eslintReact.configs["recommended-typescript"],
-
   // Ignore the same files as .gitignore
   includeIgnoreFile(path.resolve(import.meta.dirname, ".gitignore")),
 );

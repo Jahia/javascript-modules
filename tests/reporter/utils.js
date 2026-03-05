@@ -30,7 +30,7 @@ exports.inherits = util.inherits;
  * @param {string} html
  * @returns {string}
  */
-exports.escape = function (html) {
+exports.escape = function(html) {
   return he.encode(String(html), { useNamedReferences: false });
 };
 
@@ -41,7 +41,7 @@ exports.escape = function (html) {
  * @param {Object} obj
  * @returns {boolean}
  */
-exports.isString = function (obj) {
+exports.isString = function(obj) {
   return typeof obj === "string";
 };
 
@@ -52,7 +52,7 @@ exports.isString = function (obj) {
  * @param {string} str
  * @returns {string}
  */
-exports.slug = function (str) {
+exports.slug = function(str) {
   return str
     .toLowerCase()
     .replace(/\s+/g, "-")
@@ -66,7 +66,7 @@ exports.slug = function (str) {
  * @param {string} str
  * @returns {string}
  */
-exports.clean = function (str) {
+exports.clean = function(str) {
   str = str
     .replace(/\r\n?|[\n\u2028\u2029]/g, "\n")
     .replace(/^\uFEFF/, "")
@@ -166,7 +166,7 @@ var type = (exports.type = function type(value) {
  * @returns {string}
  * @see exports.type
  */
-exports.stringify = function (value) {
+exports.stringify = function(value) {
   var typeHint = type(value);
 
   if (!~["object", "array", "function"].indexOf(typeHint)) {
@@ -179,7 +179,7 @@ exports.stringify = function (value) {
     // IE7/IE8 has a bizarre String constructor; needs to be coerced
     // into an array and back to obj.
     if (typeHint === "string" && typeof value === "object") {
-      value = value.split("").reduce(function (acc, char, idx) {
+      value = value.split("").reduce(function(acc, char, idx) {
         acc[idx] = char;
         return acc;
       }, {});
@@ -240,10 +240,9 @@ function jsonStringify(object, spaces, depth) {
       case "regexp":
       case "symbol":
       case "number":
-        val =
-          val === 0 && 1 / val === -Infinity // `-0`
-            ? "-0"
-            : val.toString();
+        val = val === 0 && 1 / val === -Infinity // `-0`
+          ? "-0"
+          : val.toString();
         break;
       case "date":
         var sDate = isNaN(val.getTime()) ? val.toString() : val.toISOString();
@@ -268,18 +267,17 @@ function jsonStringify(object, spaces, depth) {
     }
 
     --length;
-    str +=
-      "\n " +
-      repeat(" ", space) +
-      (Array.isArray(object) ? "" : '"' + i + '": ') + // Key
-      _stringify(object[i]) + // Value
-      (length ? "," : ""); // Comma
+    str += "\n "
+      + repeat(" ", space)
+      + (Array.isArray(object) ? "" : "\"" + i + "\": ") // Key
+      + _stringify(object[i]) // Value
+      + (length ? "," : ""); // Comma
   }
 
   return (
-    str +
+    str
     // [], {}
-    (str.length !== 1 ? "\n" + repeat(" ", --space) + end : end)
+    + (str.length !== 1 ? "\n" + repeat(" ", --space) + end : end)
   );
 }
 
@@ -329,8 +327,8 @@ exports.canonicalize = function canonicalize(value, stack, typeHint) {
       canonicalizedObj = value;
       break;
     case "array":
-      withStack(value, function () {
-        canonicalizedObj = value.map(function (item) {
+      withStack(value, function() {
+        canonicalizedObj = value.map(function(item) {
           return exports.canonicalize(item, stack);
         });
       });
@@ -350,10 +348,10 @@ exports.canonicalize = function canonicalize(value, stack, typeHint) {
     /* Falls through */
     case "object":
       canonicalizedObj = canonicalizedObj || {};
-      withStack(value, function () {
+      withStack(value, function() {
         Object.keys(value)
           .sort()
-          .forEach(function (key) {
+          .forEach(function(key) {
             canonicalizedObj[key] = exports.canonicalize(value[key], stack);
           });
       });
@@ -382,7 +380,7 @@ function emitWarning(msg, type) {
   if (process.emitWarning) {
     process.emitWarning(msg, type);
   } else {
-    process.nextTick(function () {
+    process.nextTick(function() {
       console.warn(type + ": " + msg);
     });
   }
@@ -424,7 +422,7 @@ exports.warn = function warn(msg) {
  * @summary
  * This Filter based on `mocha-clean` module.(see: `github.com/rstacruz/mocha-clean`)
  */
-exports.stackTraceFilter = function () {
+exports.stackTraceFilter = function() {
   // TODO: Replace with `process.browser`
   var is = typeof document === "undefined" ? { node: true } : { browser: true };
   var slash = path.sep;
@@ -441,27 +439,27 @@ exports.stackTraceFilter = function () {
 
   function isMochaInternal(line) {
     return (
-      ~line.indexOf("node_modules" + slash + "mocha" + slash) ||
-      ~line.indexOf(slash + "mocha.js") ||
-      ~line.indexOf(slash + "mocha.min.js")
+      ~line.indexOf("node_modules" + slash + "mocha" + slash)
+      || ~line.indexOf(slash + "mocha.js")
+      || ~line.indexOf(slash + "mocha.min.js")
     );
   }
 
   function isNodeInternal(line) {
     return (
-      ~line.indexOf("(timers.js:") ||
-      ~line.indexOf("(events.js:") ||
-      ~line.indexOf("(node.js:") ||
-      ~line.indexOf("(module.js:") ||
-      ~line.indexOf("GeneratorFunctionPrototype.next (native)") ||
-      false
+      ~line.indexOf("(timers.js:")
+      || ~line.indexOf("(events.js:")
+      || ~line.indexOf("(node.js:")
+      || ~line.indexOf("(module.js:")
+      || ~line.indexOf("GeneratorFunctionPrototype.next (native)")
+      || false
     );
   }
 
-  return function (stack) {
+  return function(stack) {
     stack = stack.split("\n");
 
-    stack = stack.reduce(function (list, line) {
+    stack = stack.reduce(function(list, line) {
       if (isMochaInternal(line)) {
         return list;
       }
@@ -520,7 +518,7 @@ exports.clamp = function clamp(value, range) {
  * @param {string} str - Value to be quoted.
  * @returns {string} Quoted value
  */
-exports.sQuote = function (str) {
+exports.sQuote = function(str) {
   return "'" + str + "'";
 };
 
@@ -539,8 +537,8 @@ exports.sQuote = function (str) {
  * @param {string} str - Value to be quoted.
  * @returns {string} Quoted value
  */
-exports.dQuote = function (str) {
-  return '"' + str + '"';
+exports.dQuote = function(str) {
+  return "\"" + str + "\"";
 };
 
 /**
@@ -548,7 +546,7 @@ exports.dQuote = function (str) {
  *
  * @public
  */
-exports.noop = function () {};
+exports.noop = function() {};
 
 /**
  * Creates a map-like object.
@@ -564,7 +562,7 @@ exports.noop = function () {};
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create#Custom_and_Null_objects|MDN:Object.create - Custom objects}
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign|MDN:Object.assign}
  */
-exports.createMap = function () {
+exports.createMap = function() {
   return assign.apply(null, [Object.create(null)].concat(Array.prototype.slice.call(arguments)));
 };
 
@@ -579,7 +577,7 @@ exports.createMap = function () {
  * @throws {TypeError} If argument is not a non-empty object.
  * @see {@link module:utils.createMap createMap}
  */
-exports.defineConstants = function (obj) {
+exports.defineConstants = function(obj) {
   if (type(obj) !== "object" || !Object.keys(obj).length) {
     throw new TypeError("Invalid argument; expected a non-empty object");
   }
@@ -599,7 +597,7 @@ exports.defineConstants = function (obj) {
  * @returns {Boolean} Whether the current version of Node.JS supports ES Modules in a way that is
  *   compatible with Mocha
  */
-exports.supportsEsModules = function (partialSupport) {
+exports.supportsEsModules = function(partialSupport) {
   if (!exports.isBrowser() && process.versions && process.versions.node) {
     var versionFields = process.versions.node.split(".");
     var major = Number(versionFields[0]);

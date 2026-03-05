@@ -1,6 +1,6 @@
 import { addNode, addVanityUrl, deleteNode, publishAndWaitJobEnding } from "@jahia/cypress";
-import { addSimplePage } from "../../utils/helpers";
 import { GENERIC_SITE_KEY, JAHIA_CONTEXT } from "../../support/constants";
+import { addSimplePage } from "../../utils/helpers";
 
 describe("Test on url helper", () => {
   before("Create test page and contents", () => {
@@ -79,7 +79,7 @@ describe("Test on url helper", () => {
     }
   };
 
-  it("Generated URLs should be correct", function () {
+  it("Generated URLs should be correct", function() {
     cy.login();
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testUrl.html`);
 
@@ -173,7 +173,8 @@ describe("Test on url helper", () => {
         dataTestId: "fragment_link",
         tag: "a",
         attribute: "href",
-        expectedURL: `${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testUrl/pagecontent/test.html.ajax`,
+        expectedURL:
+          `${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testUrl/pagecontent/test.html.ajax`,
       },
     ]);
 
@@ -269,7 +270,7 @@ describe("Test on url helper", () => {
     cy.logout();
   });
 
-  it("Generated URLs should be correct with vanity", function () {
+  it("Generated URLs should be correct with vanity", function() {
     // Add a vanity url
     addVanityUrl(`/sites/${GENERIC_SITE_KEY}/home/linkedPage`, "en", "/vanityUrlTest");
     publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}/home/linkedPage`);
@@ -361,7 +362,8 @@ describe("Test on url helper", () => {
         dataTestId: "fragment_link",
         tag: "a",
         attribute: "href",
-        expectedURL: `${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testUrl/pagecontent/test.html.ajax`,
+        expectedURL:
+          `${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testUrl/pagecontent/test.html.ajax`,
       },
     ]);
 

@@ -1,9 +1,4 @@
-import {
-  buildModuleFileUrl,
-  Island,
-  jahiaComponent,
-  RenderChildren,
-} from "@jahia/javascript-modules-library";
+import { buildModuleFileUrl, Island, jahiaComponent, RenderChildren } from "@jahia/javascript-modules-library";
 import { Trans, useTranslation } from "react-i18next";
 import Celebrate from "./Celebrate.client.jsx";
 import classes from "./component.module.css";

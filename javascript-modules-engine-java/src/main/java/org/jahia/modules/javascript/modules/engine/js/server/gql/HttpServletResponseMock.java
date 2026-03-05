@@ -1,36 +1,32 @@
 package org.jahia.modules.javascript.modules.engine.js.server.gql;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 /**
- * A mock implementation of {@link HttpServletResponse} used for testing and server-side rendering
- * within the Jahia JavaScript modules engine.
+ * A mock implementation of {@link HttpServletResponse} used for testing and server-side rendering within the Jahia
+ * JavaScript modules engine.
  *
- * <p>This class provides a minimal, non-functional implementation of the HttpServletResponse interface
- * that can be used in environments where a real HTTP response context is not available, such as during
- * server-side rendering of JavaScript components or in unit tests.</p>
+ * <p>This class provides a minimal, non-functional implementation of the HttpServletResponse interface that can be used
+ * in environments where a real HTTP response context is not available, such as during server-side rendering of
+ * JavaScript components or in unit tests.</p>
  *
- * <p>Key characteristics of this mock implementation:</p>
- * <ul>
- *   <li>Provides a functional {@link ServletOutputStream} through {@link ServletOutputStreamMock}</li>
- *   <li>Supports character encoding configuration via constructor</li>
- *   <li>Returns sensible default values for most methods (null, empty collections, or false)</li>
- *   <li>URL encoding methods return the original URL unchanged</li>
- *   <li>Header and cookie operations are no-ops (do nothing)</li>
- *   <li>Error handling and redirection methods are no-ops</li>
- *   <li>Buffer and locale operations return default values</li>
- * </ul>
+ * <p>Key characteristics of this mock implementation:</p> <ul> <li>Provides a functional {@link ServletOutputStream}
+ * through {@link ServletOutputStreamMock} </li> <li>Supports character encoding configuration via constructor</li>
+ * <li>Returns sensible default values for most methods (null, empty collections, or false)</li> <li>URL encoding
+ * methods return the original URL unchanged</li> <li>Header and cookie operations are no-ops (do nothing)</li>
+ * <li>Error handling and redirection methods are no-ops</li> <li>Buffer and locale operations return default
+ * values</li> </ul>
  *
- * <p>The primary use case is to provide a minimal response context when executing JavaScript
- * code that expects an HttpServletResponse object to be available, particularly during
- * server-side rendering scenarios where output needs to be captured through the ServletOutputStream.</p>
+ * <p>The primary use case is to provide a minimal response context when executing JavaScript code that expects an
+ * HttpServletResponse object to be available, particularly during server-side rendering scenarios where output needs to
+ * be captured through the ServletOutputStream.</p>
  *
  * @see HttpServletResponse
  * @see ServletOutputStreamMock
@@ -45,9 +41,7 @@ class HttpServletResponseMock implements HttpServletResponse {
     }
 
     @Override
-    public void addCookie(Cookie cookie) {
-
-    }
+    public void addCookie(Cookie cookie) {}
 
     @Override
     public boolean containsHeader(String name) {
@@ -75,54 +69,34 @@ class HttpServletResponseMock implements HttpServletResponse {
     }
 
     @Override
-    public void sendError(int sc, String msg) throws IOException {
-
-    }
+    public void sendError(int sc, String msg) throws IOException {}
 
     @Override
-    public void sendError(int sc) throws IOException {
-
-    }
+    public void sendError(int sc) throws IOException {}
 
     @Override
-    public void sendRedirect(String location) throws IOException {
-
-    }
+    public void sendRedirect(String location) throws IOException {}
 
     @Override
-    public void setDateHeader(String name, long date) {
-
-    }
+    public void setDateHeader(String name, long date) {}
 
     @Override
-    public void addDateHeader(String name, long date) {
-
-    }
+    public void addDateHeader(String name, long date) {}
 
     @Override
-    public void setHeader(String name, String value) {
-
-    }
+    public void setHeader(String name, String value) {}
 
     @Override
-    public void addHeader(String name, String value) {
-
-    }
+    public void addHeader(String name, String value) {}
 
     @Override
-    public void setIntHeader(String name, int value) {
-
-    }
+    public void setIntHeader(String name, int value) {}
 
     @Override
-    public void addIntHeader(String name, int value) {
-
-    }
+    public void addIntHeader(String name, int value) {}
 
     @Override
-    public void setStatus(int sc, String sm) {
-
-    }
+    public void setStatus(int sc, String sm) {}
 
     @Override
     public int getStatus() {
@@ -130,9 +104,7 @@ class HttpServletResponseMock implements HttpServletResponse {
     }
 
     @Override
-    public void setStatus(int sc) {
-
-    }
+    public void setStatus(int sc) {}
 
     @Override
     public String getHeader(String s) {
@@ -155,9 +127,7 @@ class HttpServletResponseMock implements HttpServletResponse {
     }
 
     @Override
-    public void setCharacterEncoding(String charset) {
-
-    }
+    public void setCharacterEncoding(String charset) {}
 
     @Override
     public String getContentType() {
@@ -165,9 +135,7 @@ class HttpServletResponseMock implements HttpServletResponse {
     }
 
     @Override
-    public void setContentType(String type) {
-
-    }
+    public void setContentType(String type) {}
 
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
@@ -180,14 +148,10 @@ class HttpServletResponseMock implements HttpServletResponse {
     }
 
     @Override
-    public void setContentLength(int len) {
-
-    }
+    public void setContentLength(int len) {}
 
     @Override
-    public void setContentLengthLong(long l) {
-
-    }
+    public void setContentLengthLong(long l) {}
 
     @Override
     public int getBufferSize() {
@@ -195,19 +159,13 @@ class HttpServletResponseMock implements HttpServletResponse {
     }
 
     @Override
-    public void setBufferSize(int size) {
-
-    }
+    public void setBufferSize(int size) {}
 
     @Override
-    public void flushBuffer() throws IOException {
-
-    }
+    public void flushBuffer() throws IOException {}
 
     @Override
-    public void resetBuffer() {
-
-    }
+    public void resetBuffer() {}
 
     @Override
     public boolean isCommitted() {
@@ -215,9 +173,7 @@ class HttpServletResponseMock implements HttpServletResponse {
     }
 
     @Override
-    public void reset() {
-
-    }
+    public void reset() {}
 
     @Override
     public Locale getLocale() {
@@ -225,7 +181,5 @@ class HttpServletResponseMock implements HttpServletResponse {
     }
 
     @Override
-    public void setLocale(Locale loc) {
-
-    }
+    public void setLocale(Locale loc) {}
 }
