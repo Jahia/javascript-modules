@@ -112,13 +112,15 @@ The `npm init @jahia/module@latest` command automatically configures the [i18n a
 
 It also provides a VS Code command to extract hardcoded strings into the translation files:
 
-![VS Code i18n Ally command palette entry for extracting text into i18n messages](i18n-ally-extract.png)
+![VS Code i18n ally command palette entry for extracting text into i18n messages](i18n-ally-extract.png)
 
 The `Extract text into i18n messages` command will automatically replace the selected string with a `t("...")` call.
 
 It can also list missing or unused translations, and enables collaboration features.
 
 Check out the [i18n ally documentation](https://github.com/lokalise/i18n-ally/wiki) for a complete list of features and configuration options.
+
+A similar feature set is advertised by [i18next-cli](https://github.com/i18next/i18next-cli#readme), but we haven't tried it out yet. It may prove useful for other IDEs or in CI environments—see if that's the case for you!
 
 ### Best Practices
 
@@ -156,7 +158,7 @@ This may sound counterintuitive, but using semantic keys like `read-more` or `wr
 
 - Avoid bikeshedding over key names and nesting
 
-i18n Ally will generate a random key when using the extract command.
+i18n ally will generate a random key when using the extract command.
 
 ### Building a Language Switcher
 
