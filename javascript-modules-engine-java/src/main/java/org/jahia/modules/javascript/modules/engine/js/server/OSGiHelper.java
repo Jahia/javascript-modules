@@ -15,6 +15,12 @@
  */
 package org.jahia.modules.javascript.modules.engine.js.server;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
 import org.graalvm.polyglot.proxy.ProxyObject;
 import org.jahia.data.templates.JahiaTemplatesPackage;
 import org.jahia.modules.javascript.modules.engine.js.injector.OSGiService;
@@ -26,16 +32,8 @@ import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.*;
-import java.util.stream.Collectors;
-
 /**
- * Helper class to make it possible to access OSGi bundle resources from the
- * JavaScript engine
+ * Helper class to make it possible to access OSGi bundle resources from the JavaScript engine
  */
 public class OSGiHelper {
     private static final Logger logger = LoggerFactory.getLogger(OSGiHelper.class);
@@ -49,9 +47,8 @@ public class OSGiHelper {
     }
 
     /**
-     * Retrieves an OSGi service instance by its fully qualified class name.
-     * An interface name can be used as long as a service properly declares
-     * implementing it.
+     * Retrieves an OSGi service instance by its fully qualified class name. An interface name can be used as long as a
+     * service properly declares implementing it.
      *
      * @param clazz the fully qualified class name of the OSGi service
      * @return the OSGi instance associated to the fully qualified class name
@@ -61,11 +58,10 @@ public class OSGiHelper {
     }
 
     /**
-     * Retrieves an OSGi service instance by its fully qualified class name.
-     * An interface name can be used as long as a service properly declares
-     * implementing it.
+     * Retrieves an OSGi service instance by its fully qualified class name. An interface name can be used as long as a
+     * service properly declares implementing it.
      *
-     * @param clazz  the fully qualified class name of the OSGi service
+     * @param clazz the fully qualified class name of the OSGi service
      * @param filter the filter to apply to the service
      * @return the OSGi instance associated to the fully qualified class name
      */
@@ -90,12 +86,11 @@ public class OSGiHelper {
     /**
      * Load a resource from an OSGi bundle
      *
-     * @param bundle   the bundle to load the resource from
-     * @param path     the path to the resource in the bundle
-     * @param optional if false an error message will be logged if the resource is
-     *                 not found, otherwise null will be returned
-     * @return a String containing the content of the resource if it was found, null
-     *         otherwise
+     * @param bundle the bundle to load the resource from
+     * @param path the path to the resource in the bundle
+     * @param optional if false an error message will be logged if the resource is not found, otherwise null will be
+     * returned
+     * @return a String containing the content of the resource if it was found, null otherwise
      * @throws RenderException
      */
     public String loadResource(Bundle bundle, String path, boolean optional) throws RenderException {
@@ -111,7 +106,7 @@ public class OSGiHelper {
      * Load a properties resource from an OSGi bundle
      *
      * @param bundle the bundle to load the resource from
-     * @param path   the path to the resource in the bundle
+     * @param path the path to the resource in the bundle
      * @return A Map&lt;String,String&gt; containing the properties
      * @throws RenderException
      */
@@ -121,8 +116,8 @@ public class OSGiHelper {
             Properties properties = new Properties();
             try (InputStream inStream = url.openStream()) {
                 properties.load(inStream);
-                return ProxyObject.fromMap(properties.entrySet().stream().collect(
-                        Collectors.toMap(
+                return ProxyObject.fromMap(properties.entrySet().stream()
+                        .collect(Collectors.toMap(
                                 e -> String.valueOf(e.getKey()),
                                 e -> String.valueOf(e.getValue()),
                                 (prev, next) -> next)));

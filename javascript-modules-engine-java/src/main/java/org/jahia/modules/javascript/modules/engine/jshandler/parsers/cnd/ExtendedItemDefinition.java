@@ -15,18 +15,15 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd;
 
-import javax.jcr.nodetype.ItemDefinition;
-import javax.jcr.version.OnParentVersionAction;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.jcr.nodetype.ItemDefinition;
+import javax.jcr.version.OnParentVersionAction;
 
 /**
- * Jahia specific {@link ItemDefinition} implementation.
- * User: toto
- * Date: 15 janv. 2008
- * Time: 17:43:58
+ * Jahia specific {@link ItemDefinition} implementation. User: toto Date: 15 janv. 2008 Time: 17:43:58
  */
 class ExtendedItemDefinition implements ItemDefinition {
 
@@ -40,10 +37,10 @@ class ExtendedItemDefinition implements ItemDefinition {
     private int onParentVersion = OnParentVersionAction.VERSION;
     private int onConflict = OnConflictAction.USE_LATEST;
     protected int selector = 0;
-    private Map<String,String> selectorOptions = new ConcurrentHashMap<String,String>();
+    private Map<String, String> selectorOptions = new ConcurrentHashMap<String, String>();
     private Map<Locale, String> labels = new ConcurrentHashMap<Locale, String>(1);
-    private Map<Locale, Map<String,String>> labelsByNodeType = new ConcurrentHashMap<Locale, Map<String, String>>(1);
-    private Map<Locale, Map<String,String>> tooltipsByNodeType = new ConcurrentHashMap<Locale, Map<String, String>>(1);
+    private Map<Locale, Map<String, String>> labelsByNodeType = new ConcurrentHashMap<Locale, Map<String, String>>(1);
+    private Map<Locale, Map<String, String>> tooltipsByNodeType = new ConcurrentHashMap<Locale, Map<String, String>>(1);
     private boolean override = false;
 
     public ExtendedNodeType getDeclaringNodeType() {
@@ -126,11 +123,11 @@ class ExtendedItemDefinition implements ItemDefinition {
         this.selector = selector;
     }
 
-    public Map<String,String> getSelectorOptions() {
+    public Map<String, String> getSelectorOptions() {
         return Collections.unmodifiableMap(selectorOptions);
     }
 
-    public void setSelectorOptions(Map<String,String> selectorOptions) {
+    public void setSelectorOptions(Map<String, String> selectorOptions) {
         this.selectorOptions = selectorOptions;
     }
 
@@ -151,10 +148,8 @@ class ExtendedItemDefinition implements ItemDefinition {
     }
 
     public String getResourceBundleKey(ExtendedNodeType nodeType) {
-        if(nodeType==null)
-            return replaceColon((getDeclaringNodeType().getName() + "." + getName()));
-        else
-            return replaceColon((nodeType.getName() + "." + getName()));
+        if (nodeType == null) return replaceColon((getDeclaringNodeType().getName() + "." + getName()));
+        else return replaceColon((nodeType.getName() + "." + getName()));
     }
 
     public String getItemType() {
@@ -181,28 +176,27 @@ class ExtendedItemDefinition implements ItemDefinition {
     }
 
     public boolean isContentItem() {
-        return !isHidden()&&"content".equals(getItemType());
-//        declaringNodeType.isNodeType("jmix:droppableContent") || declaringNodeType.isNodeType("jnt:container")
-//                 || declaringNodeType.isNodeType("jnt:content") || declaringNodeType.isNodeType("jmix:contentItem") || name.toString().equals("jcr:title") || name.toString().equals("jcr:language") || name.toString().equals("jcr:statement");
+        return !isHidden() && "content".equals(getItemType());
+        //        declaringNodeType.isNodeType("jmix:droppableContent") || declaringNodeType.isNodeType("jnt:container")
+        //                 || declaringNodeType.isNodeType("jnt:content") || declaringNodeType.isNodeType("jmix:contentItem") || name.toString().equals("jcr:title") || name.toString().equals("jcr:language") || name.toString().equals("jcr:statement");
     }
 
     public ExtendedItemDefinition getOverridenDefinition() {
         ExtendedItemDefinition overridenItemDefintion = this;
         if (isOverride()) {
-             for (ExtendedItemDefinition itemDef : declaringNodeType.getItems()) {
-                 if (itemDef.getName().equals(this.getName()) && !itemDef.isOverride()) {
-                     overridenItemDefintion = itemDef;
-                     break;
-                 }
-             }
+            for (ExtendedItemDefinition itemDef : declaringNodeType.getItems()) {
+                if (itemDef.getName().equals(this.getName()) && !itemDef.isOverride()) {
+                    overridenItemDefintion = itemDef;
+                    break;
+                }
+            }
         }
         return overridenItemDefintion;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
+        if (this == obj) return true;
 
         if (obj == null || this.getClass() != obj.getClass()) {
             return false;
@@ -211,8 +205,9 @@ class ExtendedItemDefinition implements ItemDefinition {
         final ExtendedItemDefinition other = (ExtendedItemDefinition) obj;
 
         return (getName() != null ? getName().equals(other.getName()) : other.getName() == null)
-                && (getDeclaringNodeType().getName() != null ? getDeclaringNodeType().getName().equals(
-                        other.getDeclaringNodeType().getName()) : other.getDeclaringNodeType().getName() == null);
+                && (getDeclaringNodeType().getName() != null
+                        ? getDeclaringNodeType().getName().equals(other.getDeclaringNodeType().getName())
+                        : other.getDeclaringNodeType().getName() == null);
     }
 
     @Override
@@ -231,5 +226,4 @@ class ExtendedItemDefinition implements ItemDefinition {
     public static String replaceColon(String name) {
         return name != null ? Patterns.COLON.matcher(name).replaceAll("_") : name;
     }
-
 }

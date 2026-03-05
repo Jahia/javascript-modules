@@ -16,16 +16,14 @@
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.io.Serializable;
 import java.util.*;
 
 /**
  * Context for parsing files
  *
- * TEMPORARY WORKAROUND - DO NOT USE
- * This class duplicates poor legacy code to provide backward compatibility.
- * Marked for immediate replacement and removal.
+ * TEMPORARY WORKAROUND - DO NOT USE This class duplicates poor legacy code to provide backward compatibility. Marked
+ * for immediate replacement and removal.
  *
  * @deprecated since 1.0.0 Technical debt. Will be removed in next major version.
  */
@@ -44,13 +42,14 @@ public class ParsingContext implements Serializable {
     private boolean osgiBundle = false;
     private List<String> bundleClassPath = new ArrayList<>();
 
-    @JsonIgnore protected List<ParsingContext> children = new ArrayList<>();
-    @JsonIgnore Boolean optional = null;
-    @JsonIgnore Boolean external = null;
+    @JsonIgnore
+    protected List<ParsingContext> children = new ArrayList<>();
+    @JsonIgnore
+    Boolean optional = null;
+    @JsonIgnore
+    Boolean external = null;
 
-    public ParsingContext() {
-    }
-
+    public ParsingContext() {}
 
     public Set<String> getContentTypeDefinitions() {
         return contentTypeDefinitions;
@@ -116,9 +115,7 @@ public class ParsingContext implements Serializable {
     }
 
     public void setExternal(boolean external) {
-        if (this.external != null) {
-
-        }
+        if (this.external != null) {}
         this.external = external;
     }
 
@@ -147,5 +144,4 @@ public class ParsingContext implements Serializable {
         sb.append('}');
         return sb.toString();
     }
-
 }

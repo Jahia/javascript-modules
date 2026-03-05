@@ -1,9 +1,9 @@
 import { addNode, getNodeTypes, publishAndWaitJobEnding } from "@jahia/cypress";
-import { addSimplePage } from "../../utils/helpers";
 import { GENERIC_SITE_KEY, JAHIA_CONTEXT } from "../../support/constants";
+import { addSimplePage } from "../../utils/helpers";
 
 describe("Check that components of a module are correctly registered", () => {
-  it("Create a page with .hbs template", function () {
+  it("Create a page with .hbs template", function() {
     cy.login();
 
     addSimplePage(`/sites/${GENERIC_SITE_KEY}/home`, "simple", "Simple page", "en", "simple", [
@@ -26,7 +26,7 @@ describe("Check that components of a module are correctly registered", () => {
     cy.logout();
   });
 
-  it("Verify nodeTypes and icons are registered", function () {
+  it("Verify nodeTypes and icons are registered", function() {
     cy.login();
     getNodeTypes({ includeTypes: ["javascriptExample:test"] })
       .its("data.jcr.nodeTypes.nodes")

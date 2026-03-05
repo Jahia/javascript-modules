@@ -15,6 +15,12 @@
  */
 package org.jahia.modules.javascript.modules.engine.views;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+import javax.jcr.RepositoryException;
 import org.apache.commons.lang3.StringUtils;
 import org.jahia.bin.Jahia;
 import org.jahia.modules.javascript.modules.engine.registrars.ViewsRegistrar;
@@ -34,16 +40,10 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 
-import javax.jcr.RepositoryException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 @Component(immediate = true)
 public class JavascriptTemplatesNodeChoiceListInitializer implements ChoiceListInitializer {
-    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(JavascriptTemplatesNodeChoiceListInitializer.class);
+    private static final Logger logger =
+            org.slf4j.LoggerFactory.getLogger(JavascriptTemplatesNodeChoiceListInitializer.class);
 
     private ChoiceListInitializerService service;
 
@@ -73,7 +73,12 @@ public class JavascriptTemplatesNodeChoiceListInitializer implements ChoiceListI
     }
 
     @Override
-    public List<ChoiceListValue> getChoiceListValues(ExtendedPropertyDefinition epd, String param, List<ChoiceListValue> previousValues, Locale locale, Map<String, Object> context) {
+    public List<ChoiceListValue> getChoiceListValues(
+            ExtendedPropertyDefinition epd,
+            String param,
+            List<ChoiceListValue> previousValues,
+            Locale locale,
+            Map<String, Object> context) {
         List<ChoiceListValue> values = oldInitializer.getChoiceListValues(epd, param, previousValues, locale, context);
 
         try {
@@ -91,15 +96,19 @@ public class JavascriptTemplatesNodeChoiceListInitializer implements ChoiceListI
             final JCRSessionWrapper session = site.getSession();
 
             // get default template
-            String defaultTemplate = site.hasProperty("j:defaultTemplateName") ? site.getProperty("j:defaultTemplateName").getString() : null;
+            String defaultTemplate = site.hasProperty("j:defaultTemplateName")
+                    ? site.getProperty("j:defaultTemplateName").getString()
+                    : null;
 
-            List<ChoiceListValue> newValues = addTemplates(site, session, nodetype, defaultTemplate, epd, locale, context);
+            List<ChoiceListValue> newValues =
+                    addTemplates(site, session, nodetype, defaultTemplate, epd, locale, context);
 
             if (values.isEmpty()) {
                 values.addAll(newValues);
             } else {
                 // in case of page mode, the templates are rendered in a separate subsection
-                String templatesTitle = Messages.getInternal("org.jahia.services.content.nodetypes.initializers.templates.title", locale);
+                String templatesTitle = Messages.getInternal(
+                        "org.jahia.services.content.nodetypes.initializers.templates.title", locale);
                 int insertIndex = 0;
                 for (int i = 0; i < values.size(); i++) {
                     if (templatesTitle.equals(values.get(i).getDisplayName())) {
@@ -116,10 +125,22 @@ public class JavascriptTemplatesNodeChoiceListInitializer implements ChoiceListI
         return values;
     }
 
-    private List<ChoiceListValue> addTemplates(JCRSiteNode site, JCRSessionWrapper session, ExtendedNodeType nodetype, String defaultTemplate, ExtendedPropertyDefinition propertyDefinition, Locale locale, Map<String, Object> context) throws RepositoryException {
-        return viewsRegistrar.getViewsSet(nodetype, site, "html", true).stream()
+    private List<ChoiceListValue> addTemplates(
+            JCRSiteNode site,
+            JCRSessionWrapper session,
+            ExtendedNodeType nodetype,
+            String defaultTemplate,
+            ExtendedPropertyDefinition propertyDefinition,
+            Locale locale,
+            Map<String, Object> context) throws RepositoryException {
+        return viewsRegistrar
+                .getViewsSet(nodetype, site, "html", true)
+                .stream()
                 .filter(v -> v instanceof JSView && ((JSView) v).isTemplate())
-                .map(v -> new ChoiceListValue(v.getDisplayName(), getProperties(v, defaultTemplate), session.getValueFactory().createValue(v.getKey())))
+                .map(v -> new ChoiceListValue(
+                        v.getDisplayName(),
+                        getProperties(v, defaultTemplate),
+                        session.getValueFactory().createValue(v.getKey())))
                 .sorted()
                 .collect(Collectors.toList());
     }
@@ -132,9 +153,14 @@ public class JavascriptTemplatesNodeChoiceListInitializer implements ChoiceListI
 
         String imageName = StringUtils.substringAfterLast(view.getPath(), "/").replace(".hbs", ".png");
         if (view.getModule().getBundle().findEntries("images", imageName, false) != null) {
-            props.put("image", Jahia.getContextPath() + "/modules/" + view.getModule().getBundle().getSymbolicName() + "/images/" + imageName);
+            props.put(
+                    "image",
+                    Jahia.getContextPath()
+                            + "/modules/"
+                            + view.getModule().getBundle().getSymbolicName()
+                            + "/images/"
+                            + imageName);
         }
         return props;
     }
-
 }

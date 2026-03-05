@@ -15,25 +15,22 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 import javax.jcr.nodetype.*;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 /**
  * Jahia extended JCR node type information.
- * @author Thomas Draier
- * Date: 4 janv. 2008
- * Time: 14:02:22
+ * @author Thomas Draier Date: 4 janv. 2008 Time: 14:02:22
  */
 class ExtendedNodeType implements NodeType {
 
-    private static final  Logger logger = org.slf4j.LoggerFactory.getLogger(ExtendedNodeType.class);
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(ExtendedNodeType.class);
 
     private NodeTypeRegistry registry;
     private String systemId;
@@ -41,9 +38,12 @@ class ExtendedNodeType implements NodeType {
     private List<String> groupedItems;
 
     private Map<String, ExtendedNodeDefinition> nodes = new ConcurrentHashMap<String, ExtendedNodeDefinition>();
-    private Map<String, ExtendedPropertyDefinition> properties = new ConcurrentHashMap<String, ExtendedPropertyDefinition>();
-    private Map<String, ExtendedNodeDefinition> unstructuredNodes = new ConcurrentHashMap<String, ExtendedNodeDefinition>();
-    private Map<Integer, ExtendedPropertyDefinition> unstructuredProperties = new ConcurrentHashMap<Integer, ExtendedPropertyDefinition>();
+    private Map<String, ExtendedPropertyDefinition> properties =
+            new ConcurrentHashMap<String, ExtendedPropertyDefinition>();
+    private Map<String, ExtendedNodeDefinition> unstructuredNodes =
+            new ConcurrentHashMap<String, ExtendedNodeDefinition>();
+    private Map<Integer, ExtendedPropertyDefinition> unstructuredProperties =
+            new ConcurrentHashMap<Integer, ExtendedPropertyDefinition>();
 
     private Map<String, ExtendedNodeDefinition> allNodes;
     private Map<String, ExtendedPropertyDefinition> allProperties;
@@ -63,11 +63,12 @@ class ExtendedNodeType implements NodeType {
     private String itemsType;
     private List<String> mixinExtendNames = new ArrayList<String>();
     private List<ExtendedNodeType> mixinExtend = new ArrayList<ExtendedNodeType>();
-//    private boolean liveContent = false;
+    //    private boolean liveContent = false;
 
     private Map<Locale, String> labels = new ConcurrentHashMap<Locale, String>(1);
     private Map<Locale, String> descriptions = new ConcurrentHashMap<Locale, String>(1);
     private boolean systemType;
+
     public ExtendedNodeType(NodeTypeRegistry registry, String systemId) {
         this.registry = registry;
         this.systemId = systemId;
@@ -115,16 +116,16 @@ class ExtendedNodeType implements NodeType {
         isMixin = mixin;
     }
 
-//    public boolean isLiveContent() {
-//        return liveContent;
-//    }
-//
-//    public void setLiveContent(boolean liveContent) {
-//        this.liveContent = liveContent;
-//    }
+    //    public boolean isLiveContent() {
+    //        return liveContent;
+    //    }
+    //
+    //    public void setLiveContent(boolean liveContent) {
+    //        this.liveContent = liveContent;
+    //    }
 
     public boolean hasOrderableChildNodes() {
-        if(!hasOrderableChildNodes) {
+        if (!hasOrderableChildNodes) {
             return hasOrderableChildNodes(true);
         }
         return hasOrderableChildNodes;
@@ -163,7 +164,6 @@ class ExtendedNodeType implements NodeType {
         this.primaryItemName = primaryItemName;
     }
 
-
     public ExtendedNodeType[] getSupertypes() {
         Set<ExtendedNodeType> l = getSupertypeSet();
         return l.toArray(new ExtendedNodeType[l.size()]);
@@ -182,15 +182,15 @@ class ExtendedNodeType implements NodeType {
                     primaryFound = true;
                 }
             }
-            if(s != null && s.getNameObject().equals(getNameObject())) {
-                logger.error("Loop detected in definition "+getName());
+            if (s != null && s.getNameObject().equals(getNameObject())) {
+                logger.error("Loop detected in definition " + getName());
             }
         }
         if (!primaryFound && !Constants.NT_BASE.equals(getName()) && !isMixin) {
             try {
                 l.add(registry.getNodeType(Constants.NT_BASE));
             } catch (NoSuchNodeTypeException e) {
-                logger.error("No such supertype for "+getName(),e);
+                logger.error("No such supertype for " + getName(), e);
             }
         }
         return l;
@@ -212,7 +212,7 @@ class ExtendedNodeType implements NodeType {
             try {
                 l.add(registry.getNodeType(Constants.NT_BASE));
             } catch (NoSuchNodeTypeException e) {
-                logger.error("No such supertype for "+getName(),e);
+                logger.error("No such supertype for " + getName(), e);
             }
         }
         return l.toArray(new ExtendedNodeType[l.size()]);
@@ -226,16 +226,16 @@ class ExtendedNodeType implements NodeType {
         this.declaredSupertypeNames = declaredSupertypes;
     }
 
-
     public void validate() throws NoSuchNodeTypeException {
         this.declaredSupertypes = new ExtendedNodeType[declaredSupertypeNames.length];
         int mixIndex = 0;
         for (int i = 0; i < declaredSupertypeNames.length; i++) {
             final ExtendedNodeType nodeType = registry.getNodeType(declaredSupertypeNames[i]);
-            if (!nodeType.isMixin && i>0) {
-                System.arraycopy(this.declaredSupertypes, mixIndex, this.declaredSupertypes, mixIndex+1, i-mixIndex);
+            if (!nodeType.isMixin && i > 0) {
+                System.arraycopy(
+                        this.declaredSupertypes, mixIndex, this.declaredSupertypes, mixIndex + 1, i - mixIndex);
                 this.declaredSupertypes[mixIndex] = nodeType;
-                mixIndex ++;
+                mixIndex++;
             } else {
                 this.declaredSupertypes[i] = nodeType;
             }
@@ -268,11 +268,10 @@ class ExtendedNodeType implements NodeType {
         return declaredSupertypeNames;
     }
 
-
     public NodeTypeIterator getSubtypes() {
         List<ExtendedNodeType> l = new ArrayList<ExtendedNodeType>();
-        for (Iterator<ExtendedNodeType> iterator = declaredSubtypes.iterator(); iterator.hasNext();) {
-            ExtendedNodeType s =  iterator.next();
+        for (Iterator<ExtendedNodeType> iterator = declaredSubtypes.iterator(); iterator.hasNext(); ) {
+            ExtendedNodeType s = iterator.next();
             l.add(s);
             NodeTypeIterator subtypes = s.getSubtypes();
             while (subtypes.hasNext()) {
@@ -284,8 +283,8 @@ class ExtendedNodeType implements NodeType {
 
     public List<ExtendedNodeType> getSubtypesAsList() {
         List<ExtendedNodeType> l = new ArrayList<ExtendedNodeType>();
-        for (Iterator<ExtendedNodeType> iterator = declaredSubtypes.iterator(); iterator.hasNext();) {
-            ExtendedNodeType s =  iterator.next();
+        for (Iterator<ExtendedNodeType> iterator = declaredSubtypes.iterator(); iterator.hasNext(); ) {
+            ExtendedNodeType s = iterator.next();
             l.add(s);
             NodeTypeIterator subtypes = s.getSubtypes();
             while (subtypes.hasNext()) {
@@ -297,8 +296,8 @@ class ExtendedNodeType implements NodeType {
 
     public ExtendedNodeType[] getMixinSubtypes() {
         List<ExtendedNodeType> l = new ArrayList<ExtendedNodeType>();
-        for (Iterator<ExtendedNodeType> iterator = declaredSubtypes.iterator(); iterator.hasNext();) {
-            ExtendedNodeType s =  iterator.next();
+        for (Iterator<ExtendedNodeType> iterator = declaredSubtypes.iterator(); iterator.hasNext(); ) {
+            ExtendedNodeType s = iterator.next();
             if (s.isMixin()) {
                 l.add(s);
                 l.addAll(Arrays.asList(s.getMixinSubtypes()));
@@ -321,25 +320,25 @@ class ExtendedNodeType implements NodeType {
         return false;
     }
 
-    public List<ExtendedItemDefinition>  getItems() {
+    public List<ExtendedItemDefinition> getItems() {
         List<ExtendedItemDefinition> l = new ArrayList<ExtendedItemDefinition>();
         l.addAll(getDeclaredItems());
 
         /*
-        ExtendedNodeType[] supertypes = getSupertypes();
-        for (int i = 0; i < supertypes.length ; i++) {
-            l.addAll(supertypes[i].getDeclaredItems());
-        }
-        */
+         * ExtendedNodeType[] supertypes = getSupertypes();
+         * for (int i = 0; i < supertypes.length ; i++) {
+         * l.addAll(supertypes[i].getDeclaredItems());
+         * }
+         */
 
         return l;
     }
 
-    public List<ExtendedItemDefinition>  getDeclaredItems() {
+    public List<ExtendedItemDefinition> getDeclaredItems() {
         return getDeclaredItems(false);
     }
 
-    public List<ExtendedItemDefinition>  getDeclaredItems(boolean includeOverride) {
+    public List<ExtendedItemDefinition> getDeclaredItems(boolean includeOverride) {
         getPropertyDefinitionsAsMap();
         getChildNodeDefinitionsAsMap();
         List<ExtendedItemDefinition> res;
@@ -358,46 +357,49 @@ class ExtendedNodeType implements NodeType {
 
     public Map<String, ExtendedPropertyDefinition> getPropertyDefinitionsAsMap() {
         if (allProperties == null) {
-        	synchronized (this) {
-        		if (allProperties == null) {
-        			LinkedHashMap<String, ExtendedPropertyDefinition> props = new LinkedHashMap<String, ExtendedPropertyDefinition>();
+            synchronized (this) {
+                if (allProperties == null) {
+                    LinkedHashMap<String, ExtendedPropertyDefinition> props =
+                            new LinkedHashMap<String, ExtendedPropertyDefinition>();
 
-		            props.putAll(properties);
+                    props.putAll(properties);
 
                     /*
-		            ExtendedNodeType[] supertypes = getSupertypes();
-		            for (int i = supertypes.length-1; i >=0 ; i--) {
-		                ExtendedNodeType nodeType = supertypes[i];
-		                Map<String, ExtendedPropertyDefinition> c = new HashMap<String, ExtendedPropertyDefinition>(nodeType.getDeclaredPropertyDefinitionsAsMap());
-		                Map<String, ExtendedPropertyDefinition> over = new HashMap<String, ExtendedPropertyDefinition>(properties);
-		                over.keySet().retainAll(c.keySet());
-		                for (ExtendedPropertyDefinition s : over.values()) {
-		                    s.setOverride(true);
-		                }
-		                c.keySet().removeAll(over.keySet());
-		                props.putAll(c);
-		            }
-		            */
+                     * ExtendedNodeType[] supertypes = getSupertypes();
+                     * for (int i = supertypes.length-1; i >=0 ; i--) {
+                     * ExtendedNodeType nodeType = supertypes[i];
+                     * Map<String, ExtendedPropertyDefinition> c = new HashMap<String, ExtendedPropertyDefinition>(nodeType.getDeclaredPropertyDefinitionsAsMap());
+                     * Map<String, ExtendedPropertyDefinition> over = new HashMap<String, ExtendedPropertyDefinition>(properties);
+                     * over.keySet().retainAll(c.keySet());
+                     * for (ExtendedPropertyDefinition s : over.values()) {
+                     * s.setOverride(true);
+                     * }
+                     * c.keySet().removeAll(over.keySet());
+                     * props.putAll(c);
+                     * }
+                     */
 
-		            allProperties = Collections.unmodifiableMap(props);
-        		}
-        	}
+                    allProperties = Collections.unmodifiableMap(props);
+                }
+            }
         }
 
         return allProperties;
     }
 
-    public Map<Integer,ExtendedPropertyDefinition> getUnstructuredPropertyDefinitions() {
+    public Map<Integer, ExtendedPropertyDefinition> getUnstructuredPropertyDefinitions() {
         if (allUnstructuredProperties == null) {
-            allUnstructuredProperties = new LinkedHashMap<Integer,ExtendedPropertyDefinition>();
+            allUnstructuredProperties = new LinkedHashMap<Integer, ExtendedPropertyDefinition>();
 
             allUnstructuredProperties.putAll(unstructuredProperties);
 
             ExtendedNodeType[] supertypes = getSupertypes();
-            for (int i = supertypes.length-1; i >=0 ; i--) {
+            for (int i = supertypes.length - 1; i >= 0; i--) {
                 ExtendedNodeType nodeType = supertypes[i];
-                Map<Integer,ExtendedPropertyDefinition> c = new HashMap<Integer,ExtendedPropertyDefinition>(nodeType.getDeclaredUnstructuredPropertyDefinitions());
-                Map<Integer,ExtendedPropertyDefinition> over = new HashMap<Integer,ExtendedPropertyDefinition>(unstructuredProperties);
+                Map<Integer, ExtendedPropertyDefinition> c = new HashMap<Integer, ExtendedPropertyDefinition>(
+                        nodeType.getDeclaredUnstructuredPropertyDefinitions());
+                Map<Integer, ExtendedPropertyDefinition> over =
+                        new HashMap<Integer, ExtendedPropertyDefinition>(unstructuredProperties);
                 over.keySet().retainAll(c.keySet());
                 for (ExtendedPropertyDefinition s : over.values()) {
                     s.setOverride(true);
@@ -430,7 +432,7 @@ class ExtendedNodeType implements NodeType {
         return properties;
     }
 
-    public Map<Integer,ExtendedPropertyDefinition> getDeclaredUnstructuredPropertyDefinitions() {
+    public Map<Integer, ExtendedPropertyDefinition> getDeclaredUnstructuredPropertyDefinitions() {
         getUnstructuredPropertyDefinitions();
         return unstructuredProperties;
     }
@@ -441,7 +443,7 @@ class ExtendedNodeType implements NodeType {
         final List<ExtendedItemDefinition> i = getDeclaredItems();
         for (ExtendedItemDefinition item : i) {
             if (!item.isNode()) { // && ("*".equals(item.getName()) || !keys.contains(item.getName()))) {
-                    list.add((ExtendedPropertyDefinition) item);
+                list.add((ExtendedPropertyDefinition) item);
             }
         }
         return list.toArray(new ExtendedPropertyDefinition[list.size()]);
@@ -452,16 +454,18 @@ class ExtendedNodeType implements NodeType {
         return Collections.unmodifiableMap(over);
     }
 
-    public Map<String,ExtendedNodeDefinition> getUnstructuredChildNodeDefinitions() {
+    public Map<String, ExtendedNodeDefinition> getUnstructuredChildNodeDefinitions() {
         if (allUnstructuredNodes == null) {
-            allUnstructuredNodes = new ConcurrentHashMap<String,ExtendedNodeDefinition>();
+            allUnstructuredNodes = new ConcurrentHashMap<String, ExtendedNodeDefinition>();
             allUnstructuredNodes.putAll(unstructuredNodes);
 
             ExtendedNodeType[] supertypes = getSupertypes();
-            for (int i = supertypes.length-1; i >=0 ; i--) {
+            for (int i = supertypes.length - 1; i >= 0; i--) {
                 ExtendedNodeType nodeType = supertypes[i];
-                Map<String,ExtendedNodeDefinition> c = new HashMap<String,ExtendedNodeDefinition>(nodeType.getDeclaredUnstructuredChildNodeDefinitions());
-                Map<String,ExtendedNodeDefinition> over = new HashMap<String,ExtendedNodeDefinition>(unstructuredNodes);
+                Map<String, ExtendedNodeDefinition> c = new HashMap<String, ExtendedNodeDefinition>(
+                        nodeType.getDeclaredUnstructuredChildNodeDefinitions());
+                Map<String, ExtendedNodeDefinition> over =
+                        new HashMap<String, ExtendedNodeDefinition>(unstructuredNodes);
                 over.keySet().retainAll(c.keySet());
                 for (ExtendedNodeDefinition s : over.values()) {
                     s.setOverride(true);
@@ -493,7 +497,7 @@ class ExtendedNodeType implements NodeType {
         return nodes;
     }
 
-    public Map<String,ExtendedNodeDefinition> getDeclaredUnstructuredChildNodeDefinitions() {
+    public Map<String, ExtendedNodeDefinition> getDeclaredUnstructuredChildNodeDefinitions() {
         getUnstructuredChildNodeDefinitions();
         return unstructuredNodes;
     }
@@ -503,7 +507,7 @@ class ExtendedNodeType implements NodeType {
         final List<ExtendedItemDefinition> i = getDeclaredItems();
         for (ExtendedItemDefinition item : i) {
             if (item.isNode()) { // && ("*".equals(item.getName()) || !keys.contains(item.getName()))) {
-                    list.add((ExtendedNodeDefinition) item);
+                list.add((ExtendedNodeDefinition) item);
             }
         }
         return list.toArray(new ExtendedNodeDefinition[list.size()]);
@@ -522,29 +526,26 @@ class ExtendedNodeType implements NodeType {
             // setting a property to null is equivalent of removing it
             return canRemoveItem(propertyName);
         }
-            ExtendedPropertyDefinition def = getPropertyDefinitionsAsMap()
-                    .containsKey(propertyName) ? getPropertyDefinitionsAsMap().get(propertyName)
-                    : getMatchingPropDef(getUnstructuredPropertyDefinitions().values(),
-                            value.getType(), false);
-            if (def == null) {
-                def = getMatchingPropDef(getUnstructuredPropertyDefinitions().values(),
-                        PropertyType.UNDEFINED, false);
+        ExtendedPropertyDefinition def = getPropertyDefinitionsAsMap().containsKey(propertyName)
+                ? getPropertyDefinitionsAsMap().get(propertyName)
+                : getMatchingPropDef(getUnstructuredPropertyDefinitions().values(), value.getType(), false);
+        if (def == null) {
+            def = getMatchingPropDef(getUnstructuredPropertyDefinitions().values(), PropertyType.UNDEFINED, false);
+        }
+        if (def != null) {
+            if (def.isMultiple() || def.isProtected()) {
+                return false;
             }
-            if (def != null) {
-                if (def.isMultiple() || def.isProtected()) {
-                    return false;
-                }
-                int targetType;
-                if (def.getRequiredType() != PropertyType.UNDEFINED
-                        && def.getRequiredType() != value.getType()) {
-                    // type conversion required
-                    targetType = def.getRequiredType();
-                } else {
-                    // no type conversion required
-                    targetType = value.getType();
-                }
-                return true;
+            int targetType;
+            if (def.getRequiredType() != PropertyType.UNDEFINED && def.getRequiredType() != value.getType()) {
+                // type conversion required
+                targetType = def.getRequiredType();
+            } else {
+                // no type conversion required
+                targetType = value.getType();
             }
+            return true;
+        }
         return false;
     }
 
@@ -553,42 +554,40 @@ class ExtendedNodeType implements NodeType {
             // setting a property to null is equivalent of removing it
             return canRemoveItem(propertyName);
         }
-            // determine type of values
-            int type = PropertyType.UNDEFINED;
-            for (Value value : values) {
-                if (value == null) {
-                    // skip null values as those would be purged
-                    continue;
-                }
-                if (type == PropertyType.UNDEFINED) {
-                    type = value.getType();
-                } else if (type != value.getType()) {
-                    // inhomogeneous types
-                    return false;
-                }
+        // determine type of values
+        int type = PropertyType.UNDEFINED;
+        for (Value value : values) {
+            if (value == null) {
+                // skip null values as those would be purged
+                continue;
             }
-            ExtendedPropertyDefinition def = getPropertyDefinitionsAsMap()
-                    .containsKey(propertyName) ? getPropertyDefinitionsAsMap().get(propertyName)
-                    : getMatchingPropDef(getUnstructuredPropertyDefinitions().values(), type, true);
-            if (def == null) {
-                def = getMatchingPropDef(getUnstructuredPropertyDefinitions().values(),
-                        PropertyType.UNDEFINED, true);
+            if (type == PropertyType.UNDEFINED) {
+                type = value.getType();
+            } else if (type != value.getType()) {
+                // inhomogeneous types
+                return false;
             }
-            if (def != null) {
-                if (!def.isMultiple() || def.isProtected()) {
-                    return false;
-                }
-                int targetType;
-                if (def.getRequiredType() != PropertyType.UNDEFINED
-                        && def.getRequiredType() != type) {
-                    // type conversion required, but Jahia cannot do it, because we have no valueFactory, resolver, store or session object here
-                    targetType = def.getRequiredType();
-                } else {
-                    // no type conversion required
-                    targetType = type;
-                }
-                return true;
+        }
+        ExtendedPropertyDefinition def = getPropertyDefinitionsAsMap().containsKey(propertyName)
+                ? getPropertyDefinitionsAsMap().get(propertyName)
+                : getMatchingPropDef(getUnstructuredPropertyDefinitions().values(), type, true);
+        if (def == null) {
+            def = getMatchingPropDef(getUnstructuredPropertyDefinitions().values(), PropertyType.UNDEFINED, true);
+        }
+        if (def != null) {
+            if (!def.isMultiple() || def.isProtected()) {
+                return false;
             }
+            int targetType;
+            if (def.getRequiredType() != PropertyType.UNDEFINED && def.getRequiredType() != type) {
+                // type conversion required, but Jahia cannot do it, because we have no valueFactory, resolver, store or session object here
+                targetType = def.getRequiredType();
+            } else {
+                // no type conversion required
+                targetType = type;
+            }
+            return true;
+        }
         return false;
     }
 
@@ -606,13 +605,14 @@ class ExtendedNodeType implements NodeType {
             ExtendedNodeType nt = NodeTypeRegistry.getInstance().getNodeType(nodeTypeName);
             if (!nt.isAbstract() && !nt.isMixin()) {
                 if (getChildNodeDefinitionsAsMap().containsKey(childNodeName)) {
-                    if (canAddChildNode(nt,getChildNodeDefinitionsAsMap().get(childNodeName)))  {
+                    if (canAddChildNode(nt, getChildNodeDefinitionsAsMap().get(childNodeName))) {
                         return true;
                     }
                 }
-                Collection<ExtendedNodeDefinition> unstruct = getUnstructuredChildNodeDefinitions().values();
+                Collection<ExtendedNodeDefinition> unstruct =
+                        getUnstructuredChildNodeDefinitions().values();
                 for (ExtendedNodeDefinition definition : unstruct) {
-                    if (canAddChildNode(nt,definition))  {
+                    if (canAddChildNode(nt, definition)) {
                         return true;
                     }
                 }
@@ -765,7 +765,7 @@ class ExtendedNodeType implements NodeType {
     }
 
     public String getLocalName() {
-         return this.name.getLocalName();
+        return this.name.getLocalName();
     }
 
     public String getPrefix() {
@@ -783,7 +783,7 @@ class ExtendedNodeType implements NodeType {
             ExtendedPropertyDefinition[] defs = ExtendedNodeType.this.getDeclaredPropertyDefinitions();
             for (ExtendedPropertyDefinition def : defs) {
                 if (def.isInternationalized()) {
-                    String[] newRes = new String[d.length+1];
+                    String[] newRes = new String[d.length + 1];
                     System.arraycopy(d, 0, newRes, 0, d.length);
                     newRes[d.length] = "jmix:i18n";
                     return newRes;
@@ -820,7 +820,9 @@ class ExtendedNodeType implements NodeType {
                 if (!def.isInternationalized() && !def.isOverride()) {
                     r.add(new PropertyDefinition() {
                         public int getRequiredType() {
-                            return def.getRequiredType() != PropertyType.REFERENCE ? def.getRequiredType() : PropertyType.WEAKREFERENCE;
+                            return def.getRequiredType() != PropertyType.REFERENCE
+                                    ? def.getRequiredType()
+                                    : PropertyType.WEAKREFERENCE;
                         }
 
                         public String[] getValueConstraints() {
@@ -878,7 +880,6 @@ class ExtendedNodeType implements NodeType {
 
         public NodeDefinition[] getDeclaredChildNodeDefinitions() {
             ExtendedNodeDefinition[] defs = ExtendedNodeType.this.getDeclaredChildNodeDefinitions();
-
 
             List<NodeDefinition> r = new ArrayList<NodeDefinition>();
             for (final ExtendedNodeDefinition def : defs) {
@@ -960,12 +961,12 @@ class ExtendedNodeType implements NodeType {
     private void checkRemoveNodeConstraints(String name) throws ConstraintViolationException {
         ExtendedNodeDefinition def = getChildNodeDefinitionsAsMap().get(name);
         if (def != null) {
-                if (def.isMandatory()) {
-                    throw new ConstraintViolationException("can't remove mandatory node");
-                }
-                if (def.isProtected()) {
-                    throw new ConstraintViolationException("can't remove protected node");
-                }
+            if (def.isMandatory()) {
+                throw new ConstraintViolationException("can't remove mandatory node");
+            }
+            if (def.isProtected()) {
+                throw new ConstraintViolationException("can't remove protected node");
+            }
         }
     }
 
@@ -973,8 +974,7 @@ class ExtendedNodeType implements NodeType {
      * @param propertyName
      * @throws ConstraintViolationException
      */
-    private void checkRemovePropertyConstraints(String propertyName)
-            throws ConstraintViolationException {
+    private void checkRemovePropertyConstraints(String propertyName) throws ConstraintViolationException {
         ExtendedPropertyDefinition def = getPropertyDefinitionsAsMap().get(propertyName);
         if (def != null) {
             if (def.isMandatory()) {
@@ -986,14 +986,13 @@ class ExtendedNodeType implements NodeType {
         }
     }
 
-    private ExtendedPropertyDefinition getMatchingPropDef(Collection<ExtendedPropertyDefinition> defs, int type,
-            boolean multiValued) {
+    private ExtendedPropertyDefinition getMatchingPropDef(
+            Collection<ExtendedPropertyDefinition> defs, int type, boolean multiValued) {
         ExtendedPropertyDefinition match = null;
         for (ExtendedPropertyDefinition pd : defs) {
             int reqType = pd.getRequiredType();
             // match type
-            if (reqType == PropertyType.UNDEFINED || type == PropertyType.UNDEFINED
-                    || reqType == type) {
+            if (reqType == PropertyType.UNDEFINED || type == PropertyType.UNDEFINED || reqType == type) {
                 // match multiValued flag
                 if (multiValued == pd.isMultiple()) {
                     // found match
@@ -1041,7 +1040,7 @@ class ExtendedNodeType implements NodeType {
                 propertyDefinition.clearLabels();
             }
         }
-        if(items!=null) {
+        if (items != null) {
             for (ExtendedItemDefinition item : items) {
                 item.clearLabels();
             }

@@ -18,9 +18,8 @@ package org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd;
 /**
  * ParseException
  *
- * TEMPORARY WORKAROUND - DO NOT USE
- * This class duplicates poor legacy code to provide backward compatibility.
- * Marked for immediate replacement and removal.
+ * TEMPORARY WORKAROUND - DO NOT USE This class duplicates poor legacy code to provide backward compatibility. Marked
+ * for immediate replacement and removal.
  *
  * @deprecated since 1.0.0 Technical debt. Will be removed in next major version.
  */
@@ -42,10 +41,8 @@ public class ParseException extends Exception {
      */
     private final String filename;
 
-
     /**
-     * Constructs a new instance of this class with <code>null</code> as its
-     * detail message.
+     * Constructs a new instance of this class with <code>null</code> as its detail message.
      */
     public ParseException(int lineNumber, int colNumber, String filename) {
         super();
@@ -55,11 +52,10 @@ public class ParseException extends Exception {
     }
 
     /**
-     * Constructs a new instance of this class with the specified detail
-     * message.
+     * Constructs a new instance of this class with the specified detail message.
      *
-     * @param message the detail message. The detail message is saved for
-     *                later retrieval by the {@link #getMessage()} method.
+     * @param message the detail message. The detail message is saved for later retrieval by the {@link #getMessage()}
+     * method.
      */
     public ParseException(String message, int lineNumber, int colNumber, String filename) {
         super(message);
@@ -69,11 +65,10 @@ public class ParseException extends Exception {
     }
 
     /**
-     * Constructs a new instance of this class with the specified detail
-     * message and root cause.
+     * Constructs a new instance of this class with the specified detail message and root cause.
      *
-     * @param message   the detail message. The detail message is saved for
-     *                  later retrieval by the {@link #getMessage()} method.
+     * @param message the detail message. The detail message is saved for later retrieval by the {@link #getMessage()}
+     * method.
      * @param rootCause root failure cause
      */
     public ParseException(String message, Throwable rootCause, int lineNumber, int colNumber, String filename) {
@@ -130,5 +125,4 @@ public class ParseException extends Exception {
     public String toString() {
         return super.toString(); // + " (" + systemId + ", line " + lineNumber +", col " + colNumber +")";
     }
-
 }

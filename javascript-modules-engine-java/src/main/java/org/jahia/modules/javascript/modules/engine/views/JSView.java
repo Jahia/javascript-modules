@@ -15,6 +15,10 @@
  */
 package org.jahia.modules.javascript.modules.engine.views;
 
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import javax.annotation.Nonnull;
 import org.jahia.data.templates.JahiaTemplatesPackage;
 import org.jahia.modules.javascript.modules.engine.jsengine.ContextProvider;
 import org.jahia.registries.ServicesRegistry;
@@ -22,11 +26,6 @@ import org.jahia.services.render.View;
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
 
 public class JSView implements View, Comparable<View> {
 
@@ -53,7 +52,10 @@ public class JSView implements View, Comparable<View> {
         // init some system info, like componentType: template or view
         String componentType = jsValues.containsKey("componentType") ? jsValues.get("componentType").toString() : null;
         if ((!"template".equals(componentType) && !"view".equals(componentType))) {
-            logger.warn("Unrecognized componentType '{}' for view '{}', will be considered as a view", componentType, this.getKey());
+            logger.warn(
+                    "Unrecognized componentType '{}' for view '{}', will be considered as a view",
+                    componentType,
+                    this.getKey());
         }
         this.isTemplate = "template".equals(componentType);
 
@@ -78,7 +80,9 @@ public class JSView implements View, Comparable<View> {
     @Override
     public JahiaTemplatesPackage getModule() {
         if (module == null) {
-            this.module = ServicesRegistry.getInstance().getJahiaTemplateManagerService().getTemplatePackageById(bundle.getSymbolicName());
+            this.module = ServicesRegistry.getInstance()
+                    .getJahiaTemplateManagerService()
+                    .getTemplatePackageById(bundle.getSymbolicName());
         }
         return module;
     }
@@ -147,18 +151,19 @@ public class JSView implements View, Comparable<View> {
         if (this == o) return true;
         if (!(o instanceof JSView)) return false;
         JSView jsView = (JSView) o;
-        return getRegistryKey().equals(jsView.getRegistryKey()) &&
-                getKey().equals(jsView.getKey()) &&
-                getModule().equals(jsView.getModule()) &&
-                Objects.equals(path, jsView.path) &&
-                getNodeType().equals(jsView.getNodeType()) &&
-                getTemplateType().equals(jsView.getTemplateType()) &&
-                isTemplate() == jsView.isTemplate();
+        return getRegistryKey().equals(jsView.getRegistryKey())
+                && getKey().equals(jsView.getKey())
+                && getModule().equals(jsView.getModule())
+                && Objects.equals(path, jsView.path)
+                && getNodeType().equals(jsView.getNodeType())
+                && getTemplateType().equals(jsView.getTemplateType())
+                && isTemplate() == jsView.isTemplate();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getRegistryKey(), getKey(), getModule(), path, getNodeType(), getTemplateType(), isTemplate());
+        return Objects.hash(
+                getRegistryKey(), getKey(), getModule(), path, getNodeType(), getTemplateType(), isTemplate());
     }
 
     @Override
@@ -181,5 +186,4 @@ public class JSView implements View, Comparable<View> {
         }
         return getKey().compareTo(otherView.getKey());
     }
-
 }

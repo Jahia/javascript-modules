@@ -15,15 +15,14 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler;
 
+import java.io.*;
+import java.util.LinkedList;
+import java.util.List;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.IOUtils;
-
-import java.io.*;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Util to untar
@@ -39,7 +38,8 @@ public class TarUtils {
                 if (entry.isDirectory()) {
                     if (!outputFile.exists()) {
                         if (!outputFile.mkdirs()) {
-                            throw new IllegalStateException(String.format("Couldn't create directory %s.", outputFile.getAbsolutePath()));
+                            throw new IllegalStateException(
+                                    String.format("Couldn't create directory %s.", outputFile.getAbsolutePath()));
                         }
                     }
                 } else {

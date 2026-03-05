@@ -33,8 +33,7 @@ var consoleLog = console.log;
 
 /** Enable coloring by default, except in the browser interface. */
 
-exports.useColors =
-  !utils.isBrowser() && (supportsColor.stdout || process.env.MOCHA_COLORS !== undefined);
+exports.useColors = !utils.isBrowser() && (supportsColor.stdout || process.env.MOCHA_COLORS !== undefined);
 
 /** Inline diffs instead of +/- */
 
@@ -92,7 +91,7 @@ if (process.platform === "win32") {
  * @param {string} str
  * @returns {string}
  */
-var color = (exports.color = function (type, str) {
+var color = (exports.color = function(type, str) {
   if (!exports.useColors) {
     return String(str);
   }
@@ -117,23 +116,23 @@ if (isatty) {
 /** Expose some basic cursor interactions that are common among reporters. */
 
 exports.cursor = {
-  hide: function () {
+  hide: function() {
     isatty && process.stdout.write("\u001b[?25l");
   },
 
-  show: function () {
+  show: function() {
     isatty && process.stdout.write("\u001b[?25h");
   },
 
-  deleteLine: function () {
+  deleteLine: function() {
     isatty && process.stdout.write("\u001b[2K");
   },
 
-  beginningOfLine: function () {
+  beginningOfLine: function() {
     isatty && process.stdout.write("\u001b[0G");
   },
 
-  CR: function () {
+  CR: function() {
     if (isatty) {
       exports.cursor.deleteLine();
       exports.cursor.beginningOfLine();
@@ -143,12 +142,12 @@ exports.cursor = {
   },
 };
 
-var showDiff = (exports.showDiff = function (err) {
+var showDiff = (exports.showDiff = function(err) {
   return (
-    err &&
-    err.showDiff !== false &&
-    sameType(err.actual, err.expected) &&
-    err.expected !== undefined
+    err
+    && err.showDiff !== false
+    && sameType(err.actual, err.expected)
+    && err.expected !== undefined
   );
 });
 
@@ -168,16 +167,15 @@ function stringifyDiffObjs(err) {
  * @param {string} expected
  * @returns {string} Diff
  */
-var generateDiff = (exports.generateDiff = function (actual, expected) {
+var generateDiff = (exports.generateDiff = function(actual, expected) {
   try {
     return exports.inlineDiffs ? inlineDiff(actual, expected) : unifiedDiff(actual, expected);
   } catch {
-    var msg =
-      "\n      " +
-      color("diff added", "+ expected") +
-      " " +
-      color("diff removed", "- actual:  failed to generate Mocha diff") +
-      "\n";
+    var msg = "\n      "
+      + color("diff added", "+ expected")
+      + " "
+      + color("diff removed", "- actual:  failed to generate Mocha diff")
+      + "\n";
     return msg;
   }
 });
@@ -190,16 +188,15 @@ var generateDiff = (exports.generateDiff = function (actual, expected) {
  * @public
  * @variation 1
  */
-exports.list = function (failures) {
+exports.list = function(failures) {
   var multipleErr;
   var multipleTest;
   Base.consoleLog();
-  failures.forEach(function (test, i) {
+  failures.forEach(function(test, i) {
     // Format
-    var fmt =
-      color("error title", "  %s) %s:\n") +
-      color("error message", "     %s") +
-      color("error stack", "\n%s\n");
+    var fmt = color("error title", "  %s) %s:\n")
+      + color("error message", "     %s")
+      + color("error stack", "\n%s\n");
 
     // Msg
     var msg;
@@ -256,7 +253,7 @@ exports.list = function (failures) {
 
     // Indented test title
     var testTitle = "";
-    test.titlePath().forEach(function (str, index) {
+    test.titlePath().forEach(function(str, index) {
       if (index !== 0) {
         testTitle += "\n     ";
       }
@@ -294,7 +291,7 @@ function Base(runner, options) {
   this.runner = runner;
   this.stats = runner.stats; // Assigned so Reporters keep a closer reference
 
-  runner.on(EVENT_TEST_PASS, function (test) {
+  runner.on(EVENT_TEST_PASS, function(test) {
     if (test.duration > test.slow()) {
       test.speed = "slow";
     } else if (test.duration > test.slow() / 2) {
@@ -304,7 +301,7 @@ function Base(runner, options) {
     }
   });
 
-  runner.on(EVENT_TEST_FAIL, function (test, err) {
+  runner.on(EVENT_TEST_FAIL, function(test, err) {
     if (showDiff(err)) {
       stringifyDiffObjs(err);
     }
@@ -326,7 +323,7 @@ function Base(runner, options) {
  * @memberof Mocha.reporters
  * @public
  */
-Base.prototype.epilogue = function () {
+Base.prototype.epilogue = function() {
   var stats = this.stats;
   var fmt;
 
@@ -386,21 +383,20 @@ function inlineDiff(actual, expected) {
   if (lines.length > 4) {
     var width = String(lines.length).length;
     msg = lines
-      .map(function (str, i) {
+      .map(function(str, i) {
         return pad(++i, width) + " |" + " " + str;
       })
       .join("\n");
   }
 
   // Legend
-  msg =
-    "\n" +
-    color("diff removed inline", "actual") +
-    " " +
-    color("diff added inline", "expected") +
-    "\n\n" +
-    msg +
-    "\n";
+  msg = "\n"
+    + color("diff removed inline", "actual")
+    + " "
+    + color("diff added inline", "expected")
+    + "\n\n"
+    + msg
+    + "\n";
 
   // Indent
   msg = msg.replace(/^/gm, "      ");
@@ -444,12 +440,12 @@ function unifiedDiff(actual, expected) {
   var msg = diff.createPatch("string", actual, expected);
   var lines = msg.split("\n").splice(5);
   return (
-    "\n      " +
-    colorLines("diff added", "+ expected") +
-    " " +
-    colorLines("diff removed", "- actual") +
-    "\n\n" +
-    lines.map(cleanUp).filter(notBlank).join("\n")
+    "\n      "
+    + colorLines("diff added", "+ expected")
+    + " "
+    + colorLines("diff removed", "- actual")
+    + "\n\n"
+    + lines.map(cleanUp).filter(notBlank).join("\n")
   );
 }
 
@@ -464,7 +460,7 @@ function unifiedDiff(actual, expected) {
 function errorDiff(actual, expected) {
   return diff
     .diffWordsWithSpace(actual, expected)
-    .map(function (str) {
+    .map(function(str) {
       if (str.added) {
         return colorLines("diff added inline", str.value);
       }
@@ -489,7 +485,7 @@ function errorDiff(actual, expected) {
 function colorLines(name, str) {
   return str
     .split("\n")
-    .map(function (str) {
+    .map(function(str) {
       return color(name, str);
     })
     .join("\n");

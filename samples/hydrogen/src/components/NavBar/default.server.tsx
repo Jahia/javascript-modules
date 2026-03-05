@@ -3,8 +3,7 @@ import type { JCRNodeWrapper } from "org.jahia.services.content";
 import classes from "./component.module.css";
 
 /** Get all child pages of a node. */
-const getChildPages = (node: JCRNodeWrapper) =>
-  getChildNodes(node, -1, 0, (node) => node.isNodeType("jnt:page"));
+const getChildPages = (node: JCRNodeWrapper) => getChildNodes(node, -1, 0, (node) => node.isNodeType("jnt:page"));
 
 jahiaComponent(
   {

@@ -60,45 +60,43 @@ class ExtendedPropertyType {
     public static final String TYPENAME_UNDEFINED = "undefined";
 
     /**
-     * Returns the name of the specified <code>type</code>,
-     * as used in serialization.
+     * Returns the name of the specified <code>type</code>, as used in serialization.
      *
      * @param type the property type
      * @return the name of the specified <code>type</code>
-     * @throws IllegalArgumentException if <code>type</code>
-     *                                  is not a valid property type.
+     * @throws IllegalArgumentException if <code>type</code> is not a valid property type.
      */
     public static String nameFromValue(int type) {
-	switch (type) {
-	    case STRING:
-		return TYPENAME_STRING;
-	    case BINARY:
-		return TYPENAME_BINARY;
-	    case BOOLEAN:
-		return TYPENAME_BOOLEAN;
-	    case LONG:
-		return TYPENAME_LONG;
-	    case DOUBLE:
-		return TYPENAME_DOUBLE;
-	    case DATE:
-		return TYPENAME_DATE;
-	    case NAME:
-		return TYPENAME_NAME;
-	    case PATH:
-		return TYPENAME_PATH;
-	    case REFERENCE:
-		return TYPENAME_REFERENCE;
-	    case WEAKREFERENCE:
-		return TYPENAME_WEAKREFERENCE;
-	    case URI:
-		return TYPENAME_URI;
-	    case DECIMAL:
-		return TYPENAME_DECIMAL;
-	    case UNDEFINED:
-		return TYPENAME_UNDEFINED;
-	    default:
-		throw new IllegalArgumentException("unknown type: " + type);
-	}
+        switch (type) {
+            case STRING:
+                return TYPENAME_STRING;
+            case BINARY:
+                return TYPENAME_BINARY;
+            case BOOLEAN:
+                return TYPENAME_BOOLEAN;
+            case LONG:
+                return TYPENAME_LONG;
+            case DOUBLE:
+                return TYPENAME_DOUBLE;
+            case DATE:
+                return TYPENAME_DATE;
+            case NAME:
+                return TYPENAME_NAME;
+            case PATH:
+                return TYPENAME_PATH;
+            case REFERENCE:
+                return TYPENAME_REFERENCE;
+            case WEAKREFERENCE:
+                return TYPENAME_WEAKREFERENCE;
+            case URI:
+                return TYPENAME_URI;
+            case DECIMAL:
+                return TYPENAME_DECIMAL;
+            case UNDEFINED:
+                return TYPENAME_UNDEFINED;
+            default:
+                throw new IllegalArgumentException("unknown type: " + type);
+        }
     }
 
     /**
@@ -106,45 +104,42 @@ class ExtendedPropertyType {
      *
      * @param name the name of the property type
      * @return the numeric constant value
-     * @throws IllegalArgumentException if <code>name</code>
-     *                                  is not a valid property type name.
+     * @throws IllegalArgumentException if <code>name</code> is not a valid property type name.
      */
     public static int valueFromName(String name) {
-	if (name.equals(TYPENAME_STRING)) {
-	    return STRING;
-	} else if (name.equals(TYPENAME_BINARY)) {
-	    return BINARY;
-	} else if (name.equals(TYPENAME_BOOLEAN)) {
-	    return BOOLEAN;
-	} else if (name.equals(TYPENAME_LONG)) {
-	    return LONG;
-	} else if (name.equals(TYPENAME_DOUBLE)) {
-	    return DOUBLE;
-	} else if (name.equals(TYPENAME_DATE)) {
-	    return DATE;
-	} else if (name.equals(TYPENAME_NAME)) {
-	    return NAME;
-	} else if (name.equals(TYPENAME_PATH)) {
-	    return PATH;
-	} else if (name.equals(TYPENAME_REFERENCE)) {
-	    return REFERENCE;
-	} else if (name.equals(TYPENAME_WEAKREFERENCE)) {
-	    return WEAKREFERENCE;
-	} else if (name.equals(TYPENAME_URI)) {
-	    return URI;
-	} else if (name.equals(TYPENAME_DECIMAL)) {
-	    return DECIMAL;
-	} else if (name.equals(TYPENAME_UNDEFINED)) {
-	    return UNDEFINED;
-	} else {
-	    throw new IllegalArgumentException("unknown type: " + name);
-	}
+        if (name.equals(TYPENAME_STRING)) {
+            return STRING;
+        } else if (name.equals(TYPENAME_BINARY)) {
+            return BINARY;
+        } else if (name.equals(TYPENAME_BOOLEAN)) {
+            return BOOLEAN;
+        } else if (name.equals(TYPENAME_LONG)) {
+            return LONG;
+        } else if (name.equals(TYPENAME_DOUBLE)) {
+            return DOUBLE;
+        } else if (name.equals(TYPENAME_DATE)) {
+            return DATE;
+        } else if (name.equals(TYPENAME_NAME)) {
+            return NAME;
+        } else if (name.equals(TYPENAME_PATH)) {
+            return PATH;
+        } else if (name.equals(TYPENAME_REFERENCE)) {
+            return REFERENCE;
+        } else if (name.equals(TYPENAME_WEAKREFERENCE)) {
+            return WEAKREFERENCE;
+        } else if (name.equals(TYPENAME_URI)) {
+            return URI;
+        } else if (name.equals(TYPENAME_DECIMAL)) {
+            return DECIMAL;
+        } else if (name.equals(TYPENAME_UNDEFINED)) {
+            return UNDEFINED;
+        } else {
+            throw new IllegalArgumentException("unknown type: " + name);
+        }
     }
 
     /**
      * private constructor to prevent instantiation
      */
-    private ExtendedPropertyType() {
-    }
-
+    private ExtendedPropertyType() {}
 }

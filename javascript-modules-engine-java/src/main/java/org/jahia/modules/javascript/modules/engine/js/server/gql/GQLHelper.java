@@ -16,6 +16,11 @@
 package org.jahia.modules.javascript.modules.engine.js.server.gql;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.*;
+import javax.inject.Inject;
+import javax.servlet.*;
+import javax.servlet.http.*;
 import org.jahia.modules.javascript.modules.engine.js.injector.OSGiService;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.securityfilter.PermissionService;
@@ -23,13 +28,9 @@ import org.jahia.services.securityfilter.ScopeDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.servlet.*;
-import javax.servlet.http.*;
-import java.io.IOException;
-import java.util.*;
-
-/** Helper class to execute GraphQL queries. */
+/**
+ * Helper class to execute GraphQL queries.
+ */
 public class GQLHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(GQLHelper.class);
@@ -38,22 +39,13 @@ public class GQLHelper {
     private PermissionService permissionService;
 
     /**
-     * Execute a synchronous GraphQL query using the specified parameters and return
-     * the result
+     * Execute a synchronous GraphQL query using the specified parameters and return the result
      *
-     * @param parameters the parameters can contain the following keys:
-     *                   <ul>
-     *                   <li>query (string) : the GraphQL query to be executed</li>
-     *                   <li>operationName (string) : the GraphQL operation name
-     *                   </li>
-     *                   <li>variables: the variables as a JSON string or a
-     *                   Map&lt;String, Object&gt;</li>
-     *                   <li>renderContext (RenderContext) : the render context
-     *                   if the renderContext is null, a request will be created
-     *                   with the parameters that were passed,
-     *                   otherwise the request from the renderContext will be used.
-     *                   </li>
-     *                   </ul>
+     * @param parameters the parameters can contain the following keys: <ul> <li>query (string) : the GraphQL query to
+     * be executed</li> <li>operationName (string) : the GraphQL operation name </li> <li>variables: the variables as a
+     * JSON string or a Map&lt;String, Object&gt;</li> <li>renderContext (RenderContext) : the render context if the
+     * renderContext is null, a request will be created with the parameters that were passed, otherwise the request from
+     * the renderContext will be used. </li> </ul>
      * @return the result of the query as a JSON string
      * @throws ServletException
      * @throws IOException
@@ -76,7 +68,8 @@ public class GQLHelper {
                 || currentScopes.stream().noneMatch(scope -> "graphql".equals(scope.getScopeName()))) {
             // Inject graphql scope if missing
             Optional<ScopeDefinition> graphqlScope = permissionService.getAvailableScopes().stream()
-                    .filter(scope -> scope.getScopeName().equals("graphql")).findFirst();
+                    .filter(scope -> scope.getScopeName().equals("graphql"))
+                    .findFirst();
             if (graphqlScope.isPresent()) {
                 Set<ScopeDefinition> newScopes = new HashSet<>();
                 if (currentScopes != null) {
@@ -91,7 +84,8 @@ public class GQLHelper {
         }
 
         RenderContext renderContext = (RenderContext) parameters.get("renderContext");
-        HttpServletRequest request = renderContext == null ? new HttpServletRequestMock(params)
+        HttpServletRequest request = renderContext == null
+                ? new HttpServletRequestMock(params)
                 : new HttpServletRequestWrapper(renderContext.getRequest()) {
                     public String getParameter(String name) {
                         if (params.containsKey(name)) {
@@ -112,9 +106,10 @@ public class GQLHelper {
     }
 
     @Inject
-    @OSGiService(service = HttpServlet.class, filter = "(component.name=graphql.kickstart.servlet.OsgiGraphQLHttpServlet)")
+    @OSGiService(
+            service = HttpServlet.class,
+            filter = "(component.name=graphql.kickstart.servlet.OsgiGraphQLHttpServlet)")
     public void setServlet(HttpServlet servlet) {
         this.servlet = servlet;
     }
-
 }

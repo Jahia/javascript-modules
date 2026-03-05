@@ -1,7 +1,7 @@
 // @ts-check
-import { defineConfig } from "vite";
 import jahia from "@jahia/vite-plugin";
 import path from "node:path";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   resolve: {

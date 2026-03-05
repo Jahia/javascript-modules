@@ -1,6 +1,6 @@
-import { useServerContext } from "./useServerContext.js";
-import { getNodesByJCRQuery } from "../utils/jcr/getNodesByJCRQuery.js";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
+import { getNodesByJCRQuery } from "../utils/jcr/getNodesByJCRQuery.js";
+import { useServerContext } from "./useServerContext.js";
 
 /**
  * Execute a JCR query

@@ -1,6 +1,6 @@
 import { addNode, enableModule } from "@jahia/cypress";
+import { GENERIC_SITE_KEY } from "../../support/constants";
 import { addEventPageAndEvents, addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Content templates resolution testsuite", () => {
   before("Create test page and contents", () => {
@@ -79,35 +79,39 @@ describe("Content templates resolution testsuite", () => {
     });
   });
 
-  beforeEach('Login', () => { cy.login(); });
-  afterEach('Logout', () => { cy.logout(); });
+  beforeEach("Login", () => {
+    cy.login();
+  });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
-  it("Verify content template for jnt:event is correctly displayed", function () {
+  it("Verify content template for jnt:event is correctly displayed", function() {
     cy.visit(
       `/jahia/page-composer/default/en/sites/${GENERIC_SITE_KEY}/home/testEvents/events/event-a.full.html`,
     );
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testEvents/events/event-a.full.html`);
 
     // Check template is good:
-    cy.get('div[class="header"]').should("be.visible");
-    cy.get('div[class="main"]').should("be.visible");
-    cy.get('div[class="footer"]').should("be.visible");
+    cy.get("div[class=\"header\"]").should("be.visible");
+    cy.get("div[class=\"main\"]").should("be.visible");
+    cy.get("div[class=\"footer\"]").should("be.visible");
 
     // Check main resource display is correct:
-    cy.get('div[class="eventsBody"]').should("be.visible");
-    cy.get('div[class="eventsBody"]').contains("The first event");
+    cy.get("div[class=\"eventsBody\"]").should("be.visible");
+    cy.get("div[class=\"eventsBody\"]").contains("The first event");
   });
 
-  it("Verify findDisplayableNode is correctly resolving jnt:event that is using a JS content template", function () {
+  it("Verify findDisplayableNode is correctly resolving jnt:event that is using a JS content template", function() {
     cy.visit(`/jahia/page-composer/default/en/sites/${GENERIC_SITE_KEY}/home/testFindDisplayableNode.html`);
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testFindDisplayableNode.html`);
 
-    cy.get('p[data-testid="displayableContent"]').contains(
+    cy.get("p[data-testid=\"displayableContent\"]").contains(
       `Found displayable content: /sites/${GENERIC_SITE_KEY}/home/testEvents/events/event-a`,
     );
   });
 
-  it("Test default content template is working properly when content doesn't have specific view", function () {
+  it("Test default content template is working properly when content doesn't have specific view", function() {
     cy.visit(
       `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testContentTemplate/pagecontent/content.html`,
     );
@@ -117,7 +121,7 @@ describe("Content templates resolution testsuite", () => {
     cy.contains("Just a normal view").should("be.visible");
   });
 
-  it("Test default content template is working properly when content have specific view", function () {
+  it("Test default content template is working properly when content have specific view", function() {
     cy.visit(
       `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testContentTemplateWithView/pagecontent/content.html`,
     );

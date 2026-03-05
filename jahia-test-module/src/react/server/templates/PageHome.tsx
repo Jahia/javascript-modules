@@ -1,4 +1,4 @@
-import { AddResources, Render, Area, jahiaComponent } from "@jahia/javascript-modules-library";
+import { AddResources, Area, jahiaComponent, Render } from "@jahia/javascript-modules-library";
 import { footer, header, login } from "./pageComponents";
 
 jahiaComponent(

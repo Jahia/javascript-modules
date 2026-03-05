@@ -15,16 +15,12 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
- * User: toto
- * Date: 14 mars 2008
- * Time: 18:43:40
- *
+ * User: toto Date: 14 mars 2008 Time: 18:43:40
  */
 class Name {
     private String localName;
@@ -40,7 +36,7 @@ class Name {
         this.uri = uri;
     }
 
-    public Name(String qualifiedName, Map<String,String> namespaceMapping) {
+    public Name(String qualifiedName, Map<String, String> namespaceMapping) {
         if (qualifiedName.startsWith("{")) {
             int endUri = qualifiedName.indexOf("}");
             if (endUri != -1 && qualifiedName.length() > endUri) {

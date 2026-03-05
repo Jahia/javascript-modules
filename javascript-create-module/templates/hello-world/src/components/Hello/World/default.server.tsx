@@ -1,9 +1,4 @@
-import {
-  Island,
-  RenderChildren,
-  buildModuleFileUrl,
-  jahiaComponent,
-} from "@jahia/javascript-modules-library";
+import { buildModuleFileUrl, Island, jahiaComponent, RenderChildren } from "@jahia/javascript-modules-library";
 import { Trans, useTranslation } from "react-i18next";
 import down from "./arrows/down.svg";
 import left from "./arrows/left.svg";

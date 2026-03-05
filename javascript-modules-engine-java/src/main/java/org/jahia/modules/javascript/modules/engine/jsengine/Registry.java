@@ -15,11 +15,10 @@
  */
 package org.jahia.modules.javascript.modules.engine.jsengine;
 
-import org.osgi.framework.Bundle;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.osgi.framework.Bundle;
 
 public class Registry {
     private final ContextProvider contextProvider;
@@ -44,8 +43,8 @@ public class Registry {
                 .filter(item -> filter.entrySet().stream().allMatch(f -> f.getValue().equals(item.get(f.getKey()))));
 
         if (orderBy != null) {
-            filtered = filtered.sorted(Comparator.comparing(m -> (Integer) m.get(orderBy),
-                    Comparator.nullsFirst(Comparator.reverseOrder())));
+            filtered = filtered.sorted(Comparator.comparing(
+                    m -> (Integer) m.get(orderBy), Comparator.nullsFirst(Comparator.reverseOrder())));
         }
 
         return filtered.collect(Collectors.toList());

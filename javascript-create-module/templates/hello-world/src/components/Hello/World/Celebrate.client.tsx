@@ -1,9 +1,9 @@
 import clsx from "clsx";
 import { useEffect, useState } from "react";
-import classes from "./styles.module.css";
 import { useTranslation } from "react-i18next";
+import classes from "./styles.module.css";
 
-export default function () {
+export default function() {
   const [confetti, setConfetti] = useState<typeof import("canvas-confetti")>();
 
   useEffect(() => {

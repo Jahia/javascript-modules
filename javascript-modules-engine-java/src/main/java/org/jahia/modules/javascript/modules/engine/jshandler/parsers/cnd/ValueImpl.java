@@ -15,19 +15,17 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd;
 
-import org.slf4j.Logger;
-
-import javax.jcr.*;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.regex.Pattern;
+import javax.jcr.*;
+import org.slf4j.Logger;
 
 /**
- * Implementation of the JCR's {@link Value} interface for holding property
- * values of different types.
+ * Implementation of the JCR's {@link Value} interface for holding property values of different types.
  *
  * @author Thomas Draier
  */
@@ -68,7 +66,7 @@ class ValueImpl implements Value {
 
         if (value != null && !isConstraint) {
             switch (type) {
-                case PropertyType.LONG :
+                case PropertyType.LONG:
                     this.value = Long.toString(new Double(value).longValue());
                     break;
             }
@@ -77,14 +75,13 @@ class ValueImpl implements Value {
         if (value != null && isConstraint) {
             switch (type) {
                 // handle constant constraint
-                case PropertyType.LONG :
-                case PropertyType.DOUBLE :
-                case PropertyType.DATE :
-                case PropertyType.BINARY :
-                    if (value.indexOf(',') == -1) value = "["+value+","+value+"]";
+                case PropertyType.LONG:
+                case PropertyType.DOUBLE:
+                case PropertyType.DATE:
+                case PropertyType.BINARY:
+                    if (value.indexOf(',') == -1) value = "[" + value + "," + value + "]";
             }
         }
-
     }
 
     public String getString() throws ValueFormatException, IllegalStateException, RepositoryException {
@@ -139,7 +136,8 @@ class ValueImpl implements Value {
         return type;
     }
 
-    public boolean checkConstraint(String value) throws ValueFormatException, IllegalStateException, RepositoryException {
+    public boolean checkConstraint(String value)
+            throws ValueFormatException, IllegalStateException, RepositoryException {
         if (value == null || value.length() == 0) {
             return true;
         }
@@ -153,22 +151,22 @@ class ValueImpl implements Value {
                 case PropertyType.DATE:
                     String s = getString();
                     boolean lowerBoundIncluded = s.charAt(0) == '[';
-                    boolean upperBoundIncluded = s.charAt(s.length()-1) == ']';
-                    String lowerBound = s.substring(1,s.indexOf(','));
-                    String upperBound = s.substring(s.indexOf(',')+1, s.length()-1);
+                    boolean upperBoundIncluded = s.charAt(s.length() - 1) == ']';
+                    String lowerBound = s.substring(1, s.indexOf(','));
+                    String upperBound = s.substring(s.indexOf(',') + 1, s.length() - 1);
                     switch (type) {
                         case PropertyType.LONG:
                         case PropertyType.DOUBLE: {
                             double v = Double.parseDouble(value);
                             double l = Double.parseDouble(lowerBound);
                             double u = Double.parseDouble(upperBound);
-                            return (lowerBoundIncluded?v>=l:v>l) && (upperBoundIncluded?v<=u:v<u);
+                            return (lowerBoundIncluded ? v >= l : v > l) && (upperBoundIncluded ? v <= u : v < u);
                         }
                         case PropertyType.DATE: {
                             long v = Long.parseLong(value);
                             long l = ISO8601.parse(lowerBound).getTimeInMillis();
                             long u = ISO8601.parse(upperBound).getTimeInMillis();
-                            return (lowerBoundIncluded?v>=l:v>l) && (upperBoundIncluded?v<=u:v<u);
+                            return (lowerBoundIncluded ? v >= l : v > l) && (upperBoundIncluded ? v <= u : v < u);
                         }
                     }
             }

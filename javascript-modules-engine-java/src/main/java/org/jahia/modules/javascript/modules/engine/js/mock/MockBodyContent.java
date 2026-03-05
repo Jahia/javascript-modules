@@ -1,21 +1,19 @@
 package org.jahia.modules.javascript.modules.engine.js.mock;
 
-import javax.servlet.jsp.tagext.BodyContent;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
+import javax.servlet.jsp.tagext.BodyContent;
 
 public class MockBodyContent extends BodyContent {
 
     private MockJspWriter writer;
 
-
     public MockBodyContent(MockJspWriter writer) {
         super(writer);
         this.writer = writer;
     }
-
 
     public Reader getReader() {
         return new StringReader(writer.getString());
@@ -25,13 +23,11 @@ public class MockBodyContent extends BodyContent {
         return writer.getString();
     }
 
-    public void writeOut(Writer writer) throws IOException {
-    }
+    public void writeOut(Writer writer) throws IOException {}
 
-
-    //---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
     // Delegating implementations of JspWriter's abstract methods
-    //---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
     public void clear() throws IOException {
         getEnclosingWriter().clear();
@@ -132,5 +128,4 @@ public class MockBodyContent extends BodyContent {
     public void println(String value) throws IOException {
         getEnclosingWriter().println(value);
     }
-
 }

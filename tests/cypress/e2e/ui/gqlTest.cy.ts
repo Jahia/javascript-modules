@@ -1,6 +1,6 @@
 import { addNode } from "@jahia/cypress";
-import { addSimplePage } from "../../utils/helpers";
 import { GENERIC_SITE_KEY } from "../../support/constants";
+import { addSimplePage } from "../../utils/helpers";
 
 describe("Test GQL", () => {
   before("Create test page and contents", () => {
@@ -20,7 +20,7 @@ describe("Test GQL", () => {
           { name: "prop2", value: "prop2 value !@#$%ˆ//{}È" },
           {
             name: "propRichText",
-            value: '<p data-testid="propRichTextValue">Hello this is a sample rich text</p>',
+            value: "<p data-testid=\"propRichTextValue\">Hello this is a sample rich text</p>",
           },
         ],
       });
@@ -34,18 +34,18 @@ describe("Test GQL", () => {
     cy.logout();
   });
 
-  it("Check GQL execution in current view", function () {
+  it("Check GQL execution in current view", function() {
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testJGQL.html`);
-    cy.get('li[data-testid="j:nodename"]').should("contain", "test");
-    cy.get('li[data-testid="jcr:title"]').should("contain", "test component");
-    cy.get('li[data-testid="prop1"]').should("contain", "prop1 value");
-    cy.get('li[data-testid="prop2"]').should("contain", "prop2 value !@#$%ˆ//{}È");
-    cy.get('li[data-testid="propRichText"]').should("contain", "Hello this is a sample rich text");
-    cy.get('li[data-testid="j:nodename-from-document"]').should("contain", "test");
-    cy.get('li[data-testid="jcr:title-from-document"]').should("contain", "test component");
-    cy.get('li[data-testid="prop1-from-document"]').should("contain", "prop1 value");
-    cy.get('li[data-testid="prop2-from-document"]').should("contain", "prop2 value !@#$%ˆ//{}È");
-    cy.get('li[data-testid="propRichText-from-document"]').should(
+    cy.get("li[data-testid=\"j:nodename\"]").should("contain", "test");
+    cy.get("li[data-testid=\"jcr:title\"]").should("contain", "test component");
+    cy.get("li[data-testid=\"prop1\"]").should("contain", "prop1 value");
+    cy.get("li[data-testid=\"prop2\"]").should("contain", "prop2 value !@#$%ˆ//{}È");
+    cy.get("li[data-testid=\"propRichText\"]").should("contain", "Hello this is a sample rich text");
+    cy.get("li[data-testid=\"j:nodename-from-document\"]").should("contain", "test");
+    cy.get("li[data-testid=\"jcr:title-from-document\"]").should("contain", "test component");
+    cy.get("li[data-testid=\"prop1-from-document\"]").should("contain", "prop1 value");
+    cy.get("li[data-testid=\"prop2-from-document\"]").should("contain", "prop2 value !@#$%ˆ//{}È");
+    cy.get("li[data-testid=\"propRichText-from-document\"]").should(
       "contain",
       "Hello this is a sample rich text",
     );

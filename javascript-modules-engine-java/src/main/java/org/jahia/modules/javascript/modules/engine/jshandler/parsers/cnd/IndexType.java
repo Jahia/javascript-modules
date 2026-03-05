@@ -48,5 +48,4 @@ class IndexType {
             throw new IllegalArgumentException("unknown index type: " + name);
         }
     }
-
 }

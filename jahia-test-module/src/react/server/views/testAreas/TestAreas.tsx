@@ -36,7 +36,7 @@ jahiaComponent(
         <Area name={"basicArea/subLevel"} />
       </div>
 
-      <h2>Non editable area </h2>
+      <h2>Non editable area</h2>
       <div data-testid="nonEditableArea">
         <Area name="nonEditable" readOnly />
       </div>
