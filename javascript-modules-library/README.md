@@ -229,7 +229,7 @@ This function returns the list of locales available on the current site, taking 
 const locales = getSiteLocales();
 ```
 
-`locales` is an object where the keys are the locale codes and the values are [`java.util.Locale`](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Locale.html) objects.
+`locales` is an object where the keys are the locale codes and the values are [`java.util.Locale`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html) objects.
 
 ## Java server API
 
