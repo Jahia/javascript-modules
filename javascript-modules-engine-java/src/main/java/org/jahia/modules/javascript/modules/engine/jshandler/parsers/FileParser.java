@@ -15,17 +15,15 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers;
 
-import org.slf4j.Logger;
-
 import java.io.IOException;
 import java.io.InputStream;
+import org.slf4j.Logger;
 
 /**
  * Defines a parser interface that will parse the contents of a file to find package references inside of it.
  *
- * TEMPORARY WORKAROUND - DO NOT USE
- * This class duplicates poor legacy code to provide backward compatibility.
- * Marked for immediate replacement and removal.
+ * TEMPORARY WORKAROUND - DO NOT USE This class duplicates poor legacy code to provide backward compatibility. Marked
+ * for immediate replacement and removal.
  *
  * @deprecated since 1.0.0 Technical debt. Will be removed in next major version.
  */
@@ -40,6 +38,12 @@ public interface FileParser {
 
     boolean canParse(String fileName);
 
-    boolean parse(String fileName, InputStream inputStream, String fileParent, boolean externalDependency, boolean optionalDependency, String version, ParsingContext parsingContext) throws IOException;
-
+    boolean parse(
+            String fileName,
+            InputStream inputStream,
+            String fileParent,
+            boolean externalDependency,
+            boolean optionalDependency,
+            String version,
+            ParsingContext parsingContext) throws IOException;
 }

@@ -1,6 +1,6 @@
 import type { Locale } from "java.util";
-import { useServerContext } from "../hooks/useServerContext.js";
 import type { RenderContext } from "org.jahia.services.render";
+import { useServerContext } from "../hooks/useServerContext.js";
 
 /**
  * Returns the locales available on the site, as a record of language code (e.g. en_US) to locale

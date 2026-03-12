@@ -1,6 +1,6 @@
 import { buildNodeUrl, jahiaComponent } from "@jahia/javascript-modules-library";
-import type { Props } from "./types.js";
 import classes from "./component.module.css";
+import type { Props } from "./types.js";
 
 jahiaComponent(
   {
@@ -20,11 +20,10 @@ jahiaComponent(
         </h3>
         <p>{subtitle}</p>
         <p>
-          Written {authors && authors.length > 0 && <>by {authors.join(", ")} </>}
+          Written {authors && authors.length > 0 && <>by {authors.join(", ")}</>}
           {publicationDate && (
             <>
-              on{" "}
-              {new Date(publicationDate).toLocaleDateString(
+              on {new Date(publicationDate).toLocaleDateString(
                 currentResource.getLocale().toString(),
                 {
                   dateStyle: "long",

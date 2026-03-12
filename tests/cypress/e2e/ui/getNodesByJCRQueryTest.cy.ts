@@ -1,6 +1,6 @@
 import { addNode } from "@jahia/cypress";
+import { GENERIC_SITE_KEY } from "../../support/constants";
 import { addEvent, addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("getNodesByJCRQuery function test", () => {
   const initEvent = (index: number) => {
@@ -50,9 +50,13 @@ describe("getNodesByJCRQuery function test", () => {
       });
     });
   });
-  
-  beforeEach("Login", () => { cy.login(); });
-  afterEach("Logout", () => { cy.logout(); });
+
+  beforeEach("Login", () => {
+    cy.login();
+  });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
   // dynmically generated test cases
   [
@@ -101,7 +105,7 @@ describe("getNodesByJCRQuery function test", () => {
       ],
     },
   ].forEach((test) => {
-    it(`Test getNodesByJCRQuery, case: ${test.testCase}`, function () {
+    it(`Test getNodesByJCRQuery, case: ${test.testCase}`, function() {
       cy.visit(
         `/jahia/page-composer/default/en/sites/${GENERIC_SITE_KEY}/home/getNodesByJCRQuery.html`,
       );

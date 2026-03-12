@@ -15,28 +15,25 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-
+import java.io.IOException;
+import java.io.Reader;
+import java.util.*;
+import java.util.regex.Pattern;
 import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 import javax.jcr.nodetype.NoSuchNodeTypeException;
 import javax.jcr.query.qom.QueryObjectModelConstants;
 import javax.jcr.version.OnParentVersionAction;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.*;
-import java.util.regex.Pattern;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 /**
- * JahiaCndReader. Parses node type definitions written in the compact
- * node type definition format and returns a list of JahiaNodeTypeDef objects that
- * can then be used to register node types.
- * <p/>
- * The EBNF grammar of the compact node type definition:<br>
+ * JahiaCndReader. Parses node type definitions written in the compact node type definition format and returns a list of
+ * JahiaNodeTypeDef objects that can then be used to register node types. <p/> The EBNF grammar of the compact node type
+ * definition:<br>
  * <pre>
  * cnd ::= ns_mapping* node_type_def+
  *
@@ -109,9 +106,8 @@ import java.util.regex.Pattern;
  * unquoted_string ::= [A-Za-z0-9:_]+
  * </pre>
  *
- * TEMPORARY WORKAROUND - DO NOT USE
- * This class duplicates poor legacy code to provide backward compatibility.
- * Marked for immediate replacement and removal.
+ * TEMPORARY WORKAROUND - DO NOT USE This class duplicates poor legacy code to provide backward compatibility. Marked
+ * for immediate replacement and removal.
  *
  * @deprecated since 1.0.0 Technical debt. Will be removed in next major version.
  */
@@ -142,12 +138,10 @@ public class JahiaCndReader {
      */
     protected String currentToken;
 
-
     protected boolean doRegister = true;
 
     /**
-     * Checks if the provided token is semantically equal to the given
-     * argument.
+     * Checks if the provided token is semantically equal to the given argument.
      *
      * @param token the tokens to be compared
      * @param s the tokens to compare with
@@ -165,8 +159,7 @@ public class JahiaCndReader {
     /**
      * Returns the parsed property type or <code>-1</code> if the type is not recognized.
      *
-     * @param token
-     *            the token to parse property type from
+     * @param token the token to parse property type from
      * @return the parsed property type or <code>-1</code> if the type is not recognized
      */
     public static int getPropertyType(String token) {
@@ -204,8 +197,7 @@ public class JahiaCndReader {
     /**
      * Returns the parsed selector type or <code>-1</code> if the selector is not recognized.
      *
-     * @param token
-     *            the token to parse property type from
+     * @param token the token to parse property type from
      * @return the parsed selector type or <code>-1</code> if the selector is not recognized
      */
     public static int getSelectorType(String token) {
@@ -287,27 +279,27 @@ public class JahiaCndReader {
             doItemDefs(ntd);
 
             if (doRegister) {
-                registry.addNodeType(ntd.getNameObject(),ntd);
+                registry.addNodeType(ntd.getNameObject(), ntd);
             }
             nodeTypesList.add(ntd);
         }
         /*
-        for (ExtendedNodeType type : nodeTypesList) {
-            try {
-                type.validate();
-                if (!type.getPrefix().equals("nt") && !type.isMixin() && !type.isNodeType(Constants.MIX_REFERENCEABLE)) {
-                    int length = type.getDeclaredSupertypeNames().length;
-                    String[] newTypes = new String[length + 1];
-                    System.arraycopy(type.getDeclaredSupertypeNames(), 0, newTypes, 0, length);
-                    newTypes[length] = Constants.MIX_REFERENCEABLE;
-                    type.setDeclaredSupertypes(newTypes);
-                    type.validate();
-                }
-            } catch (NoSuchNodeTypeException e) {
-                throw new ParseException("Cannot validate supertypes for : "+type.getName(),e,0,0,filename);
-            }
-        }
-        */
+         * for (ExtendedNodeType type : nodeTypesList) {
+         * try {
+         * type.validate();
+         * if (!type.getPrefix().equals("nt") && !type.isMixin() && !type.isNodeType(Constants.MIX_REFERENCEABLE)) {
+         * int length = type.getDeclaredSupertypeNames().length;
+         * String[] newTypes = new String[length + 1];
+         * System.arraycopy(type.getDeclaredSupertypeNames(), 0, newTypes, 0, length);
+         * newTypes[length] = Constants.MIX_REFERENCEABLE;
+         * type.setDeclaredSupertypes(newTypes);
+         * type.validate();
+         * }
+         * } catch (NoSuchNodeTypeException e) {
+         * throw new ParseException("Cannot validate supertypes for : "+type.getName(),e,0,0,filename);
+         * }
+         * }
+         */
     }
 
     /**
@@ -355,19 +347,21 @@ public class JahiaCndReader {
      * @param ntd
      * @throws ParseException
      */
-    private void doNodeTypeName(ExtendedNodeType ntd) throws ParseException,IOException {
+    private void doNodeTypeName(ExtendedNodeType ntd) throws ParseException, IOException {
         if (!currentTokenEquals(Lexer.BEGIN_NODE_TYPE_NAME)) {
-            lexer.fail("Unexpected token '" + currentToken +"'");
+            lexer.fail("Unexpected token '" + currentToken + "'");
         }
         nextToken();
         Name name = parseName(currentToken);
         ntd.setName(name);
         nextToken();
         if (!currentTokenEquals(Lexer.END_NODE_TYPE_NAME)) {
-            lexer.fail("Missing '" + Lexer.END_NODE_TYPE_NAME + "' delimiter for end of node type name, found " + currentToken);
+            lexer.fail("Missing '"
+                    + Lexer.END_NODE_TYPE_NAME
+                    + "' delimiter for end of node type name, found "
+                    + currentToken);
         }
         nextToken();
-
     }
 
     /**
@@ -450,9 +444,9 @@ public class JahiaCndReader {
                 } else {
                     lexer.fail("Invalid validator");
                 }
-//            } else if (currentTokenEquals(Lexer.LIVECONTENT)) {
-//                nextToken();
-//                ntd.setLiveContent(true);
+                //            } else if (currentTokenEquals(Lexer.LIVECONTENT)) {
+                //                nextToken();
+                //                ntd.setLiveContent(true);
             } else {
                 hasOption = false;
             }
@@ -548,7 +542,7 @@ public class JahiaCndReader {
         }
         if (currentTokenEquals(Lexer.END_TYPE)) {
             nextToken();
-        } else{
+        } else {
             lexer.fail("Missing '" + Lexer.END_TYPE + "' delimiter for end of property type");
         }
     }
@@ -560,7 +554,8 @@ public class JahiaCndReader {
      * @param ntd
      * @throws ParseException
      */
-    private void doPropertyAttributes(ExtendedPropertyDefinition pdi, ExtendedNodeType ntd) throws ParseException, IOException {
+    private void doPropertyAttributes(ExtendedPropertyDefinition pdi, ExtendedNodeType ntd)
+            throws ParseException, IOException {
         while (currentTokenEquals(Lexer.PROP_ATTRIBUTE)) {
             if (currentTokenEquals(Lexer.PRIMARY)) {
                 ntd.setPrimaryItemName(pdi.getName());
@@ -595,7 +590,7 @@ public class JahiaCndReader {
                     } else if (currentTokenEquals(Lexer.UNTOKENIZED)) {
                         pdi.setIndex(ExtendedPropertyDefinition.INDEXED_UNTOKENIZED);
                     } else {
-                        lexer.fail("Invalid value for indexed [ no | tokenized | untokenized ] "+currentToken);
+                        lexer.fail("Invalid value for indexed [ no | tokenized | untokenized ] " + currentToken);
                     }
                 } else {
                     lexer.fail("Invalid value for indexed " + currentToken);
@@ -607,7 +602,7 @@ public class JahiaCndReader {
                     try {
                         pdi.setScoreboost(Double.parseDouble(currentToken));
                     } catch (NumberFormatException e) {
-                        lexer.fail("Invalid value for score boost "+currentToken);
+                        lexer.fail("Invalid value for score boost " + currentToken);
                     }
                 } else {
                     lexer.fail("Invalid value for score boost " + currentToken);
@@ -675,7 +670,6 @@ public class JahiaCndReader {
                 doPropertyQueryOperators(pdi);
             }
 
-
             nextToken();
         }
     }
@@ -686,8 +680,7 @@ public class JahiaCndReader {
      * @param pd the property definition builder
      * @throws ParseException if an error occurs
      */
-    private void doPropertyQueryOperators(ExtendedPropertyDefinition pd)
-            throws ParseException {
+    private void doPropertyQueryOperators(ExtendedPropertyDefinition pd) throws ParseException {
         if (!currentTokenEquals(Lexer.QUERYOPS)) {
             return;
         }
@@ -809,7 +802,7 @@ public class JahiaCndReader {
             }
             if (currentTokenEquals(Lexer.END_TYPE)) {
                 nextToken();
-            } else{
+            } else {
                 lexer.fail("Missing '" + Lexer.END_TYPE + "' delimiter for end of child node type");
             }
             ndi.setRequiredPrimaryTypes(types.toArray(new String[types.size()]));
@@ -831,7 +824,7 @@ public class JahiaCndReader {
         }
         if (currentTokenEquals(Lexer.END_TYPE)) {
             nextToken();
-        } else{
+        } else {
             lexer.fail("Missing '" + Lexer.END_TYPE + "' delimiter for end of property type");
         }
     }
@@ -859,7 +852,8 @@ public class JahiaCndReader {
      * @param ntd
      * @throws ParseException
      */
-    private void doChildNodeAttributes(ExtendedNodeDefinition ndi, ExtendedNodeType ntd) throws ParseException, IOException {
+    private void doChildNodeAttributes(ExtendedNodeDefinition ndi, ExtendedNodeType ntd)
+            throws ParseException, IOException {
         while (currentTokenEquals(Lexer.NODE_ATTRIBUTE)) {
             if (currentTokenEquals(Lexer.PRIMARY)) {
                 ntd.setPrimaryItemName(ndi.getName());
@@ -871,7 +865,7 @@ public class JahiaCndReader {
                 ndi.setHidden(true);
             } else if (currentTokenEquals(Lexer.PROTECTED)) {
                 ndi.setProtected(true);
-            } else if (currentTokenEquals(Lexer.MULTIPLE) /*|| currentTokenEquals(Lexer.SNS)*/) {
+            } else if (currentTokenEquals(Lexer.MULTIPLE)/*|| currentTokenEquals(Lexer.SNS) */) {
                 ndi.setAllowsSameNameSiblings(true);
             } else if (currentTokenEquals(Lexer.COPY)) {
                 ndi.setOnParentVersion(OnParentVersionAction.COPY);
@@ -901,11 +895,11 @@ public class JahiaCndReader {
                 } else {
                     lexer.fail("Invalid value for workflow " + currentToken);
                 }
-//            } else if (currentTokenEquals(Lexer.LIVECONTENT)) {
-//                ndi.setLiveContent(true);
+                //            } else if (currentTokenEquals(Lexer.LIVECONTENT)) {
+                //                ndi.setLiveContent(true);
             }
 
-            //todo : handle new attributes
+            // todo : handle new attributes
 
             nextToken();
         }
@@ -913,7 +907,7 @@ public class JahiaCndReader {
 
     private void doSelectorOptions(ExtendedItemDefinition pdi) throws ParseException, IOException {
         nextToken();
-        Map<String,String> options = new LinkedHashMap<String,String>();
+        Map<String, String> options = new LinkedHashMap<String, String>();
         while (true) {
             String key = currentToken;
             String value = "";
@@ -928,7 +922,7 @@ public class JahiaCndReader {
                     try {
                         registry.getNodeType(s);
                     } catch (NoSuchNodeTypeException e) {
-                        lexer.fail("Cannot find type : "+s);
+                        lexer.fail("Cannot find type : " + s);
                     }
                 }
             }
@@ -956,8 +950,7 @@ public class JahiaCndReader {
     }
 
     /**
-     * Checks if the {@link #currentToken} is semantically equal to the given
-     * argument.
+     * Checks if the {@link #currentToken} is semantically equal to the given argument.
      *
      * @param s the tokens to compare with
      * @return <code>true</code> if equals; <code>false</code> otherwise.
@@ -967,8 +960,7 @@ public class JahiaCndReader {
     }
 
     /**
-     * Checks if the {@link #currentToken} is semantically equal to the given
-     * argument.
+     * Checks if the {@link #currentToken} is semantically equal to the given argument.
      *
      * @param c the tokens to compare with
      * @return <code>true</code> if equals; <code>false</code> otherwise.
@@ -978,8 +970,7 @@ public class JahiaCndReader {
     }
 
     /**
-     * Checks if the {@link #currentToken} is semantically equal to the given
-     * argument.
+     * Checks if the {@link #currentToken} is semantically equal to the given argument.
      *
      * @param s the tokens to compare with
      * @return <code>true</code> if equals; <code>false</code> otherwise.
@@ -1001,54 +992,61 @@ public class JahiaCndReader {
         return logger;
     }
 
-    public void getDefinitionsAndReferences(Set<String> contentTypeDefinitions, Set<String> contentTypeReferences) throws RepositoryException {
+    public void getDefinitionsAndReferences(Set<String> contentTypeDefinitions, Set<String> contentTypeReferences)
+            throws RepositoryException {
         for (ExtendedNodeType extendedNodeType : getNodeTypesList()) {
-            getLog().debug(filename+ " Nodetype definition " + extendedNodeType.getName());
+            getLog().debug(filename + " Nodetype definition " + extendedNodeType.getName());
             contentTypeDefinitions.add(extendedNodeType.getName());
             for (String superTypeName : extendedNodeType.getDeclaredSupertypeNames()) {
-                getLog().debug(filename+ "  node type super type reference " + superTypeName);
+                getLog().debug(filename + "  node type super type reference " + superTypeName);
                 contentTypeReferences.add(superTypeName);
             }
             for (String mixinExtendName : extendedNodeType.getMixinExtendNames()) {
-                getLog().debug(filename+ "  node type mixin type reference " + mixinExtendName);
+                getLog().debug(filename + "  node type mixin type reference " + mixinExtendName);
                 contentTypeReferences.add(mixinExtendName);
             }
             ExtendedNodeDefinition[] childNodeDefinitions = extendedNodeType.getDeclaredChildNodeDefinitions();
             for (ExtendedNodeDefinition childNodeDefinition : childNodeDefinitions) {
                 if (childNodeDefinition.getDefaultPrimaryTypeName() != null) {
-                    getLog().debug(filename+ "  child node default type reference " + childNodeDefinition.getDefaultPrimaryTypeName());
+                    getLog()
+                            .debug(filename
+                                    + "  child node default type reference "
+                                    + childNodeDefinition.getDefaultPrimaryTypeName());
                     contentTypeReferences.add(childNodeDefinition.getDefaultPrimaryTypeName());
                 }
                 String[] requiredPrimaryTypeNames = childNodeDefinition.getRequiredPrimaryTypeNames();
                 for (String requiredPrimaryTypeName : requiredPrimaryTypeNames) {
-                    getLog().debug(filename+ "  child node required type reference " + requiredPrimaryTypeName);
+                    getLog().debug(filename + "  child node required type reference " + requiredPrimaryTypeName);
                     contentTypeReferences.add(requiredPrimaryTypeName);
                 }
-                Map<String,String> selectorOptions = childNodeDefinition.getSelectorOptions();
+                Map<String, String> selectorOptions = childNodeDefinition.getSelectorOptions();
                 if (selectorOptions.size() > 0) {
-                    getLog().debug(filename+ "Found child node selector options !!!!!!!!!!!!!!!!!!");
+                    getLog().debug(filename + "Found child node selector options !!!!!!!!!!!!!!!!!!");
                 }
             }
             ExtendedPropertyDefinition[] propertyDefinitions = extendedNodeType.getPropertyDefinitions();
             for (ExtendedPropertyDefinition propertyDefinition : propertyDefinitions) {
-                if (ExtendedPropertyType.REFERENCE == propertyDefinition.getRequiredType() ||
-                    ExtendedPropertyType.WEAKREFERENCE == propertyDefinition.getRequiredType()) {
+                if (ExtendedPropertyType.REFERENCE == propertyDefinition.getRequiredType()
+                        || ExtendedPropertyType.WEAKREFERENCE == propertyDefinition.getRequiredType()) {
                     String[] valueConstraints = propertyDefinition.getValueConstraints();
                     for (String valueConstraint : valueConstraints) {
                         if (valueConstraint != null) {
-                            getLog().debug(filename+ "  reference property value contraints " + valueConstraint);
+                            getLog().debug(filename + "  reference property value contraints " + valueConstraint);
                             contentTypeReferences.add(valueConstraint);
                         }
                     }
                     Value[] defaultValues = propertyDefinition.getDefaultValues();
                     for (Value defaultValue : defaultValues) {
                         if (defaultValue != null) {
-                            getLog().debug(filename+ "  found reference property default value " + defaultValue.getString());
+                            getLog()
+                                    .debug(filename
+                                            + "  found reference property default value "
+                                            + defaultValue.getString());
                             contentTypeReferences.add(defaultValue.getString());
                         }
                     }
                 }
-                Map<String,String> selectorOptions = propertyDefinition.getSelectorOptions();
+                Map<String, String> selectorOptions = propertyDefinition.getSelectorOptions();
                 if (selectorOptions.size() > 0) {
                     if (selectorOptions.containsKey("nodes")) {
                         String nodeSelector = selectorOptions.get("nodes");
@@ -1056,7 +1054,7 @@ public class JahiaCndReader {
                             String[] nodeSelectorOptions = nodeSelectorItem.split(";");
                             if (nodeSelectorOptions.length > 1) {
                                 if (StringUtils.isNotEmpty(nodeSelectorOptions[1])) {
-                                    getLog().debug(filename+ "  found choicelist node type " + nodeSelectorOptions[1]);
+                                    getLog().debug(filename + "  found choicelist node type " + nodeSelectorOptions[1]);
                                     contentTypeReferences.add(nodeSelectorOptions[1]);
                                 }
                             }
@@ -1064,14 +1062,9 @@ public class JahiaCndReader {
                     }
                     if (selectorOptions.containsKey("nodetypes")) {
                         String param = selectorOptions.get("nodetypes");
-                        if (param.indexOf(";fromDependencies") > -1) {
-                        }
-                        if (param.startsWith("MIXIN")) {
-                        } else if (param.startsWith("PRIMARY")) {
-                        } else if (param.startsWith("ALL")) {
-                        } else if (StringUtils.isEmpty(param)) {
-                        } else {
-                            getLog().debug(filename+ "  found choicelist nodetype type " + param);
+                        if (param.indexOf(";fromDependencies") > -1) {}
+                        if (param.startsWith("MIXIN")) {} else if (param.startsWith("PRIMARY")) {} else if (param.startsWith("ALL")) {} else if (StringUtils.isEmpty(param)) {} else {
+                            getLog().debug(filename + "  found choicelist nodetype type " + param);
                             contentTypeReferences.add(param);
                         }
                     }
@@ -1084,31 +1077,34 @@ public class JahiaCndReader {
                         Set<String> excludedTypes = new HashSet<String>();
                         String exclusion = StringUtils.substringAfter(param, ";");
                         if (StringUtils.isNotBlank(exclusion)) {
-                            excludedTypes.addAll(CollectionUtils.collect(Arrays.asList(Patterns.COMMA.split(StringUtils.substringAfter(param, ";"))), new Transformer() {
-                                public Object transform(Object input) {
-                                    return ((String) input).trim();
-                                }
-                            }));
+                            excludedTypes.addAll(CollectionUtils.collect(
+                                    Arrays.asList(Patterns.COMMA.split(StringUtils.substringAfter(param, ";"))),
+                                    new Transformer() {
+                                        public Object transform(Object input) {
+                                            return ((String) input).trim();
+                                        }
+                                    }));
                         }
 
                         for (String nodeTypeName : Patterns.COMMA.split(includedTypes)) {
                             if (StringUtils.isNotEmpty(nodeTypeName)) {
-                                getLog().debug(filename+ "  found choicelist subnodetype included type " + nodeTypeName);
+                                getLog()
+                                        .debug(filename + "  found choicelist subnodetype included type " + nodeTypeName);
                                 contentTypeReferences.add(nodeTypeName);
                             }
                         }
 
                         for (String nodeTypeName : excludedTypes) {
                             if (StringUtils.isNotEmpty(nodeTypeName)) {
-                                getLog().debug(filename+ "  found choicelist subnodetype excluded type " + nodeTypeName);
+                                getLog()
+                                        .debug(filename + "  found choicelist subnodetype excluded type " + nodeTypeName);
                                 contentTypeReferences.add(nodeTypeName);
                             }
                         }
                     }
                     if (selectorOptions.containsKey("componenttypes")) {
                         String param = selectorOptions.get("componenttypes");
-                        Set<String> DEF_INCLUDES = new TreeSet<String>(
-                                Arrays.asList("jmix:editorialContent"));
+                        Set<String> DEF_INCLUDES = new TreeSet<String>(Arrays.asList("jmix:editorialContent"));
                         Set<String> includeTypes = DEF_INCLUDES;
                         Set<String> excludeTypes = new TreeSet<String>();
 
@@ -1119,14 +1115,20 @@ public class JahiaCndReader {
 
                         for (String nodeTypeName : includeTypes) {
                             if (StringUtils.isNotEmpty(nodeTypeName)) {
-                                getLog().debug(filename+ "  found choicelist component type included type " + nodeTypeName);
+                                getLog()
+                                        .debug(filename
+                                                + "  found choicelist component type included type "
+                                                + nodeTypeName);
                                 contentTypeReferences.add(nodeTypeName);
                             }
                         }
 
                         for (String nodeTypeName : excludeTypes) {
                             if (StringUtils.isNotEmpty(nodeTypeName)) {
-                                getLog().debug(filename+ "  found choicelist component type included type " + nodeTypeName);
+                                getLog()
+                                        .debug(filename
+                                                + "  found choicelist component type included type "
+                                                + nodeTypeName);
                                 contentTypeReferences.add(nodeTypeName);
                             }
                         }
@@ -1151,5 +1153,4 @@ public class JahiaCndReader {
 
         return types;
     }
-
 }

@@ -1,10 +1,4 @@
-import {
-  addNode,
-  createSite,
-  deleteSite,
-  enableModule,
-  publishAndWaitJobEnding,
-} from "@jahia/cypress";
+import { addNode, createSite, deleteSite, enableModule, publishAndWaitJobEnding } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
 
 const testData = {
@@ -87,21 +81,21 @@ describe("Test i18n", () => {
     ["live", "default"].forEach((workspace) => {
       ["en", "fr_LU", "fr", "de"].forEach((locale) => {
         cy.visit(`/cms/render/${workspace}/${locale}/sites/${siteKey}/home/testPageI18N.html`);
-        testI18n(locale, 'div[data-testid="i18n-server-side"]', "We are server side !", false);
+        testI18n(locale, "div[data-testid=\"i18n-server-side\"]", "We are server side !", false);
         testI18n(
           locale,
-          'div[data-testid="i18n-hydrated-client-side"]',
+          "div[data-testid=\"i18n-hydrated-client-side\"]",
           "We are hydrated client side !",
           true,
         );
         testI18n(
           locale,
-          'div[data-testid="i18n-rendered-client-side"]',
+          "div[data-testid=\"i18n-rendered-client-side\"]",
           "We are rendered client side !",
           true,
         );
       });
-      cy.get('[data-testid="getSiteLocales"]').should("contain", "de,en,fr,fr_LU");
+      cy.get("[data-testid=\"getSiteLocales\"]").should("contain", "de,en,fr,fr_LU");
     });
     cy.logout();
 
@@ -123,8 +117,7 @@ describe("Test i18n", () => {
       testData.translations[locale].composed.replace("{{placeholder}}", placeholderIntialValue),
     );
 
-    const newPlaceholderValue =
-      "Updated placeholder to test dynamic client side placeholder in i18n translation !";
+    const newPlaceholderValue = "Updated placeholder to test dynamic client side placeholder in i18n translation !";
     cy.get(`${mainSelector} input[data-testid="i18n-edit-placeholder"]`).clear();
     cy.get(`${mainSelector} input[data-testid="i18n-edit-placeholder"]`).type(newPlaceholderValue);
     if (placeholderShouldBeDynamic) {
@@ -165,8 +158,8 @@ describe("Test i18n", () => {
       cy.visit(`/cms/render/${workspace}/en/sites/${siteKey}/home/testPageI18N.html`);
 
       // make sure the 2 modules are present on the page with their i18n store
-      cy.get('script[data-i18n-store="javascript-modules-engine-test-module"]').should("exist");
-      cy.get('script[data-i18n-store="hydrogen"]').should("exist");
+      cy.get("script[data-i18n-store=\"javascript-modules-engine-test-module\"]").should("exist");
+      cy.get("script[data-i18n-store=\"hydrogen\"]").should("exist");
       cy.get("jsm-island").then(($islands) => {
         // get unique "data-bundle" values from all islands elements
         const bundles = new Set($islands.get().map((el) => el.getAttribute("data-bundle")));
@@ -178,21 +171,21 @@ describe("Test i18n", () => {
       // make sure the translations are rendered server-side
       // - for hydrogen:helloWorld :
       cy.get(
-        'p:contains("Welcome to Jahia! You successfully created a new JavaScript Module and a Jahia Website built with it. Here are a few things you can do now:")',
+        "p:contains(\"Welcome to Jahia! You successfully created a new JavaScript Module and a Jahia Website built with it. Here are a few things you can do now:\")",
       ).should("have.length", 2);
       // - for javascriptExample:testI18n :
-      cy.get('div[data-testid="i18n-server-side"] div[data-testid="i18n-simple"]')
+      cy.get("div[data-testid=\"i18n-server-side\"] div[data-testid=\"i18n-simple\"]")
         .should("contain", testData.translations.en.simple)
         .should("have.length", 2);
 
       // make sure the translations are rendered client-side
       cy.get(
-        'div[data-testid="i18n-hydrated-client-side"] jsm-island[data-bundle="javascript-modules-engine-test-module"]' +
-          ' [data-testid="i18n-simple"]',
+        "div[data-testid=\"i18n-hydrated-client-side\"] jsm-island[data-bundle=\"javascript-modules-engine-test-module\"]"
+          + " [data-testid=\"i18n-simple\"]",
       )
         .should("contain", testData.translations.en.simple)
         .should("have.length", 2);
-      cy.get('jsm-island[data-bundle="hydrogen"] [data-testid="i18n-client-only"]')
+      cy.get("jsm-island[data-bundle=\"hydrogen\"] [data-testid=\"i18n-client-only\"]")
         .should(
           "contain",
           "Rendered client-side only", // the translated content

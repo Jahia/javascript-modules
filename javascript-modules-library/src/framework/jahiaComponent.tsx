@@ -57,7 +57,9 @@ export const jahiaComponent = <T extends (props: never, context: ServerContext) 
 
   // If id is not provided, generate it using bundleSymbolicName, componentType, nodeType, and name
   // optionally, include the priority if different from the default value (to remain backward compatible)
-  id ??= `${bundleKey}_${options.componentType}_${options.nodeType}_${options.name}${options.priority ? "_" + options.priority : ""}`;
+  id ??= `${bundleKey}_${options.componentType}_${options.nodeType}_${options.name}${
+    options.priority ? "_" + options.priority : ""
+  }`;
 
   // Register view
   const reactView = server.registry.get("view", "react");

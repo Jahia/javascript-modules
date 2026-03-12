@@ -27,8 +27,7 @@ export default function SampleRenderInBrowserReact({ path }: { path: string }) {
         Able to display current node path: <span data-testid="path">{path}</span>
       </p>
       <p>
-        And refreshing date every 2 sec:{" "}
-        <span data-testid="date">{currentDate.toLocaleString()}</span>
+        And refreshing date every 2 sec: <span data-testid="date">{currentDate.toLocaleString()}</span>
       </p>
       <p>
         Countdown: <span data-testid="counter">{counter}</span>

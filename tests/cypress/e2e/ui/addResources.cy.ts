@@ -1,6 +1,6 @@
 import { addNode } from "@jahia/cypress";
+import { GENERIC_SITE_KEY, JAHIA_CONTEXT } from "../../support/constants";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY, JAHIA_CONTEXT } from '../../support/constants';
 
 describe("Test on add resources component/helper", () => {
   const pageName = "testAddResources";
@@ -22,15 +22,19 @@ describe("Test on add resources component/helper", () => {
           { name: "propMultiple", values: ["value 1", "value 2", "value 3"] },
           {
             name: "propRichText",
-            value: '<p data-testid="propRichTextValue">Hello this is a sample rich text</p>',
+            value: "<p data-testid=\"propRichTextValue\">Hello this is a sample rich text</p>",
           },
         ],
       });
     });
   });
 
-  beforeEach("Login", () => { cy.login(); });
-  afterEach('Logout', () => { cy.logout(); });
+  beforeEach("Login", () => {
+    cy.login();
+  });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
   it(`${pageName}: should not contain a div in the head tag in the page source code`, () => {
     cy.request(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`)
@@ -43,7 +47,7 @@ describe("Test on add resources component/helper", () => {
   it(`${pageName} : should contain a link tag in the head tag to load the CSS styles`, () => {
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     cy.get(
-      `head link[href="${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/css/styles.css"]`
+      `head link[href="${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/css/styles.css"]`,
     ).then(($link: JQuery<HTMLLinkElement>) => {
       expect($link.attr("id")).to.match(/^staticAssetCSS/);
     });

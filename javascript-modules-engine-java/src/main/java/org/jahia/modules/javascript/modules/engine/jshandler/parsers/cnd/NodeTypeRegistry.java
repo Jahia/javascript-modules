@@ -15,27 +15,22 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd;
 
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-
-import javax.jcr.RepositoryException;
-import javax.jcr.UnsupportedRepositoryOperationException;
-import javax.jcr.nodetype.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
+import javax.jcr.RepositoryException;
+import javax.jcr.UnsupportedRepositoryOperationException;
+import javax.jcr.nodetype.*;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
 
 /**
- * Jahia implementation of the {@link NodeTypeManager}.
- * User: toto
- * Date: 4 janv. 2008
- * Time: 15:08:56
+ * Jahia implementation of the {@link NodeTypeManager} . User: toto Date: 4 janv. 2008 Time: 15:08:56
  *
- * TEMPORARY WORKAROUND - DO NOT USE
- * This class duplicates poor legacy code to provide backward compatibility.
- * Marked for immediate replacement and removal.
+ * TEMPORARY WORKAROUND - DO NOT USE This class duplicates poor legacy code to provide backward compatibility. Marked
+ * for immediate replacement and removal.
  *
  * @deprecated since 1.0.0 Technical debt. Will be removed in next major version.
  */
@@ -47,10 +42,11 @@ public class NodeTypeRegistry implements NodeTypeManager {
     private List<ExtendedNodeType> nodeTypesList = new ArrayList<ExtendedNodeType>();
     private Map<Name, ExtendedNodeType> nodetypes = new HashMap<Name, ExtendedNodeType>();
 
-    private Map<String,String> namespaces = new HashMap<String,String>();
+    private Map<String, String> namespaces = new HashMap<String, String>();
 
-    private Map<ExtendedNodeType,Set<ExtendedNodeType>> mixinExtensions = new HashMap<ExtendedNodeType,Set<ExtendedNodeType>>();
-    private Map<String,Set<ExtendedItemDefinition>> typedItems = new HashMap<String,Set<ExtendedItemDefinition>>();
+    private Map<ExtendedNodeType, Set<ExtendedNodeType>> mixinExtensions =
+            new HashMap<ExtendedNodeType, Set<ExtendedNodeType>>();
+    private Map<String, Set<ExtendedItemDefinition>> typedItems = new HashMap<String, Set<ExtendedItemDefinition>>();
 
     private boolean propertiesLoaded = false;
     private final Properties deploymentProperties = new Properties();
@@ -73,7 +69,8 @@ public class NodeTypeRegistry implements NodeTypeManager {
         }
     }
 
-    public List<ExtendedNodeType> getDefinitionsFromFile(File resource, String systemId) throws ParseException, IOException {
+    public List<ExtendedNodeType> getDefinitionsFromFile(File resource, String systemId)
+            throws ParseException, IOException {
         String ext = resource.getPath().substring(resource.getPath().lastIndexOf('.'));
         if (ext.equalsIgnoreCase(".cnd")) {
             Reader resourceReader = null;
@@ -99,12 +96,12 @@ public class NodeTypeRegistry implements NodeTypeManager {
     }
 
     public NodeTypeIterator getAllNodeTypes() {
-        return new JahiaNodeTypeIterator(nodeTypesList.iterator(),nodeTypesList.size());
+        return new JahiaNodeTypeIterator(nodeTypesList.iterator(), nodeTypesList.size());
     }
 
     public NodeTypeIterator getAllNodeTypes(List<String> systemIds) {
         List<ExtendedNodeType> res = new ArrayList<ExtendedNodeType>();
-        for (Iterator<ExtendedNodeType> iterator = nodetypes.values().iterator(); iterator.hasNext();) {
+        for (Iterator<ExtendedNodeType> iterator = nodetypes.values().iterator(); iterator.hasNext(); ) {
             ExtendedNodeType nt = iterator.next();
             if (systemIds == null || systemIds.contains(nt.getSystemId())) {
                 res.add(nt);
@@ -120,19 +117,20 @@ public class NodeTypeRegistry implements NodeTypeManager {
                 l.add(nt);
             }
         }
-        return new JahiaNodeTypeIterator(l.iterator(),l.size());
+        return new JahiaNodeTypeIterator(l.iterator(), l.size());
     }
 
     public Map<String, String> getNamespaces() {
         return namespaces;
     }
+
     public NodeTypeIterator getPrimaryNodeTypes() throws RepositoryException {
         return getPrimaryNodeTypes(null);
     }
 
     public NodeTypeIterator getPrimaryNodeTypes(List<String> systemIds) throws RepositoryException {
         List<ExtendedNodeType> res = new ArrayList<ExtendedNodeType>();
-        for (Iterator<ExtendedNodeType> iterator = nodetypes.values().iterator(); iterator.hasNext();) {
+        for (Iterator<ExtendedNodeType> iterator = nodetypes.values().iterator(); iterator.hasNext(); ) {
             ExtendedNodeType nt = iterator.next();
             if (!nt.isMixin() && (systemIds == null || systemIds.contains(nt.getSystemId()))) {
                 res.add(nt);
@@ -147,7 +145,7 @@ public class NodeTypeRegistry implements NodeTypeManager {
 
     public NodeTypeIterator getMixinNodeTypes(List<String> systemIds) throws RepositoryException {
         List<ExtendedNodeType> res = new ArrayList<ExtendedNodeType>();
-        for (Iterator<ExtendedNodeType> iterator = nodetypes.values().iterator(); iterator.hasNext();) {
+        for (Iterator<ExtendedNodeType> iterator = nodetypes.values().iterator(); iterator.hasNext(); ) {
             ExtendedNodeType nt = iterator.next();
             if (nt.isMixin() && (systemIds == null || systemIds.contains(nt.getSystemId()))) {
                 res.add(nt);
@@ -203,7 +201,7 @@ public class NodeTypeRegistry implements NodeTypeManager {
 
     class JahiaNodeTypeIterator implements NodeTypeIterator {
         private long size;
-        private long pos=0;
+        private long pos = 0;
         private Iterator<ExtendedNodeType> iterator;
 
         JahiaNodeTypeIterator(Iterator<ExtendedNodeType> it, long size) {
@@ -218,11 +216,14 @@ public class NodeTypeRegistry implements NodeTypeManager {
 
         public void skip(long l) {
             if ((pos + l + 1) > size) {
-                throw new NoSuchElementException("Tried to skip past " + l +
-                        " elements, which with current pos (" + pos +
-                        ") brings us past total size=" + size);
+                throw new NoSuchElementException("Tried to skip past "
+                        + l
+                        + " elements, which with current pos ("
+                        + pos
+                        + ") brings us past total size="
+                        + size);
             }
-            for (int i=0; i < l; i++) {
+            for (int i = 0; i < l; i++) {
                 next();
             }
         }
@@ -254,27 +255,33 @@ public class NodeTypeRegistry implements NodeTypeManager {
         return nodetypes.get(new Name(name, namespaces)) != null;
     }
 
-    public NodeTypeTemplate createNodeTypeTemplate() throws UnsupportedRepositoryOperationException, RepositoryException {
+    public NodeTypeTemplate createNodeTypeTemplate()
+            throws UnsupportedRepositoryOperationException, RepositoryException {
         throw new UnsupportedRepositoryOperationException();
     }
 
-    public NodeTypeTemplate createNodeTypeTemplate(NodeTypeDefinition ntd) throws UnsupportedRepositoryOperationException, RepositoryException {
+    public NodeTypeTemplate createNodeTypeTemplate(NodeTypeDefinition ntd)
+            throws UnsupportedRepositoryOperationException, RepositoryException {
         throw new UnsupportedRepositoryOperationException();
     }
 
-    public NodeDefinitionTemplate createNodeDefinitionTemplate() throws UnsupportedRepositoryOperationException, RepositoryException {
+    public NodeDefinitionTemplate createNodeDefinitionTemplate()
+            throws UnsupportedRepositoryOperationException, RepositoryException {
         throw new UnsupportedRepositoryOperationException();
     }
 
-    public PropertyDefinitionTemplate createPropertyDefinitionTemplate() throws UnsupportedRepositoryOperationException, RepositoryException {
+    public PropertyDefinitionTemplate createPropertyDefinitionTemplate()
+            throws UnsupportedRepositoryOperationException, RepositoryException {
         throw new UnsupportedRepositoryOperationException();
     }
 
-    public NodeType registerNodeType(NodeTypeDefinition ntd, boolean allowUpdate) throws InvalidNodeTypeDefinitionException, NodeTypeExistsException, UnsupportedRepositoryOperationException, RepositoryException {
+    public NodeType registerNodeType(NodeTypeDefinition ntd, boolean allowUpdate) throws InvalidNodeTypeDefinitionException, NodeTypeExistsException, UnsupportedRepositoryOperationException,
+            RepositoryException {
         throw new UnsupportedRepositoryOperationException();
     }
 
-    public NodeTypeIterator registerNodeTypes(NodeTypeDefinition[] ntds, boolean allowUpdate) throws InvalidNodeTypeDefinitionException, NodeTypeExistsException, UnsupportedRepositoryOperationException, RepositoryException {
+    public NodeTypeIterator registerNodeTypes(NodeTypeDefinition[] ntds, boolean allowUpdate) throws InvalidNodeTypeDefinitionException, NodeTypeExistsException, UnsupportedRepositoryOperationException,
+            RepositoryException {
         throw new UnsupportedRepositoryOperationException();
     }
 
@@ -285,17 +292,29 @@ public class NodeTypeRegistry implements NodeTypeManager {
                 if (!type.getName().equals(name)) {
                     for (ExtendedNodeType nt : type.getSupertypes()) {
                         if (nt.getName().equals(name)) {
-                            throw new ConstraintViolationException("Cannot unregister node type " + name + " because " + type.getName() + " extends it.");
+                            throw new ConstraintViolationException("Cannot unregister node type "
+                                    + name
+                                    + " because "
+                                    + type.getName()
+                                    + " extends it.");
                         }
                     }
                     for (ExtendedNodeDefinition ntd : type.getChildNodeDefinitions()) {
                         if (Arrays.asList(ntd.getRequiredPrimaryTypeNames()).contains(name)) {
-                            throw new ConstraintViolationException("Cannot unregister node type " + name + " because a child node definition of " + type.getName() + " requires it.");
+                            throw new ConstraintViolationException("Cannot unregister node type "
+                                    + name
+                                    + " because a child node definition of "
+                                    + type.getName()
+                                    + " requires it.");
                         }
                     }
                     for (ExtendedNodeDefinition ntd : type.getUnstructuredChildNodeDefinitions().values()) {
                         if (Arrays.asList(ntd.getRequiredPrimaryTypeNames()).contains(name)) {
-                            throw new ConstraintViolationException("Cannot unregister node type " + name + " because a child node definition of " + type.getName() + " requires it.");
+                            throw new ConstraintViolationException("Cannot unregister node type "
+                                    + name
+                                    + " because a child node definition of "
+                                    + type.getName()
+                                    + " requires it.");
                         }
                     }
                 }

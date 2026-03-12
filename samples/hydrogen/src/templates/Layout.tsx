@@ -1,8 +1,4 @@
-import {
-  AddResources,
-  buildModuleFileUrl,
-  useServerContext,
-} from "@jahia/javascript-modules-library";
+import { AddResources, buildModuleFileUrl, useServerContext } from "@jahia/javascript-modules-library";
 import type { ReactNode } from "react";
 
 import "modern-normalize/modern-normalize.css";

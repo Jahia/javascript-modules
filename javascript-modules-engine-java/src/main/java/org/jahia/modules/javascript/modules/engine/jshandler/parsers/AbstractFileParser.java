@@ -20,14 +20,13 @@ import org.slf4j.Logger;
 /**
  * Abstract file parser
  *
- * TEMPORARY WORKAROUND - DO NOT USE
- * This class duplicates poor legacy code to provide backward compatibility.
- * Marked for immediate replacement and removal.
+ * TEMPORARY WORKAROUND - DO NOT USE This class duplicates poor legacy code to provide backward compatibility. Marked
+ * for immediate replacement and removal.
  *
  * @deprecated since 1.0.0 Technical debt. Will be removed in next major version.
  */
 @Deprecated(since = "1.0.0")
- public abstract class AbstractFileParser implements FileParser, Comparable<AbstractFileParser> {
+public abstract class AbstractFileParser implements FileParser, Comparable<AbstractFileParser> {
 
     private Logger logger;
     protected int priority = 0;

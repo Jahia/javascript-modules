@@ -1,6 +1,6 @@
 import { addNode } from "@jahia/cypress";
+import { GENERIC_SITE_KEY } from "../../support/constants";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Test on currentContent injected data", () => {
   const pageName = "testCurrentContent";
@@ -22,53 +22,57 @@ describe("Test on currentContent injected data", () => {
           { name: "propMultiple", values: ["value 1", "value 2", "value 3"] },
           {
             name: "propRichText",
-            value: '<p data-testid="propRichTextValue">Hello this is a sample rich text</p>',
+            value: "<p data-testid=\"propRichTextValue\">Hello this is a sample rich text</p>",
           },
         ],
       });
     });
   });
 
-  beforeEach("Login", () => { cy.login(); });
-  afterEach('Logout', () => { cy.logout(); });
+  beforeEach("Login", () => {
+    cy.login();
+  });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
-  it(`${pageName}: Check currentContent injected JSON node in current view`, function () {
+  it(`${pageName}: Check currentContent injected JSON node in current view`, function() {
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
-    cy.get('div[data-testid="currentContent_resourcePath"]').should(
+    cy.get("div[data-testid=\"currentContent_resourcePath\"]").should(
       "contain",
       `/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent/test`,
     );
-    cy.get('div[data-testid="currentContent_nodePath"]').should(
+    cy.get("div[data-testid=\"currentContent_nodePath\"]").should(
       "contain",
       `/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent/test`,
     );
-    cy.get('div[data-testid="currentContent_mainNodePath"]').should(
+    cy.get("div[data-testid=\"currentContent_mainNodePath\"]").should(
       "contain",
       `/sites/${GENERIC_SITE_KEY}/home/${pageName}`,
     );
-    cy.get('div[data-testid="currentContent_properties_prop1"]').should("contain", "prop1 value");
-    cy.get('div[data-testid="currentContent_properties_jcr:title"]').should(
+    cy.get("div[data-testid=\"currentContent_properties_prop1\"]").should("contain", "prop1 value");
+    cy.get("div[data-testid=\"currentContent_properties_jcr:title\"]").should(
       "contain",
       "test component",
     );
-    cy.get('div[data-testid="currentContent_properties_propMultiple"]').should(
+    cy.get("div[data-testid=\"currentContent_properties_propMultiple\"]").should(
       "contain",
       "value 1,value 2,value 3",
     );
-    cy.get('p[data-testid="propRichTextValue"]').should(
+    cy.get("p[data-testid=\"propRichTextValue\"]").should(
       "contain",
       "Hello this is a sample rich text",
     );
-    cy.get('div[data-testid="currentContent_name"]').should("contain", "test");
-    cy.get('div[data-testid="currentContent_path"]').should(
+    cy.get("div[data-testid=\"currentContent_name\"]").should("contain", "test");
+    cy.get("div[data-testid=\"currentContent_path\"]").should(
       "contain",
       `/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent/test`,
     );
-    cy.get('div[data-testid="currentContent_parent"]').should(
+    cy.get("div[data-testid=\"currentContent_parent\"]").should(
       "contain",
       `/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent`,
     );
-    cy.get('div[data-testid="currentContent_nodeType"]').should(
+    cy.get("div[data-testid=\"currentContent_nodeType\"]").should(
       "contain",
       "javascriptExample:test",
     );

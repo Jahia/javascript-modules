@@ -1,6 +1,6 @@
 import { addNode, deleteNode } from "@jahia/cypress";
+import { GENERIC_SITE_KEY } from "../../support/constants";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
 import "cypress-wait-until";
 
 describe("Test priority parameter on views", () => {
@@ -24,7 +24,7 @@ describe("Test priority parameter on views", () => {
 
   afterEach("Delete the test page after each test", () => {
     deleteNode(`/sites/${GENERIC_SITE_KEY}/${pageName}`);
-      cy.logout();
+    cy.logout();
   });
 
   examples.forEach(({ nodeType, expectedPriority }) => {
@@ -36,7 +36,7 @@ describe("Test priority parameter on views", () => {
       });
       cy.visit(`/jahia/jcontent/${GENERIC_SITE_KEY}/en/pages/${pageName}`);
       cy.iframe("#page-builder-frame-1").within(() => {
-        cy.get('div[data-testid="testPriorityView"] span[data-testid="priorityValue"]').should(
+        cy.get("div[data-testid=\"testPriorityView\"] span[data-testid=\"priorityValue\"]").should(
           "have.text",
           expectedPriority,
         );

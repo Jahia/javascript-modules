@@ -15,17 +15,16 @@
  */
 package org.jahia.modules.javascript.modules.engine.js.mock;
 
-import javax.servlet.jsp.JspWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import javax.servlet.jsp.JspWriter;
 
 /**
  * Mock implementation of the {@link javax.servlet.jsp.JspWriter} class.
  *
- * <p>Used for testing the web framework; only necessary for testing
- * applications when testing custom JSP tags.
+ * <p>Used for testing the web framework; only necessary for testing applications when testing custom JSP tags.
  *
  * @author Juergen Hoeller
  * @since 2.5
@@ -61,8 +60,7 @@ public class MockJspWriter extends JspWriter {
         init();
     }
 
-    public void clearBuffer() throws IOException {
-    }
+    public void clearBuffer() throws IOException {}
 
     public void flush() throws IOException {
         targetWriter.flush();

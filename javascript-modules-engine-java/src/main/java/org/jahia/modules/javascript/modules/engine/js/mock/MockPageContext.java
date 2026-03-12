@@ -15,8 +15,11 @@
  */
 package org.jahia.modules.javascript.modules.engine.js.mock;
 
-import org.jahia.services.render.RenderContext;
-
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import javax.el.ELContext;
 import javax.servlet.*;
 import javax.servlet.http.HttpSession;
@@ -24,11 +27,7 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.el.ExpressionEvaluator;
 import javax.servlet.jsp.el.VariableResolver;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import org.jahia.services.render.RenderContext;
 
 public class MockPageContext extends PageContext {
     private final Map<String, Object> pageAttrs = Collections.synchronizedMap(new HashMap<>());
@@ -49,11 +48,16 @@ public class MockPageContext extends PageContext {
         writer.flush();
     }
 
-    public void initialize(Servlet servlet, ServletRequest request, ServletResponse response, String errorPageURL, boolean needSession, int bufferSize, boolean autoFlush) {
-    }
+    public void initialize(
+            Servlet servlet,
+            ServletRequest request,
+            ServletResponse response,
+            String errorPageURL,
+            boolean needSession,
+            int bufferSize,
+            boolean autoFlush) {}
 
-    public void release() {
-    }
+    public void release() {}
 
     public void setAttribute(String name, Object attribute) {
         this.pageAttrs.put(name, attribute);
@@ -76,7 +80,6 @@ public class MockPageContext extends PageContext {
             default:
                 throw new IllegalArgumentException("Bad scope " + scope);
         }
-
     }
 
     public Object getAttribute(String name) {
@@ -118,7 +121,6 @@ public class MockPageContext extends PageContext {
         } else if (this.renderContext.getRequest().getSession().getAttribute(name) != null) {
             this.renderContext.getRequest().getSession().removeAttribute(name);
         } else this.appAttr.remove(name);
-
     }
 
     public void removeAttribute(String name, int scope) {
@@ -138,7 +140,6 @@ public class MockPageContext extends PageContext {
             default:
                 throw new IllegalArgumentException("Bad scope " + scope);
         }
-
     }
 
     public int getAttributesScope(String name) {
@@ -189,20 +190,15 @@ public class MockPageContext extends PageContext {
         return null;
     }
 
-    public void forward(String path) {
-    }
+    public void forward(String path) {}
 
-    public void include(String path) {
-    }
+    public void include(String path) {}
 
-    public void handlePageException(Exception exc) {
-    }
+    public void handlePageException(Exception exc) {}
 
-    public void handlePageException(Throwable exc) {
-    }
+    public void handlePageException(Throwable exc) {}
 
-    public void include(String relativeUrlPath, boolean flush) {
-    }
+    public void include(String relativeUrlPath, boolean flush) {}
 
     public ExpressionEvaluator getExpressionEvaluator() {
         return null;
