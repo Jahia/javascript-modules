@@ -7,13 +7,13 @@ content:
   $subpath: document-area/content
 ---
 
-Jahia is a multilingual CMS. This guide explains how to properly prepare your module for internationalization (i18n).
+Jahia is a multilingual CMS. This guide explains how to prepare your module for internationalization (i18n).
 
 ## Content Definition
 
-Even when your Jahia integration is not destined to be multilingual, it is a good practice to prepare it for i18n. The multilingual edition interface only appears when more than one language is configured on the website (⚙︎ > Sites > Choose a website > Languages), making the preparation invisible until used.
+Even when your Jahia integration is not intended to be multilingual, it is still good practice to prepare it for i18n. The multilingual editing interface only appears when more than one language is configured on the website (⚙︎ > Sites > Choose a website > Languages), so these features remain hidden until actually needed.
 
-To make a field translatable, you only need to add the `i18n` attribute to the field definition, and Jahia takes care of the rest. It works for all field types and inputs.
+To make a field translatable, simply add the `i18n` attribute to the field definition, and Jahia takes care of the rest. It works for all field types and inputs.
 
 ```cnd
 // Without `i18n`, the `body` field is shared across all languages
@@ -25,18 +25,20 @@ To make a field translatable, you only need to add the `i18n` attribute to the f
  - body (string, richtext) i18n
 ```
 
-As for child nodes (e.g. `+ * (jmix:droppableContent)`), there is no such `i18n` attribute: the content tree is the same for all languages. The escape hatch for this is per-language visibility conditions (Advanced Editing > Visibility > Languages).
+Child node syntax (e.g. `+ * (jmix:link)`) does not support the `i18n` attribute: the content tree is shared across all languages. The workaround for this is per-language visibility conditions (Advanced Editing > Visibility > Languages).
 
-We recommend that you add the `i18n` attribute to:
+We recommend adding the `i18n` attribute to:
 
 - All visitor-facing free text fields (e.g. string, richtext, textarea)
-- All weak references that point to images that may contain text or people
+- All weak references pointing to images that may include text overlays or locale-specific visuals
 
-Under the hood, non-i18n fields will be stored on the node itself, while i18n fields will be stored as properties of `jnt:translation` child nodes named `j:translation_<language>`. You don't need to worry about this, but it is useful to know for debugging purposes.
+Under the hood, non-i18n fields are stored directly on the node, while i18n fields are stored as properties of `jnt:translation` child nodes named `j:translation_<language>`. You usually don't need to worry about this, properties will be handled automatically, but it can be helpful when debugging.
 
 ## Views and Templates
 
-For editor-written content, you don't need to do anything special: `i18n` properties are handled the exact same way as classic properties. Given the following Compact Node Definition (CND):
+After the editors have created content, you will want to display it in views and templates.
+
+As mentioned before, for editor-written content, you don't need to do anything special: `i18n` properties are handled the exact same way as regular properties. Given the following Compact Node Definition (CND):
 
 ```cnd
 [example:title] > jnt:content
@@ -44,7 +46,7 @@ For editor-written content, you don't need to do anything special: `i18n` proper
  - color (string)
 ```
 
-The `title` field is translatable, while the `color` field is not. As a developer, you'll retrieve them in the same way in your views and templates:
+The `title` field is translatable, while the `color` field is not. As a developer, you retrieve them in the same way in your views and templates:
 
 ```tsx
 interface Props {
@@ -64,9 +66,9 @@ jahiaComponent(
 
 ### Static Text
 
-When creating views and templates, you may want to include basic text such as `<a href="...">Read more</a>` links or `Written by {{author}}` labels. For all user-facing translations, we use the [`i18next`](https://www.i18next.com/) and [`react-i18next`](https://react.i18next.com/) libraries. For convenience, we cover the basics in this guide, but you can refer to the official documentation for more details.
+When creating views and templates, you may want to include static text such as `<a href="...">Read more</a>` links or labels like `Written by {{author}}`. For all user-facing translations, we use the [`i18next`](https://www.i18next.com/) and [`react-i18next`](https://react.i18next.com/) libraries. This guide covers the basics, but you can refer to the official documentation for more details.
 
-Translations are stored in JSON files located in the `settings/locales` directory, named `<language>.json`. Their structure is a JSON object (potentially nested), with key-value pairs where the key is used in the code and the value is displayed to the user. For example:
+Translations are stored in JSON files located in the `settings/locales` directory, named `<language>.json`. Each file contains a JSON object (potentially nested), with key-value pairs where the key is used in the code and the value is displayed to the user. For example:
 
 ```js
 // en.json
@@ -82,7 +84,7 @@ Translations are stored in JSON files located in the `settings/locales` director
 }
 ```
 
-The translation files are loaded automatically for you. The translation code is the same for both client and server code:
+The translation files are loaded automatically. The translation code is the same for both client and server code:
 
 ```jsx
 // Import the `useTranslation` hook
@@ -110,23 +112,23 @@ The `npm init @jahia/module@latest` command automatically configures the [i18n a
 
 ![VS Code i18n ally extension showing inline translation keys and values](i18n-ally-display.png)
 
-It also provides a VS Code command to extract hardcoded strings into the translation files:
+It also provides a VS Code command to extract hardcoded strings into translation files:
 
 ![VS Code i18n ally command palette entry for extracting text into i18n messages](i18n-ally-extract.png)
 
 The `Extract text into i18n messages` command will automatically replace the selected string with a `t("...")` call.
 
-It can also list missing or unused translations, and enables collaboration features.
+It can also list missing or unused translations, and provide collaboration features.
 
 Check out the [i18n ally documentation](https://github.com/lokalise/i18n-ally/wiki) for a complete list of features and configuration options.
 
-A similar feature set is advertised by [i18next-cli](https://github.com/i18next/i18next-cli#readme), but we haven't tried it out yet. It may prove useful for other IDEs or in CI environments—see if that's the case for you!
+A similar feature set is provided by [i18next-cli](https://github.com/i18next/i18next-cli#readme). We haven't tested it yet, but it may prove useful for other IDEs or in CI environments.
 
 ### Best Practices
 
 #### Don't use concatenation
 
-It can be tempting to write something like this: `t("key") + " " + author` to append dynamic data to a translation, but this will make translation impossible in languages with different word order.
+It can be tempting to write something like `t("key") + " " + author` to append dynamic data to a translation, but this will make translation impossible in languages with different word order.
 
 For simple use cases, use [interpolation](https://www.i18next.com/translation-function/interpolation): `"key": "Written by {{author}}"` and `t("key", { author })`.
 
@@ -156,13 +158,13 @@ This may sound counterintuitive, but using semantic keys like `read-more` or `wr
 
   For instance, the word "close" has two meanings: "shut" (verb) and "near" (adjective). Having a `"close": "Close"` pair would make it impossible to translate this word in languages where the two meanings are different words.
 
-- Avoid bikeshedding over key names and nesting
+- Avoid bikeshedding over key names or nesting
 
-i18n ally will generate a random key when using the extract command.
+The i18n ally extension generates a random key when you use the extract command.
 
 ### Building a Language Switcher
 
-Building a production-ready language switcher requires combining four pieces:
+Building a production-ready language switcher requires combining four elements:
 
 - [`getSiteLocales`](https://github.com/Jahia/javascript-modules/blob/main/javascript-modules-library/README.md#getsitelocales) to retrieve the list of available languages on the current site
 - The `j:invalidLanguages` property to check if a translation is usable (e.g. not hidden by a visibility condition)
@@ -205,9 +207,9 @@ function languageSwitcher(node: JCRNodeWrapper) {
 
 ## Edition Interfaces
 
-Jahia maintains almost all of the translations for the edition interfaces. The only thing we cannot translate for you is the display name of node types, fields, and choice list options.
+Jahia provides translations for most of the edition interfaces. The only elements that must be translated by the module developer are the display name of node types, fields, and choice list options.
 
-To offer a multilingual edition interface, provide translations in `<module>_<language>.properties` (or `<module>.properties` in English) files in your module in the `settings/resources/` directory.
+To support a multilingual edition interface, provide translations in `<module>_<language>.properties` (or `<module>.properties` in English) files in your module's `settings/resources/` directory.
 
 ```properties
 # Example for the `luxe:header` node type
@@ -231,7 +233,7 @@ luxe_header.subtitle.ui.tooltip=Le sous-titre n'est affiché qu'avec certaines v
 ![Edition interface in French](header_fr.png)
 
 :::info
-Contrary to what these screenshots may suggest, the edition interface language and the edited content language are independent:
+Despite what these screenshots may suggest, the edition interface language and the edited content language are independent:
 
 - Edited content language can be changed at the top of the edition interface:
 
@@ -254,7 +256,7 @@ luxe_estate.type.building=Building
 
 ![Choice list interface in English](choicelist_en.png)
 
-Don't forget the `[resourceBundle]` suffix in the field declaration, otherwise the translations will be ignored.
+Make sure to include the `[resourceBundle]` suffix in the field declaration; without it, the translations will be ignored.
 
 ## Reference
 
@@ -264,4 +266,4 @@ For further reference, you can check out the documentation of the libraries and 
 - [react-i18next](https://react.i18next.com/)
 - [i18n ally](https://github.com/lokalise/i18n-ally/wiki)
 
-We recommend that you also consult the [i18next Best Practices](https://www.i18next.com/principles/best-practices) guide.
+We recommend consulting the [i18next Best Practices](https://www.i18next.com/principles/best-practices) guide.
