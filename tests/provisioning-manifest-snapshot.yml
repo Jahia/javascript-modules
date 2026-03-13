@@ -1,20 +1,20 @@
 - include: "provisioning.yml"
-- installBundle:
+- installModule:
     - "mvn:org.jahia.modules/javascript-modules-engine"
   autoStart: true
   uninstallPreviousVersion: true
 
-- installBundle:
+- installModule:
     - "js:mvn:org.jahia.test/javascript-modules-engine-test-module/LATEST/tgz"
   autoStart: true
   uninstallPreviousVersion: true
 
-- installBundle:
+- installModule:
     - "js:mvn:org.jahia.samples/javascript-modules-samples-hydrogen/LATEST/tgz"
   autoStart: true
   uninstallPreviousVersion: true
 
-- installBundle:
+- installModule:
     - "mvn:org.jahia.samples/simple-osgi-service"
   autoStart: true
   uninstallPreviousVersion: true
