@@ -35,7 +35,7 @@ body.append(
   "script",
   JSON.stringify([
     {
-      installOrUpgradeModule: "package.tgz",
+      installOrUpgradeBundle: "package.tgz",
       // Skip CND breaking change prevention by default
       ignoreChecks: (process.env.JAHIA_IGNORE_CHECKS || "true") !== "false",
     },
