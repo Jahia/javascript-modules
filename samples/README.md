@@ -16,7 +16,7 @@ docker run --name jahia-ee-dev -p 8080:8080 -p 9229:9229 -e JPDA=true -d jahia/j
 ```
 curl http://root:root1234@localhost:8080/modules/api/provisioning \
   --header 'Content-Type: application/json' \
-  --data '[{"installOrUpgradeBundle":"mvn:org.jahia.modules/javascript-modules-engine","autoStart":true}]'
+  --data '[{"installOrUpgradeModule":"mvn:org.jahia.modules/javascript-modules-engine","autoStart":true}]'
 ```
 
 4. Navigate to the [hydrogen](./hydrogen) directory:

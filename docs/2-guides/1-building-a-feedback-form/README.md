@@ -226,7 +226,7 @@ Add this at the end of the file:
 
 ```yaml
 # Install and start jExperience
-- installBundle:
+- installModule:
     - "mvn:org.jahia.modules/jexperience/3.6.2"
     - "mvn:org.jahia.modules/jexperience-dashboards/1.0.0"
   autoStart: true
@@ -251,7 +251,7 @@ Add this at the end of the file:
     kibana_dashboards_provider.kibanaPassword: "ELASTIC_PASSWORD"
     kibana_dashboards_provider.KibanaProxy.enable: "true"
     kibana_dashboards_provider.KibanaProxy.cloud: "true"
-- installBundle:
+- installModule:
     - "mvn:org.jahia.modules/kibana-dashboards-provider/1.4.0"
   autoStart: true
   uninstallPreviousVersion: true
