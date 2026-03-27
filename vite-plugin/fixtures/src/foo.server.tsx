@@ -1,7 +1,7 @@
 import { buildModuleFileUrl, Island, jahiaComponent } from "@jahia/javascript-modules-library";
-import vite from "./vite.png";
-import { Layout } from "./Layout.tsx";
 import Foo from "./foo.client.tsx";
+import { Layout } from "./Layout.tsx";
+import vite from "./vite.png";
 
 jahiaComponent(
   {

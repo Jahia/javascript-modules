@@ -15,25 +15,23 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers;
 
-import org.apache.commons.io.FilenameUtils;
-import org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd.JahiaCndReader;
-import org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd.NodeTypeRegistry;
-import org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd.ParseException;
-
-import javax.jcr.RepositoryException;
-import javax.jcr.ValueFormatException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.jcr.RepositoryException;
+import javax.jcr.ValueFormatException;
+import org.apache.commons.io.FilenameUtils;
+import org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd.JahiaCndReader;
+import org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd.NodeTypeRegistry;
+import org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd.ParseException;
 
 /**
  * A CND (JCR content definition) file parser
  *
- * TEMPORARY WORKAROUND - DO NOT USE
- * This class duplicates poor legacy code to provide backward compatibility.
- * Marked for immediate replacement and removal.
+ * TEMPORARY WORKAROUND - DO NOT USE This class duplicates poor legacy code to provide backward compatibility. Marked
+ * for immediate replacement and removal.
  *
  * @deprecated since 1.0.0 Technical debt. Will be removed in next major version.
  */
@@ -45,11 +43,19 @@ public class CndFileParser extends AbstractFileParser {
         return "cnd".equals(ext);
     }
 
-    public boolean parse(String fileName, InputStream inputStream, String fileParent, boolean externalDependency, boolean optionalDependency, String version, ParsingContext parsingContext) throws IOException {
+    public boolean parse(
+            String fileName,
+            InputStream inputStream,
+            String fileParent,
+            boolean externalDependency,
+            boolean optionalDependency,
+            String version,
+            ParsingContext parsingContext) throws IOException {
         getLogger().debug("Processing CND " + fileName + "...");
 
         try {
-            JahiaCndReader jahiaCndReader = new JahiaCndReader(new InputStreamReader(inputStream), fileName, fileName, NodeTypeRegistry.getInstance());
+            JahiaCndReader jahiaCndReader = new JahiaCndReader(
+                    new InputStreamReader(inputStream), fileName, fileName, NodeTypeRegistry.getInstance());
             jahiaCndReader.setDoRegister(false);
             jahiaCndReader.parse();
 

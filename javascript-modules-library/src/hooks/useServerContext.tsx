@@ -1,6 +1,6 @@
-import { createContext, type ReactNode, use, type JSX, useMemo } from "react";
-import type { RenderContext, Resource } from "org.jahia.services.render";
 import type { JCRNodeWrapper, JCRSessionWrapper } from "org.jahia.services.content";
+import type { RenderContext, Resource } from "org.jahia.services.render";
+import { createContext, type JSX, type ReactNode, use, useMemo } from "react";
 
 /**
  * A context object that gives access to the underlying Jahia Java objects that are part of the

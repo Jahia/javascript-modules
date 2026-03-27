@@ -1,6 +1,6 @@
 import { JContent } from "@jahia/jcontent-cypress/dist/page-object/jcontent";
+import { GENERIC_SITE_KEY } from "../../support/constants";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Template Picker Correct Order Test", () => {
   before("Create page", () => {
@@ -16,8 +16,12 @@ describe("Template Picker Correct Order Test", () => {
     );
   });
 
-  beforeEach('Login', () => { cy.login(); });
-  afterEach('Logout', () => { cy.logout(); });
+  beforeEach("Login", () => {
+    cy.login();
+  });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
   it("should display the correct order of templates", () => {
     const templatesValues = [
@@ -40,9 +44,9 @@ describe("Template Picker Correct Order Test", () => {
     ];
     const jContent = JContent.visit("javascriptTestSite", "en", "pages/home").switchToPageBuilder();
     jContent.getCreatePage();
-    cy.get('[id="select-jmix:hasTemplateNode_j:templateName"]').click();
+    cy.get("[id=\"select-jmix:hasTemplateNode_j:templateName\"]").click();
     let i = 0;
-    cy.get('[id="select-jmix:hasTemplateNode_j:templateName"] menu li').each((el) => {
+    cy.get("[id=\"select-jmix:hasTemplateNode_j:templateName\"] menu li").each((el) => {
       cy.wrap(el).should("have.text", templatesValues[i]);
       i++;
     });

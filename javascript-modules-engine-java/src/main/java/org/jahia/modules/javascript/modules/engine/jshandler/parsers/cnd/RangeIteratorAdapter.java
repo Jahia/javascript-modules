@@ -16,24 +16,22 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd;
 
-import javax.jcr.RangeIterator;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import javax.jcr.RangeIterator;
 
 /**
- * Adapter for turning normal {@link Iterator}s into {@link RangeIterator}s.
- * This helper class is used by the adapter classes in this package to
- * implement the JCR iterator interfaces on top of normal Java iterators.
+ * Adapter for turning normal {@link Iterator} s into {@link RangeIterator} s. This helper class is used by the adapter
+ * classes in this package to implement the JCR iterator interfaces on top of normal Java iterators.
  */
 class RangeIteratorAdapter implements RangeIterator {
 
     /**
-     * Static instance of an empty {@link RangeIterator}.
+     * Static instance of an empty {@link RangeIterator} .
      */
-    public static final RangeIterator EMPTY =
-        new RangeIteratorAdapter(Collections.EMPTY_LIST);
+    public static final RangeIterator EMPTY = new RangeIteratorAdapter(Collections.EMPTY_LIST);
 
     /**
      * The adapted iterator instance.
@@ -80,7 +78,7 @@ class RangeIteratorAdapter implements RangeIterator {
         this(collection.iterator(), collection.size());
     }
 
-    //-------------------------------------------------------< RangeIterator >
+    // -------------------------------------------------------< RangeIterator >
 
     /**
      * Returns the current position of the iterator.
@@ -107,8 +105,7 @@ class RangeIteratorAdapter implements RangeIterator {
      * @throws IllegalArgumentException if n is negative
      * @throws NoSuchElementException if skipped past the last element
      */
-    public void skip(long n)
-    throws IllegalArgumentException, NoSuchElementException {
+    public void skip(long n) throws IllegalArgumentException, NoSuchElementException {
         if (n < 0) {
             throw new IllegalArgumentException("skip(" + n + ")");
         }
@@ -117,15 +114,13 @@ class RangeIteratorAdapter implements RangeIterator {
         }
     }
 
-    //------------------------------------------------------------< Iterator >
+    // ------------------------------------------------------------< Iterator >
 
     /**
-     * Checks if this iterator has more elements. If there are no more
-     * elements and the size of the iterator is unknown, then the size is
-     * set to the current position.
+     * Checks if this iterator has more elements. If there are no more elements and the size of the iterator is unknown,
+     * then the size is set to the current position.
      *
-     * @return <code>true</code> if this iterator has more elements,
-     *         <code>false</code> otherwise
+     * @return <code>true</code> if this iterator has more elements, <code>false</code> otherwise
      */
     public boolean hasNext() {
         if (iterator.hasNext()) {
@@ -139,9 +134,8 @@ class RangeIteratorAdapter implements RangeIterator {
     }
 
     /**
-     * Returns the next element in this iterator and advances the iterator
-     * position. If there are no more elements and the size of the iterator
-     * is unknown, then the size is set to the current position.
+     * Returns the next element in this iterator and advances the iterator position. If there are no more elements and
+     * the size of the iterator is unknown, then the size is set to the current position.
      *
      * @return next element
      * @throws NoSuchElementException if there are no more elements
@@ -160,19 +154,16 @@ class RangeIteratorAdapter implements RangeIterator {
     }
 
     /**
-     * Removes the previously retrieved element. Decreases the current
-     * position and size of this iterator.
+     * Removes the previously retrieved element. Decreases the current position and size of this iterator.
      *
      * @throws UnsupportedOperationException if removes are not permitted
      * @throws IllegalStateException if there is no previous element to remove
      */
-    public void remove()
-    throws UnsupportedOperationException, IllegalStateException {
+    public void remove() throws UnsupportedOperationException, IllegalStateException {
         iterator.remove();
         position--;
         if (size != -1) {
             size--;
         }
     }
-
 }

@@ -1,9 +1,9 @@
-import type { JSX } from "react";
-import { Render } from "./Render.js";
-import { useServerContext } from "../../hooks/useServerContext.js";
-import { AddContentButtons } from "../AddContentButtons.js";
-import { getChildNodes } from "../../utils/jcr/getChildNodes.js";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
+import type { JSX } from "react";
+import { useServerContext } from "../../hooks/useServerContext.js";
+import { getChildNodes } from "../../utils/jcr/getChildNodes.js";
+import { AddContentButtons } from "../AddContentButtons.js";
+import { Render } from "./Render.js";
 
 /** Renders the children of the current node, and "Add content" buttons afterwards. */
 export function RenderChildren({
@@ -56,9 +56,7 @@ export function RenderChildren({
         limit,
         offset,
         typeof filter === "string" ? (node) => node.isNodeType(filter) : filter,
-      ).map((node) => (
-        <Render key={node.getIdentifier()} node={node} view={view} />
-      ))}
+      ).map((node) => <Render key={node.getIdentifier()} node={node} view={view} />)}
       <AddContentButtons nodeTypes={nodeTypes} />
     </>
   );

@@ -15,18 +15,13 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd;
 
-
-import javax.jcr.Value;
 import java.util.List;
+import javax.jcr.Value;
 
 /**
- * Defines a property value initializer.
- * User: toto
- * Date: Apr 3, 2008
- * Time: 4:09:58 PM
+ * Defines a property value initializer. User: toto Date: Apr 3, 2008 Time: 4:09:58 PM
  */
- interface ValueInitializer {
+interface ValueInitializer {
 
-     Value[] getValues(ExtendedPropertyDefinition declaringPropertyDefinition, List<String> params);
-
+    Value[] getValues(ExtendedPropertyDefinition declaringPropertyDefinition, List<String> params);
 }

@@ -1,5 +1,7 @@
 export {
   createPortal,
+  // Default export too
+  default,
   flushSync,
   preconnect,
   prefetchDNS,
@@ -11,6 +13,4 @@ export {
   unstable_batchedUpdates,
   useFormState,
   useFormStatus,
-  // Default export too
-  default,
 } from "react-dom";

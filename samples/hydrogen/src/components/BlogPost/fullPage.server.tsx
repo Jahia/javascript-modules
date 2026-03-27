@@ -1,8 +1,8 @@
 import { AbsoluteArea, jahiaComponent } from "@jahia/javascript-modules-library";
-import type { Props } from "./types.js";
-import classes from "./component.module.css";
-import { SmallHeroSection } from "../Hero/Section/small.server.jsx";
 import { buildNodeUrl } from "@jahia/javascript-modules-library";
+import { SmallHeroSection } from "../Hero/Section/small.server.jsx";
+import classes from "./component.module.css";
+import type { Props } from "./types.js";
 
 jahiaComponent(
   {
@@ -20,11 +20,10 @@ jahiaComponent(
       <main className={classes.main}>
         <header>
           <p>
-            Written {authors && authors.length > 0 && <>by {authors.join(", ")} </>}
+            Written {authors && authors.length > 0 && <>by {authors.join(", ")}</>}
             {publicationDate && (
               <>
-                on{" "}
-                {new Date(publicationDate).toLocaleDateString(
+                on {new Date(publicationDate).toLocaleDateString(
                   currentResource.getLocale().toString(),
                   { dateStyle: "long" },
                 )}

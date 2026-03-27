@@ -1,6 +1,0 @@
-# This file inherits .gitignore, there is no need to copy its content here
-.yarn
-.github/ISSUE_TEMPLATE
-
-# Do not format expected dist files
-**/fixtures/expected

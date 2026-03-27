@@ -106,7 +106,9 @@ export default function jahia(
  • If this is the intended behavior, you can safely ignore this message
  • Otherwise, ensure that your client files are properly configured in the plugin options
    Client base directory: ${styleText("cyanBright", options.inputDir ?? "src (default value)")}
-   Client glob pattern:   ${styleText("cyanBright", String(options.client?.inputGlob ?? "**/*.client.{jsx,tsx} (default value)"))}`,
+   Client glob pattern:   ${
+        styleText("cyanBright", String(options.client?.inputGlob ?? "**/*.client.{jsx,tsx} (default value)"))
+      }`,
     );
   }
 
@@ -175,9 +177,9 @@ export default function jahia(
                     },
                   },
                   // Only add the callback plugin in watch mode
-                  config.build?.watch &&
-                    options.watchCallback &&
-                    buildSuccessful(options.watchCallback),
+                  config.build?.watch
+                  && options.watchCallback
+                  && buildSuccessful(options.watchCallback),
                 ],
               },
             },
@@ -216,9 +218,9 @@ export default function jahia(
                 plugins: [
                   multiEntry(options.server?.outputFile ?? "server/index.js"),
                   // Only add the callback plugin in watch mode
-                  config.build?.watch &&
-                    options.watchCallback &&
-                    buildSuccessful(options.watchCallback),
+                  config.build?.watch
+                  && options.watchCallback
+                  && buildSuccessful(options.watchCallback),
                   // Insert filenames in client-side components
                   insertFilename(
                     clientBaseDir,
@@ -264,7 +266,9 @@ export default function jahia(
     resolveId(id, importer) {
       if (this.environment.name === "client" && id === "@jahia/javascript-modules-library") {
         this.error(
-          `\n\tCannot import @jahia/javascript-modules-library in the client bundle\n\tin ${importer}\n\t${styleText("bgRedBright", "This module is only available on the server.")}`,
+          `\n\tCannot import @jahia/javascript-modules-library in the client bundle\n\tin ${importer}\n\t${
+            styleText("bgRedBright", "This module is only available on the server.")
+          }`,
         );
       }
     },

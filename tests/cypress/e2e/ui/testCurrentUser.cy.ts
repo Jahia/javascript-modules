@@ -1,6 +1,6 @@
 import { addNode } from "@jahia/cypress";
+import { GENERIC_SITE_KEY } from "../../support/constants";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Test current user", () => {
   before("Create tests contents", () => {
@@ -25,12 +25,16 @@ describe("Test current user", () => {
     });
   });
 
-beforeEach('Login', () => { cy.login(); });
-afterEach('Logout', () => { cy.logout(); });
+  beforeEach("Login", () => {
+    cy.login();
+  });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
   it("should display the current user as root", () => {
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testCurrentUser.html`);
-    cy.get('div[data-testid="currentUser_username"]').should("exist").contains("root");
-    cy.get('div[data-testid="currentUser_isRoot"]').should("exist").contains("true");
+    cy.get("div[data-testid=\"currentUser_username\"]").should("exist").contains("root");
+    cy.get("div[data-testid=\"currentUser_isRoot\"]").should("exist").contains("true");
   });
 });

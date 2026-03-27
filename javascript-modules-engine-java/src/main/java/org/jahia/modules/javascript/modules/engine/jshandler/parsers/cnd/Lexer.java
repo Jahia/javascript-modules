@@ -15,12 +15,12 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd;
 
-import javax.jcr.query.qom.QueryObjectModelConstants;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import javax.jcr.query.qom.QueryObjectModelConstants;
 
 /**
  * Lexer
@@ -40,73 +40,66 @@ class Lexer {
     public static final char CONSTRAINT = '<';
 
     public static final String[] ORDERABLE = new String[] {"orderable", "ord", "o"};
-    public static final String[] MIXIN = new String[]{"mixin", "mix", "m"};
-    public static final String[] ABSTRACT = new String[]{"abstract", "abs", "a"};
-    public static final String[] NOQUERY = new String[]{"noquery", "nq"};
-    public static final String[] QUERY = new String[]{"query", "q"};
-    public static final String[] PRIMARYITEM = new String[]{"primaryitem", "!"};
-    public static final String[] MIXIN_EXTENDS = new String[]{"extends"};
+    public static final String[] MIXIN = new String[] {"mixin", "mix", "m"};
+    public static final String[] ABSTRACT = new String[] {"abstract", "abs", "a"};
+    public static final String[] NOQUERY = new String[] {"noquery", "nq"};
+    public static final String[] QUERY = new String[] {"query", "q"};
+    public static final String[] PRIMARYITEM = new String[] {"primaryitem", "!"};
+    public static final String[] MIXIN_EXTENDS = new String[] {"extends"};
 
-    public static final String[] VALIDATOR = new String[]{"validator", "val", "v"};
+    public static final String[] VALIDATOR = new String[] {"validator", "val", "v"};
 
-    public static final String[] PRIMARY = new String[]{"primary", "pri", "!"};
-    public static final String[] AUTOCREATED = new String[]{"autocreated", "aut", "a"};
-    public static final String[] MANDATORY = new String[]{"mandatory", "man", "m"};
-    public static final String[] PROTECTED = new String[]{"protected", "pro", "p"};
-    public static final String[] MULTIPLE = new String[]{"multiple", "mul", "*"};
-    public static final String[] SNS = new String[]{"sns", "*", "multiple"};
-    public static final String[] INTERNATIONALIZED = new String[]{"internationalized", "i15d", "i18n", "i"};
+    public static final String[] PRIMARY = new String[] {"primary", "pri", "!"};
+    public static final String[] AUTOCREATED = new String[] {"autocreated", "aut", "a"};
+    public static final String[] MANDATORY = new String[] {"mandatory", "man", "m"};
+    public static final String[] PROTECTED = new String[] {"protected", "pro", "p"};
+    public static final String[] MULTIPLE = new String[] {"multiple", "mul", "*"};
+    public static final String[] SNS = new String[] {"sns", "*", "multiple"};
+    public static final String[] INTERNATIONALIZED = new String[] {"internationalized", "i15d", "i18n", "i"};
 
-    public static final String[] ITEMTYPE = new String[]{"itemtype", "type"};
-    public static final String[] INDEXED = new String[]{"indexed", "ind", "x"};
-    public static final String[] SCOREBOOST = new String[]{"scoreboost", "boost", "b"};
-    public static final String[] NO = new String[]{"no","n"};
-    public static final String[] YES = new String[]{"yes","y"};
-    public static final String[] TOKENIZED = new String[]{"tokenized","tok","t"};
-    public static final String[] UNTOKENIZED = new String[]{"untokenized","untok","u"};
-    public static final String[] ANALYZER = new String[]{"analyzer"};
-    public static final String[] FACETABLE = new String[]{"facetable"};
-    public static final String[] HIERARCHICAL = new String[]{"hierarchical"};
+    public static final String[] ITEMTYPE = new String[] {"itemtype", "type"};
+    public static final String[] INDEXED = new String[] {"indexed", "ind", "x"};
+    public static final String[] SCOREBOOST = new String[] {"scoreboost", "boost", "b"};
+    public static final String[] NO = new String[] {"no", "n"};
+    public static final String[] YES = new String[] {"yes", "y"};
+    public static final String[] TOKENIZED = new String[] {"tokenized", "tok", "t"};
+    public static final String[] UNTOKENIZED = new String[] {"untokenized", "untok", "u"};
+    public static final String[] ANALYZER = new String[] {"analyzer"};
+    public static final String[] FACETABLE = new String[] {"facetable"};
+    public static final String[] HIERARCHICAL = new String[] {"hierarchical"};
 
-    public static final String[] SORTABLE = new String[]{"sortable"};
-    public static final String[] FULLTEXTSEARCHABLE = new String[]{"fulltextsearchable", "fts"};
+    public static final String[] SORTABLE = new String[] {"sortable"};
+    public static final String[] FULLTEXTSEARCHABLE = new String[] {"fulltextsearchable", "fts"};
 
-    public static final String[] QUERYOPS = new String[]{"queryops", "qop"};
-    public static final String[] NOFULLTEXT = new String[]{"nofulltext", "nof"};
-    public static final String[] NOQUERYORDER = new String[]{"noqueryorder", "nqord"};
+    public static final String[] QUERYOPS = new String[] {"queryops", "qop"};
+    public static final String[] NOFULLTEXT = new String[] {"nofulltext", "nof"};
+    public static final String[] NOQUERYORDER = new String[] {"noqueryorder", "nqord"};
 
-    public static final String[] HIDDEN = new String[]{"hidden", "Hidden", "HIDDEN"};
+    public static final String[] HIDDEN = new String[] {"hidden", "Hidden", "HIDDEN"};
 
-    public static final String[] ONCONFLICT = new String[]{"onconflict"};
-    public static final String[] USE_LATEST = new String[]{"latest"};
-    public static final String[] USE_OLDEST = new String[]{"oldest"};
-    public static final String[] NUMERIC_USE_MIN = new String[]{"min"};
-    public static final String[] NUMERIC_USE_MAX = new String[]{"max"};
-    public static final String[] NUMERIC_SUM = new String[]{"sum"};
+    public static final String[] ONCONFLICT = new String[] {"onconflict"};
+    public static final String[] USE_LATEST = new String[] {"latest"};
+    public static final String[] USE_OLDEST = new String[] {"oldest"};
+    public static final String[] NUMERIC_USE_MIN = new String[] {"min"};
+    public static final String[] NUMERIC_USE_MAX = new String[] {"max"};
+    public static final String[] NUMERIC_SUM = new String[] {"sum"};
 
-    public static final String[] COPY = new String[]{"copy", "Copy", "COPY"};
-    public static final String[] VERSION = new String[]{"version", "Version", "VERSION"};
-    public static final String[] INITIALIZE = new String[]{"initialize", "Initialize", "INITIALIZE"};
-    public static final String[] COMPUTE = new String[]{"compute", "Compute", "COMPUTE"};
-    public static final String[] IGNORE = new String[]{"ignore", "Ignore", "IGNORE"};
-    public static final String[] ABORT = new String[]{"abort", "Abort", "ABORT"};
+    public static final String[] COPY = new String[] {"copy", "Copy", "COPY"};
+    public static final String[] VERSION = new String[] {"version", "Version", "VERSION"};
+    public static final String[] INITIALIZE = new String[] {"initialize", "Initialize", "INITIALIZE"};
+    public static final String[] COMPUTE = new String[] {"compute", "Compute", "COMPUTE"};
+    public static final String[] IGNORE = new String[] {"ignore", "Ignore", "IGNORE"};
+    public static final String[] ABORT = new String[] {"abort", "Abort", "ABORT"};
 
-//    public static final String[] LIVECONTENT = new String[]{"livecontent", "LiveContent", "LIVECONTENT"};
+    //    public static final String[] LIVECONTENT = new String[]{"livecontent", "LiveContent", "LIVECONTENT"};
 
-    public static final String[] WORKFLOW = new String[]{"workflow", "Workflow", "WORKFLOW"};
+    public static final String[] WORKFLOW = new String[] {"workflow", "Workflow", "WORKFLOW"};
 
     public static final String[] PROP_ATTRIBUTE;
     public static final String[] NODE_ATTRIBUTE;
 
-    public static final String[] ALL_OPERATORS = new String[]{
-            QueryObjectModelConstants.JCR_OPERATOR_EQUAL_TO,
-            QueryObjectModelConstants.JCR_OPERATOR_NOT_EQUAL_TO,
-            QueryObjectModelConstants.JCR_OPERATOR_GREATER_THAN,
-            QueryObjectModelConstants.JCR_OPERATOR_GREATER_THAN_OR_EQUAL_TO,
-            QueryObjectModelConstants.JCR_OPERATOR_LESS_THAN,
-            QueryObjectModelConstants.JCR_OPERATOR_LESS_THAN_OR_EQUAL_TO,
-            QueryObjectModelConstants.JCR_OPERATOR_LIKE
-    };
+    public static final String[] ALL_OPERATORS =
+            new String[] {QueryObjectModelConstants.JCR_OPERATOR_EQUAL_TO, QueryObjectModelConstants.JCR_OPERATOR_NOT_EQUAL_TO, QueryObjectModelConstants.JCR_OPERATOR_GREATER_THAN, QueryObjectModelConstants.JCR_OPERATOR_GREATER_THAN_OR_EQUAL_TO, QueryObjectModelConstants.JCR_OPERATOR_LESS_THAN, QueryObjectModelConstants.JCR_OPERATOR_LESS_THAN_OR_EQUAL_TO, QueryObjectModelConstants.JCR_OPERATOR_LIKE};
 
     static {
         ArrayList<String> attr = new ArrayList<String>();
@@ -152,7 +145,7 @@ class Lexer {
         attr.addAll(Arrays.asList(WORKFLOW));
         attr.addAll(Arrays.asList(HIDDEN));
         attr.addAll(Arrays.asList(ITEMTYPE));
-//        attr.addAll(Arrays.asList(LIVECONTENT));
+        //        attr.addAll(Arrays.asList(LIVECONTENT));
         NODE_ATTRIBUTE = attr.toArray(new String[attr.size()]);
     }
 
@@ -192,7 +185,7 @@ class Lexer {
     public static final String[] CRON = {"cron", "Cron", "CRON"};
     public static final String[] TAG = {"tag", "Tag", "TAG"};
 
-    public static final String[] UNDEFINED = new String[]{"undefined", "Undefined", "UNDEFINED", "*"};
+    public static final String[] UNDEFINED = new String[] {"undefined", "Undefined", "UNDEFINED", "*"};
 
     public static final String EOF = "eof";
 
@@ -246,9 +239,7 @@ class Lexer {
             int tokenType = st.nextToken();
             if (tokenType == StreamTokenizer.TT_EOF) {
                 return EOF;
-            } else if (tokenType == StreamTokenizer.TT_WORD
-                    || tokenType == SINGLE_QUOTE
-                    || tokenType == DOUBLE_QUOTE) {
+            } else if (tokenType == StreamTokenizer.TT_WORD || tokenType == SINGLE_QUOTE || tokenType == DOUBLE_QUOTE) {
                 return st.sval;
             } else if (tokenType == StreamTokenizer.TT_NUMBER) {
                 return String.valueOf(st.nval);
@@ -280,12 +271,12 @@ class Lexer {
         throw new ParseException(message, e, st.lineno(), -1, filename);
     }
 
-     /**
+    /**
      * Creates a failure exception including the current line number and systemid.
      * @param e root cause
      * @throws ParseException the created exception
      */
-     public void fail(Throwable e) throws ParseException {
+    public void fail(Throwable e) throws ParseException {
         throw new ParseException(e, st.lineno(), -1, filename);
     }
 }

@@ -15,6 +15,7 @@
  */
 package org.jahia.modules.javascript.modules.engine.registrars;
 
+import java.util.*;
 import org.graalvm.polyglot.Value;
 import org.jahia.modules.javascript.modules.engine.jsengine.ContextProvider;
 import org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine;
@@ -31,8 +32,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
-
-import java.util.*;
 
 @Component(service = Registrar.class, immediate = true)
 public class RenderFilterRegistrar implements Registrar {
@@ -120,16 +119,22 @@ public class RenderFilterRegistrar implements Registrar {
         }
 
         @Override
-        public String execute(String s, RenderContext renderContext, Resource resource, RenderChain renderChain) throws Exception {
+        public String execute(String s, RenderContext renderContext, Resource resource, RenderChain renderChain)
+                throws Exception {
             return engine.doWithContext(contextProvider -> {
-                return Value.asValue(getJsFilter(contextProvider).get("execute")).execute(s, renderContext, resource, renderChain).asString();
+                return Value.asValue(getJsFilter(contextProvider).get("execute"))
+                        .execute(s, renderContext, resource, renderChain)
+                        .asString();
             });
         }
 
         @Override
-        public String prepare(RenderContext renderContext, Resource resource, RenderChain renderChain) throws Exception {
+        public String prepare(RenderContext renderContext, Resource resource, RenderChain renderChain)
+                throws Exception {
             return engine.doWithContext(contextProvider -> {
-                return Value.asValue(getJsFilter(contextProvider).get("prepare")).execute(renderContext, resource, renderChain).asString();
+                return Value.asValue(getJsFilter(contextProvider).get("prepare"))
+                        .execute(renderContext, resource, renderChain)
+                        .asString();
             });
         }
 

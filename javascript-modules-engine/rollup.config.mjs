@@ -48,7 +48,7 @@ const plugins = [
 ];
 
 export default defineConfig([
-  //#region Client build
+  // #region Client build
   // Bundle the shared libraries for browser use (exposed by an importmap)
   // They are used by both the main client script and client-side module scripts
   {
@@ -83,9 +83,9 @@ export default defineConfig([
       buildEnv === "production" && terser(),
     ],
   },
-  //#endregion
+  // #endregion
 
-  //#region Server build
+  // #region Server build
   // Bundle the shared libraries for server use
   {
     input: serverLibs,
@@ -120,8 +120,9 @@ export default defineConfig([
           if (id === "virtual:shared-lib-files") return `\0shared-lib-files`;
         },
         load(id) {
-          if (id === "\0shared-lib-files")
+          if (id === "\0shared-lib-files") {
             return `export default ${JSON.stringify(sharedLibFiles)};`;
+          }
         },
       },
       ...plugins,
@@ -137,5 +138,5 @@ export default defineConfig([
     external: Object.keys(serverLibs),
     plugins,
   },
-  //#endregion
+  // #endregion
 ]);

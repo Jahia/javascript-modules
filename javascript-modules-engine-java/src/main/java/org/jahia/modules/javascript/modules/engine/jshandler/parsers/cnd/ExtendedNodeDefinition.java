@@ -15,19 +15,15 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd;
 
+import java.util.Arrays;
+import javax.jcr.nodetype.NoSuchNodeTypeException;
+import javax.jcr.nodetype.NodeDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.jcr.nodetype.NoSuchNodeTypeException;
-import javax.jcr.nodetype.NodeDefinition;
-import java.util.Arrays;
-
 /**
  *
- * User: toto
- * Date: 4 janv. 2008
- * Time: 14:08:56
- *
+ * User: toto Date: 4 janv. 2008 Time: 14:08:56
  */
 class ExtendedNodeDefinition extends ExtendedItemDefinition implements NodeDefinition {
     private static final transient Logger logger = LoggerFactory.getLogger(ExtendedItemDefinition.class);
@@ -37,7 +33,7 @@ class ExtendedNodeDefinition extends ExtendedItemDefinition implements NodeDefin
     private String[] requiredPrimaryTypes;
     private String defaultPrimaryType;
     private boolean allowsSameNameSiblings;
-//    private boolean liveContent = false;
+    //    private boolean liveContent = false;
     private String workflow;
 
     public ExtendedNodeDefinition(NodeTypeRegistry registry) {
@@ -58,7 +54,7 @@ class ExtendedNodeDefinition extends ExtendedItemDefinition implements NodeDefin
             try {
                 res[i] = registry.getNodeType(requiredPrimaryTypes[i]);
             } catch (NoSuchNodeTypeException e) {
-                logger.error("Nodetype not found",e);
+                logger.error("Nodetype not found", e);
             }
         }
         return res;
@@ -67,7 +63,6 @@ class ExtendedNodeDefinition extends ExtendedItemDefinition implements NodeDefin
     public String[] getRequiredPrimaryTypeNames() {
         return requiredPrimaryTypes;
     }
-
 
     public void setRequiredPrimaryTypes(String[] requiredPrimaryTypes) {
         this.requiredPrimaryTypes = requiredPrimaryTypes;
@@ -78,7 +73,7 @@ class ExtendedNodeDefinition extends ExtendedItemDefinition implements NodeDefin
             try {
                 return registry.getNodeType(defaultPrimaryType);
             } catch (NoSuchNodeTypeException e) {
-                logger.error("Nodetype not found",e);
+                logger.error("Nodetype not found", e);
             }
         }
         return null;
@@ -108,13 +103,13 @@ class ExtendedNodeDefinition extends ExtendedItemDefinition implements NodeDefin
         this.workflow = workflow;
     }
 
-//    public boolean isLiveContent() {
-//        return liveContent;
-//    }
-//
-//    public void setLiveContent(boolean liveContent) {
-//        this.liveContent = liveContent;
-//    }
+    //    public boolean isLiveContent() {
+    //        return liveContent;
+    //    }
+    //
+    //    public void setLiveContent(boolean liveContent) {
+    //        this.liveContent = liveContent;
+    //    }
 
     public boolean isNode() {
         return true;

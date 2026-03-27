@@ -1,6 +1,6 @@
 import { addNode } from "@jahia/cypress";
+import { GENERIC_SITE_KEY } from "../../support/constants";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("getNodeProps function test", () => {
   before("Create test page and contents", () => {
@@ -39,7 +39,7 @@ describe("getNodeProps function test", () => {
           },
           {
             name: "bigtext",
-            value: '<div data-testid="getNodeProps_bigtext_inner">bigtext value</div>',
+            value: "<div data-testid=\"getNodeProps_bigtext_inner\">bigtext value</div>",
           },
           { name: "date", value: "2023-12-26T01:30:25.243Z", type: "DATE" },
           { name: "decimal", value: "4535353.55665775", type: "DECIMAL" },
@@ -63,8 +63,8 @@ describe("getNodeProps function test", () => {
           {
             name: "multipleBigtext",
             values: [
-              '<div data-testid="getNodeProps_multipleBigtext_inner1">bigtext value1</div>',
-              '<div data-testid="getNodeProps_multipleBigtext_inner2">bigtext value2</div>',
+              "<div data-testid=\"getNodeProps_multipleBigtext_inner1\">bigtext value1</div>",
+              "<div data-testid=\"getNodeProps_multipleBigtext_inner2\">bigtext value2</div>",
             ],
           },
           {
@@ -97,70 +97,72 @@ describe("getNodeProps function test", () => {
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testGetNodeProps.html`);
   });
 
-  afterEach("Logout", () => { cy.logout(); });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
-  it("Verify property values from getNodeProps", function () {
-    cy.get('div[data-testid="getNodeProps_smallText"]').contains("smallTextValue");
-    cy.get('div[data-testid="getNodeProps_textarea"]').contains("textareaValue");
-    cy.get('div[data-testid="getNodeProps_choicelist"]').contains("choice2");
-    cy.get('div[data-testid="getNodeProps_long"]').contains("2");
-    cy.get('div[data-testid="getNodeProps_double"]').contains("3.6");
-    cy.get('div[data-testid="getNodeProps_boolean"]').contains("true");
-    cy.get('div[data-testid="getNodeProps_weakreference"]').contains(
+  it("Verify property values from getNodeProps", function() {
+    cy.get("div[data-testid=\"getNodeProps_smallText\"]").contains("smallTextValue");
+    cy.get("div[data-testid=\"getNodeProps_textarea\"]").contains("textareaValue");
+    cy.get("div[data-testid=\"getNodeProps_choicelist\"]").contains("choice2");
+    cy.get("div[data-testid=\"getNodeProps_long\"]").contains("2");
+    cy.get("div[data-testid=\"getNodeProps_double\"]").contains("3.6");
+    cy.get("div[data-testid=\"getNodeProps_boolean\"]").contains("true");
+    cy.get("div[data-testid=\"getNodeProps_weakreference\"]").contains(
       `/sites/${GENERIC_SITE_KEY}/home/testGetNodeProps/pagecontent`,
     );
-    cy.get('div[data-testid="getNodeProps_bigtext_inner"]').contains("bigtext value");
-    cy.get('div[data-testid="getNodeProps_date"]').contains("2023-12-26T01:30:25.243Z");
-    cy.get('div[data-testid="getNodeProps_decimal"]').contains("4535353.55665775");
-    cy.get('div[data-testid="getNodeProps_uri"]').contains("https://www.jahia.com");
-    cy.get('div[data-testid="getNodeProps_name"]').contains("nameValue");
-    cy.get('div[data-testid="getNodeProps_path"]').contains(
+    cy.get("div[data-testid=\"getNodeProps_bigtext_inner\"]").contains("bigtext value");
+    cy.get("div[data-testid=\"getNodeProps_date\"]").contains("2023-12-26T01:30:25.243Z");
+    cy.get("div[data-testid=\"getNodeProps_decimal\"]").contains("4535353.55665775");
+    cy.get("div[data-testid=\"getNodeProps_uri\"]").contains("https://www.jahia.com");
+    cy.get("div[data-testid=\"getNodeProps_name\"]").contains("nameValue");
+    cy.get("div[data-testid=\"getNodeProps_path\"]").contains(
       `/sites/${GENERIC_SITE_KEY}/home/testGetNodeProps/pagecontent`,
     );
   });
 
-  it("Verify property values from getNodeProps (multiple)", function () {
-    cy.get('div[data-testid="getNodeProps_multipleSmallText_1"]').contains("smallTextValue1");
-    cy.get('div[data-testid="getNodeProps_multipleSmallText_2"]').contains("smallTextValue2");
-    cy.get('div[data-testid="getNodeProps_multipleTextarea_1"]').contains("textareaValue1");
-    cy.get('div[data-testid="getNodeProps_multipleTextarea_2"]').contains("textareaValue2");
-    cy.get('div[data-testid="getNodeProps_multipleChoicelist_1"]').contains("choice1");
-    cy.get('div[data-testid="getNodeProps_multipleChoicelist_2"]').contains("choice2");
-    cy.get('div[data-testid="getNodeProps_multipleLong_1"]').contains("1");
-    cy.get('div[data-testid="getNodeProps_multipleLong_2"]').contains("2");
-    cy.get('div[data-testid="getNodeProps_multipleDouble_1"]').contains("1.5");
-    cy.get('div[data-testid="getNodeProps_multipleDouble_2"]').contains("2.5");
-    cy.get('div[data-testid="getNodeProps_multipleBoolean_1"]').contains("true");
-    cy.get('div[data-testid="getNodeProps_multipleBoolean_2"]').contains("false");
-    cy.get('div[data-testid="getNodeProps_multipleWeakreference_1"]').contains(
+  it("Verify property values from getNodeProps (multiple)", function() {
+    cy.get("div[data-testid=\"getNodeProps_multipleSmallText_1\"]").contains("smallTextValue1");
+    cy.get("div[data-testid=\"getNodeProps_multipleSmallText_2\"]").contains("smallTextValue2");
+    cy.get("div[data-testid=\"getNodeProps_multipleTextarea_1\"]").contains("textareaValue1");
+    cy.get("div[data-testid=\"getNodeProps_multipleTextarea_2\"]").contains("textareaValue2");
+    cy.get("div[data-testid=\"getNodeProps_multipleChoicelist_1\"]").contains("choice1");
+    cy.get("div[data-testid=\"getNodeProps_multipleChoicelist_2\"]").contains("choice2");
+    cy.get("div[data-testid=\"getNodeProps_multipleLong_1\"]").contains("1");
+    cy.get("div[data-testid=\"getNodeProps_multipleLong_2\"]").contains("2");
+    cy.get("div[data-testid=\"getNodeProps_multipleDouble_1\"]").contains("1.5");
+    cy.get("div[data-testid=\"getNodeProps_multipleDouble_2\"]").contains("2.5");
+    cy.get("div[data-testid=\"getNodeProps_multipleBoolean_1\"]").contains("true");
+    cy.get("div[data-testid=\"getNodeProps_multipleBoolean_2\"]").contains("false");
+    cy.get("div[data-testid=\"getNodeProps_multipleWeakreference_1\"]").contains(
       `/sites/${GENERIC_SITE_KEY}/home/testGetNodeProps/pagecontent`,
     );
-    cy.get('div[data-testid="getNodeProps_multipleWeakreference_2"]').contains(
+    cy.get("div[data-testid=\"getNodeProps_multipleWeakreference_2\"]").contains(
       `/sites/${GENERIC_SITE_KEY}/home/testGetNodeProps/header`,
     );
-    cy.get('div[data-testid="getNodeProps_multipleBigtext_inner1"]').contains("bigtext value1");
-    cy.get('div[data-testid="getNodeProps_multipleBigtext_inner2"]').contains("bigtext value2");
-    cy.get('div[data-testid="getNodeProps_multipleDate_1"]').contains("2023-12-26T01:30:25.243Z");
-    cy.get('div[data-testid="getNodeProps_multipleDate_2"]').contains("2023-12-27T01:30:25.243Z");
-    cy.get('div[data-testid="getNodeProps_multipleDecimal_1"]').contains("4535353.55665775");
-    cy.get('div[data-testid="getNodeProps_multipleDecimal_2"]').contains("4535353.55665776");
-    cy.get('div[data-testid="getNodeProps_multipleUri_1"]').contains("https://www.jahia.com");
-    cy.get('div[data-testid="getNodeProps_multipleUri_2"]').contains("https://www.google.com");
-    cy.get('div[data-testid="getNodeProps_multipleName_1"]').contains("nameValue1");
-    cy.get('div[data-testid="getNodeProps_multipleName_2"]').contains("nameValue2");
-    cy.get('div[data-testid="getNodeProps_multiplePath_1"]').contains(
+    cy.get("div[data-testid=\"getNodeProps_multipleBigtext_inner1\"]").contains("bigtext value1");
+    cy.get("div[data-testid=\"getNodeProps_multipleBigtext_inner2\"]").contains("bigtext value2");
+    cy.get("div[data-testid=\"getNodeProps_multipleDate_1\"]").contains("2023-12-26T01:30:25.243Z");
+    cy.get("div[data-testid=\"getNodeProps_multipleDate_2\"]").contains("2023-12-27T01:30:25.243Z");
+    cy.get("div[data-testid=\"getNodeProps_multipleDecimal_1\"]").contains("4535353.55665775");
+    cy.get("div[data-testid=\"getNodeProps_multipleDecimal_2\"]").contains("4535353.55665776");
+    cy.get("div[data-testid=\"getNodeProps_multipleUri_1\"]").contains("https://www.jahia.com");
+    cy.get("div[data-testid=\"getNodeProps_multipleUri_2\"]").contains("https://www.google.com");
+    cy.get("div[data-testid=\"getNodeProps_multipleName_1\"]").contains("nameValue1");
+    cy.get("div[data-testid=\"getNodeProps_multipleName_2\"]").contains("nameValue2");
+    cy.get("div[data-testid=\"getNodeProps_multiplePath_1\"]").contains(
       "/sites/javascriptTestSite/home/testGetNodeProps/pagecontent",
     );
-    cy.get('div[data-testid="getNodeProps_multiplePath_2"]').contains(
+    cy.get("div[data-testid=\"getNodeProps_multiplePath_2\"]").contains(
       `/sites/${GENERIC_SITE_KEY}/home/testGetNodeProps/header`,
     );
   });
 
-  it("Verify property values from getNodeProps (Types and safety)", function () {
-    cy.get('div[data-testid="getNodeProps_propNotSet"]').should("be.empty");
-    cy.get('div[data-testid="getNodeProps_propNotExists"]').should("be.empty");
-    cy.get('div[data-testid="getNodeProps_checkBooleanType"]').contains("true");
-    cy.get('div[data-testid="getNodeProps_checkLongType"]').contains("true");
-    cy.get('div[data-testid="getNodeProps_checkDoubleType"]').contains("true");
+  it("Verify property values from getNodeProps (Types and safety)", function() {
+    cy.get("div[data-testid=\"getNodeProps_propNotSet\"]").should("be.empty");
+    cy.get("div[data-testid=\"getNodeProps_propNotExists\"]").should("be.empty");
+    cy.get("div[data-testid=\"getNodeProps_checkBooleanType\"]").contains("true");
+    cy.get("div[data-testid=\"getNodeProps_checkLongType\"]").contains("true");
+    cy.get("div[data-testid=\"getNodeProps_checkDoubleType\"]").contains("true");
   });
 });

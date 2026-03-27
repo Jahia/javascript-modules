@@ -1,6 +1,6 @@
 import { AbsoluteArea, Area, jahiaComponent } from "@jahia/javascript-modules-library";
-import { Layout } from "../Layout.jsx";
 import { Render } from "@jahia/javascript-modules-library";
+import { Layout } from "../Layout.jsx";
 
 jahiaComponent(
   {

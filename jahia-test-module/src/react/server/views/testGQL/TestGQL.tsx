@@ -10,8 +10,7 @@ jahiaComponent(
   },
   (_, { currentNode }) => {
     const result = useGQLQuery({
-      query:
-        "query ($path:String!) { jcr { nodeByPath(path:$path) { name, properties { name, value } } } }",
+      query: "query ($path:String!) { jcr { nodeByPath(path:$path) { name, properties { name, value } } } }",
       variables: { path: currentNode.getPath() },
     });
     const resultFromDocument = useGQLQuery({

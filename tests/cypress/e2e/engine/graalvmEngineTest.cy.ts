@@ -3,7 +3,7 @@ describe("Check that GraalVM debugger can be enabled", () => {
   const ports = [9229, 10229];
 
   ports.forEach((port) => {
-    it(`Check that GraalVM debugger can be enabled on port ${port}`, function () {
+    it(`Check that GraalVM debugger can be enabled on port ${port}`, function() {
       // extract the host from the JAHIA_URL env var
       const host = Cypress.env("JAHIA_URL").split("//")[1].split(":")[0];
 
@@ -51,10 +51,9 @@ function waitForCurlExitCode(
           const actualCode = result.code;
 
           if (expectedCodes.includes(actualCode)) {
-            const msg =
-              actualCode === 0
-                ? `Connection successful (HTTP ${result.stdout})`
-                : `Got expected connection error (exit code: ${actualCode})`;
+            const msg = actualCode === 0
+              ? `Connection successful (HTTP ${result.stdout})`
+              : `Got expected connection error (exit code: ${actualCode})`;
             Cypress.log({ message: msg });
             return true;
           }

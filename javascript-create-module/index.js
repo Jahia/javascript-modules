@@ -8,8 +8,7 @@ import { styleText } from "node:util";
 import pkg from "./package.json" with { type: "json" };
 
 /** Renames the `dot` directory to dotfiles and dotdirs. */
-const renameDot = (/** @type {string} */ name) =>
-  name.startsWith(`dot${path.sep}`) ? `.${name.slice(4)}` : name;
+const renameDot = (/** @type {string} */ name) => name.startsWith(`dot${path.sep}`) ? `.${name.slice(4)}` : name;
 
 try {
   prompts.intro("Jahia JavaScript Module Creator");
@@ -31,8 +30,9 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
     initialValue: process.argv[2],
     validate(value) {
       if (!/^[a-z]/.test(value)) return "Module name must start with a lowercase letter.";
-      if (!/^[a-z0-9-]+$/.test(value))
+      if (!/^[a-z0-9-]+$/.test(value)) {
         return "Module name can only contain lowercase letters, numbers, and hyphens.";
+      }
     },
   });
 
@@ -116,9 +116,15 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
 
 Run the following commands to get started:
   ${styleText("dim", "1.")} ${styleText("greenBright", `cd ${output}`)}
-  ${styleText("dim", "2.")} ${styleText("cyanBright", "yarn install")}              ${styleText("dim", "# Install dependencies")}
-  ${styleText("dim", "3.")} ${styleText("blueBright", "docker compose up --wait")}  ${styleText("dim", "# Start Jahia in Docker")}
-  ${styleText("dim", "4.")} ${styleText("magentaBright", "yarn dev")}                  ${styleText("dim", "# Start the dev mode")}
+  ${styleText("dim", "2.")} ${styleText("cyanBright", "yarn install")}              ${
+    styleText("dim", "# Install dependencies")
+  }
+  ${styleText("dim", "3.")} ${styleText("blueBright", "docker compose up --wait")}  ${
+    styleText("dim", "# Start Jahia in Docker")
+  }
+  ${styleText("dim", "4.")} ${styleText("magentaBright", "yarn dev")}                  ${
+    styleText("dim", "# Start the dev mode")
+  }
 
 The ${styleText("underline", "README.md")} file contains a reminder of all commands.
 `);

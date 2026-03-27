@@ -1,7 +1,7 @@
 import type { JSX } from "react";
-import { Render } from "./Render.js";
 import { useServerContext } from "../../hooks/useServerContext.js";
 import { AddContentButtons } from "../AddContentButtons.js";
+import { Render } from "./Render.js";
 
 /**
  * Renders a child of the current node, designated by its name.

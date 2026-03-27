@@ -58,7 +58,7 @@ jahiaComponent(
         />
       </div>
 
-      <h2>Non editable area </h2>
+      <h2>Non editable area</h2>
       <div data-testid="nonEditableArea">
         <AbsoluteArea name="nonEditable" parent={currentNode} readOnly />
       </div>

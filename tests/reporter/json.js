@@ -33,23 +33,23 @@ function JSONReporter(runner, options) {
   var failures = [];
   var passes = [];
 
-  runner.on(EVENT_TEST_END, function (test) {
+  runner.on(EVENT_TEST_END, function(test) {
     tests.push(test);
   });
 
-  runner.on(EVENT_TEST_PASS, function (test) {
+  runner.on(EVENT_TEST_PASS, function(test) {
     passes.push(test);
   });
 
-  runner.on(EVENT_TEST_FAIL, function (test) {
+  runner.on(EVENT_TEST_FAIL, function(test) {
     failures.push(test);
   });
 
-  runner.on(EVENT_TEST_PENDING, function (test) {
+  runner.on(EVENT_TEST_PENDING, function(test) {
     pending.push(test);
   });
 
-  runner.once(EVENT_RUN_END, function () {
+  runner.once(EVENT_RUN_END, function() {
     var obj = {
       stats: self.stats,
       tests: tests.map(clean),
@@ -76,7 +76,7 @@ function JSONReporter(runner, options) {
       reportsPath + fileName + ".json",
       JSON.stringify(obj, null, 2),
       "utf8",
-      function (err) {
+      function(err) {
         if (err) {
           console.log("An error occured while writing JSON Object to File.");
           return console.log(err);
@@ -123,7 +123,7 @@ function clean(test) {
 function cleanCycles(obj) {
   var cache = [];
   return JSON.parse(
-    JSON.stringify(obj, function (key, value) {
+    JSON.stringify(obj, function(key, value) {
       if (typeof value === "object" && value !== null) {
         if (cache.indexOf(value) !== -1) {
           // Instead of going in a circle, we'll print [object Object]
@@ -147,7 +147,7 @@ function cleanCycles(obj) {
  */
 function errorJSON(err) {
   var res = {};
-  Object.getOwnPropertyNames(err).forEach(function (key) {
+  Object.getOwnPropertyNames(err).forEach(function(key) {
     res[key] = err[key];
   }, err);
   return res;

@@ -1,0 +1,9 @@
+{
+  "plugins": [
+    "https://github.com/speakeasy-api/dprint-plugin-java/releases/download/v0.5.0/dprint_plugin_java.wasm",
+    "https://plugins.dprint.dev/typescript-0.95.15.wasm",
+    "https://plugins.dprint.dev/json-0.21.1.wasm"
+  ],
+  "excludes": ["**/.yarn/releases/**", ".github/**", "**/fixtures/expected"],
+  "java": { "formatJavadoc": true }
+}

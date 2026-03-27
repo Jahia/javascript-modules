@@ -76,8 +76,8 @@ jahiaComponent(
       richText = false,
     ) => {
       return (
-        values &&
-        values.map(function (value, i) {
+        values
+        && values.map(function(value, i) {
           if (richText) {
             return (
               <div
@@ -100,8 +100,8 @@ jahiaComponent(
     };
     const printMultiValuedRefsProp = (selector: string, values: JCRNodeWrapper[]) => {
       return (
-        values &&
-        values.map(function (value, i) {
+        values
+        && values.map(function(value, i) {
           return (
             <div key={value.getPath()} data-testid={`${selector}_${i + 1}`}>
               {value.getPath()}

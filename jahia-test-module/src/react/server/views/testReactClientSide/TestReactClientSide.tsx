@@ -1,6 +1,6 @@
-import { Island, jahiaComponent } from "@jahia/javascript-modules-library";
 import SampleHydrateInBrowserReact from "$client/components/SampleHydrateInBrowserReact";
 import SampleRenderInBrowserReact from "$client/components/SampleRenderInBrowserReact";
+import { Island, jahiaComponent } from "@jahia/javascript-modules-library";
 
 jahiaComponent(
   {
@@ -11,7 +11,7 @@ jahiaComponent(
   (_, { currentResource }) => {
     return (
       <>
-        <h2>Just a normal view, that is using a client side react component: </h2>
+        <h2>Just a normal view, that is using a client side react component:</h2>
         <Island
           component={SampleHydrateInBrowserReact}
           props={{ initialValue: 9, set: new Set(["a", "b", "c"]) }}

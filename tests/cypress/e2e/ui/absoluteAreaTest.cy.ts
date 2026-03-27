@@ -1,6 +1,6 @@
 import { addNode, enableModule } from "@jahia/cypress";
+import { GENERIC_SITE_KEY } from "../../support/constants";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
 import "cypress-wait-until";
 
 describe("Absolute Area test", () => {
@@ -66,7 +66,7 @@ describe("Absolute Area test", () => {
       primaryNodeType: "jnt:contentList",
     });
     addSimplePage(`/sites/${GENERIC_SITE_KEY}`, "custom", "Custom", "en", "simple").then(() =>
-      addSimplePage(`/sites/${GENERIC_SITE_KEY}/custom`, "sub-level", "Sub level", "en", "simple"),
+      addSimplePage(`/sites/${GENERIC_SITE_KEY}/custom`, "sub-level", "Sub level", "en", "simple")
     );
   });
 
@@ -79,20 +79,20 @@ describe("Absolute Area test", () => {
 
   it(`${pageName}: Basic Area test`, () => {
     cy.iframe("#page-builder-frame-1").within(() => {
-      cy.get('div[data-testid="basicArea"]').find('div[type="absoluteArea"]').should("be.visible");
+      cy.get("div[data-testid=\"basicArea\"]").find("div[type=\"absoluteArea\"]").should("be.visible");
     });
   });
 
   it(`${pageName}: Allowed types area`, () => {
     cy.iframe("#page-builder-frame-1").within(() => {
-      cy.get('div[data-testid="allowedTypesArea"]')
-        .find('div[type="placeholder"]')
+      cy.get("div[data-testid=\"allowedTypesArea\"]")
+        .find("div[type=\"placeholder\"]")
         .then((buttons) => {
           const selector = `div[data-jahia-id="${buttons.attr("id")}"]`;
-          cy.get(selector).find('button[data-sel-role="jnt:bigText"]').should("be.visible");
-          cy.get(selector).find('button[data-sel-role="jnt:event"]').should("be.visible");
+          cy.get(selector).find("button[data-sel-role=\"jnt:bigText\"]").should("be.visible");
+          cy.get(selector).find("button[data-sel-role=\"jnt:event\"]").should("be.visible");
           cy.get(selector)
-            .find('button[data-sel-role!="jnt:event"][data-sel-role!="jnt:bigText"]')
+            .find("button[data-sel-role!=\"jnt:event\"][data-sel-role!=\"jnt:bigText\"]")
             .should("not.exist");
         });
     });
@@ -111,21 +111,21 @@ describe("Absolute Area test", () => {
     });
     cy.reload();
     cy.iframe("#page-builder-frame-1").within(() => {
-      cy.get('div[data-testid="numberOfItemsArea"]')
-        .find('div[type="placeholder"]')
+      cy.get("div[data-testid=\"numberOfItemsArea\"]")
+        .find("div[type=\"placeholder\"]")
         .should("not.be.visible");
     });
   });
 
   it(`${pageName}: areaView Area`, () => {
     cy.iframe("#page-builder-frame-1").within(() => {
-      cy.get('div[data-testid="areaViewArea"]').find('ul[class*="dropdown"]').should("be.visible");
+      cy.get("div[data-testid=\"areaViewArea\"]").find("ul[class*=\"dropdown\"]").should("be.visible");
     });
   });
 
   it(`${pageName}: absolute Area home page`, () => {
     cy.iframe("#page-builder-frame-1").within(() => {
-      cy.get('div[data-testid="absoluteAreaHomePage"] div[data-testid="row-twoColumns"]').should(
+      cy.get("div[data-testid=\"absoluteAreaHomePage\"] div[data-testid=\"row-twoColumns\"]").should(
         "exist",
       );
     });
@@ -133,44 +133,44 @@ describe("Absolute Area test", () => {
 
   it(`${pageName}: absolute Area site root`, () => {
     cy.iframe("#page-builder-frame-1").within(() => {
-      cy.get('div[data-testid="absoluteAreaCustomPage"]')
-        .find('div[type="absoluteArea"]')
+      cy.get("div[data-testid=\"absoluteAreaCustomPage\"]")
+        .find("div[type=\"absoluteArea\"]")
         .should("be.visible");
     });
   });
 
   it(`${pageName}: absolute Area custom page (sub-level)`, () => {
     cy.iframe("#page-builder-frame-1").within(() => {
-      cy.get('div[data-testid="absoluteAreaCustomPage"]')
-        .find('div[type="absoluteArea"]')
+      cy.get("div[data-testid=\"absoluteAreaCustomPage\"]")
+        .find("div[type=\"absoluteArea\"]")
         .should("be.visible");
     });
   });
 
   it(`${pageName}: non editable Area`, () => {
     cy.iframe("#page-builder-frame-1").within(() => {
-      cy.get('div[data-testid="nonEditableArea"]').should("be.empty");
+      cy.get("div[data-testid=\"nonEditableArea\"]").should("be.empty");
     });
   });
 
   it(`${pageName}: Area type`, () => {
     cy.iframe("#page-builder-frame-1").within(() => {
-      cy.get('div[data-testid="areaType"]').find('div[data-testid="row-areaType"]').should("exist");
+      cy.get("div[data-testid=\"areaType\"]").find("div[data-testid=\"row-areaType\"]").should("exist");
     });
   });
 
   it(`${pageName}: Limited absolute area editing`, () => {
     cy.iframe("#page-builder-frame-1").within(() => {
-      cy.get('div[data-testid="limitedAbsoluteAreaEdit"]')
-        .find('div[type="existingNode"]')
+      cy.get("div[data-testid=\"limitedAbsoluteAreaEdit\"]")
+        .find("div[type=\"existingNode\"]")
         .should("not.exist");
     });
   });
 
-  it(`${pageName}: should render absolute area with parameters`, function () {
+  it(`${pageName}: should render absolute area with parameters`, function() {
     cy.iframe("#page-builder-frame-1").within(() => {
-      cy.get('div[data-testid="areaParam-string1"]').should("contain", "stringParam1=stringValue1");
-      cy.get('div[data-testid="areaParam-string2"]').should("contain", "stringParam2=stringValue2");
+      cy.get("div[data-testid=\"areaParam-string1\"]").should("contain", "stringParam1=stringValue1");
+      cy.get("div[data-testid=\"areaParam-string2\"]").should("contain", "stringParam2=stringValue2");
     });
   });
 });

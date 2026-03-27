@@ -1,33 +1,29 @@
 package org.jahia.modules.javascript.modules.engine.js.server.gql;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
 
 /**
- * A mock implementation of {@link HttpServletRequest} used for testing and server-side rendering
- * within the Jahia JavaScript modules engine.
+ * A mock implementation of {@link HttpServletRequest} used for testing and server-side rendering within the Jahia
+ * JavaScript modules engine.
  *
- * <p>This class provides a minimal, non-functional implementation of the HttpServletRequest interface
- * that can be used in environments where a real HTTP request context is not available, such as during
- * server-side rendering of JavaScript components or in unit tests.</p>
+ * <p>This class provides a minimal, non-functional implementation of the HttpServletRequest interface that can be used
+ * in environments where a real HTTP request context is not available, such as during server-side rendering of
+ * JavaScript components or in unit tests.</p>
  *
- * <p>Key characteristics of this mock implementation:</p>
- * <ul>
- *   <li>Returns sensible default values for most methods (null, empty collections, or false)</li>
- *   <li>Always returns "GET" as the HTTP method</li>
- *   <li>Returns "/" as the path info</li>
- *   <li>Supports basic parameter retrieval through the constructor-provided parameter map</li>
- *   <li>Does not maintain session state or authentication information</li>
- * </ul>
+ * <p>Key characteristics of this mock implementation:</p> <ul> <li>Returns sensible default values for most methods
+ * (null, empty collections, or false)</li> <li>Always returns "GET" as the HTTP method</li> <li>Returns "/" as the path
+ * info</li> <li>Supports basic parameter retrieval through the constructor-provided parameter map</li> <li>Does not
+ * maintain session state or authentication information</li> </ul>
  *
- * <p>The primary use case is to provide a minimal request context when executing JavaScript
- * code that expects an HttpServletRequest object to be available, particularly during
- * server-side rendering scenarios in the Jahia JavaScript modules framework.</p>
+ * <p>The primary use case is to provide a minimal request context when executing JavaScript code that expects an
+ * HttpServletRequest object to be available, particularly during server-side rendering scenarios in the Jahia
+ * JavaScript modules framework.</p>
  *
  * @see HttpServletRequest
  */
@@ -174,14 +170,10 @@ class HttpServletRequestMock implements HttpServletRequest {
     }
 
     @Override
-    public void login(String s, String s1) throws ServletException {
-
-    }
+    public void login(String s, String s1) throws ServletException {}
 
     @Override
-    public void logout() throws ServletException {
-
-    }
+    public void logout() throws ServletException {}
 
     @Override
     public Collection<Part> getParts() throws IOException, ServletException {
@@ -214,9 +206,7 @@ class HttpServletRequestMock implements HttpServletRequest {
     }
 
     @Override
-    public void setCharacterEncoding(String env) throws UnsupportedEncodingException {
-
-    }
+    public void setCharacterEncoding(String env) throws UnsupportedEncodingException {}
 
     @Override
     public int getContentLength() {
@@ -294,14 +284,10 @@ class HttpServletRequestMock implements HttpServletRequest {
     }
 
     @Override
-    public void setAttribute(String name, Object o) {
-
-    }
+    public void setAttribute(String name, Object o) {}
 
     @Override
-    public void removeAttribute(String name) {
-
-    }
+    public void removeAttribute(String name) {}
 
     @Override
     public Locale getLocale() {
@@ -359,7 +345,8 @@ class HttpServletRequestMock implements HttpServletRequest {
     }
 
     @Override
-    public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) throws IllegalStateException {
+    public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse)
+            throws IllegalStateException {
         return null;
     }
 

@@ -1,10 +1,9 @@
 package org.jahia.modules.javascript.modules.engine.js.server;
 
+import java.util.HashMap;
 import org.graalvm.polyglot.proxy.ProxyArray;
 import org.graalvm.polyglot.proxy.ProxyObject;
 import org.jahia.taglibs.functions.Functions;
-
-import java.util.HashMap;
 
 /**
  * Java helper to expose OSGi configuration values to Javascript code
@@ -25,7 +24,8 @@ public class ConfigHelper {
      * @return an array of String containing the OSGi configuration factory PIDs
      */
     public ProxyArray getConfigFactoryIdentifiers(String factoryPid) {
-        return ProxyArray.fromArray(Functions.getConfigFactoryIdentifiers(factoryPid).toArray());
+        return ProxyArray.fromArray(
+                Functions.getConfigFactoryIdentifiers(factoryPid).toArray());
     }
 
     /**
@@ -39,10 +39,9 @@ public class ConfigHelper {
     }
 
     /**
-     * Get the configuration values for a given OSGi configuration factory PID and
-     * factory identifier
+     * Get the configuration values for a given OSGi configuration factory PID and factory identifier
      *
-     * @param factoryPid        the factory PID
+     * @param factoryPid the factory PID
      * @param factoryIdentifier the factory identifier within the given factory PID
      * @return a Map&lt;String, Object&gt; containing the configuration values
      */
@@ -51,11 +50,10 @@ public class ConfigHelper {
     }
 
     /**
-     * Get a single configuration value for a given OSGi configuration PID and a
-     * property key
+     * Get a single configuration value for a given OSGi configuration PID and a property key
      *
      * @param configPid the unique identifier of the OSGi configuration
-     * @param key       the property key
+     * @param key the property key
      * @return a String containing the configuration value
      */
     public String getConfigValue(String configPid, String key) {
@@ -63,13 +61,12 @@ public class ConfigHelper {
     }
 
     /**
-     * Get a single configuration value for a given OSGi configuration factory PID,
-     * factory identifier and a
-     * property key
+     * Get a single configuration value for a given OSGi configuration factory PID, factory identifier and a property
+     * key
      *
-     * @param factoryPid        the factory PID
+     * @param factoryPid the factory PID
      * @param factoryIdentifier the factory identifier within the given factory PID
-     * @param key               the property key
+     * @param key the property key
      * @return a String containing the configuration value
      */
     public String getConfigFactoryValue(String factoryPid, String factoryIdentifier, String key) {

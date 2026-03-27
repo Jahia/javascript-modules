@@ -19,8 +19,8 @@ const PrintChildren = ({
   <>
     <h2>${title}</h2>
     <div data-testid={`getChildNodes_${testid}`}>
-      {children &&
-        children.map(function (child, i) {
+      {children
+        && children.map(function(child, i) {
           return (
             <div data-testid={`getChildNodes_${testid}_${i + 1}`} key={child.getPath()}>
               {child.getPath()}

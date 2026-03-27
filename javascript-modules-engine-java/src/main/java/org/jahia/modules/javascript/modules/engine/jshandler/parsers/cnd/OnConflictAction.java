@@ -17,10 +17,7 @@ package org.jahia.modules.javascript.modules.engine.jshandler.parsers.cnd;
 
 /**
  *
- * User: toto
- * Date: Feb 4, 2010
- * Time: 8:24:09 PM
- *
+ * User: toto Date: Feb 4, 2010 Time: 8:24:09 PM
  */
 class OnConflictAction {
     public static final int IGNORE = 0;
@@ -44,13 +41,11 @@ class OnConflictAction {
     public static final String ACTIONNAME_NUMERIC_SUM = "sum";
 
     /**
-     * Returns the name of the specified <code>action</code>, as used in
-     * serialization.
+     * Returns the name of the specified <code>action</code>, as used in serialization.
      *
      * @param action the on-conflict action
      * @return the name of the specified <code>action</code>
-     * @throws IllegalArgumentException if <code>action</code> is not a valid
-     *                                  on-conflict action.
+     * @throws IllegalArgumentException if <code>action</code> is not a valid on-conflict action.
      */
     public static String nameFromValue(int action) {
         switch (action) {
@@ -70,13 +65,11 @@ class OnConflictAction {
     }
 
     /**
-     * Returns the numeric constant value of the on-conflict action with the
-     * specified name.
+     * Returns the numeric constant value of the on-conflict action with the specified name.
      *
      * @param name the name of the on-conflict action
      * @return the numeric constant value
-     * @throws IllegalArgumentException if <code>name</code> is not a valid
-     *                                  on-conflict action name.
+     * @throws IllegalArgumentException if <code>name</code> is not a valid on-conflict action name.
      */
     public static int valueFromName(String name) {
         if (name.equals(ACTIONNAME_USE_OLDEST)) {

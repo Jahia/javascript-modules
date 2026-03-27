@@ -1,7 +1,7 @@
 // @ts-check
-import { defineConfig } from "vite";
 import jahia from "@jahia/vite-plugin";
 import { spawnSync } from "node:child_process";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [

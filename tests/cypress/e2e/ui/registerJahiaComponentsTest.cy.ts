@@ -1,6 +1,6 @@
 import { addNode } from "@jahia/cypress";
+import { GENERIC_SITE_KEY } from "../../support/constants";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
 
 describe("Verify that registerJahiaComponents behaves as expected", () => {
   before("Create test contents", () => {
@@ -34,12 +34,12 @@ describe("Verify that registerJahiaComponents behaves as expected", () => {
 
   it("Check that components are properly registered", () => {
     cy.iframe("#page-builder-frame-1").within(() => {
-      cy.get('div[data-testid="standardViewRegistration"]').should("exist");
-      cy.get('div[data-testid="standardViewRegistration"]').contains("default");
-      cy.get('div[data-testid="customViewRegistration"]').should("exist");
-      cy.get('div[data-testid="customViewRegistration"]').contains("default");
-      cy.get('div[data-testid="noRegistration"]').should("exist");
-      cy.get('div[data-testid="noRegistration"]').contains("null");
+      cy.get("div[data-testid=\"standardViewRegistration\"]").should("exist");
+      cy.get("div[data-testid=\"standardViewRegistration\"]").contains("default");
+      cy.get("div[data-testid=\"customViewRegistration\"]").should("exist");
+      cy.get("div[data-testid=\"customViewRegistration\"]").contains("default");
+      cy.get("div[data-testid=\"noRegistration\"]").should("exist");
+      cy.get("div[data-testid=\"noRegistration\"]").contains("null");
     });
   });
 });

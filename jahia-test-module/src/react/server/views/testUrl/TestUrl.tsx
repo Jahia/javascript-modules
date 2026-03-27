@@ -1,10 +1,10 @@
 /// <reference types="vite/client" />
 import {
-  jahiaComponent,
-  server,
   buildEndpointUrl,
   buildModuleFileUrl,
   buildNodeUrl,
+  jahiaComponent,
+  server,
 } from "@jahia/javascript-modules-library";
 import goat from "./goat.png";
 

@@ -15,6 +15,10 @@
  */
 package org.jahia.modules.javascript.modules.engine.jshandler.parsers;
 
+import java.io.*;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.jdom2.Attribute;
@@ -24,36 +28,43 @@ import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPath;
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Generic file parser for different XML file types
  *
- * TEMPORARY WORKAROUND - DO NOT USE
- * This class duplicates poor legacy code to provide backward compatibility.
- * Marked for immediate replacement and removal.
+ * TEMPORARY WORKAROUND - DO NOT USE This class duplicates poor legacy code to provide backward compatibility. Marked
+ * for immediate replacement and removal.
  *
  * @deprecated since 1.0.0 Technical debt. Will be removed in next major version.
  */
 @Deprecated(since = "1.0.0")
- abstract class AbstractXmlFileParser extends AbstractFileParser {
+abstract class AbstractXmlFileParser extends AbstractFileParser {
 
     public static final Pattern XPATH_PREFIX_PATTERN = Pattern.compile("(\\w+):[\\w-]+");
 
     public abstract boolean canParse(String fileName, Element rootElement);
 
-    public abstract void parse(String fileName, Element rootElement, String fileParent, boolean externalDependency, boolean optionalDependency, String version, ParsingContext parsingContext)
-            throws JDOMException;
+    public abstract void parse(
+            String fileName,
+            Element rootElement,
+            String fileParent,
+            boolean externalDependency,
+            boolean optionalDependency,
+            String version,
+            ParsingContext parsingContext) throws JDOMException;
 
     public boolean canParse(String fileName) {
         String ext = FilenameUtils.getExtension(fileName).toLowerCase();
         return "xml".equals(ext);
     }
 
-    public boolean parse(String fileName, InputStream inputStream, String fileParent, boolean externalDependency, boolean optionalDependency, String version, ParsingContext parsingContext) {
+    public boolean parse(
+            String fileName,
+            InputStream inputStream,
+            String fileParent,
+            boolean externalDependency,
+            boolean optionalDependency,
+            String version,
+            ParsingContext parsingContext) {
         boolean processed = true;
         SAXBuilder saxBuilder = new SAXBuilder();
         saxBuilder.setValidation(false);
@@ -71,15 +82,32 @@ import java.util.regex.Pattern;
             // getLog().debug("Parsed XML file" + fileName + " successfully.");
 
             if (canParse(fileName, rootElement)) {
-                parse(fileName, rootElement, fileParent, externalDependency, optionalDependency, version, parsingContext);
+                parse(
+                        fileName,
+                        rootElement,
+                        fileParent,
+                        externalDependency,
+                        optionalDependency,
+                        version,
+                        parsingContext);
             } else {
                 processed = false;
             }
         } catch (JDOMException e) {
-            getLogger().warn("Error parsing XML file " + fileName + ": " + e.getMessage() + " enable debug mode (-X) for more detailed exception");
+            getLogger()
+                    .warn("Error parsing XML file "
+                            + fileName
+                            + ": "
+                            + e.getMessage()
+                            + " enable debug mode (-X) for more detailed exception");
             getLogger().debug("Detailed exception", e);
         } catch (IOException e) {
-            getLogger().warn("Error parsing XML file " + fileName + ": " + e.getMessage() + " enable debug mode (-X) for more detailed exception");
+            getLogger()
+                    .warn("Error parsing XML file "
+                            + fileName
+                            + ": "
+                            + e.getMessage()
+                            + " enable debug mode (-X) for more detailed exception");
             getLogger().debug("Detailed exception", e);
         } finally {
             IOUtils.closeQuietly(inputStreamCopy);
@@ -88,13 +116,13 @@ import java.util.regex.Pattern;
     }
 
     public boolean hasNamespaceURI(Element element, String namespaceURI) {
-        //getLog().debug("Main namespace URI=" + element.getNamespace().getURI());
+        // getLog().debug("Main namespace URI=" + element.getNamespace().getURI());
         if (element.getNamespace().getURI().equals(namespaceURI)) {
             return true;
         }
         List<Namespace> additionalNamespaces = (List<Namespace>) element.getAdditionalNamespaces();
         for (Namespace additionalNamespace : additionalNamespaces) {
-            //getLog().debug("Additional namespace URI=" + additionalNamespace.getURI());
+            // getLog().debug("Additional namespace URI=" + additionalNamespace.getURI());
             if (additionalNamespace.getURI().equals(namespaceURI)) {
                 return true;
             }
@@ -103,15 +131,14 @@ import java.util.regex.Pattern;
     }
 
     /**
-     * Utility method to retrieve an XML element using an XPath expression. Note that this method is
-     * namespace aware and will require you to use the "xp" prefix in your XPath queries. For example, an XPath query
-     * for a Spring XML configuration will look like this :
-     * /xp:beans/xp:bean[@id="FileListSync"]/xp:property[@name="syncUrl"]
-     * Currently there is no way to rename the prefix.
+     * Utility method to retrieve an XML element using an XPath expression. Note that this method is namespace aware and
+     * will require you to use the "xp" prefix in your XPath queries. For example, an XPath query for a Spring XML
+     * configuration will look like this : /xp:beans/xp:bean[@id="FileListSync"]/xp:property[@name="syncUrl"] Currently
+     * there is no way to rename the prefix.
      *
-     * @param scopeElement    the scope in which to execute the XPath query
+     * @param scopeElement the scope in which to execute the XPath query
      * @param xPathExpression the XPath query to select the element we wish to retrieve. In the case where multiple
-     *                        elements match, only the first one will be returned.
+     * elements match, only the first one will be returned.
      * @return the first element that matches the XPath expression, or null if no element matches.
      * @throws JDOMException raised if there was a problem navigating the JDOM structure.
      */
@@ -121,7 +148,8 @@ import java.util.regex.Pattern;
         if ((namespaceURI != null) && (!"".equals(namespaceURI))) {
             xPath.addNamespace("xp", namespaceURI);
         }
-        for (Namespace additionalNamespace : (List<Namespace>) scopeElement.getDocument().getRootElement().getAdditionalNamespaces()) {
+        for (Namespace additionalNamespace : (List<
+                        Namespace>) scopeElement.getDocument().getRootElement().getAdditionalNamespaces()) {
             xPath.addNamespace(additionalNamespace);
         }
         return (Element) xPath.selectSingleNode(scopeElement);
@@ -159,7 +187,8 @@ import java.util.regex.Pattern;
         if ((namespaceURI != null) && (!"".equals(namespaceURI))) {
             xPath.addNamespace("xp", namespaceURI);
         }
-        for (Namespace additionalNamespace : (List<Namespace>) scopeElement.getDocument().getRootElement().getAdditionalNamespaces()) {
+        for (Namespace additionalNamespace : (List<
+                        Namespace>) scopeElement.getDocument().getRootElement().getAdditionalNamespaces()) {
             xPath.addNamespace(additionalNamespace);
         }
         for (Object obj : xPath.selectNodes(scopeElement)) {
@@ -196,7 +225,8 @@ import java.util.regex.Pattern;
         return missingPrefixes;
     }
 
-    public List<Object> getNodes(Element scopeElement, String xPathExpression, String defaultPrefix) throws JDOMException {
+    public List<Object> getNodes(Element scopeElement, String xPathExpression, String defaultPrefix)
+            throws JDOMException {
         List<Object> nodes = new LinkedList<Object>();
         XPath xPath = XPath.newInstance(xPathExpression);
         String namespaceURI = scopeElement.getDocument().getRootElement().getNamespaceURI();
@@ -213,34 +243,42 @@ import java.util.regex.Pattern;
     }
 
     /**
-     * Use an array of XPath queries to extract class name, package or content type references from
-     * a JDOM document.
+     * Use an array of XPath queries to extract class name, package or content type references from a JDOM document.
      *
-     * @param fileName               the name of the file (mostly used for logging)
-     * @param root                   the root element to search the DOM
-     * @param classNameReferences    if true, indicates that the queries reference class names, if false
-     *                               we check the value of packageReferences parameter. If both are false
-     *                               we assume we are dealing with content node types
-     * @param packageReferences      if true, indicates that the queries reference package names, if false
-     *                               and classNameReferences is also false, we assume we are searching for
-     *                               content node types
-     * @param xPathQueries           the XPath queries to execute to extract the references
+     * @param fileName the name of the file (mostly used for logging)
+     * @param root the root element to search the DOM
+     * @param classNameReferences if true, indicates that the queries reference class names, if false we check the value
+     * of packageReferences parameter. If both are false we assume we are dealing with content node types
+     * @param packageReferences if true, indicates that the queries reference package names, if false and
+     * classNameReferences is also false, we assume we are searching for content node types
+     * @param xPathQueries the XPath queries to execute to extract the references
      * @param defaultNamespacePrefix the default namespace prefix to use for the XPath queries
      * @param optionalDependency
-     *@param parsingContext         the context in which we will store the references, depending on the type
-     *                               of references we are parsing.  @throws JDOMException
+     * @param parsingContext the context in which we will store the references, depending on the type of references we
+     * are parsing. @throws JDOMException
      */
-    public void getRefsUsingXPathQueries(String fileName, Element root,
-                                         boolean classNameReferences,
-                                         boolean packageReferences,
-                                         String[] xPathQueries, String defaultNamespacePrefix,
-                                         String fileParent,
-                                         String version,
-                                         boolean optionalDependency, ParsingContext parsingContext) throws JDOMException {
+    public void getRefsUsingXPathQueries(
+            String fileName,
+            Element root,
+            boolean classNameReferences,
+            boolean packageReferences,
+            String[] xPathQueries,
+            String defaultNamespacePrefix,
+            String fileParent,
+            String version,
+            boolean optionalDependency,
+            ParsingContext parsingContext) throws JDOMException {
         for (String xPathQuery : xPathQueries) {
             Set<String> missingPrefixes = getMissingQueryPrefixes(root, xPathQuery);
             if (missingPrefixes.size() > 0) {
-                getLogger().debug(fileParent + " / " + fileName + ": xPath query " + xPathQuery + " cannot be executed on this file since it has prefixes not declared in the file: " + missingPrefixes);
+                getLogger()
+                        .debug(fileParent
+                                + " / "
+                                + fileName
+                                + ": xPath query "
+                                + xPathQuery
+                                + " cannot be executed on this file since it has prefixes not declared in the file: "
+                                + missingPrefixes);
                 continue;
             }
             List<Object> referenceObjects = getNodes(root, xPathQuery, defaultNamespacePrefix);
@@ -251,7 +289,15 @@ import java.util.regex.Pattern;
                 } else if (referenceObject instanceof Element) {
                     referenceValue = ((Element) referenceObject).getTextTrim();
                 } else {
-                    getLogger().warn(fileParent + " / " + fileName + ": xPath query" + xPathQuery + " return unknown XML node type " + referenceObject + "...");
+                    getLogger()
+                            .warn(fileParent
+                                    + " / "
+                                    + fileName
+                                    + ": xPath query"
+                                    + xPathQuery
+                                    + " return unknown XML node type "
+                                    + referenceObject
+                                    + "...");
                 }
                 if (referenceValue != null) {
                     if (classNameReferences) {
@@ -285,11 +331,20 @@ import java.util.regex.Pattern;
 
     public void dumpElementNamespaces(Element element) {
         Namespace mainNamespace = element.getNamespace();
-        getLogger().debug("Main namespace prefix=[" + mainNamespace.getPrefix() + "] uri=[" + mainNamespace.getURI() + "] getNamespaceURI=[" + element.getNamespaceURI() + "]");
+        getLogger()
+                .debug("Main namespace prefix=["
+                        + mainNamespace.getPrefix()
+                        + "] uri=["
+                        + mainNamespace.getURI()
+                        + "] getNamespaceURI=["
+                        + element.getNamespaceURI()
+                        + "]");
         for (Namespace additionalNamespace : (List<Namespace>) element.getAdditionalNamespaces()) {
-            getLogger().debug("Additional namespace prefix=" + additionalNamespace.getPrefix() + " uri=" + additionalNamespace.getURI());
+            getLogger()
+                    .debug("Additional namespace prefix="
+                            + additionalNamespace.getPrefix()
+                            + " uri="
+                            + additionalNamespace.getURI());
         }
     }
-
-
 }

@@ -17,7 +17,7 @@
     "build": "tsc --noEmit && vite build && run pack",
     "clean": "rm -rf dist/",
     "deploy": "jahia-deploy",
-    "format": "prettier --write --list-different .",
+    "format": "dprint fmt",
     "pack": "yarn pack --out dist/package.tgz"
   },
   "devDependencies": {

@@ -47,13 +47,13 @@ server.registry.add("viewRenderer", "react", {
 
     return (
       // In page mode, prepend the rendered HTML with the HTML5 doctype
-      (currentResource.getContextConfiguration() === "page" ? "<!DOCTYPE html>" : "") +
+      (currentResource.getContextConfiguration() === "page" ? "<!DOCTYPE html>" : "")
       // We use a `<jsm-raw-html>` element to wrap raw HTML output because React does not allow
       // directly returning raw HTML strings. These elements are removed there, to avoid
       // having them in the final output.
       // `<jsm-raw-html>` SHOULD NOT be used in userland code, it is an internal implementation
       // detail.
-      ReactDOMServer.renderToString(element).replaceAll(/<\/?jsm-raw-html>/g, "")
+      + ReactDOMServer.renderToString(element).replaceAll(/<\/?jsm-raw-html>/g, "")
     );
   },
 });

@@ -8,7 +8,6 @@ jahiaComponent(
     displayName: "Default event template",
     componentType: "template",
   },
-
   (_, { currentResource }) => {
     return (
       <html lang="en">

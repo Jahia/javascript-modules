@@ -12,7 +12,7 @@ if (deployMethod !== "curl") {
   console.warn(
     styleText(
       "yellow",
-      'JAHIA_DEPLOY_METHOD environment is now ignored and will always be "curl". You can safely remove it from your .env file.',
+      "JAHIA_DEPLOY_METHOD environment is now ignored and will always be \"curl\". You can safely remove it from your .env file.",
     ),
   );
 }
