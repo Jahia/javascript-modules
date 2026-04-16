@@ -13,6 +13,7 @@ export function Area({
   numberOfItems,
   readOnly = false,
   nodeType = "jnt:contentList",
+  areaAsSubNode = false,
   parameters,
 }: Readonly<{
   /** The name of the area. */
@@ -38,6 +39,15 @@ export function Area({
    * @default jnt:contentList
    */
   nodeType?: string;
+
+  /**
+   * When true, allows the area to be stored as a subnode of the current component
+   * rather than under the main resource. Useful for repeatable components where
+   * each instance needs its own content area.
+   *
+   * @default false
+   */
+  areaAsSubNode?: boolean;
   /** Map of custom parameters that can be passed to the backend engine for advanced logic. */
   parameters?: Record<string, unknown>;
 }>): JSX.Element {
@@ -52,6 +62,7 @@ export function Area({
           numberOfItems,
           nodeType,
           editable: !readOnly,
+          areaAsSubNode,
           parameters,
         },
         renderContext,
