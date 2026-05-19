@@ -12,7 +12,8 @@
   "internalChecksFilter": "strict",
   "prCreation": "not-pending",
   "minor": {
-    "dependencyDashboardApproval": true
+    "automerge": true,
+    "groupName": "patch"
   },
   "patch": {
     "automerge": true,
