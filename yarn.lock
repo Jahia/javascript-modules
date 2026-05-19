@@ -2267,7 +2267,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"devalue@npm:5.6.4, devalue@npm:^5.6.1":
+"devalue@npm:5.8.1":
+  version: 5.8.1
+  resolution: "devalue@npm:5.8.1"
+  checksum: 10c0/fad0c5aeb615e0ddea3385923389991652b285cd2adcd84e10f07a930f735127d94621751f7ef5249a7fe2c7c666ec7c02bb95c3901da337c91f45ef4da18dea
+  languageName: node
+  linkType: hard
+
+"devalue@npm:^5.6.1":
   version: 5.6.4
   resolution: "devalue@npm:5.6.4"
   checksum: 10c0/0c1bbe036945e55c5f6d54f52bb1a99b19677dd48a8404517fbddb02e725803457bed6317d2c05292d68767914ba319a6a645dbfdf8ade65d687ab430bfc2ae1
@@ -3426,7 +3433,7 @@ __metadata:
     "@rollup/plugin-typescript": "npm:^12.3.0"
     "@types/node": "npm:^22.19.3"
     "@types/react-dom": "npm:^19.2.3"
-    devalue: "npm:5.6.4"
+    devalue: "npm:5.8.1"
     fast-text-encoding: "npm:1.0.6"
     i18next: "npm:25.7.3"
     react: "npm:19.2.4"
