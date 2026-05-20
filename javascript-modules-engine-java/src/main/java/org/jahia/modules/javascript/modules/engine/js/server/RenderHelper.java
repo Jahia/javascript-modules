@@ -63,7 +63,7 @@ public class RenderHelper {
             "allowedNodeTypes", "numberOfItems", "nodeType", "editable", "areaType", "limitedAbsoluteAreaEdit",
             "parameters");
     private static final Set<String> AREA_ALLOWED_ATTRIBUTES = Set.of("name", "view", "allowedNodeTypes",
-            "numberOfItems", "nodeType", "editable", "parameters");
+            "numberOfItems", "nodeType", "editable", "areaAsSubNode", "parameters");
 
     private JCRSessionFactory jcrSessionFactory;
     private JCRTemplate jcrTemplate;

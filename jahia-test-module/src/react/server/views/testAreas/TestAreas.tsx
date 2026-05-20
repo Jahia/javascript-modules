@@ -57,6 +57,16 @@ jahiaComponent(
           }}
         />
       </div>
+
+      <h2>Area with areaAsSubNode=true</h2>
+      <div data-testid="areaAsSubNodeTrue">
+        <Area name="subNodeArea" areaAsSubNode={true} />
+      </div>
+
+      <h2>Area with areaAsSubNode=false</h2>
+      <div data-testid="areaAsSubNodeFalse">
+        <Area name="noSubNodeArea" areaAsSubNode={false} />
+      </div>
     </>
   ),
 );
