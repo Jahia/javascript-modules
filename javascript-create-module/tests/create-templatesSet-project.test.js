@@ -74,9 +74,9 @@ test("Project creation", async () => {
     // Make sure the renaming with MODULE_NAME is correct
     "settings/resources/project-name.properties",
     "settings/resources/project-name_fr.properties",
-    "settings/content-types-icons/project-namemix_component.png",
-    "settings/content-types-icons/project-name_helloWorld.png",
-    "settings/content-types-icons/project-name_helloCard.png",
+    "settings/content-types-icons/projectnamemix_component.png",
+    "settings/content-types-icons/projectname_helloWorld.png",
+    "settings/content-types-icons/projectname_helloCard.png",
     // Check other setting files
     "settings/template-thumbnail.png",
     "settings/locales/en.json",
