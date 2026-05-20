@@ -33,7 +33,7 @@ import org.apache.commons.io.IOUtils;
 public class JSFileSystem implements FileSystem {
   private static final String ROOT_JS_LIBS_DIR = "/META-INF/js/libs/";
 
-  final private BundleContext bundleContext;
+  private final BundleContext bundleContext;
 
   JSFileSystem(BundleContext bundleContext) {
     this.bundleContext = bundleContext;
