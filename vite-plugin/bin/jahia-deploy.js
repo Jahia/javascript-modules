@@ -1,10 +1,9 @@
 #!/usr/bin/env node
-import dotenv from "dotenv";
 import * as fs from "node:fs";
 import { inspect, styleText } from "node:util";
 
 // Load environment variables from .env file
-dotenv.config();
+if (fs.existsSync(".env")) process.loadEnvFile();
 
 // Deprecation warning for JAHIA_DEPLOY_METHOD
 const deployMethod = process.env.JAHIA_DEPLOY_METHOD || "curl";
