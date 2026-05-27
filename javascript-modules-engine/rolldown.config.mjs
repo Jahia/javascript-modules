@@ -1,11 +1,6 @@
 // @ts-check
-import commonJs from "@rollup/plugin-commonjs";
-import nodeResolve from "@rollup/plugin-node-resolve";
-import replace from "@rollup/plugin-replace";
-import terser from "@rollup/plugin-terser";
-import typescript from "@rollup/plugin-typescript";
 import { fileURLToPath } from "node:url";
-import { defineConfig } from "rollup";
+import { defineConfig } from "rolldown";
 import sbom from "rollup-plugin-sbom";
 import { clientLibs, serverLibs } from "./shared-libs.mjs";
 
@@ -25,40 +20,37 @@ const buildEnv = process.env.BUILD || "development";
  * The goal of all this is to flatten the network dependency graph of the hydrated code, by using
  * `<link rel="modulepreload" />` hints.
  *
- * @type {string[]}
+ * @type {string[] | undefined}
  */
 let sharedLibFiles;
 
 /**
- * Rollup plugins common to all builds.
+ * Options common to all builds.
  *
- * @type {import("rollup").InputPluginOption[]}
+ * @satisfies {import("rolldown").InputOptions}
  */
-const plugins = [
-  commonJs(),
-  nodeResolve(),
-  replace({
-    values: {
+const commonOptions = {
+  transform: {
+    define: {
       "process.env.NODE_ENV": JSON.stringify(buildEnv),
     },
-    preventAssignment: true,
-  }),
-  typescript(),
-  sbom({ specVersion: "1.4" }),
-];
+  },
+  plugins: [sbom({ specVersion: "1.4" })],
+};
 
 export default defineConfig([
   //#region Client build
   // Bundle the shared libraries for browser use (exposed by an importmap)
   // They are used by both the main client script and client-side module scripts
   {
+    ...commonOptions,
     input: clientLibs,
     output: {
       dir: "./src/main/resources/javascript/shared-libs/",
+      minify: buildEnv === "production",
     },
     plugins: [
-      ...plugins,
-      buildEnv === "production" && terser(),
+      ...commonOptions.plugins,
       {
         name: "extract-shared-lib-files",
         generateBundle(_, bundle) {
@@ -72,22 +64,20 @@ export default defineConfig([
   },
   // Build the main client script: the script that hydrates server-rendered components
   {
+    ...commonOptions,
     input: "./src/client/index.ts",
     output: {
       file: "src/main/resources/javascript/index.js",
+      minify: buildEnv === "production",
     },
     external: Object.keys(clientLibs),
-    plugins: [
-      ...plugins,
-      // Minify client files in production
-      buildEnv === "production" && terser(),
-    ],
   },
   //#endregion
 
   //#region Server build
   // Bundle the shared libraries for server use
   {
+    ...commonOptions,
     input: serverLibs,
     output: {
       dir: "./src/main/resources/META-INF/js/libs/",
@@ -120,22 +110,23 @@ export default defineConfig([
           if (id === "virtual:shared-lib-files") return `\0shared-lib-files`;
         },
         load(id) {
+          if (!sharedLibFiles) throw new Error("sharedLibFiles not collected yet");
           if (id === "\0shared-lib-files")
             return `export default ${JSON.stringify(sharedLibFiles)};`;
         },
       },
-      ...plugins,
+      ...commonOptions.plugins,
     ],
   },
   // Build the server-side script
   // It takes care of rendering JSX components on the server
   {
+    ...commonOptions,
     input: "./src/server/index.ts",
+    external: Object.keys(serverLibs),
     output: {
       file: "./src/main/resources/META-INF/js/main.js",
     },
-    external: Object.keys(serverLibs),
-    plugins,
   },
   //#endregion
 ]);
