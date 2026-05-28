@@ -71,7 +71,10 @@ export default defineConfig([
       file: "src/main/resources/javascript/index.js",
       minify: buildEnv === "production",
     },
-    external: Object.keys(clientLibs),
+    plugins: [
+      esmExternalRequirePlugin({ external: Object.keys(clientLibs) }),
+      ...commonOptions.plugins,
+    ],
   },
   //#endregion
 
@@ -128,12 +131,7 @@ export default defineConfig([
       file: "./src/main/resources/META-INF/js/main.js",
     },
     plugins: [
-      // Use `esmExternalRequirePlugin` instead of `external: Object.keys(serverLibs)`
-      // because React is CJS
-      // See https://rolldown.rs/in-depth/bundling-cjs#require-external-modules
-      esmExternalRequirePlugin({
-        external: Object.keys(serverLibs),
-      }),
+      esmExternalRequirePlugin({ external: Object.keys(serverLibs) }),
       ...commonOptions.plugins,
     ],
   },
