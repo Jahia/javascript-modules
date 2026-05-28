@@ -11,6 +11,7 @@ export {
   unstable_batchedUpdates,
   useFormState,
   useFormStatus,
+  version,
   // Default export too
   default,
   // @ts-expect-error Expose react-dom internals for react-dom/client
