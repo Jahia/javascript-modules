@@ -1,6 +1,7 @@
 // @ts-check
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "rolldown";
+import { esmExternalRequirePlugin } from "rolldown/plugins";
 import sbom from "rollup-plugin-sbom";
 import { clientLibs, serverLibs } from "./shared-libs.mjs";
 
@@ -123,10 +124,18 @@ export default defineConfig([
   {
     ...commonOptions,
     input: "./src/server/index.ts",
-    external: Object.keys(serverLibs),
     output: {
       file: "./src/main/resources/META-INF/js/main.js",
     },
+    plugins: [
+      // Use `esmExternalRequirePlugin` instead of `external: Object.keys(serverLibs)`
+      // because React is CJS
+      // See https://rolldown.rs/in-depth/bundling-cjs#require-external-modules
+      esmExternalRequirePlugin({
+        external: Object.keys(serverLibs),
+      }),
+      ...commonOptions.plugins,
+    ],
   },
   //#endregion
 ]);
