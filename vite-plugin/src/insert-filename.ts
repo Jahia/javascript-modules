@@ -1,6 +1,6 @@
 import { createFilter } from "@rollup/pluginutils";
 import MagicString from "magic-string";
-import type { AstNode, Plugin } from "rollup";
+import type { Plugin } from "rolldown";
 
 /**
  * This plugin adds a `__filename` property to all default exports.
@@ -53,7 +53,7 @@ export function insertFilename(
       const ast = this.parse(code);
       for (const node of ast.body) {
         if (node.type === "ExportDefaultDeclaration") {
-          const declaration = node.declaration as AstNode;
+          const declaration = node.declaration;
           s.prependLeft(
             declaration.start,
             `

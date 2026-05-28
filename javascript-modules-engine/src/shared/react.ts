@@ -1,6 +1,7 @@
 // Until https://github.com/facebook/react/issues/10021 is fixed,
 // we have to list every single export
 export {
+  Activity,
   Children,
   Component,
   Fragment,
@@ -26,6 +27,7 @@ export {
   useDebugValue,
   useDeferredValue,
   useEffect,
+  useEffectEvent,
   useId,
   useImperativeHandle,
   useInsertionEffect,
@@ -40,4 +42,6 @@ export {
   version,
   // Default export too
   default,
+  // @ts-expect-error Expose react internals for react-dom
+  __CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE,
 } from "react";
