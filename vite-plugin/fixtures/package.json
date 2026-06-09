@@ -12,5 +12,5 @@
     "modern-normalize": "^3.0.1",
     "vite": "^8.0.14"
   },
-  "packageManager": "yarn@4.15.0"
+  "packageManager": "yarn@4.16.0"
 }
