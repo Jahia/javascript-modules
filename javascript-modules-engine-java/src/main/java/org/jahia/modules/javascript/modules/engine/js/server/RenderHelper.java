@@ -62,7 +62,7 @@ public class RenderHelper {
     private static final Set<String> ABSOLUTEAREA_ALLOWED_ATTRIBUTES = Set.of("name", "parent", "view",
             "allowedNodeTypes", "numberOfItems", "nodeType", "editable", "areaType", "limitedAbsoluteAreaEdit",
             "parameters");
-    private static final Set<String> AREA_ALLOWED_ATTRIBUTES = Set.of("name", "view", "allowedNodeTypes",
+    private static final Set<String> AREA_ALLOWED_ATTRIBUTES = Set.of("name", "parent", "view", "allowedNodeTypes",
             "numberOfItems", "nodeType", "editable", "parameters");
 
     private JCRSessionFactory jcrSessionFactory;
@@ -409,15 +409,22 @@ public class RenderHelper {
     public String renderArea(Map<String, Object> attr, RenderContext renderContext)
             throws IllegalAccessException, InvocationTargetException, JspException, IOException {
         checkAttributes(attr, AREA_ALLOWED_ATTRIBUTES);
-        // This is actually expected, the path of an area is relative by default, so the
-        // name is directly mapped to: path
-        // the AreaTag will resolve the area content using template inheritance
-        // hierarchy.
-        // Even if it's not used in the javascript engine, we need to respect this
-        // concept for compatibility with existing system relying on this behavior.
-        // (jExperience for example is using this behavior, for page perso/opti, by
-        // pushing the page variant node as parent template)
-        attr.put("path", readMandatoryAttribute(attr, "name"));
+        String name = readMandatoryAttribute(attr, "name");
+        JCRNodeWrapper parent = (JCRNodeWrapper) attr.remove("parent");
+        if (parent != null) {
+            // When a parent node is provided, compute an absolute JCR path so that AreaTag
+            // resolves the area via a direct node lookup (findNodeForAbsoluteAreaPath) rather
+            // than the default template-inheritance resolution.
+            attr.put("path", parent.getPath() + "/" + name);
+        } else {
+            // the AreaTag will resolve the area content using template inheritance
+            // hierarchy.
+            // Even if it's not used in the javascript engine, we need to respect this
+            // concept for compatibility with existing system relying on this behavior.
+            // (jExperience for example is using this behavior, for page perso/opti, by
+            // pushing the page variant node as parent template)
+            attr.put("path", name);
+        }
         return internalRenderArea(attr, "area", renderContext);
     }
 
