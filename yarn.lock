@@ -468,14 +468,14 @@ __metadata:
     "@types/react": "npm:^19.2.7"
     devalue: "npm:^5.6.1"
     graphql: "npm:^16.12.0"
-    i18next: "npm:^25.7.3"
+    i18next: "npm:^26.0.0"
     publint: "npm:^0.3.16"
     react-i18next: "npm:^16.5.0"
     typescript: "npm:^5.9.3"
   peerDependencies:
     "@graphql-typed-document-node/core": ^3.2.0
     graphql: "*"
-    i18next: ^25.0.0
+    i18next: ^25.0.0 || ^26.0.0
     react: ^19.0.0
     react-dom: ^19.0.0
     react-i18next: ^15.4.0 || ^16.0.0
@@ -2363,7 +2363,7 @@ __metadata:
     clsx: "npm:^2.1.1"
     eslint: "npm:^9.39.2"
     globals: "npm:^16.5.0"
-    i18next: "npm:^25.7.3"
+    i18next: "npm:^26.0.0"
     modern-normalize: "npm:^3.0.1"
     prettier: "npm:^3.7.4"
     react: "npm:^19.2.3"
@@ -2375,17 +2375,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"i18next@npm:25.10.10, i18next@npm:^25.7.3":
-  version: 25.10.10
-  resolution: "i18next@npm:25.10.10"
-  dependencies:
-    "@babel/runtime": "npm:^7.29.2"
+"i18next@npm:26.3.1, i18next@npm:^26.0.0":
+  version: 26.3.1
+  resolution: "i18next@npm:26.3.1"
   peerDependencies:
     typescript: ^5 || ^6
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/6ff601b52363c9c974ef293af4a6de04d9f76b4bf2ad9a56c8546235aaf19ff1a7c2109ddba3a73922d418e208ec5b688e5afb323eba6e27c75d629e93827ae1
+  checksum: 10c0/8f26cb9a09b648edde395a58c2fe890dd996cb81a969d0a05da178b9cb4ce3dee009f9c677a480bb58b5a9d8bbf762fd226111626b015e9bbd66b96132dbba39
   languageName: node
   linkType: hard
 
@@ -2592,7 +2590,7 @@ __metadata:
     "@jahia/vite-plugin": "workspace:^"
     "@types/react": "npm:^19.2.7"
     graphql: "npm:^16.12.0"
-    i18next: "npm:^25.7.3"
+    i18next: "npm:^26.0.0"
     react-i18next: "npm:^16.5.0"
     typescript: "npm:^5.9.3"
     vite: "npm:^8.0.14"
@@ -2608,7 +2606,7 @@ __metadata:
     "@types/react-dom": "npm:^19.2.3"
     devalue: "npm:5.8.1"
     fast-text-encoding: "patch:fast-text-encoding@npm%3A1.0.6#~/.yarn/patches/fast-text-encoding-npm-1.0.6-b474f65fe2.patch"
-    i18next: "npm:25.10.10"
+    i18next: "npm:26.3.1"
     react: "npm:19.2.4"
     react-dom: "npm:19.2.4"
     react-i18next: "npm:16.6.6"
