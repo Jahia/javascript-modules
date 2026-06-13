@@ -470,7 +470,7 @@ __metadata:
     graphql: "npm:^16.12.0"
     i18next: "npm:^25.7.3"
     publint: "npm:^0.3.16"
-    react-i18next: "npm:^16.5.0"
+    react-i18next: "npm:^17.0.0"
     typescript: "npm:^5.9.3"
   peerDependencies:
     "@graphql-typed-document-node/core": ^3.2.0
@@ -478,7 +478,7 @@ __metadata:
     i18next: ^25.0.0
     react: ^19.0.0
     react-dom: ^19.0.0
-    react-i18next: ^15.4.0 || ^16.0.0
+    react-i18next: ^15.4.0 || ^16.0.0 || ^17.0.0
   peerDependenciesMeta:
     "@graphql-typed-document-node/core":
       optional: true
@@ -2367,7 +2367,7 @@ __metadata:
     modern-normalize: "npm:^3.0.1"
     prettier: "npm:^3.7.4"
     react: "npm:^19.2.3"
-    react-i18next: "npm:^16.5.0"
+    react-i18next: "npm:^17.0.0"
     typescript: "npm:^5.9.3"
     typescript-eslint: "npm:^8.50.0"
     typescript-plugin-css-modules: "npm:^5.2.0"
@@ -2593,7 +2593,7 @@ __metadata:
     "@types/react": "npm:^19.2.7"
     graphql: "npm:^16.12.0"
     i18next: "npm:^25.7.3"
-    react-i18next: "npm:^16.5.0"
+    react-i18next: "npm:^17.0.0"
     typescript: "npm:^5.9.3"
     vite: "npm:^8.0.14"
   languageName: unknown
@@ -2611,7 +2611,7 @@ __metadata:
     i18next: "npm:25.10.10"
     react: "npm:19.2.4"
     react-dom: "npm:19.2.4"
-    react-i18next: "npm:16.6.6"
+    react-i18next: "npm:17.0.8"
     rolldown: "npm:^1.0.2"
     rollup-plugin-sbom: "npm:^3.0.0"
   languageName: unknown
@@ -3813,15 +3813,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-i18next@npm:16.6.6, react-i18next@npm:^16.5.0":
-  version: 16.6.6
-  resolution: "react-i18next@npm:16.6.6"
+"react-i18next@npm:17.0.8, react-i18next@npm:^17.0.0":
+  version: 17.0.8
+  resolution: "react-i18next@npm:17.0.8"
   dependencies:
     "@babel/runtime": "npm:^7.29.2"
     html-parse-stringify: "npm:^3.0.1"
     use-sync-external-store: "npm:^1.6.0"
   peerDependencies:
-    i18next: ">= 25.10.9"
+    i18next: ">= 26.2.0"
     react: ">= 16.8.0"
     typescript: ^5 || ^6
   peerDependenciesMeta:
@@ -3831,7 +3831,7 @@ __metadata:
       optional: true
     typescript:
       optional: true
-  checksum: 10c0/7d6660d382a529d4dc56e7a7bbab59689ac0f435b3a18bba81d6bbf52c87b2a41fd5d1bffcf60b92b5e6e2a1ad9443949fcf16329d9c63d582316557199a7d32
+  checksum: 10c0/4d13d396208927ed3c80eb62db011a98dae16d93fc951bb4cb220fc5a3a5dd2f0046244fdbd197f627f595230d6fa05cc5d1c6f52b6241acd63ff818dff63acb
   languageName: node
   linkType: hard
 
