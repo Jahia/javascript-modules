@@ -18,7 +18,6 @@ package org.jahia.modules.javascript.modules.engine.jsengine;
 import org.osgi.framework.Bundle;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Registry {
@@ -48,7 +47,7 @@ public class Registry {
                     Comparator.nullsFirst(Comparator.reverseOrder())));
         }
 
-        return filtered.collect(Collectors.toList());
+        return filtered.toList();
     }
 
     public void add(String type, String key, Map<String, Object>... arguments) {
