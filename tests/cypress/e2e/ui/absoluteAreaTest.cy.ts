@@ -68,6 +68,31 @@ describe("Absolute Area test", () => {
     addSimplePage(`/sites/${GENERIC_SITE_KEY}`, "custom", "Custom", "en", "simple").then(() =>
       addSimplePage(`/sites/${GENERIC_SITE_KEY}/custom`, "sub-level", "Sub level", "en", "simple"),
     );
+
+    // Content for the absolute area whose parent is the home page itself, used to verify it's
+    // editable when rendered on the home page, and read-only when rendered on any other page.
+    addNode({
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home`,
+      name: "limitedEditHomeArea",
+      primaryNodeType: "jnt:contentList",
+    });
+    addNode({
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/limitedEditHomeArea`,
+      name: "bigText",
+      primaryNodeType: "jnt:bigText",
+      properties: [{ name: "text", value: "Home limited edit area content", language: "en" }],
+    });
+    // Renders TestAbsoluteAreas directly on the home page, so its main resource is the home page.
+    addNode({
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/pagecontent`,
+      name: "testOnHomePage",
+      primaryNodeType: "javascriptExample:testAbsoluteAreas",
+    });
+    addNode({
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/pagecontent/testOnHomePage`,
+      name: "basicArea",
+      primaryNodeType: "jnt:contentList",
+    });
   });
 
   beforeEach("Login and visit test page", () => {
@@ -164,6 +189,23 @@ describe("Absolute Area test", () => {
       cy.get('div[data-testid="limitedAbsoluteAreaEdit"]')
         .find('div[type="existingNode"]')
         .should("not.exist");
+    });
+  });
+
+  it(`${pageName}: Limited absolute area editing (home parent) is read-only on other pages`, () => {
+    cy.iframe("#page-builder-frame-1").within(() => {
+      cy.get('div[data-testid="limitedAbsoluteAreaEditHomeParent"]')
+        .find('div[type="existingNode"]')
+        .should("not.exist");
+    });
+  });
+
+  it("home: Limited absolute area editing (home parent) is editable on the home page", () => {
+    cy.visit(`/jahia/jcontent/${GENERIC_SITE_KEY}/en/pages/home`);
+    cy.iframe("#page-builder-frame-1").within(() => {
+      cy.get('div[data-testid="limitedAbsoluteAreaEditHomeParent"]')
+        .find('div[type="existingNode"]')
+        .should("exist");
     });
   });
 
