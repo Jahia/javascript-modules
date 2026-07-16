@@ -195,6 +195,7 @@ describe("Absolute Area test", () => {
   it(`${pageName}: Limited absolute area editing (home parent) is read-only on other pages`, () => {
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="limitedAbsoluteAreaEditHomeParent"]')
+        .should("contain", "Home limited edit area content")
         .find('div[type="existingNode"]')
         .should("not.exist");
     });
@@ -204,6 +205,7 @@ describe("Absolute Area test", () => {
     cy.visit(`/jahia/jcontent/${GENERIC_SITE_KEY}/en/pages/home`);
     cy.iframe("#page-builder-frame-1").within(() => {
       cy.get('div[data-testid="limitedAbsoluteAreaEditHomeParent"]')
+        .should("contain", "Home limited edit area content")
         .find('div[type="existingNode"]')
         .should("exist");
     });
