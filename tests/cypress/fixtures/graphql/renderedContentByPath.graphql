@@ -1,0 +1,21 @@
+query (
+  $path: String!
+  $templateType: String!
+  $view: String
+  $contextConfiguration: String!
+  $language: String!
+  $workspace: Workspace!
+) {
+  jcr(workspace: $workspace) {
+    nodeByPath(path: $path) {
+      renderedContent(
+        templateType: $templateType
+        view: $view
+        contextConfiguration: $contextConfiguration
+        language: $language
+      ) {
+        output
+      }
+    }
+  }
+}
