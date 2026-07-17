@@ -403,6 +403,14 @@ public class RenderHelper {
         JCRNodeWrapper parent = readMandatoryAttribute(attr, "parent");
         String relativePath = calculateRelativePath(renderContext.getSite().getPath(), parent.getPath());
         attr.put("path", relativePath + "/" + name);
+
+        // internalRenderArea always pins "level" to the site root and conflicts with limitedAbsoluteAreaEdit for editing access.
+        // To keep compatibility, we compute the logic here instead against the real parent node.
+        if (Boolean.TRUE.equals(attr.get("limitedAbsoluteAreaEdit"))) {
+            boolean onOwnerPage = parent.getPath().equals(renderContext.getMainResource().getNodePath());
+            attr.put("limitedAbsoluteAreaEdit", !onOwnerPage);
+        }
+
         return internalRenderArea(attr, "absoluteArea", renderContext);
     }
 

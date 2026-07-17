@@ -77,6 +77,15 @@ jahiaComponent(
         <AbsoluteArea name="pagecontent" parent={currentNode} readOnly="children" />
       </div>
 
+      <h2>Limited absolute area editing (home page parent)</h2>
+      <div data-testid="limitedAbsoluteAreaEditHomeParent">
+        <AbsoluteArea
+          name="limitedEditHomeArea"
+          parent={renderContext.getSite().getHome()}
+          readOnly="children"
+        />
+      </div>
+
       <h2>Absolute Area parameters</h2>
       <div data-testid="absoluteAreaParameters">
         <AbsoluteArea
