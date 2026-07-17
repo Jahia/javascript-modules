@@ -70,6 +70,7 @@ describe("Test GQL", () => {
         workspace: "EDIT",
       },
       queryFile: "graphql/renderedContentByPath.graphql",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }).then((response: { data?: any; errors?: unknown[] }) => {
       // Before the fix the nested useGQLQuery threw, surfacing as a GraphQL error and null output.
       expect(response.errors, "GraphQL errors").to.satisfy(
