@@ -93,6 +93,21 @@ public class GQLHelper {
         RenderContext renderContext = (RenderContext) parameters.get("renderContext");
         HttpServletRequest request = renderContext == null ? new HttpServletRequestMock(params)
                 : new HttpServletRequestWrapper(renderContext.getRequest()) {
+                    // This is a synthetic sub-request: the query/operationName/variables are supplied
+                    // through parameters, not through a body. The GraphQL servlet dispatches on the HTTP
+                    // method, and only the GET parser reads the query from parameters (the POST parser
+                    // reads the request body, which here is null or already consumed by the outer request,
+                    // e.g. a jContent preview "previewQueryByWorkspace" POST). We therefore force GET so the
+                    // parameter overrides below are honored regardless of how the outer request was made.
+                    // This also matches HttpServletRequestMock, which always reports GET.
+                    public String getMethod() {
+                        return "GET";
+                    }
+
+                    public String getContentType() {
+                        return null;
+                    }
+
                     public String getParameter(String name) {
                         if (params.containsKey(name)) {
                             return params.get(name);
