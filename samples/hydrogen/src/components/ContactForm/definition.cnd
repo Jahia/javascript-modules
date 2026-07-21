@@ -1,0 +1,4 @@
+[hydrogen:contactForm] > jnt:content, hydrogenmix:component
+ - title (string) i18n mandatory
+ - style (string, choicelist[hydrogenFormStyles]) = 'plain'
+ - notificationEmail (string)

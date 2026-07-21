@@ -29,6 +29,11 @@ export {
   type NodeValidatorContext,
   type NodeValidatorViolation,
 } from "./framework/registerNodeValidator.js";
+export {
+  registerRenderFilter,
+  type RenderFilterDeclaration,
+  type RenderFilterCallbacks,
+} from "./framework/registerRenderFilter.js";
 
 // Hooks
 export { useGQLQuery } from "./hooks/useGQLQuery.js";
