@@ -42,7 +42,7 @@ jahiaComponent(
 
       <h2>Absolute Area with home page</h2>
       <div data-testid="absoluteAreaHomePage">
-        <AbsoluteArea name="pagecontent" parent={renderContext.getSite().getHome()} />
+        <AbsoluteArea name="homePageArea" parent={renderContext.getSite().getHome()} />
       </div>
 
       <h2>Absolute Area with site root node</h2>

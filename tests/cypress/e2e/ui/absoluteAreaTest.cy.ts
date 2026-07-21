@@ -9,40 +9,43 @@ describe("Absolute Area test", () => {
   before("Create test page and contents", () => {
     enableModule("event", GENERIC_SITE_KEY);
 
-    // First let's create the content on the home page that will be referenced by areas in the test pages.
+    // Content on the home page referenced by the "absolute area with home page" test. It lives in a
+    // dedicated list (not the home's own "pagecontent"): the absoluteAreaHomePage area renders this
+    // list, and "pagecontent" hosts a testAbsoluteAreas component (testOnHomePage, see below) — pointing
+    // the area at "pagecontent" would make that component render its own container, an infinite loop.
     addNode({
       parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home`,
-      name: "pagecontent",
+      name: "homePageArea",
       primaryNodeType: "jnt:contentList",
     });
 
     addNode({
-      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/pagecontent`,
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/homePageArea`,
       name: "twoColumns",
       primaryNodeType: "javascriptExample:testAreaColumns",
     });
 
     addNode({
-      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/pagecontent/twoColumns`,
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/homePageArea/twoColumns`,
       name: "twoColumns-col-1",
       primaryNodeType: "jnt:contentList",
     });
 
     addNode({
-      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/pagecontent/twoColumns/twoColumns-col-1`,
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/homePageArea/twoColumns/twoColumns-col-1`,
       name: "bigText",
       primaryNodeType: "jnt:bigText",
       properties: [{ name: "text", value: "Column 1", language: "en" }],
     });
 
     addNode({
-      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/pagecontent/twoColumns`,
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/homePageArea/twoColumns`,
       name: "twoColumns-col-2",
       primaryNodeType: "jnt:contentList",
     });
 
     addNode({
-      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/pagecontent/twoColumns/twoColumns-col-2`,
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/homePageArea/twoColumns/twoColumns-col-2`,
       name: "bigText",
       primaryNodeType: "jnt:bigText",
       properties: [{ name: "text", value: "Column 2", language: "en" }],
@@ -82,7 +85,13 @@ describe("Absolute Area test", () => {
       primaryNodeType: "jnt:bigText",
       properties: [{ name: "text", value: "Home limited edit area content", language: "en" }],
     });
-    // Renders TestAbsoluteAreas directly on the home page, so its main resource is the home page.
+    // Renders TestAbsoluteAreas directly on the home page (in the home's own "pagecontent", the area
+    // rendered by the home template), so its main resource is the home page.
+    addNode({
+      parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home`,
+      name: "pagecontent",
+      primaryNodeType: "jnt:contentList",
+    });
     addNode({
       parentPathOrId: `/sites/${GENERIC_SITE_KEY}/home/pagecontent`,
       name: "testOnHomePage",
