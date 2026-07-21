@@ -13,6 +13,12 @@ export { Area } from "./components/Area.js";
 // Declaration and registration
 export { jahiaComponent } from "./framework/jahiaComponent.js";
 export {
+  registerAction,
+  type ActionDeclaration,
+  type ActionContext,
+  type ActionResult,
+} from "./framework/registerAction.js";
+export {
   registerChoiceListInitializer,
   type ChoiceListValue,
   type ChoiceListInitializerContext,

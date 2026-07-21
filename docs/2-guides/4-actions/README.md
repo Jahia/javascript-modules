@@ -1,0 +1,79 @@
+---
+page:
+  $path: /sites/academy/home/documentation/jahia/8_2/developer/javascript-module-development/actions
+  jcr:title: Declaring Actions
+  j:templateName: documentation
+content:
+  $subpath: document-area/content
+---
+
+Actions are HTTP endpoints bound to content nodes: appending `.<actionName>.do` to a node URL invokes the action against that node. They are the classic Jahia mechanism for form submissions and lightweight server endpoints. With JavaScript modules you can declare actions in JavaScript, without writing a Java module.
+
+## Declaring an action
+
+Call `registerAction` at the top level of a server file (it registers the action as a side effect at module startup, like `jahiaComponent`):
+
+```ts
+import { registerAction } from "@jahia/javascript-modules-library";
+
+registerAction(
+  { name: "myModuleGreet", requiredMethods: ["GET"], requireAuthenticatedUser: false },
+  ({ parameters, resource }) => ({
+    json: {
+      greeting: `Hello ${parameters.who?.[0] ?? "world"}`,
+      path: resource.getNode().getPath(),
+    },
+  }),
+);
+```
+
+The action is then reachable on any node URL:
+
+```
+GET /cms/render/live/en/sites/mysite/home.myModuleGreet.do?who=Jahia
+→ 200 {"greeting": "Hello Jahia", "path": "/sites/mysite/home"}
+```
+
+## Declaration options
+
+| Option | Description |
+|--------|-------------|
+| `name` | The URL-visible action name. Names are platform-wide (shared with Java modules, last registration wins) — prefix them with your module name. |
+| `requiredMethods` | Allowed HTTP methods, e.g. `["POST"]`. Defaults to Jahia's default (GET and POST). |
+| `requireAuthenticatedUser` | Defaults to **`true`** (Jahia's default): guests get a 401. Set to `false` explicitly for public actions. |
+| `requiredPermission` | Permission required on the target node, e.g. `"jcr:write"`. |
+| `requiredWorkspace` | Restrict to `"default"` or `"live"`. |
+
+## The handler
+
+The handler receives a context object:
+
+- `parameters` — merged query-string and form parameters, as `Record<string, string[]>`,
+- `resource` / `renderContext` / `session` — the target resource, render context and user JCR session,
+- `request` — escape hatch: the raw `HttpServletRequest` (headers, cookies, body),
+- `urlResolver` — escape hatch: the Jahia URL resolver.
+
+And returns (synchronously — no promises):
+
+- `json` — an object serialized as the JSON response body,
+- `statusCode` — HTTP status, default 200,
+- `redirect` (+ `absoluteRedirect`) — redirect the client instead of returning a body.
+
+Returning nothing sends an empty 200.
+
+## CSRF protection for POST actions
+
+POST, PUT and DELETE requests to `.do` URLs are blocked by Jahia's CSRF guard unless the URL is whitelisted. **This is your module's responsibility**: ship an OSGi configuration file in your module's `settings/configurations/` folder:
+
+```properties
+# settings/configurations/org.jahia.modules.jahiacsrfguard-mymodule.cfg
+whitelist = *.myModuleSubmit.do,*.myModuleOther.do
+```
+
+Whitelisting disables CSRF protection for those URLs, so only do it for actions designed to be called without a CSRF token (e.g. public form submissions), and keep the patterns as narrow as possible. Without this file, POST calls to your action fail with a 403.
+
+## Good to know
+
+- **Keep handlers fast and non-blocking** — they run synchronously on a request thread.
+- **Content modifications**: use the provided `session` to read/write JCR content as the calling user; standard permissions apply, plus `requiredPermission` if you set it.
+- **Errors**: an exception thrown by the handler results in an error response; validate input and return explicit `statusCode` values (e.g. 400) for expected failures.
