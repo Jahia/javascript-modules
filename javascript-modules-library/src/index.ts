@@ -12,6 +12,11 @@ export { Area } from "./components/Area.js";
 
 // Declaration and registration
 export { jahiaComponent } from "./framework/jahiaComponent.js";
+export {
+  registerChoiceListInitializer,
+  type ChoiceListValue,
+  type ChoiceListInitializerContext,
+} from "./framework/registerChoiceListInitializer.js";
 
 // Hooks
 export { useGQLQuery } from "./hooks/useGQLQuery.js";

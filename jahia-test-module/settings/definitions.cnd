@@ -155,3 +155,7 @@
 
 [javascriptExample:testVirtualNodeSample] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
  - myProperty (string)
+
+[javascriptExample:testChoicelistInitializer] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
+ - color (string, choicelist[testColorsInitializer])
+ - colorWithParam (string, choicelist[testColorsInitializer='warm'])

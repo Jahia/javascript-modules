@@ -328,6 +328,8 @@
                                 <!-- used to generate *.d.ts from Java code: -->
                                 <ignoredUnusedDeclaredDependency>io.github.bensku:java-ts-bind
                                 </ignoredUnusedDeclaredDependency>
+                                <!-- JS language loaded at runtime by the polyglot engine in tests: -->
+                                <ignoredUnusedDeclaredDependency>org.graalvm.js:js</ignoredUnusedDeclaredDependency>
                                 <!-- only exposed in *.d.ts files, not used in Java: -->
                                 <ignoredUnusedDeclaredDependency>org.apache.jackrabbit:jackrabbit-spi-commons</ignoredUnusedDeclaredDependency>
                                 <ignoredUnusedDeclaredDependency>org.jboss.spec.javax.servlet:jboss-servlet-api_3.1_spec</ignoredUnusedDeclaredDependency>
