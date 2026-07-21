@@ -159,3 +159,8 @@
 [javascriptExample:testChoicelistInitializer] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
  - color (string, choicelist[testColorsInitializer])
  - colorWithParam (string, choicelist[testColorsInitializer='warm'])
+
+[javascriptExample:testValidation] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
+ - email (string)
+ - score (long)
+ - i18nText (string) internationalized

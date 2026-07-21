@@ -23,6 +23,12 @@ export {
   type ChoiceListValue,
   type ChoiceListInitializerContext,
 } from "./framework/registerChoiceListInitializer.js";
+export {
+  registerNodeValidator,
+  type NodeValidatorProps,
+  type NodeValidatorContext,
+  type NodeValidatorViolation,
+} from "./framework/registerNodeValidator.js";
 
 // Hooks
 export { useGQLQuery } from "./hooks/useGQLQuery.js";
