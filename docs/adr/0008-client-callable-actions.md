@@ -58,3 +58,4 @@ Handlers may be `async`. The endpoint settles returned promises through `JSPromi
 - Good: no per-module CSRF or servlet configuration.
 - Limitation (documented): `location.pathname`-based stub URLs assume the island is served from a page render URL; the `.html` template extension is stripped, other extensions are passed through.
 - Limitation (documented): microtask-only asynchronicity; no `export { }` lists/`default` in action files (v1).
+- Intended evolution ([#690](https://github.com/Jahia/javascript-modules/issues/690)): swap the transport to a dedicated servlet (module-scoped URLs, real HTTP status codes, no CSRF-guard entry). Both wire ends are platform-generated, so the swap is invisible to module authors.
