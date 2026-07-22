@@ -165,16 +165,16 @@
  - score (long)
  - i18nText (string) internationalized
 
-[javascriptExample:migrationContent] > jnt:content, javascriptExampleMix:javascriptExampleComponent
+[javascriptExample:patchTestContent] > jnt:content, javascriptExampleMix:javascriptExampleComponent
  - legacyColor (string)
  - theme (string)
  - counter (undefined)
 
-[javascriptExample:legacyMigrated] > jnt:content, javascriptExampleMix:javascriptExampleComponent
+[javascriptExample:patchTestLegacy] > jnt:content, javascriptExampleMix:javascriptExampleComponent
  - oldTitle (string)
 
-[javascriptExample:newMigrated] > jnt:content, javascriptExampleMix:javascriptExampleComponent
+[javascriptExample:patchTestNew] > jnt:content, javascriptExampleMix:javascriptExampleComponent
  - newTitle (string)
 
-[javascriptExample:doomedMigrated] > jnt:content, javascriptExampleMix:javascriptExampleComponent
+[javascriptExample:patchTestDoomed] > jnt:content, javascriptExampleMix:javascriptExampleComponent
  - label (string)

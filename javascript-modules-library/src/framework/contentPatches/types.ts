@@ -4,27 +4,27 @@ import type {
   JCRValueWrapper,
 } from "org.jahia.services.content";
 
-/** Declaration of a migration. */
-export interface MigrationDeclaration {
+/** Declaration of a content patch. */
+export interface ContentPatchDeclaration {
   /**
-   * Run-once identity AND ordering key of the migration (migrations of a module are executed in
+   * Run-once identity AND ordering key of the content patch (content patches of a module are executed in
    * lexicographic order of their names).
    *
    * Recommended shape: `"<moduleVersion>-<NN>-<slug>"`, e.g. `"2.0.0-01-remove-legacy-color"`.
    *
-   * NEVER rename or reorder a migration after it shipped in a release — the name is the key under
-   * which its execution is recorded; ship a new migration instead.
+   * NEVER rename or reorder a content patch after it shipped in a release — the name is the key under
+   * which its execution is recorded; ship a new content patch instead.
    */
   name: string;
-  /** Shown in logs and in the migration status. */
+  /** Shown in logs and in the content patch status. */
   description?: string;
 }
 
 /**
- * Logger dedicated to one migration (backed by SLF4J, named
- * `org.jahia.modules.javascript.modules.engine.migrations.<module>.<migration>`).
+ * Logger dedicated to one content patch (backed by SLF4J, named
+ * `org.jahia.modules.javascript.modules.engine.contentpatches.<module>.<content patch>`).
  */
-export interface MigrationLogger {
+export interface ContentPatchLogger {
   debug(message: string): void;
   info(message: string): void;
   warn(message: string): void;
@@ -32,7 +32,7 @@ export interface MigrationLogger {
 }
 
 /** Values accepted by the property-writing helpers. */
-export type MigrationPropertyValue = string | number | boolean | JCRNodeWrapper;
+export type ContentPatchPropertyValue = string | number | boolean | JCRNodeWrapper;
 
 /** Common selection options for bulk operations. */
 export interface NodeSelection {
@@ -61,7 +61,7 @@ export interface QuerySelection {
 }
 
 /** Outcome of a bulk operation. */
-export interface MigrationOperationReport {
+export interface ContentPatchOperationReport {
   /** Nodes matched by the selection, across all processed workspaces. */
   matched: number;
   /** Nodes actually modified. */
@@ -77,9 +77,9 @@ export interface MigrationOperationReport {
  * handle i18n properties on their translation subnodes, no-op gracefully when the node type was
  * never registered on this instance (fresh installs), and honor dry-run mode.
  */
-export interface MigrationOperations {
+export interface ContentPatchOperations {
   /** Removes leftover values of a property (i18n-aware) on all instances of a node type. */
-  removePropertyValues(options: NodeSelection & { property: string }): MigrationOperationReport;
+  removePropertyValues(options: NodeSelection & { property: string }): ContentPatchOperationReport;
 
   /** Sets a property value on existing content, e.g. to backfill a newly added property. */
   setPropertyValues(
@@ -90,14 +90,14 @@ export interface MigrationOperations {
        * skip the node). For i18n properties the function is called once per locale.
        */
       value:
-        | MigrationPropertyValue
-        | ((node: JCRNodeWrapper, locale?: string) => MigrationPropertyValue | undefined);
+        | ContentPatchPropertyValue
+        | ((node: JCRNodeWrapper, locale?: string) => ContentPatchPropertyValue | undefined);
       /** Never overwrite an existing value. @default true */
       onlyIfMissing?: boolean;
       /** For i18n properties: language codes to process. @default the site languages */
       locales?: string[];
     },
-  ): MigrationOperationReport;
+  ): ContentPatchOperationReport;
 
   /** Rewrites the values of a property after its data type changed in the definitions. */
   convertPropertyValues(
@@ -107,13 +107,13 @@ export interface MigrationOperations {
        * Converts one stored value (which may still carry the previous data type) to the new value.
        * Return `undefined` to leave that value untouched.
        */
-      convert: (value: JCRValueWrapper, node: JCRNodeWrapper) => MigrationPropertyValue | undefined;
+      convert: (value: JCRValueWrapper, node: JCRNodeWrapper) => ContentPatchPropertyValue | undefined;
     },
-  ): MigrationOperationReport;
+  ): ContentPatchOperationReport;
 
   /**
    * Removes a node type OWNED BY THIS MODULE from the registry, optionally purging its instances.
-   * With the default `ifContentExists: "fail"`, the migration fails (and content is left untouched)
+   * With the default `ifContentExists: "fail"`, the content patch fails (and content is left untouched)
    * if instances still exist — destroying content is opt-in.
    */
   removeNodeType(options: {
@@ -124,7 +124,7 @@ export interface MigrationOperations {
     workspaces?: ("default" | "live")[];
     /** @default 100 */
     batchSize?: number;
-  }): MigrationOperationReport;
+  }): ContentPatchOperationReport;
 
   /**
    * Rebinds all instances of the `from` node type to the `to` node type (which must exist in the
@@ -139,17 +139,17 @@ export interface MigrationOperations {
       /** Unregister the `from` definition once all instances are rebound. @default true */
       removeOldDefinition?: boolean;
     },
-  ): MigrationOperationReport;
+  ): ContentPatchOperationReport;
 }
 
-/** Lower-level JCR access for migrations. */
-export interface MigrationJcr {
+/** Lower-level JCR access for content patches. */
+export interface ContentPatchJcr {
   /**
    * Opens a system (root) session on the given workspace and executes the callback with it.
    * With `locale: null` (the default), translation nodes are visible as plain subnodes, which is
-   * usually what migrations want.
+   * usually what content patches want.
    *
-   * NOTE: unlike the `migrate.*` helpers, code in this callback is NOT dry-run aware — check
+   * NOTE: unlike the `patch.*` helpers, code in this callback is NOT dry-run aware — check
    * `context.dryRun` yourself before saving if you want to support dry runs.
    */
   withSystemSession<T>(
@@ -158,41 +158,41 @@ export interface MigrationJcr {
   ): T;
 
   /**
-   * The batching engine behind the `migrate.*` helpers: iterates the selected nodes in batches,
+   * The batching engine behind the `patch.*` helpers: iterates the selected nodes in batches,
    * committing (`session.save()`) after each batch — or discarding changes in dry-run mode. The
    * callback may return `false` to count the node as skipped instead of updated.
    */
   forEachNode(
     options: NodeSelection | QuerySelection,
     callback: (node: JCRNodeWrapper) => boolean | void,
-  ): MigrationOperationReport;
+  ): ContentPatchOperationReport;
 }
 
-/** Context passed to a migration's run function. */
-export interface MigrationContext {
+/** Context passed to a content patch's run function. */
+export interface ContentPatchContext {
   /** High-level, guard-railed operations. */
-  migrate: MigrationOperations;
+  patch: ContentPatchOperations;
   /** Lower-level JCR access: system sessions and the shared batching iterator. */
-  jcr: MigrationJcr;
-  /** Logger dedicated to this migration. */
-  log: MigrationLogger;
+  jcr: ContentPatchJcr;
+  /** Logger dedicated to this content patch. */
+  log: ContentPatchLogger;
   /** True in dry-run mode: helpers report what they would do instead of saving. */
   dryRun: boolean;
-  /** Aborts the migration now and records it as `.skipped` (terminal — it will not run again). */
+  /** Aborts the content patch now and records it as `.skipped` (terminal — it will not run again). */
   skip(reason: string): never;
-  /** The module owning this migration. */
+  /** The module owning this content patch. */
   module: { name: string; version: string };
 }
 
 /**
- * Shape of the Java support object handed by the engine's MigrationRegistrar to the registered
+ * Shape of the Java support object handed by the engine's ContentPatchRegistrar to the registered
  * `execute` adapter. Keep in sync with
- * `org.jahia.modules.javascript.modules.engine.registrars.migrations.MigrationSupport`.
+ * `org.jahia.modules.javascript.modules.engine.registrars.contentpatches.ContentPatchSupport`.
  *
  * @internal
  */
-export interface JavaMigrationSupport {
-  getLogger(migrationName: string): MigrationLogger;
+export interface JavaContentPatchSupport {
+  getLogger(patchName: string): ContentPatchLogger;
   isDryRun(): boolean;
   getModuleName(): string;
   getModuleVersion(): string;

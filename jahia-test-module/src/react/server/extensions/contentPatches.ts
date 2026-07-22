@@ -1,37 +1,37 @@
-import { registerMigration } from "@jahia/javascript-modules-library";
+import { registerContentPatch } from "@jahia/javascript-modules-library";
 
 /**
- * Test fixtures for JS migrations, exercised by tests/cypress/e2e/engine/migrationTest.cy.ts.
+ * Test fixtures for JS content patches, exercised by tests/cypress/e2e/engine/contentPatchTest.cy.ts.
  *
- * The migrations run once when this module first starts on a fresh instance. 01 creates the fixture
- * content under /sites/systemsite/contents/migration-tests, 02-06 exercise the five guard-railed
+ * The content patches run once when this module first starts on a fresh instance. 01 creates the fixture
+ * content under /sites/systemsite/contents/content-patch-tests, 02-06 exercise the five guard-railed
  * operations on it, 07-09 exercise the skip / failure / halt semantics (names order execution, so
  * 09 must never run because 08 fails).
  */
 
 const FIXTURES_PARENT = "/sites/systemsite/contents";
-const FIXTURES_PATH = `${FIXTURES_PARENT}/migration-tests`;
+const FIXTURES_PATH = `${FIXTURES_PARENT}/content-patch-tests`;
 
-registerMigration(
+registerContentPatch(
   {
     name: "1.0.0-01-create-fixture-content",
-    description: "Creates the content the following migrations transform (imperative escape hatch)",
+    description: "Creates the content the following content patches transform (imperative escape hatch)",
   },
   ({ jcr }) => {
     jcr.withSystemSession({ workspace: "default" }, (session) => {
       const parent = session.getNode(FIXTURES_PARENT);
-      const folder = parent.hasNode("migration-tests")
-        ? parent.getNode("migration-tests")
-        : parent.addNode("migration-tests", "jnt:contentList");
+      const folder = parent.hasNode("content-patch-tests")
+        ? parent.getNode("content-patch-tests")
+        : parent.addNode("content-patch-tests", "jnt:contentList");
 
-      const content = folder.addNode("content1", "javascriptExample:migrationContent");
+      const content = folder.addNode("content1", "javascriptExample:patchTestContent");
       content.setProperty("legacyColor", "red");
       content.setProperty("counter", "42");
 
-      const legacy = folder.addNode("legacy1", "javascriptExample:legacyMigrated");
+      const legacy = folder.addNode("legacy1", "javascriptExample:patchTestLegacy");
       legacy.setProperty("oldTitle", "hello");
 
-      const doomed = folder.addNode("doomed1", "javascriptExample:doomedMigrated");
+      const doomed = folder.addNode("doomed1", "javascriptExample:patchTestDoomed");
       doomed.setProperty("label", "to be deleted");
 
       session.save();
@@ -39,41 +39,41 @@ registerMigration(
   },
 );
 
-registerMigration(
+registerContentPatch(
   {
     name: "1.0.0-02-remove-legacy-color",
     description: "U1: removes leftover legacyColor values",
   },
-  ({ migrate }) => {
-    migrate.removePropertyValues({
-      nodeType: "javascriptExample:migrationContent",
+  ({ patch }) => {
+    patch.removePropertyValues({
+      nodeType: "javascriptExample:patchTestContent",
       property: "legacyColor",
     });
   },
 );
 
-registerMigration(
+registerContentPatch(
   {
     name: "1.0.0-03-backfill-theme",
     description: "U2: backfills the theme property on existing content",
   },
-  ({ migrate }) => {
-    migrate.setPropertyValues({
-      nodeType: "javascriptExample:migrationContent",
+  ({ patch }) => {
+    patch.setPropertyValues({
+      nodeType: "javascriptExample:patchTestContent",
       property: "theme",
       value: "light",
     });
   },
 );
 
-registerMigration(
+registerContentPatch(
   {
     name: "1.0.0-04-convert-counter",
     description: "U3: converts counter values from string to number",
   },
-  ({ migrate, log }) => {
-    migrate.convertPropertyValues({
-      nodeType: "javascriptExample:migrationContent",
+  ({ patch, log }) => {
+    patch.convertPropertyValues({
+      nodeType: "javascriptExample:patchTestContent",
       property: "counter",
       convert: (value, node) => {
         const parsed = Number.parseInt(value.getString(), 10);
@@ -87,15 +87,15 @@ registerMigration(
   },
 );
 
-registerMigration(
+registerContentPatch(
   {
     name: "1.0.0-05-rename-legacy-type",
-    description: "U5: rebinds legacyMigrated instances to newMigrated, renaming oldTitle to newTitle",
+    description: "U5: rebinds patchTestLegacy instances to patchTestNew, renaming oldTitle to newTitle",
   },
-  ({ migrate }) => {
-    migrate.changeNodeType({
-      from: "javascriptExample:legacyMigrated",
-      to: "javascriptExample:newMigrated",
+  ({ patch }) => {
+    patch.changeNodeType({
+      from: "javascriptExample:patchTestLegacy",
+      to: "javascriptExample:patchTestNew",
       mapProperties: { oldTitle: "newTitle" },
       // the legacy type is still in this module's CND (single-version test fixture), so keep its
       // definition registered instead of fighting the redeploy
@@ -104,40 +104,40 @@ registerMigration(
   },
 );
 
-registerMigration(
+registerContentPatch(
   {
     name: "1.0.0-06-remove-doomed-type",
-    description: "U4: purges doomedMigrated instances and unregisters the type",
+    description: "U4: purges patchTestDoomed instances and unregisters the type",
   },
-  ({ migrate }) => {
-    migrate.removeNodeType({
-      nodeType: "javascriptExample:doomedMigrated",
+  ({ patch }) => {
+    patch.removeNodeType({
+      nodeType: "javascriptExample:patchTestDoomed",
       ifContentExists: "delete",
     });
   },
 );
 
-registerMigration(
+registerContentPatch(
   {
     name: "1.0.0-07-skip-me",
-    description: "Records .skipped without halting the following migrations",
+    description: "Records .skipped without halting the following content patches",
   },
   ({ skip }) => {
     skip("nothing to do on this instance");
   },
 );
 
-registerMigration(
+registerContentPatch(
   {
     name: "1.0.0-08-fail-on-purpose",
-    description: "Records .failed and halts the module's remaining migrations",
+    description: "Records .failed and halts the module's remaining content patches",
   },
   () => {
-    throw new Error("intentional failure (migration e2e fixture)");
+    throw new Error("intentional failure (content patch e2e fixture)");
   },
 );
 
-registerMigration(
+registerContentPatch(
   {
     name: "1.0.0-09-after-failure-never-runs",
     description: "Must never run: 08 fails before it",

@@ -23,18 +23,18 @@ export {
   type ChoiceListValue,
   type ChoiceListInitializerContext,
 } from "./framework/registerChoiceListInitializer.js";
-export { registerMigration } from "./framework/migrations/registerMigration.js";
+export { registerContentPatch } from "./framework/contentPatches/registerContentPatch.js";
 export type {
-  MigrationContext,
-  MigrationDeclaration,
-  MigrationJcr,
-  MigrationLogger,
-  MigrationOperationReport,
-  MigrationOperations,
-  MigrationPropertyValue,
+  ContentPatchContext,
+  ContentPatchDeclaration,
+  ContentPatchJcr,
+  ContentPatchLogger,
+  ContentPatchOperationReport,
+  ContentPatchOperations,
+  ContentPatchPropertyValue,
   NodeSelection,
   QuerySelection,
-} from "./framework/migrations/types.js";
+} from "./framework/contentPatches/types.js";
 export {
   registerNodeValidator,
   type NodeValidatorProps,

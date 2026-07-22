@@ -1,13 +1,13 @@
 /**
- * Verifies the JS migrations of the test module (declared in
- * jahia-test-module/src/react/server/extensions/migrations.ts): they ran once at module start, in
+ * Verifies the JS content patches of the test module (declared in
+ * jahia-test-module/src/react/server/extensions/contentPatches.ts): they ran once at module start, in
  * name order, with the expected terminal statuses in Jahia's module patch status store, and the
  * fixture content was transformed accordingly.
  */
 
 const MODULE_NAME = "javascript-modules-engine-test-module";
-const STATUS_PATH_PREFIX = "/javascript/migrations/";
-const FIXTURES_PATH = "/sites/systemsite/contents/migration-tests";
+const STATUS_PATH_PREFIX = "/javascript/content-patches/";
+const FIXTURES_PATH = "/sites/systemsite/contents/content-patch-tests";
 
 const NODE_QUERY = `
   query migratedNode($path: String!) {
@@ -26,7 +26,7 @@ const NODE_QUERY = `
 `;
 
 const STATUS_QUERY = `
-  query migrationStatuses {
+  query contentPatchStatuses {
     jcr {
       nodeByPath(path: "/module-management") {
         property(name: "j:bundlesScripts") {
@@ -57,7 +57,7 @@ const propertiesOf = (response: NodeResponse): Record<string, string> =>
     (response.data?.jcr?.nodeByPath?.properties ?? []).map(({ name, value }) => [name, value]),
   );
 
-describe("JS migrations", () => {
+describe("JS content patches", () => {
   beforeEach("Login", () => {
     cy.login();
   });
@@ -112,7 +112,7 @@ describe("JS migrations", () => {
   it("rebinds content to a renamed node type (U5)", () => {
     getNode(`${FIXTURES_PATH}/legacy1`).then((response: NodeResponse) => {
       expect(response.data?.jcr?.nodeByPath?.primaryNodeType.name, "rebound by 05").to.equal(
-        "javascriptExample:newMigrated",
+        "javascriptExample:patchTestNew",
       );
       const properties = propertiesOf(response);
       expect(properties.newTitle, "value moved to newTitle").to.equal("hello");

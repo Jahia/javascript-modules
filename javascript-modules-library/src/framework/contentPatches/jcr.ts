@@ -4,9 +4,9 @@ import type {
   JCRSessionWrapper,
 } from "org.jahia.services.content";
 import type {
-  MigrationJcr,
-  MigrationLogger,
-  MigrationOperationReport,
+  ContentPatchJcr,
+  ContentPatchLogger,
+  ContentPatchOperationReport,
   NodeSelection,
   QuerySelection,
 } from "./types.js";
@@ -15,10 +15,10 @@ import type {
 const SNAPSHOT_PAGE_SIZE = 1000;
 
 /** Thrown by `context.skip()`; caught by the `execute` adapter to record `.skipped`. */
-export class MigrationSkipped extends Error {
+export class ContentPatchSkipped extends Error {
   constructor(public readonly reason: string) {
     super(reason);
-    this.name = "MigrationSkipped";
+    this.name = "ContentPatchSkipped";
   }
 }
 
@@ -37,8 +37,8 @@ const buildQuery = (options: NodeSelection): string => {
   }`;
 };
 
-/** Builds the `jcr` part of the migration context. */
-export const createMigrationJcr = (dryRun: boolean, log: MigrationLogger): MigrationJcr => {
+/** Builds the `jcr` part of the content patch context. */
+export const createContentPatchJcr = (dryRun: boolean, log: ContentPatchLogger): ContentPatchJcr => {
   const withSystemSession = <T>(
     { workspace = "default", locale = null }: { workspace?: "default" | "live"; locale?: string | null },
     callback: (session: JCRSessionWrapper) => T,
@@ -53,14 +53,14 @@ export const createMigrationJcr = (dryRun: boolean, log: MigrationLogger): Migra
   const forEachNode = (
     options: NodeSelection | QuerySelection,
     callback: (node: JCRNodeWrapper) => boolean | void,
-  ): MigrationOperationReport => {
+  ): ContentPatchOperationReport => {
     const workspaces = options.workspaces ?? ["default", "live"];
     const batchSize = options.batchSize ?? 100;
     const query = "query" in options ? options.query : buildQuery(options);
     const primaryTypeOnly =
       "query" in options || (options.includeSubtypes ?? true) ? null : options.nodeType;
 
-    const report: MigrationOperationReport = { matched: 0, updated: 0, skipped: 0, byWorkspace: {} };
+    const report: ContentPatchOperationReport = { matched: 0, updated: 0, skipped: 0, byWorkspace: {} };
 
     for (const workspace of workspaces) {
       const counters = { matched: 0, updated: 0, skipped: 0 };

@@ -2,15 +2,15 @@ import type { Node } from "javax.jcr";
 import type { Locale } from "java.util";
 import type { JCRNodeWrapper, JCRValueWrapper } from "org.jahia.services.content";
 import type {
-  JavaMigrationSupport,
-  MigrationJcr,
-  MigrationLogger,
-  MigrationOperationReport,
-  MigrationOperations,
-  MigrationPropertyValue,
+  JavaContentPatchSupport,
+  ContentPatchJcr,
+  ContentPatchLogger,
+  ContentPatchOperationReport,
+  ContentPatchOperations,
+  ContentPatchPropertyValue,
 } from "./types.js";
 
-const EMPTY_REPORT = (): MigrationOperationReport => ({
+const EMPTY_REPORT = (): ContentPatchOperationReport => ({
   matched: 0,
   updated: 0,
   skipped: 0,
@@ -26,17 +26,17 @@ const listToArray = <T>(list: { size(): number; get(index: number): unknown }): 
   return result;
 };
 
-/** Builds the `migrate` part of the migration context. */
-export const createMigrationOperations = (
-  jcr: MigrationJcr,
-  support: JavaMigrationSupport,
-  log: MigrationLogger,
-): MigrationOperations => {
+/** Builds the `patch` part of the content patch context. */
+export const createContentPatchOperations = (
+  jcr: ContentPatchJcr,
+  support: JavaContentPatchSupport,
+  log: ContentPatchLogger,
+): ContentPatchOperations => {
   /** Fresh-install guard: a selection on a type that was never registered here is a graceful no-op. */
   const guarded = (
     nodeType: string,
-    operation: () => MigrationOperationReport,
-  ): MigrationOperationReport => {
+    operation: () => ContentPatchOperationReport,
+  ): ContentPatchOperationReport => {
     if (!support.isNodeTypeRegistered(nodeType)) {
       log.info(
         `Node type ${nodeType} is not registered on this instance (fresh install?) — nothing to do`,
@@ -61,7 +61,7 @@ export const createMigrationOperations = (
     return locales ? siteLocales.filter((l) => locales.includes(l.toString())) : siteLocales;
   };
 
-  const removePropertyValues: MigrationOperations["removePropertyValues"] = (options) =>
+  const removePropertyValues: ContentPatchOperations["removePropertyValues"] = (options) =>
     guarded(options.nodeType, () =>
       jcr.forEachNode(options, (node) => {
         let touched = false;
@@ -80,12 +80,12 @@ export const createMigrationOperations = (
       }),
     );
 
-  const setPropertyValues: MigrationOperations["setPropertyValues"] = (options) => {
+  const setPropertyValues: ContentPatchOperations["setPropertyValues"] = (options) => {
     const onlyIfMissing = options.onlyIfMissing ?? true;
     const resolveValue = (
       node: JCRNodeWrapper,
       locale?: string,
-    ): MigrationPropertyValue | undefined =>
+    ): ContentPatchPropertyValue | undefined =>
       typeof options.value === "function" ? options.value(node, locale) : options.value;
 
     return guarded(options.nodeType, () =>
@@ -122,7 +122,7 @@ export const createMigrationOperations = (
     );
   };
 
-  const convertPropertyValues: MigrationOperations["convertPropertyValues"] = (options) => {
+  const convertPropertyValues: ContentPatchOperations["convertPropertyValues"] = (options) => {
     /** Converts the property on one node (or translation node); returns whether it was rewritten. */
     const convertOn = (owner: JCRNodeWrapper | Node, node: JCRNodeWrapper): boolean => {
       if (!owner.hasProperty(options.property)) return false;
@@ -153,7 +153,7 @@ export const createMigrationOperations = (
     );
   };
 
-  const removeNodeType: MigrationOperations["removeNodeType"] = (options) =>
+  const removeNodeType: ContentPatchOperations["removeNodeType"] = (options) =>
     guarded(options.nodeType, () => {
       const mode = options.ifContentExists ?? "fail";
       const report = jcr.forEachNode(
@@ -173,7 +173,7 @@ export const createMigrationOperations = (
       return report;
     });
 
-  const changeNodeType: MigrationOperations["changeNodeType"] = (options) => {
+  const changeNodeType: ContentPatchOperations["changeNodeType"] = (options) => {
     /** Renames a property on a node or translation node, preserving raw values (incl. multi-valued). */
     const renameOn = (owner: JCRNodeWrapper | Node, oldName: string, newName: string) => {
       if (!owner.hasProperty(oldName)) return;

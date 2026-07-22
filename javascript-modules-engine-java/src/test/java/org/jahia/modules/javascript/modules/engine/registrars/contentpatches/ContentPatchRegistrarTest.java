@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jahia.modules.javascript.modules.engine.registrars.migrations;
+package org.jahia.modules.javascript.modules.engine.registrars.contentpatches;
 
 import org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine;
 import org.json.JSONObject;
@@ -31,10 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static org.jahia.modules.javascript.modules.engine.registrars.migrations.MigrationRegistrar.RESULT_FAILED;
-import static org.jahia.modules.javascript.modules.engine.registrars.migrations.MigrationRegistrar.RESULT_INSTALLED;
-import static org.jahia.modules.javascript.modules.engine.registrars.migrations.MigrationRegistrar.RESULT_SKIPPED;
-import static org.jahia.modules.javascript.modules.engine.registrars.migrations.MigrationRegistrar.STATUS_PATH_PREFIX;
+import static org.jahia.modules.javascript.modules.engine.registrars.contentpatches.ContentPatchRegistrar.RESULT_FAILED;
+import static org.jahia.modules.javascript.modules.engine.registrars.contentpatches.ContentPatchRegistrar.RESULT_INSTALLED;
+import static org.jahia.modules.javascript.modules.engine.registrars.contentpatches.ContentPatchRegistrar.RESULT_SKIPPED;
+import static org.jahia.modules.javascript.modules.engine.registrars.contentpatches.ContentPatchRegistrar.STATUS_PATH_PREFIX;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -42,15 +42,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MigrationRegistrarTest {
+public class ContentPatchRegistrarTest {
 
     private GraalVMEngine engine;
     private Bundle bundle;
-    private TestableMigrationRegistrar registrar;
+    private TestableContentPatchRegistrar registrar;
     private List<Map<String, Object>> registryEntries;
 
     /** Overrides the JCR/JS seams: canned execution results, in-memory status store. */
-    private static class TestableMigrationRegistrar extends MigrationRegistrar {
+    private static class TestableContentPatchRegistrar extends ContentPatchRegistrar {
         final Map<String, String> results = new HashMap<>();
         final List<String> executed = new ArrayList<>();
         final List<String> storeCalls = new ArrayList<>();
@@ -77,7 +77,7 @@ public class MigrationRegistrarTest {
         }
 
         @Override
-        protected String executeMigration(Bundle bundle, String key, String name) {
+        protected String executeContentPatch(Bundle bundle, String key, String name) {
             executed.add(name);
             return results.getOrDefault(name, RESULT_INSTALLED);
         }
@@ -93,37 +93,37 @@ public class MigrationRegistrarTest {
         registryEntries = new ArrayList<>();
         when(engine.doWithContext(any(Function.class))).thenAnswer(invocation -> registryEntries);
 
-        registrar = new TestableMigrationRegistrar();
+        registrar = new TestableContentPatchRegistrar();
         registrar.setGraalVMEngine(engine);
         registrar.activate(Collections.emptyMap());
     }
 
-    private Map<String, Object> migration(String name) {
+    private Map<String, Object> patchEntry(String name) {
         Map<String, Object> entry = new HashMap<>();
-        entry.put("type", MigrationRegistrar.REGISTRY_TYPE);
-        entry.put("key", "test-bundle_migration_" + name);
+        entry.put("type", ContentPatchRegistrar.REGISTRY_TYPE);
+        entry.put("key", "test-bundle_content-patch_" + name);
         entry.put("bundleKey", "test-bundle");
         entry.put("name", name);
         return entry;
     }
 
     @Test
-    public void runsPendingMigrationsInNameOrderAndRecordsResults() {
+    public void runsPendingContentPatchsInNameOrderAndRecordsResults() {
         // registered out of order on purpose: execution must follow name order
-        registryEntries.addAll(Arrays.asList(migration("2.0.0-02-second"), migration("2.0.0-01-first")));
+        registryEntries.addAll(Arrays.asList(patchEntry("2.0.0-02-second"), patchEntry("2.0.0-01-first")));
 
         registrar.register(bundle);
 
         assertEquals(Arrays.asList("2.0.0-01-first", "2.0.0-02-second"), registrar.executed);
         assertEquals(RESULT_INSTALLED, registrar.status.getString(STATUS_PATH_PREFIX + "2.0.0-01-first"));
         assertEquals(RESULT_INSTALLED, registrar.status.getString(STATUS_PATH_PREFIX + "2.0.0-02-second"));
-        // status persisted after each migration, not only at the end
+        // status persisted after each content patch, not only at the end
         assertEquals(2, registrar.storeCalls.size());
     }
 
     @Test
-    public void alreadyRecordedMigrationsNeverRunAgain() {
-        registryEntries.addAll(Arrays.asList(migration("2.0.0-01-first"), migration("2.0.0-02-second")));
+    public void alreadyRecordedContentPatchsNeverRunAgain() {
+        registryEntries.addAll(Arrays.asList(patchEntry("2.0.0-01-first"), patchEntry("2.0.0-02-second")));
         registrar.status.put(STATUS_PATH_PREFIX + "2.0.0-01-first", RESULT_INSTALLED);
 
         registrar.register(bundle);
@@ -132,8 +132,8 @@ public class MigrationRegistrarTest {
     }
 
     @Test
-    public void failedMigrationsAreRecordedAsTerminal() {
-        registryEntries.add(migration("2.0.0-01-first"));
+    public void failedContentPatchsAreRecordedAsTerminal() {
+        registryEntries.add(patchEntry("2.0.0-01-first"));
         registrar.status.put(STATUS_PATH_PREFIX + "2.0.0-01-first", RESULT_FAILED);
 
         registrar.register(bundle);
@@ -142,8 +142,8 @@ public class MigrationRegistrarTest {
     }
 
     @Test
-    public void failureHaltsTheModulesRemainingMigrations() {
-        registryEntries.addAll(Arrays.asList(migration("2.0.0-01-first"), migration("2.0.0-02-second")));
+    public void failureHaltsTheModulesRemainingContentPatchs() {
+        registryEntries.addAll(Arrays.asList(patchEntry("2.0.0-01-first"), patchEntry("2.0.0-02-second")));
         registrar.results.put("2.0.0-01-first", RESULT_FAILED);
 
         registrar.register(bundle);
@@ -156,7 +156,7 @@ public class MigrationRegistrarTest {
     @Test
     public void recordedFailureIsAPersistentBarrierAcrossRestarts() {
         // simulates the NEXT module start after a failure: 01 is recorded .failed, 02 never ran
-        registryEntries.addAll(Arrays.asList(migration("2.0.0-01-first"), migration("2.0.0-02-second")));
+        registryEntries.addAll(Arrays.asList(patchEntry("2.0.0-01-first"), patchEntry("2.0.0-02-second")));
         registrar.status.put(STATUS_PATH_PREFIX + "2.0.0-01-first", RESULT_FAILED);
 
         registrar.register(bundle);
@@ -166,8 +166,8 @@ public class MigrationRegistrarTest {
     }
 
     @Test
-    public void clearingAFailedRecordReleasesTheHeldMigrations() {
-        registryEntries.addAll(Arrays.asList(migration("2.0.0-01-first"), migration("2.0.0-02-second")));
+    public void clearingAFailedRecordReleasesTheHeldContentPatchs() {
+        registryEntries.addAll(Arrays.asList(patchEntry("2.0.0-01-first"), patchEntry("2.0.0-02-second")));
         // the failed record was cleared (the documented recovery), 01 re-runs then 02 follows
         registrar.register(bundle);
 
@@ -176,7 +176,7 @@ public class MigrationRegistrarTest {
 
     @Test
     public void skippedIsTerminalButDoesNotHalt() {
-        registryEntries.addAll(Arrays.asList(migration("2.0.0-01-first"), migration("2.0.0-02-second")));
+        registryEntries.addAll(Arrays.asList(patchEntry("2.0.0-01-first"), patchEntry("2.0.0-02-second")));
         registrar.results.put("2.0.0-01-first", RESULT_SKIPPED);
 
         registrar.register(bundle);
@@ -187,7 +187,7 @@ public class MigrationRegistrarTest {
 
     @Test
     public void groovyPatchEntriesInTheSharedStoreAreLeftUntouched() {
-        registryEntries.add(migration("2.0.0-01-first"));
+        registryEntries.add(patchEntry("2.0.0-01-first"));
         registrar.status.put("/META-INF/patches/groovy/foo.started.groovy", ".installed");
 
         registrar.register(bundle);
@@ -197,11 +197,11 @@ public class MigrationRegistrarTest {
     }
 
     @Test
-    public void autoRunDisabledLeavesMigrationsPending() {
+    public void autoRunDisabledLeavesContentPatchsPending() {
         Map<String, Object> props = new HashMap<>();
         props.put("autoRun", "false");
         registrar.activate(props);
-        registryEntries.add(migration("2.0.0-01-first"));
+        registryEntries.add(patchEntry("2.0.0-01-first"));
 
         registrar.register(bundle);
 
@@ -212,7 +212,7 @@ public class MigrationRegistrarTest {
     @Test
     public void nonProcessingServersExecuteNothing() {
         registrar.processingServer = false;
-        registryEntries.add(migration("2.0.0-01-first"));
+        registryEntries.add(patchEntry("2.0.0-01-first"));
 
         registrar.register(bundle);
 
@@ -222,7 +222,7 @@ public class MigrationRegistrarTest {
     @Test
     public void statusStoreErrorsNeverPreventModuleStart() {
         registrar.failOnGetStatus = true;
-        registryEntries.add(migration("2.0.0-01-first"));
+        registryEntries.add(patchEntry("2.0.0-01-first"));
 
         registrar.register(bundle); // must not throw
 
@@ -230,7 +230,7 @@ public class MigrationRegistrarTest {
     }
 
     @Test
-    public void modulesWithoutMigrationsAreANoOp() {
+    public void modulesWithoutContentPatchsAreANoOp() {
         registrar.register(bundle);
 
         assertTrue(registrar.executed.isEmpty());

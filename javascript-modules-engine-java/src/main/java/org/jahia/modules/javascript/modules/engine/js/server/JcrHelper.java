@@ -48,16 +48,16 @@ public class JcrHelper {
 
     /**
      * Execute JCR operations on a system session (root privileges) on the given workspace and locale.
-     * This is intended for server-side code that must write to the repository, such as migration
+     * This is intended for server-side code that must write to the repository, such as content patch
      * scripts.
      *
      * <p>Unlike {@link #doExecuteAsGuest}, errors are NOT swallowed: they are rethrown to the caller,
-     * because callers like the migration runner must detect failures.
+     * because callers like the content patch runner must detect failures.
      *
      * @param callback  the callback to execute using the JCR session
      * @param language  the session language code (e.g. "en"), or null for a non-localized session
      *                  (translation nodes are then visible as plain subnodes, which is usually what
-     *                  migrations want)
+     *                  content patches want)
      * @param workspace the workspace to open the session on ("default" or "live")
      * @return the result of the callback
      */
