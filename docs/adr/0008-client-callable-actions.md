@@ -20,7 +20,7 @@
 
 `.action.{ts,js}` files (default glob `**/*.action.{js,ts}`) are compiled twice:
 
-- **Server bundle**: the file is included as-is and a `registerActionsModule({ …exports }, "<moduleName>")` call is appended. Each exported function is registered in the engine registry under type `action`, key `<moduleName>/<exportName>` (module name read from `package.json` at build time — the same value the stubs embed, so no runtime agreement on bundle symbolic names is needed). Duplicate keys fail at module startup via the registry's add semantics.
+- **Server bundle**: the file is included as-is and a `__registerActionsModule({ …exports }, "<moduleName>")` call is appended (underscore-marked internal: the engine resolves the library as one shared module at runtime, so a separate subpath entry point is not resolvable there). Each exported function is registered in the engine registry under type `action`, key `<moduleName>/<exportName>` (module name read from `package.json` at build time — the same value the stubs embed, so no runtime agreement on bundle symbolic names is needed). Duplicate keys fail at module startup via the registry's add semantics.
 - **Client bundle**: the module is replaced wholesale by generated stubs — one `async` function per export that POSTs `devalue.stringify(args)` and parses the response. The server implementation never reaches the client bundle, and imports it made (including `@jahia/javascript-modules-library`) disappear with it.
 
 Export discovery is a deliberate v1 simplification: only top-level `export const <name> = …` / `export function <name>` declarations, extracted lexically (works identically on TS and JS, no parser dependency, no plugin-phase sensitivity). Other export forms emit a build warning and are ignored.

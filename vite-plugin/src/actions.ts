@@ -8,7 +8,8 @@ import type { Plugin } from "rolldown";
  * Action files are compiled twice:
  *
  * - In the server bundle, the file is kept as-is and a registration call is appended, so every
- *   exported function becomes a callable action (`registerActionsModule` in the library).
+ *   exported function becomes a callable action (`__registerActionsModule`, internal to the
+ *   library).
  * - In the client bundle, the file is replaced by generated fetch stubs (one per export) that POST
  *   devalue-serialized arguments to the engine's generic action endpoint.
  *
@@ -55,7 +56,7 @@ export const actionsServerRegister = (moduleName: string): Plugin => ({
     if (names.length === 0) return;
     return {
       code: `${code}
-;import { registerActionsModule as __jsmRegisterActionsModule } from "@jahia/javascript-modules-library";
+;import { __registerActionsModule as __jsmRegisterActionsModule } from "@jahia/javascript-modules-library";
 __jsmRegisterActionsModule({ ${names.map((name) => `${JSON.stringify(name)}: ${name}`).join(", ")} }, ${JSON.stringify(moduleName)});
 `,
       map: null,

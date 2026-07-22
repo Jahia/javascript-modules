@@ -13,7 +13,7 @@ export { Area } from "./components/Area.js";
 // Declaration and registration
 export { jahiaComponent } from "./framework/jahiaComponent.js";
 export { action, ActionValidationError } from "./framework/actions/action.js";
-export { registerActionsModule } from "./framework/actions/registerActionsModule.js";
+export { __registerActionsModule } from "./framework/actions/registerActionsModule.js";
 export type { StandardSchemaV1 } from "./framework/actions/standardSchema.js";
 export {
   registerNodeLegacyAction,

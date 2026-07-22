@@ -1,4 +1,4 @@
-import { AddResources, Island, buildModuleFileUrl, jahiaComponent, registerActionsModule } from "@jahia/javascript-modules-library";
+import { AddResources, Island, __registerActionsModule, buildModuleFileUrl, jahiaComponent } from "@jahia/javascript-modules-library";
 import { jsx, jsxs } from "react/jsx-runtime";
 import "react";
 //#region src/vite.png
@@ -37,7 +37,7 @@ jahiaComponent({
 //#region src/greet.action.ts
 var greet = async (name) => `Hello ${name}!`;
 var sum = (...numbers) => numbers.reduce((total, number) => total + number, 0);
-registerActionsModule({
+__registerActionsModule({
 	"greet": greet,
 	"sum": sum
 }, "@jahia/vite-plugin-fixtures");
