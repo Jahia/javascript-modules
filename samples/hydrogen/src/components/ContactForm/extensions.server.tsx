@@ -1,5 +1,5 @@
 import {
-  registerAction,
+  registerNodeLegacyAction,
   registerChoiceListInitializer,
   registerNodeValidator,
 } from "@jahia/javascript-modules-library";
@@ -12,7 +12,7 @@ import {
 
 // receives the form POST; the URL pattern is whitelisted in Jahia's CSRF guard by
 // settings/configurations/org.jahia.modules.jahiacsrfguard-hydrogen.cfg
-registerAction(
+registerNodeLegacyAction(
   { name: "hydrogenContact", requiredMethods: ["POST"], requireAuthenticatedUser: false },
   ({ parameters, resource }) => {
     const from = parameters.from?.[0];

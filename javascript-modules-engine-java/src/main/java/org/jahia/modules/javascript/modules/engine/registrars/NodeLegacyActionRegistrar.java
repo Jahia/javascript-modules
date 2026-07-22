@@ -41,19 +41,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Exposes JavaScript registry entries of type {@code action} as {@link Action} OSGi services, consumed by
+ * Exposes JavaScript registry entries of type {@code node-legacy-action} as {@link Action} OSGi services, consumed by
  * Jahia core and invoked through {@code <nodeUrl>.<actionName>.do} URLs.
  */
 @Component(service = Registrar.class, immediate = true)
-public class ActionRegistrar extends AbstractServiceRegistrar<Action> {
+public class NodeLegacyActionRegistrar extends AbstractServiceRegistrar<Action> {
 
-    public static final String REGISTRY_TYPE = "action";
+    public static final String REGISTRY_TYPE = "node-legacy-action";
 
-    private static final Logger logger = LoggerFactory.getLogger(ActionRegistrar.class);
+    private static final Logger logger = LoggerFactory.getLogger(NodeLegacyActionRegistrar.class);
 
     private JahiaTemplateManagerService templateManagerService;
 
-    public ActionRegistrar() {
+    public NodeLegacyActionRegistrar() {
         super(Action.class, REGISTRY_TYPE);
     }
 

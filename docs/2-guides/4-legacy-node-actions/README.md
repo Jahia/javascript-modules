@@ -1,22 +1,24 @@
 ---
 page:
-  $path: /sites/academy/home/documentation/jahia/8_2/developer/javascript-module-development/actions
-  jcr:title: Declaring Actions
+  $path: /sites/academy/home/documentation/jahia/8_2/developer/javascript-module-development/legacy-node-actions
+  jcr:title: Declaring Legacy Node Actions
   j:templateName: documentation
 content:
   $subpath: document-area/content
 ---
 
-Actions are HTTP endpoints bound to content nodes: appending `.<actionName>.do` to a node URL invokes the action against that node. They are the classic Jahia mechanism for form submissions and lightweight server endpoints. With JavaScript modules you can declare actions in JavaScript, without writing a Java module.
+Legacy node actions are HTTP endpoints bound to content nodes: appending `.<actionName>.do` to a node URL invokes the action against that node. They expose the classic Jahia `org.jahia.bin.Action` mechanism to JavaScript modules, for parity with Java modules — useful for plain HTML form submissions and for interoperating with existing `.do`-based integrations.
 
-## Declaring an action
+> To call server code from client components (islands), prefer [actions](../7-actions/README.md): typed, client-callable functions with automatic serialization.
 
-Call `registerAction` at the top level of a server file (it registers the action as a side effect at module startup, like `jahiaComponent`):
+## Declaring a legacy node action
+
+Call `registerNodeLegacyAction` at the top level of a server file (it registers the action as a side effect at module startup, like `jahiaComponent`):
 
 ```ts
-import { registerAction } from "@jahia/javascript-modules-library";
+import { registerNodeLegacyAction } from "@jahia/javascript-modules-library";
 
-registerAction(
+registerNodeLegacyAction(
   { name: "myModuleGreet", requiredMethods: ["GET"], requireAuthenticatedUser: false },
   ({ parameters, resource }) => ({
     json: {

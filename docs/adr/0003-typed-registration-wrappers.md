@@ -23,7 +23,7 @@ The POC passed raw Java objects (`HttpServletRequest`, `ExtendedPropertyDefiniti
 
 Chosen option: **1.**
 
-* The library exports one registration function per extension point (`registerChoiceListInitializer`, `registerAction`, `registerNodeValidator`, `registerRenderFilter`), siblings of `jahiaComponent` in `javascript-modules-library/src/framework/`.
+* The library exports one registration function per extension point (`registerChoiceListInitializer`, `registerNodeLegacyAction`, `registerNodeValidator`, `registerRenderFilter`), siblings of `jahiaComponent` in `javascript-modules-library/src/framework/`.
 * Each wrapper stores an *adapter* function in the registry: the Java bridge always calls a stable, raw-shaped function; the TS adapter converts to/from the idiomatic shapes before invoking the user callback. **Java stays dumb and stable; the adaptation lives in TS**, where it is cheap to evolve and unit-test.
 * Idiomatic context objects expose converted values (e.g. `locale` as a BCP-47 language tag via `Locale.toLanguageTag()`, parameters as `Record<string, string[]>`) and keep the raw Java objects under a `java` property (or as documented raw fields such as the `JCRNodeWrapper` itself, which is already the library's public node surface).
 * Structured return values that must cross the boundary as JSON (action results) are **pre-stringified with `JSON.stringify` in the adapter** and parsed with `new JSONObject(String)` on the Java side. This sidesteps polyglot deep-conversion issues with nested objects/arrays that broke the POC's `new JSONObject(value.as(Map.class))` approach.

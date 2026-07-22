@@ -1,4 +1,4 @@
-import { registerAction } from "@jahia/javascript-modules-library";
+import { registerNodeLegacyAction } from "@jahia/javascript-modules-library";
 
 /**
  * Test fixtures for JS-declared actions, invoked via <nodeUrl>.<name>.do URLs.
@@ -8,7 +8,7 @@ import { registerAction } from "@jahia/javascript-modules-library";
  * requirement, redirects, and method restrictions.
  */
 
-registerAction(
+registerNodeLegacyAction(
   { name: "testJsActionGet", requiredMethods: ["GET"], requireAuthenticatedUser: false },
   ({ parameters, resource }) => ({
     json: {
@@ -18,7 +18,7 @@ registerAction(
   }),
 );
 
-registerAction(
+registerNodeLegacyAction(
   { name: "testJsActionPost", requiredMethods: ["POST"], requireAuthenticatedUser: false },
   ({ parameters }) => ({
     statusCode: 201,
@@ -27,11 +27,11 @@ registerAction(
 );
 
 // requireAuthenticatedUser defaults to true: guests get a 401
-registerAction({ name: "testJsActionAuth", requiredMethods: ["GET"] }, ({ renderContext }) => ({
+registerNodeLegacyAction({ name: "testJsActionAuth", requiredMethods: ["GET"] }, ({ renderContext }) => ({
   json: { user: renderContext.getUser().getUsername() },
 }));
 
-registerAction(
+registerNodeLegacyAction(
   { name: "testJsActionRedirect", requiredMethods: ["GET"], requireAuthenticatedUser: false },
   () => ({
     statusCode: 302,

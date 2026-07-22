@@ -4,7 +4,7 @@ import type { HttpServletRequest } from "javax.servlet.http";
 import type { List, Map as JavaMap } from "java.util";
 
 /** Declaration of an action, invoked through `<nodeUrl>.<name>.do` URLs. */
-export interface ActionDeclaration {
+export interface NodeLegacyActionDeclaration {
   /**
    * The action name; the action is triggered by URLs of the form `<nodeUrl>.<name>.do`.
    *
@@ -31,7 +31,7 @@ export interface ActionDeclaration {
 }
 
 /** Context passed to an action handler. */
-export interface ActionContext {
+export interface NodeLegacyActionContext {
   /** Merged query-string and form parameters of the request. */
   parameters: Record<string, string[]>;
   /** The render context of the action request. */
@@ -47,7 +47,7 @@ export interface ActionContext {
 }
 
 /** Result of an action handler. */
-export interface ActionResult {
+export interface NodeLegacyActionResult {
   /** HTTP status code of the response. @default 200 */
   statusCode?: number;
   /** Serialized as the JSON response body. Must be a JSON object at the top level. */
@@ -59,11 +59,15 @@ export interface ActionResult {
 }
 
 /**
- * Registers an action: an HTTP endpoint bound to a content node, invoked through
- * `<nodeUrl>.<name>.do` URLs.
+ * Registers a legacy node action: an HTTP endpoint bound to a content node, invoked through
+ * `<nodeUrl>.<name>.do` URLs — Jahia's classic `org.jahia.bin.Action` mechanism, exposed for
+ * parity with Java modules.
+ *
+ * To call server code from client components (islands), prefer actions declared in `.action.ts`
+ * files: typed, client-callable functions with automatic serialization.
  *
  * ```ts
- * registerAction({ name: "myModuleGreet", requiredMethods: ["GET"] }, ({ parameters, resource }) => ({
+ * registerNodeLegacyAction({ name: "myModuleGreet", requiredMethods: ["GET"] }, ({ parameters, resource }) => ({
  *   json: {
  *     greeting: `Hello ${parameters.who?.[0] ?? "world"}`,
  *     path: resource.getNode().getPath(),
@@ -76,16 +80,16 @@ export interface ActionResult {
  * @param declaration The action declaration; `name` is the URL-visible action name.
  * @param handler Executes the action and returns the response to send.
  */
-export const registerAction = (
-  { name, requiredMethods, requireAuthenticatedUser, requiredPermission, requiredWorkspace }: ActionDeclaration,
-  handler: (context: ActionContext) => ActionResult | undefined,
+export const registerNodeLegacyAction = (
+  { name, requiredMethods, requireAuthenticatedUser, requiredPermission, requiredWorkspace }: NodeLegacyActionDeclaration,
+  handler: (context: NodeLegacyActionContext) => NodeLegacyActionResult | undefined,
 ): void => {
-  server.registry.add("action", name, {
+  server.registry.add("node-legacy-action", name, {
     ...(requiredMethods !== undefined && { requiredMethods: requiredMethods.join(",") }),
     ...(requireAuthenticatedUser !== undefined && { requireAuthenticatedUser }),
     ...(requiredPermission !== undefined && { requiredPermission }),
     ...(requiredWorkspace !== undefined && { requiredWorkspace }),
-    // Raw adapter invoked by the Java bridge (ActionRegistrar.ActionBridge) with the
+    // Raw adapter invoked by the Java bridge (NodeLegacyActionRegistrar.ActionBridge) with the
     // Action#doExecute arguments; returns {statusCode, json?: string, redirect?, absoluteRedirect?}
     // with json pre-stringified. Keep both shapes in sync.
     doExecute: (

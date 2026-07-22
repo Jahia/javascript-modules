@@ -30,7 +30,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class ActionRegistrarTest {
+public class NodeLegacyActionRegistrarTest {
 
     private static Context context;
 
@@ -46,7 +46,7 @@ public class ActionRegistrarTest {
 
     private static ActionResult convert(String jsExpression) {
         Value result = context.eval("js", jsExpression);
-        return ActionRegistrar.ActionBridge.convertResult(result);
+        return NodeLegacyActionRegistrar.ActionBridge.convertResult(result);
     }
 
     @Test
@@ -58,7 +58,7 @@ public class ActionRegistrarTest {
         entry.put("requiredPermission", "jcr:write");
         entry.put("requiredWorkspace", "live");
 
-        ActionRegistrar.ActionBridge bridge = new ActionRegistrar.ActionBridge(entry, null);
+        NodeLegacyActionRegistrar.ActionBridge bridge = new NodeLegacyActionRegistrar.ActionBridge(entry, null);
 
         assertEquals("myAction", bridge.getName());
         assertTrue(bridge.getRequiredMethods().contains("GET"));
@@ -73,7 +73,7 @@ public class ActionRegistrarTest {
         Map<String, Object> entry = new HashMap<>();
         entry.put("key", "minimalAction");
 
-        ActionRegistrar.ActionBridge bridge = new ActionRegistrar.ActionBridge(entry, null);
+        NodeLegacyActionRegistrar.ActionBridge bridge = new NodeLegacyActionRegistrar.ActionBridge(entry, null);
 
         assertEquals("minimalAction", bridge.getName());
         // Jahia's Action base class requires an authenticated user by default

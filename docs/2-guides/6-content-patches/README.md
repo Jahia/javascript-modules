@@ -13,7 +13,7 @@ Typical uses: removing leftover values of a dropped property, backfilling a defa
 
 ## Declaring a content patch
 
-Call `registerContentPatch` at the top level of a server file (it registers the content patch as a side effect at module startup, like `registerAction`). Convention: one content patch per file under `src/content-patches/`:
+Call `registerContentPatch` at the top level of a server file (it registers the content patch as a side effect at module startup, like `registerNodeLegacyAction`). Convention: one content patch per file under `src/content-patches/`:
 
 ```ts
 // src/content-patches/2.0.0-01-remove-legacy-color.server.ts
