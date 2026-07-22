@@ -21,7 +21,10 @@ export interface ChoiceListInitializerContext {
    * Parameter from the CND declaration `choicelist[myKey,'myParam']`; empty string when absent.
    */
   param: string;
-  /** BCP-47 language tag of the editing UI locale, e.g. `"en"` or `"fr-FR"`. */
+  /**
+   * BCP-47 language tag of the content language being edited (not the editor's UI language),
+   * e.g. `"en"` or `"fr-FR"`.
+   */
   locale: string;
   /**
    * Choices accumulated by the previous initializers of the CND declaration chain (empty when this

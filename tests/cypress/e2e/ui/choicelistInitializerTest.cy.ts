@@ -32,15 +32,18 @@ const FORM_QUERY = `
   }
 `;
 
-/** Fetches the creation form of the test node type and returns its fields, flattened. */
-const getFormFields = (uiLocale: string): Cypress.Chainable<Field[]> =>
+/**
+ * Fetches the creation form of the test node type and returns its fields, flattened.
+ * Initializers receive the CONTENT locale (the language being edited), not the UI locale.
+ */
+const getFormFields = (locale: string): Cypress.Chainable<Field[]> =>
   cy
     .apollo({
       query: FORM_QUERY,
       variables: {
         nodeType: "javascriptExample:testChoicelistInitializer",
-        uiLocale,
-        locale: "en",
+        uiLocale: "en",
+        locale,
         uuidOrPath: `/sites/${GENERIC_SITE_KEY}/home`,
       },
     })
@@ -101,7 +104,7 @@ describe("JS choicelist initializers", () => {
     });
   });
 
-  it("localizes labels through the ui locale", () => {
+  it("localizes labels through the content locale", () => {
     getFormFields("fr").then((fields) => {
       expect(constraintLabel(field(fields, "color"), "red")).to.equal("Rouge");
     });

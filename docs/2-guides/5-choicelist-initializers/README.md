@@ -42,7 +42,7 @@ The callback receives a context object:
 | Property | Description |
 |----------|-------------|
 | `param` | The parameter from the CND declaration: `choicelist[myModuleColors='myParam']` passes `"myParam"`. Empty string when absent. |
-| `locale` | BCP-47 language tag of the editing UI locale (e.g. `"en"`, `"fr"`). Use it to localize labels. |
+| `locale` | BCP-47 language tag of the content language being edited (e.g. `"en"`, `"fr"`) — not the editor's UI language. Use it to localize labels. |
 | `values` | Choices accumulated by previous initializers when several are chained in the CND declaration (e.g. `choicelist[resourceBundle,myModuleColors]`). Include them in your result to keep them. |
 | `node` | The node being edited, when it exists (it does not on creation forms). |
 | `java` | Escape hatch: the raw Java objects received by the underlying `ModuleChoiceListInitializer` — `propertyDefinition` (`ExtendedPropertyDefinition`), `locale` (`java.util.Locale`), `values`, `context`. |

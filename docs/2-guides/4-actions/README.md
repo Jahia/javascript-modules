@@ -31,8 +31,11 @@ The action is then reachable on any node URL:
 
 ```
 GET /cms/render/live/en/sites/mysite/home.myModuleGreet.do?who=Jahia
+Accept: application/json
 → 200 {"greeting": "Hello Jahia", "path": "/sites/mysite/home"}
 ```
+
+Note that Jahia's render servlet only writes the JSON body when the request declares it accepts JSON — send an `Accept: application/json` header (browsers submitting forms get the redirect/status behavior instead).
 
 ## Declaration options
 
