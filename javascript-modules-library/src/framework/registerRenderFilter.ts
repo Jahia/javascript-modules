@@ -6,6 +6,7 @@ export interface RenderFilterDeclaration {
   key: string;
   /**
    * Position of the filter in the render chain (may be fractional). Lower priorities execute first.
+   *
    * @default 0
    */
   priority?: number;
@@ -28,6 +29,8 @@ export interface RenderFilterCallbacks {
   /**
    * Invoked before the resource is rendered; returning a non-null string short-circuits the chain
    * with that output.
+   *
+   * `chain` is the raw Java `RenderChain`, typed as `unknown` because it has no generated typing.
    */
   prepare?: (
     renderContext: RenderContext,
@@ -37,6 +40,8 @@ export interface RenderFilterCallbacks {
   /**
    * Invoked after the resource is rendered, with the output produced so far; returns the (possibly
    * transformed) output. Returning null/undefined keeps the previous output.
+   *
+   * `chain` is the raw Java `RenderChain`, typed as `unknown` because it has no generated typing.
    */
   execute?: (
     previousOutput: string,
@@ -57,6 +62,9 @@ export interface RenderFilterCallbacks {
  * ```
  *
  * Filters run synchronously on every matching render — keep them fast.
+ *
+ * Keys live in a single platform-wide registry namespace; prefix them with your module name to
+ * avoid collisions.
  *
  * @param declaration The filter declaration; `applyOn*` options restrict when the filter runs.
  * @param callbacks The `prepare` and/or `execute` callbacks.

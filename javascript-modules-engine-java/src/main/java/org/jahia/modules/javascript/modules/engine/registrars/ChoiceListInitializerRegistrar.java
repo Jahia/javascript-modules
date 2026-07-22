@@ -92,9 +92,9 @@ public class ChoiceListInitializerRegistrar extends AbstractServiceRegistrar<Mod
         private final GraalVMEngine engine;
         private String key;
 
-        public ChoiceListInitializerBridge(Map<String, Object> value, GraalVMEngine engine) {
+        public ChoiceListInitializerBridge(Map<String, Object> registryEntry, GraalVMEngine engine) {
             this.engine = engine;
-            this.key = (String) value.get("key");
+            this.key = (String) registryEntry.get("key");
         }
 
         @Override

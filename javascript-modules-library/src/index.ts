@@ -40,7 +40,7 @@ export type {
 } from "./framework/contentPatches/types.js";
 export {
   registerNodeValidator,
-  type NodeValidatorProps,
+  type NodeValidatorDeclaration,
   type NodeValidatorContext,
   type NodeValidatorViolation,
 } from "./framework/registerNodeValidator.js";

@@ -16,10 +16,10 @@ import type { Plugin } from "rolldown";
  * function <name>` / `export async function <name>` declarations are supported.
  */
 
-const ACTION_FILE = /\.action\.(ts|js|mts|mjs)$/;
-const EXPORT_DECLARATION =
-  /^export\s+(?:const|let|async\s+function\s*\*?|function\s*\*?)\s+([A-Za-z_$][\w$]*)/gm;
-const UNSUPPORTED_EXPORT = /^export\s*(?:\{|\*|default)/m;
+// keep in sync with the default `actions.inputGlob` of the plugin (index.ts)
+const ACTION_FILE = /\.action\.(ts|js)$/;
+const EXPORT_DECLARATION = /^export\s+(?:const|async\s+function|function)\s+([A-Za-z_$][\w$]*)/gm;
+const UNSUPPORTED_EXPORT = /^export\s*(?:\{|\*|default\b)|^export\s+let\b/m;
 
 export const isActionFile = (id: string): boolean => ACTION_FILE.test(id.split("?")[0]);
 
@@ -79,6 +79,7 @@ const __jsmCall = (name) => async (...args) => {
   const target = \`\${location.pathname.replace(/\\.html$/, "")}.jsAction.do?name=\${encodeURIComponent(name)}\`;
   const response = await fetch(target, {
     method: "POST",
+    // the endpoint (GenericActionEndpoint) only checks the header's presence, not its value
     headers: { "X-JS-Action": "1", accept: "application/json" },
     body: __jsmStringify(args),
   });

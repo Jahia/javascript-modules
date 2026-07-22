@@ -94,12 +94,13 @@ const toJsChoiceListValues = (values: List<unknown>): ChoiceListValue[] => {
   const result: ChoiceListValue[] = [];
   if (values) {
     for (let i = 0; i < values.size(); i++) {
-      // Jahia's ChoiceListValue: getDisplayName(), getValue() (JCR Value), getProperties()
+      // Jahia's ChoiceListValue: getDisplayName(), getValue() (a JCR Value)
       const value = values.get(i) as {
         getDisplayName(): string;
         getValue(): { getString(): string };
-        getProperties(): JavaMap<string, unknown> | null;
       };
+      // properties of accumulated values are intentionally not surfaced here;
+      // the raw list stays available under the `java` escape hatch
       result.push({ label: value.getDisplayName(), value: value.getValue().getString() });
     }
   }

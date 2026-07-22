@@ -39,55 +39,55 @@ public class JSPromiseTest {
         context.close();
     }
 
-    private static JSPromise.Settled run(String jsFunction) {
+    private static JSPromise.Outcome run(String jsFunction) {
         Value fn = context.eval("js", "(" + jsFunction + ")");
         return JSPromise.settle(fn.execute());
     }
 
     @Test
     public void settlesPlainValues() {
-        JSPromise.Settled settled = run("() => 42");
-        assertTrue(settled.isDone());
+        JSPromise.Outcome settled = run("() => 42");
+        assertTrue(settled.isSettled());
         assertFalse(settled.isRejected());
         assertEquals(42, settled.getValue().asInt());
     }
 
     @Test
     public void settlesAsyncFunctions() {
-        JSPromise.Settled settled = run("async () => 'hello'");
-        assertTrue("async function result should settle at the API boundary", settled.isDone());
+        JSPromise.Outcome settled = run("async () => 'hello'");
+        assertTrue("async function result should settle at the API boundary", settled.isSettled());
         assertEquals("hello", settled.getValue().asString());
     }
 
     @Test
     public void settlesAwaitChains() {
-        JSPromise.Settled settled = run(
+        JSPromise.Outcome settled = run(
                 "async () => { const a = await Promise.resolve(20); const b = await Promise.resolve(22); return a + b; }");
-        assertTrue("awaited chains should settle through the microtask queue", settled.isDone());
+        assertTrue("awaited chains should settle through the microtask queue", settled.isSettled());
         assertEquals(42, settled.getValue().asInt());
     }
 
     @Test
     public void settlesThenChains() {
-        JSPromise.Settled settled = run(
+        JSPromise.Outcome settled = run(
                 "() => Promise.resolve('a').then((v) => v + 'b').then((v) => v + 'c')");
-        assertTrue(settled.isDone());
+        assertTrue(settled.isSettled());
         assertEquals("abc", settled.getValue().asString());
     }
 
     @Test
     public void capturesRejections() {
-        JSPromise.Settled settled = run("async () => { throw new Error('boom'); }");
-        assertTrue(settled.isDone());
+        JSPromise.Outcome settled = run("async () => { throw new Error('boom'); }");
+        assertTrue(settled.isSettled());
         assertTrue(settled.isRejected());
         assertEquals("boom", settled.getError().getMember("message").asString());
     }
 
     @Test
     public void capturesRejectedPlainObjects() {
-        JSPromise.Settled settled = run(
+        JSPromise.Outcome settled = run(
                 "() => Promise.reject({ message: 'invalid', issues: '[{\"message\":\"nope\"}]' })");
-        assertTrue(settled.isDone());
+        assertTrue(settled.isSettled());
         assertTrue(settled.isRejected());
         assertEquals("invalid", settled.getError().getMember("message").asString());
         assertEquals("[{\"message\":\"nope\"}]", settled.getError().getMember("issues").asString());
@@ -95,7 +95,7 @@ public class JSPromiseTest {
 
     @Test
     public void neverSettlingPromisesAreReportedAsNotDone() {
-        JSPromise.Settled settled = run("() => new Promise(() => {})");
-        assertFalse(settled.isDone());
+        JSPromise.Outcome settled = run("() => new Promise(() => {})");
+        assertFalse(settled.isSettled());
     }
 }

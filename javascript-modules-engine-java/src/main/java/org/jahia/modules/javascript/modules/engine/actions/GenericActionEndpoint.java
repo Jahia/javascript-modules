@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -82,40 +83,40 @@ public class GenericActionEndpoint extends Action {
             JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver)
             throws Exception {
         if (request.getHeader(REQUIRED_HEADER) == null) {
-            return error("Missing " + REQUIRED_HEADER + " header", null);
+            return error("Missing " + REQUIRED_HEADER + " header");
         }
         String name = getParameter(parameters, "name");
         if (name == null) {
-            return error("Missing action name", null);
+            return error("Missing action name");
         }
         String body = IOUtils.toString(request.getReader());
 
         return graalVMEngine.doWithContext(contextProvider -> {
             Map<String, Object> entry = contextProvider.getRegistry().get(REGISTRY_TYPE, name);
             if (entry == null || entry.get("execute") == null) {
-                return error("Unknown action: " + name, null);
+                return error("Unknown action: " + name);
             }
-            JSPromise.Settled settled;
+            JSPromise.Outcome outcome;
             try {
-                settled = JSPromise.settle(Value.asValue(entry.get("execute")).execute(body));
+                outcome = JSPromise.settle(Value.asValue(entry.get("execute")).execute(body));
             } catch (Exception e) {
                 logger.error("JS action '{}' failed to execute", name, e);
-                return error("Action execution failed", null);
+                return error("Action execution failed");
             }
-            if (!settled.isDone()) {
+            if (!outcome.isSettled()) {
                 logger.error("JS action '{}' returned a promise that did not settle; only microtask-based " +
                         "asynchronicity is supported on the server (no timers or async I/O)", name);
-                return error("Action did not settle synchronously", null);
+                return error("Action did not settle synchronously");
             }
-            if (settled.isRejected()) {
-                return error(readMessage(settled.getError()), readIssues(settled.getError()));
+            if (outcome.isRejected()) {
+                return error(readMessage(outcome.getError()), readIssues(outcome.getError()));
             }
-            Value data = settled.getValue();
+            Value data = outcome.getValue();
             if (data == null || data.isNull() || !data.isString()) {
                 logger.error("JS action '{}' adapter did not return a serialized string", name);
-                return error("Action returned an unexpected result", null);
+                return error("Action returned an unexpected result");
             }
-            return new ActionResult(200, null, new JSONObject().put("data", data.asString()));
+            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("data", data.asString()));
         });
     }
 
@@ -144,11 +145,15 @@ public class GenericActionEndpoint extends Action {
         return null;
     }
 
+    private static ActionResult error(String message) {
+        return error(message, null);
+    }
+
     private static ActionResult error(String message, JSONArray issues) {
         JSONObject json = new JSONObject().put("error", message);
         if (issues != null) {
             json.put("issues", issues);
         }
-        return new ActionResult(200, null, json);
+        return new ActionResult(HttpServletResponse.SC_OK, null, json);
     }
 }

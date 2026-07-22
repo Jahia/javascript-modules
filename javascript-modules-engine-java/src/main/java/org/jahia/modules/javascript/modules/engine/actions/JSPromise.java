@@ -33,19 +33,19 @@ public final class JSPromise {
     }
 
     /** Outcome of settling a JS value. */
-    public static final class Settled {
+    public static final class Outcome {
         private final Value value;
         private final Value error;
-        private final boolean done;
+        private final boolean settled;
 
-        private Settled(Value value, Value error, boolean done) {
+        private Outcome(Value value, Value error, boolean settled) {
             this.value = value;
             this.error = error;
-            this.done = done;
+            this.settled = settled;
         }
 
-        public boolean isDone() {
-            return done;
+        public boolean isSettled() {
+            return settled;
         }
 
         public boolean isRejected() {
@@ -61,9 +61,9 @@ public final class JSPromise {
         }
     }
 
-    public static Settled settle(Value result) {
+    public static Outcome settle(Value result) {
         if (result == null || !isThenable(result)) {
-            return new Settled(result, null, true);
+            return new Outcome(result, null, true);
         }
         final Value[] outcome = new Value[2];
         final boolean[] done = new boolean[1];
@@ -74,12 +74,13 @@ public final class JSPromise {
                     return null;
                 },
                 (ProxyExecutable) arguments -> {
+                    // a bare reject() carries no reason; substitute a readable one
                     outcome[1] = arguments.length > 0 ? arguments[0] : Value.asValue("unknown error");
                     done[0] = true;
                     return null;
                 });
         // the microtask queue is drained when invokeMember returns to the host
-        return new Settled(outcome[0], outcome[1], done[0]);
+        return new Outcome(outcome[0], outcome[1], done[0]);
     }
 
     private static boolean isThenable(Value value) {

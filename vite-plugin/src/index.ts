@@ -9,6 +9,28 @@ import { buildSuccessful } from "./build-successful.js";
 import { insertFilename } from "./insert-filename.js";
 import { multiEntry } from "./multi-entry.js";
 
+/**
+ * Reads the module name from package.json. Action keys are namespaced by it, so a missing name
+ * falls back to a generic value that could collide across modules — hence the loud warning.
+ */
+function readModuleName(): string {
+  try {
+    const name = (
+      JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf-8")) as { name?: string }
+    ).name;
+    if (name) return name;
+  } catch {
+    // fall through to the warning below
+  }
+  console.warn(
+    styleText(
+      "yellowBright",
+      "[@jahia/vite-plugin] Unable to read the module name from package.json; actions will be namespaced under 'module', which may collide with other modules",
+    ),
+  );
+  return "module";
+}
+
 export default function jahia(
   options: {
     /**
@@ -113,15 +135,8 @@ export default function jahia(
   });
 
   // The module name namespaces action keys; the same value is used by the server registration
-  // and the generated client stubs.
-  let moduleName = "module";
-  try {
-    moduleName =
-      (JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf-8")) as { name?: string })
-        .name ?? moduleName;
-  } catch {
-    // keep the fallback name
-  }
+  // and the generated client stubs, so both sides agree by construction.
+  const moduleName = readModuleName();
 
   if (clientEntries.length === 0) {
     console.warn(

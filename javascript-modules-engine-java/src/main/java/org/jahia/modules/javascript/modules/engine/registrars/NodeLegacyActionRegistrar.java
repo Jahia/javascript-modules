@@ -92,20 +92,20 @@ public class NodeLegacyActionRegistrar extends AbstractServiceRegistrar<Action> 
 
         private final GraalVMEngine engine;
 
-        public ActionBridge(Map<String, Object> value, GraalVMEngine engine) {
+        public ActionBridge(Map<String, Object> registryEntry, GraalVMEngine engine) {
             this.engine = engine;
-            setName((String) value.get("key"));
-            if (value.containsKey("requiredMethods")) {
-                setRequiredMethods(value.get("requiredMethods").toString());
+            setName((String) registryEntry.get("key"));
+            if (registryEntry.containsKey("requiredMethods")) {
+                setRequiredMethods(registryEntry.get("requiredMethods").toString());
             }
-            if (value.containsKey("requireAuthenticatedUser")) {
-                setRequireAuthenticatedUser((Boolean) value.get("requireAuthenticatedUser"));
+            if (registryEntry.containsKey("requireAuthenticatedUser")) {
+                setRequireAuthenticatedUser((Boolean) registryEntry.get("requireAuthenticatedUser"));
             }
-            if (value.containsKey("requiredPermission")) {
-                setRequiredPermission(value.get("requiredPermission").toString());
+            if (registryEntry.containsKey("requiredPermission")) {
+                setRequiredPermission(registryEntry.get("requiredPermission").toString());
             }
-            if (value.containsKey("requiredWorkspace")) {
-                setRequiredWorkspace(value.get("requiredWorkspace").toString());
+            if (registryEntry.containsKey("requiredWorkspace")) {
+                setRequiredWorkspace(registryEntry.get("requiredWorkspace").toString());
             }
         }
 

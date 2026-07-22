@@ -34,6 +34,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+/**
+ * Exposes JavaScript registry entries of type {@code render-filter} as {@link RenderFilter} OSGi
+ * services, participating in Jahia's render chain like Java {@link AbstractFilter} implementations.
+ */
 @Component(service = Registrar.class, immediate = true)
 public class RenderFilterRegistrar extends AbstractServiceRegistrar<RenderFilter> {
 
@@ -74,31 +78,31 @@ public class RenderFilterRegistrar extends AbstractServiceRegistrar<RenderFilter
         private final GraalVMEngine engine;
         private final String key;
 
-        public RenderFilterBridge(Map<String, Object> value, GraalVMEngine engine) {
+        public RenderFilterBridge(Map<String, Object> registryEntry, GraalVMEngine engine) {
             this.engine = engine;
-            this.key = (String) value.get("key");
-            if (value.containsKey("priority")) {
-                setPriority(Float.parseFloat(value.get("priority").toString()));
+            this.key = (String) registryEntry.get("key");
+            if (registryEntry.containsKey("priority")) {
+                setPriority(Float.parseFloat(registryEntry.get("priority").toString()));
             } else {
                 setPriority(0);
             }
-            if (value.containsKey("description")) {
-                setDescription(value.get("description").toString());
+            if (registryEntry.containsKey("description")) {
+                setDescription(registryEntry.get("description").toString());
             }
-            if (value.containsKey("applyOnConfigurations")) {
-                this.setApplyOnConfigurations(value.get("applyOnConfigurations").toString());
+            if (registryEntry.containsKey("applyOnConfigurations")) {
+                setApplyOnConfigurations(registryEntry.get("applyOnConfigurations").toString());
             }
-            if (value.containsKey("applyOnModes")) {
-                this.setApplyOnModes(value.get("applyOnModes").toString());
+            if (registryEntry.containsKey("applyOnModes")) {
+                setApplyOnModes(registryEntry.get("applyOnModes").toString());
             }
-            if (value.containsKey("applyOnNodeTypes")) {
-                this.setApplyOnNodeTypes(value.get("applyOnNodeTypes").toString());
+            if (registryEntry.containsKey("applyOnNodeTypes")) {
+                setApplyOnNodeTypes(registryEntry.get("applyOnNodeTypes").toString());
             }
-            if (value.containsKey("applyOnTemplates")) {
-                this.setApplyOnTemplates(value.get("applyOnTemplates").toString());
+            if (registryEntry.containsKey("applyOnTemplates")) {
+                setApplyOnTemplates(registryEntry.get("applyOnTemplates").toString());
             }
-            if (value.containsKey("applyOnTemplateTypes")) {
-                this.setApplyOnTemplateTypes(value.get("applyOnTemplateTypes").toString());
+            if (registryEntry.containsKey("applyOnTemplateTypes")) {
+                setApplyOnTemplateTypes(registryEntry.get("applyOnTemplateTypes").toString());
             }
         }
 
@@ -106,8 +110,12 @@ public class RenderFilterRegistrar extends AbstractServiceRegistrar<RenderFilter
         public String execute(String previousOut, RenderContext renderContext, Resource resource, RenderChain renderChain) throws Exception {
             return engine.doWithContext(contextProvider -> {
                 Map<String, Object> jsFilter = getJsFilter(contextProvider);
-                if (jsFilter == null || jsFilter.get("execute") == null) {
+                if (jsFilter == null) {
                     logger.warn("JS render filter '{}' is no longer available in the registry, skipping execute", key);
+                    return previousOut;
+                }
+                if (jsFilter.get("execute") == null) {
+                    // both callbacks are optional: a prepare-only filter is a no-op here
                     return previousOut;
                 }
                 Value result = Value.asValue(jsFilter.get("execute")).execute(previousOut, renderContext, resource, renderChain);
@@ -119,7 +127,12 @@ public class RenderFilterRegistrar extends AbstractServiceRegistrar<RenderFilter
         public String prepare(RenderContext renderContext, Resource resource, RenderChain renderChain) throws Exception {
             return engine.doWithContext(contextProvider -> {
                 Map<String, Object> jsFilter = getJsFilter(contextProvider);
-                if (jsFilter == null || jsFilter.get("prepare") == null) {
+                if (jsFilter == null) {
+                    logger.warn("JS render filter '{}' is no longer available in the registry, skipping prepare", key);
+                    return null;
+                }
+                if (jsFilter.get("prepare") == null) {
+                    // both callbacks are optional: an execute-only filter is a no-op here
                     return null;
                 }
                 Value result = Value.asValue(jsFilter.get("prepare")).execute(renderContext, resource, renderChain);

@@ -63,10 +63,6 @@ public abstract class AbstractServiceRegistrar<S> implements Registrar {
         this.registryType = registryType;
     }
 
-    public String getRegistryType() {
-        return registryType;
-    }
-
     /**
      * Builds the OSGi service bridge for a single registry entry. The returned object is published as a
      * service of the registrar's service class.

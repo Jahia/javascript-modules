@@ -27,12 +27,7 @@ export const registerActionsModule = (
             (error: unknown) => {
               // Shape the rejection for the Java endpoint: a plain object with a string message
               // and, for validation failures, pre-stringified issues.
-              const shaped: { message: string; issues?: string } = {
-                message:
-                  error instanceof Error
-                    ? error.message
-                    : String((error as { message?: unknown } | undefined)?.message ?? error),
-              };
+              const shaped: { message: string; issues?: string } = { message: messageOf(error) };
               const issues = (error as { issues?: unknown } | undefined)?.issues;
               if (Array.isArray(issues)) {
                 shaped.issues = JSON.stringify(issues);
@@ -43,4 +38,11 @@ export const registerActionsModule = (
     });
     console.debug(`Registered action: ${moduleName}/${name}`);
   }
+};
+
+/** Extracts a human-readable message from an Error, an error-like object, or anything else. */
+const messageOf = (error: unknown): string => {
+  if (error instanceof Error) return error.message;
+  const message = (error as { message?: unknown } | undefined)?.message;
+  return String(message ?? error);
 };

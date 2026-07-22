@@ -90,7 +90,7 @@ public class JSValidationConstraintValidator implements ConstraintValidator<JSVa
 
     static String sanitizeMessage(String message, String validatorKey) {
         if (message == null || message.trim().length() < 2) {
-            logger.warn("JS node validator '{}' returned a blank violation message, using a generic one",
+            logger.warn("JS node validator '{}' returned a blank or too-short violation message (the platform interpolator requires at least 2 characters), using a generic one",
                     validatorKey);
             return "Invalid content";
         }

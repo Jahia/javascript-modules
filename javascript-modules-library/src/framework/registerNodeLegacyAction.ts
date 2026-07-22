@@ -128,7 +128,7 @@ export const registerNodeLegacyAction = (
       };
     },
   });
-  console.debug(`Registered action: ${name}`);
+  console.debug(`Registered node legacy action: ${name}`);
 };
 
 /** Converts the Java Map<String, List<String>> of request parameters into a plain JS object. */

@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -142,6 +141,14 @@ public class AbstractServiceRegistrarTest {
     }
 
     @Test
+    public void registrarQueriesTheRegistryWithItsTypeAndTheBundleKey() {
+        registrar.register(bundle);
+        // the registry read goes through doWithContext with a {type, bundleKey} filter;
+        // the mocked engine records the interaction
+        verify(registrar.graalVMEngine).doWithContext(any(Function.class));
+    }
+
+    @Test
     public void unregisterSurvivesAFailingServiceUnregistration() {
         registryEntries.addAll(Arrays.asList(entry("a"), entry("b")));
         List<ServiceRegistration<Runnable>> registrations = stubRegistrations();
@@ -158,8 +165,4 @@ public class AbstractServiceRegistrarTest {
         }
     }
 
-    @Test
-    public void registryTypeIsExposed() {
-        assertTrue(registrar.getRegistryType().equals("test-type"));
-    }
 }

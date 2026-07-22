@@ -37,7 +37,7 @@ export interface NodeValidatorContext {
 }
 
 /** Declaration of a node validator. */
-export interface NodeValidatorProps {
+export interface NodeValidatorDeclaration {
   /** Node type (primary or mixin) this validator applies to, matched with `isNodeType()`. */
   nodeType: string;
   /**
@@ -72,11 +72,11 @@ export interface NodeValidatorProps {
  * Validators run synchronously on every matching save — keep them fast, and never call
  * `session.save()` from a validator.
  *
- * @param props The validator declaration.
+ * @param declaration The validator declaration.
  * @param validate Returns the violations (array, single violation, or nothing when valid).
  */
 export const registerNodeValidator = (
-  { nodeType, name = "default", skipOnImport = false, advanced = false }: NodeValidatorProps,
+  { nodeType, name = "default", skipOnImport = false, advanced = false }: NodeValidatorDeclaration,
   validate: (
     node: JCRNodeWrapper,
     context: NodeValidatorContext,
