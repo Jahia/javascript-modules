@@ -1,0 +1,101 @@
+/*
+ * Copyright (C) 2002-2023 Jahia Solutions Group SA. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.jahia.modules.javascript.modules.engine.actions;
+
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Value;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class JSPromiseTest {
+
+    private static Context context;
+
+    @BeforeClass
+    public static void setUp() {
+        context = Context.newBuilder("js").build();
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        context.close();
+    }
+
+    private static JSPromise.Settled run(String jsFunction) {
+        Value fn = context.eval("js", "(" + jsFunction + ")");
+        return JSPromise.settle(fn.execute());
+    }
+
+    @Test
+    public void settlesPlainValues() {
+        JSPromise.Settled settled = run("() => 42");
+        assertTrue(settled.isDone());
+        assertFalse(settled.isRejected());
+        assertEquals(42, settled.getValue().asInt());
+    }
+
+    @Test
+    public void settlesAsyncFunctions() {
+        JSPromise.Settled settled = run("async () => 'hello'");
+        assertTrue("async function result should settle at the API boundary", settled.isDone());
+        assertEquals("hello", settled.getValue().asString());
+    }
+
+    @Test
+    public void settlesAwaitChains() {
+        JSPromise.Settled settled = run(
+                "async () => { const a = await Promise.resolve(20); const b = await Promise.resolve(22); return a + b; }");
+        assertTrue("awaited chains should settle through the microtask queue", settled.isDone());
+        assertEquals(42, settled.getValue().asInt());
+    }
+
+    @Test
+    public void settlesThenChains() {
+        JSPromise.Settled settled = run(
+                "() => Promise.resolve('a').then((v) => v + 'b').then((v) => v + 'c')");
+        assertTrue(settled.isDone());
+        assertEquals("abc", settled.getValue().asString());
+    }
+
+    @Test
+    public void capturesRejections() {
+        JSPromise.Settled settled = run("async () => { throw new Error('boom'); }");
+        assertTrue(settled.isDone());
+        assertTrue(settled.isRejected());
+        assertEquals("boom", settled.getError().getMember("message").asString());
+    }
+
+    @Test
+    public void capturesRejectedPlainObjects() {
+        JSPromise.Settled settled = run(
+                "() => Promise.reject({ message: 'invalid', issues: '[{\"message\":\"nope\"}]' })");
+        assertTrue(settled.isDone());
+        assertTrue(settled.isRejected());
+        assertEquals("invalid", settled.getError().getMember("message").asString());
+        assertEquals("[{\"message\":\"nope\"}]", settled.getError().getMember("issues").asString());
+    }
+
+    @Test
+    public void neverSettlingPromisesAreReportedAsNotDone() {
+        JSPromise.Settled settled = run("() => new Promise(() => {})");
+        assertFalse(settled.isDone());
+    }
+}

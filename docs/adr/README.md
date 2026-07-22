@@ -14,3 +14,5 @@ ADRs are numbered in the order they were accepted and are never rewritten once a
 | [0004](0004-csrf-whitelisting-for-js-actions.md) | CSRF whitelisting of JavaScript actions is the module author's responsibility | accepted |
 | [0005](0005-js-node-validators-single-bean-validation-bridge.md) | Bridge JS node validators through a single Bean Validation bean registered for `nt:base` | accepted |
 | [0006](0006-javascript-content-patches.md) | Run JavaScript content patches through a dedicated registrar backed by core's patch status store | accepted |
+| [0007](0007-action-naming.md) | Reserve "action" for client-callable server functions; rename the platform bridge to "legacy node actions" | accepted |
+| [0008](0008-client-callable-actions.md) | Client-callable actions: dual-compiled `.action.ts` files over a single dispatch endpoint | accepted |

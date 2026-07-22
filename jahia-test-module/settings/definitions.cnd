@@ -178,3 +178,5 @@
 
 [javascriptExample:patchTestDoomed] > jnt:content, javascriptExampleMix:javascriptExampleComponent
  - label (string)
+
+[javascriptExample:testGenericAction] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title

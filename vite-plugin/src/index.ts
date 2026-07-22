@@ -1,8 +1,10 @@
 import { clientLibs, serverLibs } from "javascript-modules-engine/shared-libs.mjs";
+import fs from "node:fs";
 import path from "node:path";
 import { styleText } from "node:util";
 import { globSync } from "tinyglobby";
 import type { PluginOption } from "vite";
+import { actionsClientStub, actionsServerRegister } from "./actions.js";
 import { buildSuccessful } from "./build-successful.js";
 import { insertFilename } from "./insert-filename.js";
 import { multiEntry } from "./multi-entry.js";
@@ -58,6 +60,16 @@ export default function jahia(
       sourcemap?: boolean | "hidden" | "inline" | undefined;
     };
 
+    /** Options for actions (`.action.ts` files, compiled for both the server and the client). */
+    actions?: {
+      /**
+       * Glob pattern(s) used to find action files in `inputDir`.
+       *
+       * @default "**‍/*.action.{js,ts}"
+       */
+      inputGlob?: string;
+    };
+
     /** Options for the server-side bundle. */
     server?: {
       /**
@@ -99,6 +111,17 @@ export default function jahia(
   const clientEntries = globSync(options.client?.inputGlob ?? "**/*.client.{jsx,tsx}", {
     cwd: clientBaseDir,
   });
+
+  // The module name namespaces action keys; the same value is used by the server registration
+  // and the generated client stubs.
+  let moduleName = "module";
+  try {
+    moduleName = (
+      JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf-8")) as { name?: string }
+    ).name ?? moduleName;
+  } catch {
+    // keep the fallback name
+  }
 
   if (clientEntries.length === 0) {
     console.warn(
@@ -164,6 +187,8 @@ export default function jahia(
                 preserveEntrySignatures: "allow-extension",
                 external: Object.keys(clientLibs),
                 plugins: [
+                  // Replace .action.ts files with client-side fetch stubs
+                  actionsClientStub(moduleName),
                   {
                     name: "forbid-library",
                     resolveId(id) {
@@ -191,10 +216,17 @@ export default function jahia(
               cssCodeSplit: false,
               emptyOutDir: false,
               rollupOptions: {
-                input: path.posix.join(
-                  options.inputDir ?? "src",
-                  options.server?.inputGlob ?? "**/*.server.{js,jsx,ts,tsx}",
-                ),
+                input: [
+                  path.posix.join(
+                    options.inputDir ?? "src",
+                    options.server?.inputGlob ?? "**/*.server.{js,jsx,ts,tsx}",
+                  ),
+                  // action files are part of the server bundle (their exports get registered)
+                  path.posix.join(
+                    options.inputDir ?? "src",
+                    options.actions?.inputGlob ?? "**/*.action.{js,ts}",
+                  ),
+                ],
                 output: {
                   dir: options.outputDir ?? "dist",
                   chunkFileNames: "server/[name]-[hash].js",
@@ -215,6 +247,8 @@ export default function jahia(
                 },
                 plugins: [
                   multiEntry(options.server?.outputFile ?? "server/index.js"),
+                  // Register the exports of .action.ts files as callable actions
+                  actionsServerRegister(moduleName),
                   // Only add the callback plugin in watch mode
                   config.build?.watch &&
                     options.watchCallback &&

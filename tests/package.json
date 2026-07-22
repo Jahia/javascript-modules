@@ -23,6 +23,7 @@
     "glob": "^11.0.3"
   },
   "devDependencies": {
+    "devalue": "^5.6.1",
     "@4tw/cypress-drag-drop": "^2.3.0",
     "@jahia/cypress": "^7.0.0",
     "@jahia/jahia-reporter": "^1.6.0",
