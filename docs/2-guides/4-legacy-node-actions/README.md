@@ -41,13 +41,13 @@ Note that Jahia's render servlet only writes the JSON body when the request decl
 
 ## Declaration options
 
-| Option | Description |
-|--------|-------------|
-| `name` | The URL-visible action name. Names are platform-wide (shared with Java modules, last registration wins) — prefix them with your module name. |
-| `requiredMethods` | Allowed HTTP methods, e.g. `["POST"]`. Defaults to Jahia's default (GET and POST). |
-| `requireAuthenticatedUser` | Defaults to **`true`** (Jahia's default): guests get a 401. Set to `false` explicitly for public actions. |
-| `requiredPermission` | Permission required on the target node, e.g. `"jcr:write"`. |
-| `requiredWorkspace` | Restrict to `"default"` or `"live"`. |
+| Option                     | Description                                                                                                                                  |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                     | The URL-visible action name. Names are platform-wide (shared with Java modules, last registration wins) — prefix them with your module name. |
+| `requiredMethods`          | Allowed HTTP methods, e.g. `["POST"]`. Defaults to Jahia's default (GET and POST).                                                           |
+| `requireAuthenticatedUser` | Defaults to **`true`** (Jahia's default): guests get a 401. Set to `false` explicitly for public actions.                                    |
+| `requiredPermission`       | Permission required on the target node, e.g. `"jcr:write"`.                                                                                  |
+| `requiredWorkspace`        | Restrict to `"default"` or `"live"`.                                                                                                         |
 
 ## The handler
 

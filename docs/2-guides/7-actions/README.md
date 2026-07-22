@@ -70,8 +70,8 @@ On invalid input the client call rejects with an error carrying the validation `
 
 ## When to use what
 
-| Need | Use |
-|------|-----|
-| Call server code from an island | **Actions** (this page) |
+| Need                                                                                   | Use                                                       |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| Call server code from an island                                                        | **Actions** (this page)                                   |
 | Expose a `.do` HTTP endpoint on a content node (plain form POST, external integration) | [Legacy node actions](../4-legacy-node-actions/README.md) |
-| Expose data in the content graph | GraphQL extensions |
+| Expose data in the content graph                                                       | GraphQL extensions                                        |

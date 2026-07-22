@@ -21,7 +21,10 @@ const ADD_NODE_MUTATION = `
 `;
 
 /** Attempts to create a testValidation node and yields the raw apollo response (errors included). */
-const tryCreate = (name: string, properties: Array<{ name: string; value: string; language?: string }>) =>
+const tryCreate = (
+  name: string,
+  properties: Array<{ name: string; value: string; language?: string }>,
+) =>
   cy.apollo({
     mutation: ADD_NODE_MUTATION,
     variables: { parentPathOrId: parentPath, name, properties },
@@ -79,7 +82,9 @@ describe("JS node validators", () => {
 
   it("passes messages through verbatim, including special characters", () => {
     tryCreate("escaping", [{ name: "email", value: "escaping-probe" }]).then((response) => {
-      expect(errorMessages(response)).to.contain("lone { brace, ${7*7}, back\\slash and {jcr:title}");
+      expect(errorMessages(response)).to.contain(
+        "lone { brace, ${7*7}, back\\slash and {jcr:title}",
+      );
     });
   });
 

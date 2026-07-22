@@ -1,7 +1,7 @@
 # Idiomatic TypeScript registration wrappers with a raw Java escape hatch
 
-* Status: accepted
-* Date: 2026-07-21
+- Status: accepted
+- Date: 2026-07-21
 
 ## Context and Problem Statement
 
@@ -9,9 +9,9 @@ The POC passed raw Java objects (`HttpServletRequest`, `ExtendedPropertyDefiniti
 
 ## Decision Drivers
 
-* Developer experience consistent with `jahiaComponent`: one exported function, TypeScript-typed, registration as a module-init side effect.
-* Advanced use cases must stay possible: the underlying Java objects carry capabilities we cannot re-expose exhaustively.
-* Polyglot value conversion must be controlled in one place, not in every module.
+- Developer experience consistent with `jahiaComponent`: one exported function, TypeScript-typed, registration as a module-init side effect.
+- Advanced use cases must stay possible: the underlying Java objects carry capabilities we cannot re-expose exhaustively.
+- Polyglot value conversion must be controlled in one place, not in every module.
 
 ## Considered Options
 
@@ -23,16 +23,16 @@ The POC passed raw Java objects (`HttpServletRequest`, `ExtendedPropertyDefiniti
 
 Chosen option: **1.**
 
-* The library exports one registration function per extension point (`registerChoiceListInitializer`, `registerNodeLegacyAction`, `registerNodeValidator`, `registerRenderFilter`), siblings of `jahiaComponent` in `javascript-modules-library/src/framework/`.
-* Each wrapper stores an *adapter* function in the registry: the Java bridge always calls a stable, raw-shaped function; the TS adapter converts to/from the idiomatic shapes before invoking the user callback. **Java stays dumb and stable; the adaptation lives in TS**, where it is cheap to evolve and unit-test.
-* Idiomatic context objects expose converted values (e.g. `locale` as a BCP-47 language tag via `Locale.toLanguageTag()`, parameters as `Record<string, string[]>`) and keep the raw Java objects under a `java` property (or as documented raw fields such as the `JCRNodeWrapper` itself, which is already the library's public node surface).
-* Structured return values that must cross the boundary as JSON (action results) are **pre-stringified with `JSON.stringify` in the adapter** and parsed with `new JSONObject(String)` on the Java side. This sidesteps polyglot deep-conversion issues with nested objects/arrays that broke the POC's `new JSONObject(value.as(Map.class))` approach.
-* Java types referenced in public signatures are provided by the existing java-ts-bind generation; types not yet generated (`ExtendedPropertyDefinition`, `URLResolver`, `Locale.toLanguageTag`) are added to the bind configuration with narrow method whitelists.
-* Handlers are synchronous in v1. Promise-returning handlers require explicit GraalJS promise resolution across the host boundary and are deferred.
+- The library exports one registration function per extension point (`registerChoiceListInitializer`, `registerNodeLegacyAction`, `registerNodeValidator`, `registerRenderFilter`), siblings of `jahiaComponent` in `javascript-modules-library/src/framework/`.
+- Each wrapper stores an _adapter_ function in the registry: the Java bridge always calls a stable, raw-shaped function; the TS adapter converts to/from the idiomatic shapes before invoking the user callback. **Java stays dumb and stable; the adaptation lives in TS**, where it is cheap to evolve and unit-test.
+- Idiomatic context objects expose converted values (e.g. `locale` as a BCP-47 language tag via `Locale.toLanguageTag()`, parameters as `Record<string, string[]>`) and keep the raw Java objects under a `java` property (or as documented raw fields such as the `JCRNodeWrapper` itself, which is already the library's public node surface).
+- Structured return values that must cross the boundary as JSON (action results) are **pre-stringified with `JSON.stringify` in the adapter** and parsed with `new JSONObject(String)` on the Java side. This sidesteps polyglot deep-conversion issues with nested objects/arrays that broke the POC's `new JSONObject(value.as(Map.class))` approach.
+- Java types referenced in public signatures are provided by the existing java-ts-bind generation; types not yet generated (`ExtendedPropertyDefinition`, `URLResolver`, `Locale.toLanguageTag`) are added to the bind configuration with narrow method whitelists.
+- Handlers are synchronous in v1. Promise-returning handlers require explicit GraalJS promise resolution across the host boundary and are deferred.
 
 ### Consequences
 
-* Good: typed, documented, discoverable API; conversion bugs are fixed once in the library.
-* Good: no capability loss — the escape hatch keeps the full Java surface reachable.
-* Bad: two representations of some values (idiomatic + raw) can confuse; mitigated by docs marking the `java` property as the escape hatch.
-* Bad: the registry entry shape becomes a library↔engine contract that must be kept in sync (documented in both the wrapper and the bridge).
+- Good: typed, documented, discoverable API; conversion bugs are fixed once in the library.
+- Good: no capability loss — the escape hatch keeps the full Java surface reachable.
+- Bad: two representations of some values (idiomatic + raw) can confuse; mitigated by docs marking the `java` property as the escape hatch.
+- Bad: the registry entry shape becomes a library↔engine contract that must be kept in sync (documented in both the wrapper and the bridge).

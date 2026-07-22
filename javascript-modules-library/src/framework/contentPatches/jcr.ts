@@ -1,8 +1,4 @@
-import type {
-  JCRCallback,
-  JCRNodeWrapper,
-  JCRSessionWrapper,
-} from "org.jahia.services.content";
+import type { JCRCallback, JCRNodeWrapper, JCRSessionWrapper } from "org.jahia.services.content";
 import type {
   ContentPatchJcr,
   ContentPatchLogger,
@@ -38,9 +34,15 @@ const buildQuery = (options: NodeSelection): string => {
 };
 
 /** Builds the `jcr` part of the content patch context. */
-export const createContentPatchJcr = (dryRun: boolean, log: ContentPatchLogger): ContentPatchJcr => {
+export const createContentPatchJcr = (
+  dryRun: boolean,
+  log: ContentPatchLogger,
+): ContentPatchJcr => {
   const withSystemSession = <T>(
-    { workspace = "default", locale = null }: { workspace?: "default" | "live"; locale?: string | null },
+    {
+      workspace = "default",
+      locale = null,
+    }: { workspace?: "default" | "live"; locale?: string | null },
     callback: (session: JCRSessionWrapper) => T,
   ): T =>
     server.jcr.doExecuteAsSystem(
@@ -60,7 +62,12 @@ export const createContentPatchJcr = (dryRun: boolean, log: ContentPatchLogger):
     const primaryTypeOnly =
       "query" in options || (options.includeSubtypes ?? true) ? null : options.nodeType;
 
-    const report: ContentPatchOperationReport = { matched: 0, updated: 0, skipped: 0, byWorkspace: {} };
+    const report: ContentPatchOperationReport = {
+      matched: 0,
+      updated: 0,
+      skipped: 0,
+      byWorkspace: {},
+    };
 
     for (const workspace of workspaces) {
       const counters = { matched: 0, updated: 0, skipped: 0 };
@@ -71,10 +78,7 @@ export const createContentPatchJcr = (dryRun: boolean, log: ContentPatchLogger):
       const identifiers = withSystemSession({ workspace }, (session) => {
         const result: string[] = [];
         for (let offset = 0; ; offset += SNAPSHOT_PAGE_SIZE) {
-          const sql2Query = session
-            .getWorkspace()
-            .getQueryManager()
-            .createQuery(query, "JCR-SQL2");
+          const sql2Query = session.getWorkspace().getQueryManager().createQuery(query, "JCR-SQL2");
           sql2Query.setLimit(SNAPSHOT_PAGE_SIZE);
           sql2Query.setOffset(offset);
           const iterator = sql2Query.execute().getNodes();

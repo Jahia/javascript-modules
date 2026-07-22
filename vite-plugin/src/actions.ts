@@ -9,15 +9,16 @@ import type { Plugin } from "rolldown";
  *
  * - In the server bundle, the file is kept as-is and a registration call is appended, so every
  *   exported function becomes a callable action (`registerActionsModule` in the library).
- * - In the client bundle, the file is replaced by generated fetch stubs (one per export) that
- *   POST devalue-serialized arguments to the engine's generic action endpoint.
+ * - In the client bundle, the file is replaced by generated fetch stubs (one per export) that POST
+ *   devalue-serialized arguments to the engine's generic action endpoint.
  *
- * Export discovery is intentionally simple (v1): only top-level `export const <name> = …` /
- * `export function <name>` / `export async function <name>` declarations are supported.
+ * Export discovery is intentionally simple (v1): only top-level `export const <name> = …` / `export
+ * function <name>` / `export async function <name>` declarations are supported.
  */
 
 const ACTION_FILE = /\.action\.(ts|js|mts|mjs)$/;
-const EXPORT_DECLARATION = /^export\s+(?:const|let|async\s+function\s*\*?|function\s*\*?)\s+([A-Za-z_$][\w$]*)/gm;
+const EXPORT_DECLARATION =
+  /^export\s+(?:const|let|async\s+function\s*\*?|function\s*\*?)\s+([A-Za-z_$][\w$]*)/gm;
 const UNSUPPORTED_EXPORT = /^export\s*(?:\{|\*|default)/m;
 
 export const isActionFile = (id: string): boolean => ACTION_FILE.test(id.split("?")[0]);

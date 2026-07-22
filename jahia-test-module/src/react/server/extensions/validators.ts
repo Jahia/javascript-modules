@@ -36,9 +36,15 @@ registerNodeValidator({ nodeType: NODE_TYPE, name: "score-range", advanced: true
 });
 
 // skipped during content imports
-registerNodeValidator({ nodeType: NODE_TYPE, name: "skip-on-import", skipOnImport: true }, (node) => {
-  if (node.getPropertyAsString("email") === "import-probe") {
-    return { message: "Rejected outside of imports (skip-on-import probe)", propertyName: "email" };
-  }
-  return undefined;
-});
+registerNodeValidator(
+  { nodeType: NODE_TYPE, name: "skip-on-import", skipOnImport: true },
+  (node) => {
+    if (node.getPropertyAsString("email") === "import-probe") {
+      return {
+        message: "Rejected outside of imports (skip-on-import probe)",
+        propertyName: "email",
+      };
+    }
+    return undefined;
+  },
+);

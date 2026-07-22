@@ -46,6 +46,8 @@ export const action = <Schema extends StandardSchemaV1, Return>(
     if (result.issues) {
       throw new ActionValidationError(result.issues);
     }
-    return (await implementation(result.value as StandardSchemaV1.InferOutput<Schema>)) as Awaited<Return>;
+    return (await implementation(
+      result.value as StandardSchemaV1.InferOutput<Schema>,
+    )) as Awaited<Return>;
   };
 };

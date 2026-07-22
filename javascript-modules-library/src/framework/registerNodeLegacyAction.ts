@@ -60,19 +60,22 @@ export interface NodeLegacyActionResult {
 
 /**
  * Registers a legacy node action: an HTTP endpoint bound to a content node, invoked through
- * `<nodeUrl>.<name>.do` URLs — Jahia's classic `org.jahia.bin.Action` mechanism, exposed for
- * parity with Java modules.
+ * `<nodeUrl>.<name>.do` URLs — Jahia's classic `org.jahia.bin.Action` mechanism, exposed for parity
+ * with Java modules.
  *
  * To call server code from client components (islands), prefer actions declared in `.action.ts`
  * files: typed, client-callable functions with automatic serialization.
  *
  * ```ts
- * registerNodeLegacyAction({ name: "myModuleGreet", requiredMethods: ["GET"] }, ({ parameters, resource }) => ({
- *   json: {
- *     greeting: `Hello ${parameters.who?.[0] ?? "world"}`,
- *     path: resource.getNode().getPath(),
- *   },
- * }));
+ * registerNodeLegacyAction(
+ *   { name: "myModuleGreet", requiredMethods: ["GET"] },
+ *   ({ parameters, resource }) => ({
+ *     json: {
+ *       greeting: `Hello ${parameters.who?.[0] ?? "world"}`,
+ *       path: resource.getNode().getPath(),
+ *     },
+ *   }),
+ * );
  * ```
  *
  * Handlers run synchronously on a server thread and must return their result (no promises).
@@ -81,7 +84,13 @@ export interface NodeLegacyActionResult {
  * @param handler Executes the action and returns the response to send.
  */
 export const registerNodeLegacyAction = (
-  { name, requiredMethods, requireAuthenticatedUser, requiredPermission, requiredWorkspace }: NodeLegacyActionDeclaration,
+  {
+    name,
+    requiredMethods,
+    requireAuthenticatedUser,
+    requiredPermission,
+    requiredWorkspace,
+  }: NodeLegacyActionDeclaration,
   handler: (context: NodeLegacyActionContext) => NodeLegacyActionResult | undefined,
 ): void => {
   server.registry.add("node-legacy-action", name, {
@@ -123,7 +132,9 @@ export const registerNodeLegacyAction = (
 };
 
 /** Converts the Java Map<String, List<String>> of request parameters into a plain JS object. */
-const toJsParameters = (javaParameters: JavaMap<string, List<string>>): Record<string, string[]> => {
+const toJsParameters = (
+  javaParameters: JavaMap<string, List<string>>,
+): Record<string, string[]> => {
   const parameters: Record<string, string[]> = {};
   if (javaParameters) {
     // keySet() is not part of the generated Map typing but is available at runtime

@@ -2,8 +2,8 @@ import type { JCRNodeWrapper } from "org.jahia.services.content";
 import type { Locale } from "java.util";
 
 /**
- * `registerNodeValidator` calls are executed synchronously during module initialization. During this
- * time, `bundleKey` is set to the symbolic name of the active bundle.
+ * `registerNodeValidator` calls are executed synchronously during module initialization. During
+ * this time, `bundleKey` is set to the symbolic name of the active bundle.
  */
 declare const bundleKey: string;
 

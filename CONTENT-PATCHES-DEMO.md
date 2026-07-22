@@ -122,7 +122,9 @@ registerContentPatch(
       convert: (value, node) => {
         const parsed = Number.parseInt(value.getString(), 10);
         if (Number.isNaN(parsed)) {
-          log.warn(`Unparseable priority "${value.getString()}" on ${node.getPath()} — defaulting to 0`);
+          log.warn(
+            `Unparseable priority "${value.getString()}" on ${node.getPath()} — defaulting to 0`,
+          );
           return 0;
         }
         return parsed;
@@ -132,7 +134,7 @@ registerContentPatch(
 );
 ```
 
-`convert` receives the old value as a typed `JCRValueWrapper` (the property may still carry the *old* type) and must return the new value; the helper rewrites the property under the new definition. Returning `undefined` leaves that node untouched.
+`convert` receives the old value as a typed `JCRValueWrapper` (the property may still carry the _old_ type) and must return the new value; the helper rewrites the property under the new definition. Returning `undefined` leaves that node untouched.
 
 ## 4. U4 — delete a definition programmatically
 
@@ -212,8 +214,8 @@ Trimmed `.d.ts` — the implementation target. **Content patches are synchronous
 
 ```ts
 /**
- * Registers a content patch: a run-once script executed on the processing server when a new
- * version of this module starts, tracked in Jahia's module patch status store.
+ * Registers a content patch: a run-once script executed on the processing server when a new version
+ * of this module starts, tracked in Jahia's module patch status store.
  */
 export function registerContentPatch(
   declaration: ContentPatchDeclaration,
@@ -222,10 +224,10 @@ export function registerContentPatch(
 
 interface ContentPatchDeclaration {
   /**
-   * Run-once identity AND ordering key (lexicographic within the module).
-   * Convention: "<moduleVersion>-<NN>-<slug>", e.g. "2.0.0-01-remove-legacy-color".
-   * NEVER rename or reorder after release — ship a new content patch instead.
-   * Duplicate names in one module throw at registration time.
+   * Run-once identity AND ordering key (lexicographic within the module). Convention:
+   * "<moduleVersion>-<NN>-<slug>", e.g. "2.0.0-01-remove-legacy-color". NEVER rename or reorder
+   * after release — ship a new content patch instead. Duplicate names in one module throw at
+   * registration time.
    */
   name: string;
   /** Shown in logs, CLI and GraphQL status. */
@@ -239,7 +241,10 @@ interface ContentPatchContext {
   jcr: ContentPatchJcr;
   /** SLF4J-backed logger (org.jahia.modules.javascript.modules.engine.contentpatches.<module>). */
   log: Logger;
-  /** True in dry-run mode (the DEFAULT for `jahia content-patches run`) — helpers report instead of saving. */
+  /**
+   * True in dry-run mode (the DEFAULT for `jahia content-patches run`) — helpers report instead of
+   * saving.
+   */
   dryRun: boolean;
   /** Abort now and record `.skipped` (terminal, Groovy parity). */
   skip(reason: string): never;
@@ -271,8 +276,10 @@ interface ContentPatchOperations {
   setPropertyValues(
     options: NodeSelection & {
       property: string;
-      /** Constant, or per-node function. Return undefined to skip a node.
-       *  For i18n properties the function is called once per existing translation (locale passed). */
+      /**
+       * Constant, or per-node function. Return undefined to skip a node. For i18n properties the
+       * function is called once per existing translation (locale passed).
+       */
       value: PropertyValue | ((node: JCRNodeWrapper, locale?: string) => PropertyValue | undefined);
       /** @default true — never overwrite an existing value unless set to false. */
       onlyIfMissing?: boolean;
@@ -287,12 +294,17 @@ interface ContentPatchOperations {
     },
   ): OpReport;
 
-  /** U4 — undeploy a node type OWNED BY THIS MODULE.
-   *  @default ifContentExists: "fail" — refuses while instances remain; "delete" purges them first. */
+  /**
+   * U4 — undeploy a node type OWNED BY THIS MODULE.
+   *
+   * @default ifContentExists:  "fail" — refuses while instances remain; "delete" purges them first.
+   */
   removeNodeType(options: { nodeType: string; ifContentExists?: "fail" | "delete" }): OpReport;
 
-  /** U5 — rebind all instances of `from` to `to` (setPrimaryType + optional property renames),
-   *  then undeploy `from` (own definition only). */
+  /**
+   * U5 — rebind all instances of `from` to `to` (setPrimaryType + optional property renames), then
+   * undeploy `from` (own definition only).
+   */
   changeNodeType(
     options: Omit<NodeSelection, "nodeType"> & {
       from: string;
@@ -305,14 +317,19 @@ interface ContentPatchOperations {
 }
 
 interface ContentPatchJcr {
-  /** Typed system session (new engine helper alongside doExecuteAsGuest). @default workspace "default" */
+  /**
+   * Typed system session (new engine helper alongside doExecuteAsGuest). @default workspace
+   * "default"
+   */
   withSystemSession<T>(
     options: { workspace?: "default" | "live"; locale?: string | null },
     callback: (session: JCRSessionWrapper) => T,
   ): T;
   /** The batching engine behind migrate.*, for imperative bulk work. */
   forEachNode(
-    options: NodeSelection | (Omit<NodeSelection, "nodeType" | "includeSubtypes"> & { query: string }),
+    options:
+      | NodeSelection
+      | (Omit<NodeSelection, "nodeType" | "includeSubtypes"> & { query: string }),
     callback: (node: JCRNodeWrapper) => void,
   ): OpReport;
 }
@@ -389,7 +406,7 @@ The only test that proves JCR reality: i18n translation nodes, definition regist
 3. Deploy v2, wait for content patch status via GraphQL.
 4. Assert content transformed + statuses `.installed` + redeploy is a no-op.
 
-Cost: minutes per run, needs docker. This is what "test easily" means for correctness — today's Groovy equivalent has *no* recipe at all.
+Cost: minutes per run, needs docker. This is what "test easily" means for correctness — today's Groovy equivalent has _no_ recipe at all.
 
 **Level 2 — vitest recorder fake (optional extra, the open part of Q5).**
 A pure-JS `ContentPatchContext` stand-in: `patch.*`/`jcr.*` record their calls instead of touching a repository; your `convert`/`value` callbacks run for real. Tests assert structure and callback logic in milliseconds, no docker:

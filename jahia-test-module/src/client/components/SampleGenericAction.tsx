@@ -2,8 +2,8 @@ import { useState } from "react";
 import { add, failOnPurpose, safeDouble } from "../../actions/calculator.action";
 
 /**
- * Exercises the client side of actions: the imports above resolve to generated fetch stubs, not
- * to the server implementation.
+ * Exercises the client side of actions: the imports above resolve to generated fetch stubs, not to
+ * the server implementation.
  */
 export default function SampleGenericAction() {
   const [result, setResult] = useState("");

@@ -116,9 +116,9 @@ export default function jahia(
   // and the generated client stubs.
   let moduleName = "module";
   try {
-    moduleName = (
-      JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf-8")) as { name?: string }
-    ).name ?? moduleName;
+    moduleName =
+      (JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf-8")) as { name?: string })
+        .name ?? moduleName;
   } catch {
     // keep the fallback name
   }

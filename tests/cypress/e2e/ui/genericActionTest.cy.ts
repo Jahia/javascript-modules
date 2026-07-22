@@ -8,7 +8,11 @@ const pagePath = `/sites/${GENERIC_SITE_KEY}/home/${pageName}`;
 const MODULE = "javascript-modules-engine-test-module";
 
 /** Calls the generic action endpoint the same way the generated client stubs do. */
-const callAction = (name: string, args: unknown[], headers: Record<string, string> = { "X-JS-Action": "1" }) =>
+const callAction = (
+  name: string,
+  args: unknown[],
+  headers: Record<string, string> = { "X-JS-Action": "1" },
+) =>
   cy.request({
     method: "POST",
     url: `/cms/render/default/en${pagePath}.jsAction.do?name=${encodeURIComponent(name)}`,
@@ -99,7 +103,10 @@ describe("Actions (.action.ts files)", () => {
     cy.get('button[data-testid="call-add"]').click();
     cy.get('p[data-testid="action-result"]').should("contain", "add:42");
     cy.get('button[data-testid="call-invalid"]').click();
-    cy.get('p[data-testid="action-result"]').should("contain", "rejected:n must be a positive number");
+    cy.get('p[data-testid="action-result"]').should(
+      "contain",
+      "rejected:n must be a positive number",
+    );
     cy.get('button[data-testid="call-failing"]').click();
     cy.get('p[data-testid="action-result"]').should("contain", "failed:Intentional failure");
   });

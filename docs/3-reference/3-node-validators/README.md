@@ -33,12 +33,12 @@ A violation is `{ message, propertyName? }`: with `propertyName`, the message is
 
 ## Declaration options
 
-| Option | Description |
-|--------|-------------|
-| `nodeType` | Node type (primary or mixin) the validator applies to, matched with `isNodeType()`. |
-| `name` | Distinguishes several validators on the same node type in one module. Default `"default"`. |
-| `skipOnImport` | Skip this validator during content imports. Default `false`. |
-| `advanced` | Run in the advanced phase, which only runs once **all** default-phase validators passed. Default `false`. |
+| Option         | Description                                                                                               |
+| -------------- | --------------------------------------------------------------------------------------------------------- |
+| `nodeType`     | Node type (primary or mixin) the validator applies to, matched with `isNodeType()`.                       |
+| `name`         | Distinguishes several validators on the same node type in one module. Default `"default"`.                |
+| `skipOnImport` | Skip this validator during content imports. Default `false`.                                              |
+| `advanced`     | Run in the advanced phase, which only runs once **all** default-phase validators passed. Default `false`. |
 
 The two phases mirror Jahia's Java validator groups: default-phase violations suppress the advanced phase entirely (advanced checks can assume basic integrity).
 

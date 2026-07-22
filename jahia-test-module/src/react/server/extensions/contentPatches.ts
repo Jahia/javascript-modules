@@ -1,12 +1,13 @@
 import { registerContentPatch } from "@jahia/javascript-modules-library";
 
 /**
- * Test fixtures for JS content patches, exercised by tests/cypress/e2e/engine/contentPatchTest.cy.ts.
+ * Test fixtures for JS content patches, exercised by
+ * tests/cypress/e2e/engine/contentPatchTest.cy.ts.
  *
- * The content patches run once when this module first starts on a fresh instance. 01 creates the fixture
- * content under /sites/systemsite/contents/content-patch-tests, 02-06 exercise the five guard-railed
- * operations on it, 07-09 exercise the skip / failure / halt semantics (names order execution, so
- * 09 must never run because 08 fails).
+ * The content patches run once when this module first starts on a fresh instance. 01 creates the
+ * fixture content under /sites/systemsite/contents/content-patch-tests, 02-06 exercise the five
+ * guard-railed operations on it, 07-09 exercise the skip / failure / halt semantics (names order
+ * execution, so 09 must never run because 08 fails).
  */
 
 const FIXTURES_PARENT = "/sites/systemsite/contents";
@@ -15,7 +16,8 @@ const FIXTURES_PATH = `${FIXTURES_PARENT}/content-patch-tests`;
 registerContentPatch(
   {
     name: "1.0.0-01-create-fixture-content",
-    description: "Creates the content the following content patches transform (imperative escape hatch)",
+    description:
+      "Creates the content the following content patches transform (imperative escape hatch)",
   },
   ({ jcr }) => {
     jcr.withSystemSession({ workspace: "default" }, (session) => {
@@ -90,7 +92,8 @@ registerContentPatch(
 registerContentPatch(
   {
     name: "1.0.0-05-rename-legacy-type",
-    description: "U5: rebinds patchTestLegacy instances to patchTestNew, renaming oldTitle to newTitle",
+    description:
+      "U5: rebinds patchTestLegacy instances to patchTestNew, renaming oldTitle to newTitle",
   },
   ({ patch }) => {
     patch.changeNodeType({

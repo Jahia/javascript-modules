@@ -1,7 +1,7 @@
 # Client-callable actions: dual-compiled `.action.ts` files over a single dispatch endpoint
 
-* Status: accepted
-* Date: 2026-07-22
+- Status: accepted
+- Date: 2026-07-22
 
 ## Context and Problem Statement
 
@@ -9,10 +9,10 @@
 
 ## Decision Drivers
 
-* Zero boilerplate for module authors: export a function, import it from the client, call it.
-* Ride proven infrastructure: the engine's registry/`doWithContext` model, the Render servlet's auth valves, devalue (already used for island props).
-* CSRF safety without per-module configuration.
-* The server JS runtime has no event loop: asynchronicity is microtask-only.
+- Zero boilerplate for module authors: export a function, import it from the client, call it.
+- Ride proven infrastructure: the engine's registry/`doWithContext` model, the Render servlet's auth valves, devalue (already used for island props).
+- CSRF safety without per-module configuration.
+- The server JS runtime has no event loop: asynchronicity is microtask-only.
 
 ## Decision Outcome
 
@@ -20,8 +20,8 @@
 
 `.action.{ts,js}` files (default glob `**/*.action.{js,ts}`) are compiled twice:
 
-* **Server bundle**: the file is included as-is and a `registerActionsModule({ …exports }, "<moduleName>")` call is appended. Each exported function is registered in the engine registry under type `action`, key `<moduleName>/<exportName>` (module name read from `package.json` at build time — the same value the stubs embed, so no runtime agreement on bundle symbolic names is needed). Duplicate keys fail at module startup via the registry's add semantics.
-* **Client bundle**: the module is replaced wholesale by generated stubs — one `async` function per export that POSTs `devalue.stringify(args)` and parses the response. The server implementation never reaches the client bundle, and imports it made (including `@jahia/javascript-modules-library`) disappear with it.
+- **Server bundle**: the file is included as-is and a `registerActionsModule({ …exports }, "<moduleName>")` call is appended. Each exported function is registered in the engine registry under type `action`, key `<moduleName>/<exportName>` (module name read from `package.json` at build time — the same value the stubs embed, so no runtime agreement on bundle symbolic names is needed). Duplicate keys fail at module startup via the registry's add semantics.
+- **Client bundle**: the module is replaced wholesale by generated stubs — one `async` function per export that POSTs `devalue.stringify(args)` and parses the response. The server implementation never reaches the client bundle, and imports it made (including `@jahia/javascript-modules-library`) disappear with it.
 
 Export discovery is a deliberate v1 simplification: only top-level `export const <name> = …` / `export function <name>` declarations, extracted lexically (works identically on TS and JS, no parser dependency, no plugin-phase sensitivity). Other export forms emit a build warning and are ignored.
 
@@ -29,13 +29,13 @@ Export discovery is a deliberate v1 simplification: only top-level `export const
 
 One engine-owned platform action, `jsAction` (`GenericActionEndpoint`), dispatches to all registered actions:
 
-* URL: `<currentPageUrl>.jsAction.do?name=<moduleName>/<exportName>` — riding the Render servlet keeps Jahia's authentication valves (calls execute as the visitor, guest included) and requires no new servlet/HTTP-whiteboard surface.
-* Request body: devalue-serialized arguments array. Response envelope: `{"data": "<devalue>"}` on success, `{"error": "...", "issues": [...]?}` on failure — always on HTTP 200, because the render servlet only writes JSON bodies for 2xx action results; the stub discriminates on the envelope.
-* The JS adapter (library) owns all serialization: the Java endpoint pipes opaque strings and never converts structured polyglot values.
+- URL: `<currentPageUrl>.jsAction.do?name=<moduleName>/<exportName>` — riding the Render servlet keeps Jahia's authentication valves (calls execute as the visitor, guest included) and requires no new servlet/HTTP-whiteboard surface.
+- Request body: devalue-serialized arguments array. Response envelope: `{"data": "<devalue>"}` on success, `{"error": "...", "issues": [...]?}` on failure — always on HTTP 200, because the render servlet only writes JSON bodies for 2xx action results; the stub discriminates on the envelope.
+- The JS adapter (library) owns all serialization: the Java endpoint pipes opaque strings and never converts structured polyglot values.
 
 ### CSRF
 
-The engine ships a single reviewable CSRF-guard whitelist entry (`*.jsAction.do`) in its own configuration. Actual protection is the mandatory **`X-JS-Action` request header**: HTML forms cannot set custom headers, and cross-origin scripts cannot send one without a CORS preflight that Jahia does not grant. This does not contradict [ADR-0004](0004-csrf-whitelisting-for-js-actions.md): that decision rejected *silent per-module* whitelist generation for developer-shaped `.do` endpoints; here the endpoint is engine-owned, single, and header-protected by construction.
+The engine ships a single reviewable CSRF-guard whitelist entry (`*.jsAction.do`) in its own configuration. Actual protection is the mandatory **`X-JS-Action` request header**: HTML forms cannot set custom headers, and cross-origin scripts cannot send one without a CORS preflight that Jahia does not grant. This does not contradict [ADR-0004](0004-csrf-whitelisting-for-js-actions.md): that decision rejected _silent per-module_ whitelist generation for developer-shaped `.do` endpoints; here the endpoint is engine-owned, single, and header-protected by construction.
 
 ### Asynchronicity
 
@@ -47,14 +47,14 @@ Handlers may be `async`. The endpoint settles returned promises through `JSPromi
 
 ## Considered Alternatives
 
-* **Dedicated OSGi HTTP-whiteboard servlet** — rejected for v1: leaves Jahia's authentication valve chain and the `/modules/*` URL space with unclear interactions; the Render servlet gives auth, sessions and URL resolution for free.
-* **Per-action platform Actions** (one `org.jahia.bin.Action` per export) — rejected: floods the global action-name map, requires per-module CSRF whitelists (the exact DX problem ADR-0004 chose not to solve silently), and gains nothing over a single dispatcher.
-* **JSON wire format** — rejected: loses `Date`/`Map`/`Set`/cycles; devalue is already in the stack for island props.
-* **AST-based export discovery** — deferred: a real parser (oxc/es-module-lexer) can replace the lexical extraction later without changing any contract.
+- **Dedicated OSGi HTTP-whiteboard servlet** — rejected for v1: leaves Jahia's authentication valve chain and the `/modules/*` URL space with unclear interactions; the Render servlet gives auth, sessions and URL resolution for free.
+- **Per-action platform Actions** (one `org.jahia.bin.Action` per export) — rejected: floods the global action-name map, requires per-module CSRF whitelists (the exact DX problem ADR-0004 chose not to solve silently), and gains nothing over a single dispatcher.
+- **JSON wire format** — rejected: loses `Date`/`Map`/`Set`/cycles; devalue is already in the stack for island props.
+- **AST-based export discovery** — deferred: a real parser (oxc/es-module-lexer) can replace the lexical extraction later without changing any contract.
 
 ## Consequences
 
-* Good: end-to-end typed calls with one import; guests can call actions (public-site islands), with the explicit documented duty to validate inputs and enforce permissions in the function.
-* Good: no per-module CSRF or servlet configuration.
-* Limitation (documented): `location.pathname`-based stub URLs assume the island is served from a page render URL; the `.html` template extension is stripped, other extensions are passed through.
-* Limitation (documented): microtask-only asynchronicity; no `export { }` lists/`default` in action files (v1).
+- Good: end-to-end typed calls with one import; guests can call actions (public-site islands), with the explicit documented duty to validate inputs and enforce permissions in the function.
+- Good: no per-module CSRF or servlet configuration.
+- Limitation (documented): `location.pathname`-based stub URLs assume the island is served from a page render URL; the `.html` template extension is stripped, other extensions are passed through.
+- Limitation (documented): microtask-only asynchronicity; no `export { }` lists/`default` in action files (v1).

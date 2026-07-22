@@ -62,10 +62,12 @@ describe("JS actions", () => {
   });
 
   it("sends redirects", () => {
-    cy.request({ url: actionUrl("testJsActionRedirect"), followRedirect: false }).then((response) => {
-      expect(response.status).to.equal(302);
-      expect(response.headers.location).to.contain("/redirected-target");
-    });
+    cy.request({ url: actionUrl("testJsActionRedirect"), followRedirect: false }).then(
+      (response) => {
+        expect(response.status).to.equal(302);
+        expect(response.headers.location).to.contain("/redirected-target");
+      },
+    );
   });
 
   it("rejects disallowed HTTP methods", () => {

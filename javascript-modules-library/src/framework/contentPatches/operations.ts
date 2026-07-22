@@ -156,18 +156,15 @@ export const createContentPatchOperations = (
   const removeNodeType: ContentPatchOperations["removeNodeType"] = (options) =>
     guarded(options.nodeType, () => {
       const mode = options.ifContentExists ?? "fail";
-      const report = jcr.forEachNode(
-        { ...options, includeSubtypes: false },
-        (node) => {
-          if (mode === "fail") {
-            throw new Error(
-              `Cannot remove node type ${options.nodeType}: instances still exist (e.g. ${node.getPath()}). ` +
-                `Migrate or delete them first, or opt into deletion with ifContentExists: "delete".`,
-            );
-          }
-          node.remove();
-        },
-      );
+      const report = jcr.forEachNode({ ...options, includeSubtypes: false }, (node) => {
+        if (mode === "fail") {
+          throw new Error(
+            `Cannot remove node type ${options.nodeType}: instances still exist (e.g. ${node.getPath()}). ` +
+              `Migrate or delete them first, or opt into deletion with ifContentExists: "delete".`,
+          );
+        }
+        node.remove();
+      });
       support.unregisterNodeType(options.nodeType);
       log.info(`Node type ${options.nodeType} unregistered`);
       return report;

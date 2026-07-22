@@ -1,8 +1,8 @@
 import { action, type StandardSchemaV1 } from "@jahia/javascript-modules-library";
 
 /**
- * Test fixtures for actions (.action.ts files): functions executed on the server, callable from
- * the client through generated fetch stubs.
+ * Test fixtures for actions (.action.ts files): functions executed on the server, callable from the
+ * client through generated fetch stubs.
  */
 
 export const add = async (a: number, b: number) => a + b;

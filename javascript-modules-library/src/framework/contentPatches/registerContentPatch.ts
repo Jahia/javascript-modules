@@ -1,6 +1,10 @@
 import { createContentPatchJcr, ContentPatchSkipped } from "./jcr.js";
 import { createContentPatchOperations } from "./operations.js";
-import type { JavaContentPatchSupport, ContentPatchContext, ContentPatchDeclaration } from "./types.js";
+import type {
+  JavaContentPatchSupport,
+  ContentPatchContext,
+  ContentPatchDeclaration,
+} from "./types.js";
 
 /**
  * `registerContentPatch` calls are executed synchronously during module initialization. During this
@@ -11,8 +15,8 @@ declare const bundleKey: string;
 const RECOMMENDED_NAME_PATTERN = /^\d+\.\d+\.\d+-\d{2,}-[A-Za-z0-9._-]+$/;
 
 /**
- * Registers a content patch: a run-once script executed on the processing server when a new version of
- * this module starts, used to reconcile existing content with definition changes (the JavaScript
+ * Registers a content patch: a run-once script executed on the processing server when a new version
+ * of this module starts, used to reconcile existing content with definition changes (the JavaScript
  * equivalent of Jahia's Groovy `META-INF/patches` scripts).
  *
  * ```ts
@@ -23,13 +27,14 @@ const RECOMMENDED_NAME_PATTERN = /^\d+\.\d+\.\d+-\d{2,}-[A-Za-z0-9._-]+$/;
  *
  * Execution is tracked in Jahia's module patch status store, keyed by `name`: whatever the outcome
  * (`.installed`, `.skipped`, `.failed`), a recorded content patch never runs again. A module's
- * content patches run in lexicographic order of their names; on failure the module still starts, but its
- * remaining content patches are halted (they stay pending).
+ * content patches run in lexicographic order of their names; on failure the module still starts,
+ * but its remaining content patches are halted (they stay pending).
  *
- * Content patches run synchronously on the module start thread and must NOT be async — keep heavy work
- * bounded through the built-in batching of the `patch.*` helpers and `jcr.forEachNode`.
+ * Content patches run synchronously on the module start thread and must NOT be async — keep heavy
+ * work bounded through the built-in batching of the `patch.*` helpers and `jcr.forEachNode`.
  *
- * @param declaration The content patch declaration; `name` is its run-once identity and ordering key.
+ * @param declaration The content patch declaration; `name` is its run-once identity and ordering
+ *   key.
  * @param run Performs the content patch. Returning normally records `.installed`; throwing records
  *   `.failed`; calling `context.skip(reason)` records `.skipped`.
  */

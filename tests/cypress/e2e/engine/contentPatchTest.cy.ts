@@ -1,7 +1,7 @@
 /**
  * Verifies the JS content patches of the test module (declared in
- * jahia-test-module/src/react/server/extensions/contentPatches.ts): they ran once at module start, in
- * name order, with the expected terminal statuses in Jahia's module patch status store, and the
+ * jahia-test-module/src/react/server/extensions/contentPatches.ts): they ran once at module start,
+ * in name order, with the expected terminal statuses in Jahia's module patch status store, and the
  * fixture content was transformed accordingly.
  */
 

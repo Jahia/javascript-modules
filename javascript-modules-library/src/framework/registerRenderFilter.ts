@@ -5,8 +5,8 @@ export interface RenderFilterDeclaration {
   /** Unique key of the filter in the registry. */
   key: string;
   /**
-   * Position of the filter in the render chain (may be fractional). Lower priorities execute
-   * first. @default 0
+   * Position of the filter in the render chain (may be fractional). Lower priorities execute first.
+   * @default 0
    */
   priority?: number;
   /** Human-readable description of the filter. */
@@ -29,10 +29,14 @@ export interface RenderFilterCallbacks {
    * Invoked before the resource is rendered; returning a non-null string short-circuits the chain
    * with that output.
    */
-  prepare?: (renderContext: RenderContext, resource: Resource, chain: unknown) => string | null | undefined;
+  prepare?: (
+    renderContext: RenderContext,
+    resource: Resource,
+    chain: unknown,
+  ) => string | null | undefined;
   /**
-   * Invoked after the resource is rendered, with the output produced so far; returns the
-   * (possibly transformed) output. Returning null/undefined keeps the previous output.
+   * Invoked after the resource is rendered, with the output produced so far; returns the (possibly
+   * transformed) output. Returning null/undefined keeps the previous output.
    */
   execute?: (
     previousOutput: string,
@@ -75,7 +79,9 @@ export const registerRenderFilter = (
     ...(description !== undefined && { description }),
     ...(applyOnNodeTypes !== undefined && { applyOnNodeTypes: join(applyOnNodeTypes) }),
     ...(applyOnModes !== undefined && { applyOnModes: join(applyOnModes) }),
-    ...(applyOnConfigurations !== undefined && { applyOnConfigurations: join(applyOnConfigurations) }),
+    ...(applyOnConfigurations !== undefined && {
+      applyOnConfigurations: join(applyOnConfigurations),
+    }),
     ...(applyOnTemplates !== undefined && { applyOnTemplates: join(applyOnTemplates) }),
     ...(applyOnTemplateTypes !== undefined && { applyOnTemplateTypes: join(applyOnTemplateTypes) }),
     ...(prepare !== undefined && { prepare }),

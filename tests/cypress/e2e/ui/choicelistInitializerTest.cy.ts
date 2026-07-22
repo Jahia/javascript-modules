@@ -33,8 +33,8 @@ const FORM_QUERY = `
 `;
 
 /**
- * Fetches the creation form of the test node type and returns its fields, flattened.
- * Initializers receive the CONTENT locale (the language being edited), not the UI locale.
+ * Fetches the creation form of the test node type and returns its fields, flattened. Initializers
+ * receive the CONTENT locale (the language being edited), not the UI locale.
  */
 const getFormFields = (locale: string): Cypress.Chainable<Field[]> =>
   cy
@@ -48,8 +48,9 @@ const getFormFields = (locale: string): Cypress.Chainable<Field[]> =>
       },
     })
     .then((response) =>
-      response.data.forms.createForm.sections.flatMap((section: { fieldSets: Array<{ fields: Field[] }> }) =>
-        section.fieldSets.flatMap((fieldSet) => fieldSet.fields),
+      response.data.forms.createForm.sections.flatMap(
+        (section: { fieldSets: Array<{ fields: Field[] }> }) =>
+          section.fieldSets.flatMap((fieldSet) => fieldSet.fields),
       ),
     );
 
@@ -100,7 +101,9 @@ describe("JS choicelist initializers", () => {
     getFormFields("en").then((fields) => {
       // the fixture derives a label from ExtendedPropertyDefinition#getName()
       expect(constraintLabel(field(fields, "color"), "propName")).to.equal("prop:color");
-      expect(constraintLabel(field(fields, "colorWithParam"), "propName")).to.equal("prop:colorWithParam");
+      expect(constraintLabel(field(fields, "colorWithParam"), "propName")).to.equal(
+        "prop:colorWithParam",
+      );
     });
   });
 

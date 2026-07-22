@@ -7,13 +7,13 @@ import type {
 /** Declaration of a content patch. */
 export interface ContentPatchDeclaration {
   /**
-   * Run-once identity AND ordering key of the content patch (content patches of a module are executed in
-   * lexicographic order of their names).
+   * Run-once identity AND ordering key of the content patch (content patches of a module are
+   * executed in lexicographic order of their names).
    *
    * Recommended shape: `"<moduleVersion>-<NN>-<slug>"`, e.g. `"2.0.0-01-remove-legacy-color"`.
    *
-   * NEVER rename or reorder a content patch after it shipped in a release — the name is the key under
-   * which its execution is recorded; ship a new content patch instead.
+   * NEVER rename or reorder a content patch after it shipped in a release — the name is the key
+   * under which its execution is recorded; ship a new content patch instead.
    */
   name: string;
   /** Shown in logs and in the content patch status. */
@@ -86,8 +86,8 @@ export interface ContentPatchOperations {
     options: NodeSelection & {
       property: string;
       /**
-       * Constant value, or per-node function returning the value to set (return `undefined` to
-       * skip the node). For i18n properties the function is called once per locale.
+       * Constant value, or per-node function returning the value to set (return `undefined` to skip
+       * the node). For i18n properties the function is called once per locale.
        */
       value:
         | ContentPatchPropertyValue
@@ -107,14 +107,17 @@ export interface ContentPatchOperations {
        * Converts one stored value (which may still carry the previous data type) to the new value.
        * Return `undefined` to leave that value untouched.
        */
-      convert: (value: JCRValueWrapper, node: JCRNodeWrapper) => ContentPatchPropertyValue | undefined;
+      convert: (
+        value: JCRValueWrapper,
+        node: JCRNodeWrapper,
+      ) => ContentPatchPropertyValue | undefined;
     },
   ): ContentPatchOperationReport;
 
   /**
    * Removes a node type OWNED BY THIS MODULE from the registry, optionally purging its instances.
-   * With the default `ifContentExists: "fail"`, the content patch fails (and content is left untouched)
-   * if instances still exist — destroying content is opt-in.
+   * With the default `ifContentExists: "fail"`, the content patch fails (and content is left
+   * untouched) if instances still exist — destroying content is opt-in.
    */
   removeNodeType(options: {
     nodeType: string;
@@ -128,7 +131,8 @@ export interface ContentPatchOperations {
 
   /**
    * Rebinds all instances of the `from` node type to the `to` node type (which must exist in the
-   * module's current definitions), optionally renaming properties, then removes the old definition.
+   * module's current definitions), optionally renaming properties, then removes the old
+   * definition.
    */
   changeNodeType(
     options: Omit<NodeSelection, "nodeType" | "includeSubtypes"> & {
@@ -145,9 +149,9 @@ export interface ContentPatchOperations {
 /** Lower-level JCR access for content patches. */
 export interface ContentPatchJcr {
   /**
-   * Opens a system (root) session on the given workspace and executes the callback with it.
-   * With `locale: null` (the default), translation nodes are visible as plain subnodes, which is
-   * usually what content patches want.
+   * Opens a system (root) session on the given workspace and executes the callback with it. With
+   * `locale: null` (the default), translation nodes are visible as plain subnodes, which is usually
+   * what content patches want.
    *
    * NOTE: unlike the `patch.*` helpers, code in this callback is NOT dry-run aware — check
    * `context.dryRun` yourself before saving if you want to support dry runs.

@@ -27,9 +27,12 @@ registerNodeLegacyAction(
 );
 
 // requireAuthenticatedUser defaults to true: guests get a 401
-registerNodeLegacyAction({ name: "testJsActionAuth", requiredMethods: ["GET"] }, ({ renderContext }) => ({
-  json: { user: renderContext.getUser().getUsername() },
-}));
+registerNodeLegacyAction(
+  { name: "testJsActionAuth", requiredMethods: ["GET"] },
+  ({ renderContext }) => ({
+    json: { user: renderContext.getUser().getUsername() },
+  }),
+);
 
 registerNodeLegacyAction(
   { name: "testJsActionRedirect", requiredMethods: ["GET"], requireAuthenticatedUser: false },

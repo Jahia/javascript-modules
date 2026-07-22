@@ -39,23 +39,19 @@ The callback returns the list of choices as `{ label, value, properties? }` obje
 
 The callback receives a context object:
 
-| Property | Description |
-|----------|-------------|
-| `param` | The parameter from the CND declaration: `choicelist[myModuleColors='myParam']` passes `"myParam"`. Empty string when absent. |
-| `locale` | BCP-47 language tag of the content language being edited (e.g. `"en"`, `"fr"`) — not the editor's UI language. Use it to localize labels. |
-| `values` | Choices accumulated by previous initializers when several are chained in the CND declaration (e.g. `choicelist[resourceBundle,myModuleColors]`). Include them in your result to keep them. |
-| `node` | The node being edited, when it exists (it does not on creation forms). |
-| `java` | Escape hatch: the raw Java objects received by the underlying `ModuleChoiceListInitializer` — `propertyDefinition` (`ExtendedPropertyDefinition`), `locale` (`java.util.Locale`), `values`, `context`. |
+| Property | Description                                                                                                                                                                                            |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `param`  | The parameter from the CND declaration: `choicelist[myModuleColors='myParam']` passes `"myParam"`. Empty string when absent.                                                                           |
+| `locale` | BCP-47 language tag of the content language being edited (e.g. `"en"`, `"fr"`) — not the editor's UI language. Use it to localize labels.                                                              |
+| `values` | Choices accumulated by previous initializers when several are chained in the CND declaration (e.g. `choicelist[resourceBundle,myModuleColors]`). Include them in your result to keep them.             |
+| `node`   | The node being edited, when it exists (it does not on creation forms).                                                                                                                                 |
+| `java`   | Escape hatch: the raw Java objects received by the underlying `ModuleChoiceListInitializer` — `propertyDefinition` (`ExtendedPropertyDefinition`), `locale` (`java.util.Locale`), `values`, `context`. |
 
 For example, an initializer that lists values differently per property and honors a parameter:
 
 ```ts
 registerChoiceListInitializer({ key: "myModuleSizes" }, ({ param, values, java }) => {
-  const sizes = [
-    ...values,
-    { label: "Small", value: "s" },
-    { label: "Medium", value: "m" },
-  ];
+  const sizes = [...values, { label: "Small", value: "s" }, { label: "Medium", value: "m" }];
   if (param === "extended") {
     sizes.push({ label: `Large (${java.propertyDefinition.getName()})`, value: "l" });
   }

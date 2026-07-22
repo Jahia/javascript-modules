@@ -28,7 +28,11 @@ registerNodeLegacyAction(
 
 // populates the "style" dropdown of the component in Content Editor
 registerChoiceListInitializer({ key: "hydrogenFormStyles" }, ({ locale }) => [
-  { label: locale.startsWith("fr") ? "Simple" : "Plain", value: "plain", properties: { defaultProperty: true } },
+  {
+    label: locale.startsWith("fr") ? "Simple" : "Plain",
+    value: "plain",
+    properties: { defaultProperty: true },
+  },
   { label: locale.startsWith("fr") ? "Encadré" : "Boxed", value: "boxed" },
 ]);
 

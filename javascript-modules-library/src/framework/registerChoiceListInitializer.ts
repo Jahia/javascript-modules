@@ -9,21 +9,19 @@ export interface ChoiceListValue {
   /** String persisted in the JCR when this choice is selected. */
   value: string;
   /**
-   * Optional metadata attached to the choice, interpreted by the editing UI (e.g.
-   * `{ image: "/path.png" }` or `{ defaultProperty: true }`).
+   * Optional metadata attached to the choice, interpreted by the editing UI (e.g. `{ image:
+   * "/path.png" }` or `{ defaultProperty: true }`).
    */
   properties?: Record<string, unknown>;
 }
 
 /** Context passed to a choicelist initializer callback. */
 export interface ChoiceListInitializerContext {
-  /**
-   * Parameter from the CND declaration `choicelist[myKey,'myParam']`; empty string when absent.
-   */
+  /** Parameter from the CND declaration `choicelist[myKey,'myParam']`; empty string when absent. */
   param: string;
   /**
-   * BCP-47 language tag of the content language being edited (not the editor's UI language),
-   * e.g. `"en"` or `"fr-FR"`.
+   * BCP-47 language tag of the content language being edited (not the editor's UI language), e.g.
+   * `"en"` or `"fr-FR"`.
    */
   locale: string;
   /**
@@ -47,7 +45,7 @@ export interface ChoiceListInitializerContext {
  * the editing UI:
  *
  * ```cnd
- * - color (string, choicelist[myModuleColors])
+ * -color(string, choicelist[myModuleColors]);
  * ```
  *
  * ```ts
