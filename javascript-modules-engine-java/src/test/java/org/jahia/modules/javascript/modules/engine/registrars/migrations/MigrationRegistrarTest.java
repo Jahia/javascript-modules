@@ -154,6 +154,27 @@ public class MigrationRegistrarTest {
     }
 
     @Test
+    public void recordedFailureIsAPersistentBarrierAcrossRestarts() {
+        // simulates the NEXT module start after a failure: 01 is recorded .failed, 02 never ran
+        registryEntries.addAll(Arrays.asList(migration("2.0.0-01-first"), migration("2.0.0-02-second")));
+        registrar.status.put(STATUS_PATH_PREFIX + "2.0.0-01-first", RESULT_FAILED);
+
+        registrar.register(bundle);
+
+        assertTrue("02 must stay held behind the failed 01", registrar.executed.isEmpty());
+        assertFalse(registrar.status.has(STATUS_PATH_PREFIX + "2.0.0-02-second"));
+    }
+
+    @Test
+    public void clearingAFailedRecordReleasesTheHeldMigrations() {
+        registryEntries.addAll(Arrays.asList(migration("2.0.0-01-first"), migration("2.0.0-02-second")));
+        // the failed record was cleared (the documented recovery), 01 re-runs then 02 follows
+        registrar.register(bundle);
+
+        assertEquals(Arrays.asList("2.0.0-01-first", "2.0.0-02-second"), registrar.executed);
+    }
+
+    @Test
     public void skippedIsTerminalButDoesNotHalt() {
         registryEntries.addAll(Arrays.asList(migration("2.0.0-01-first"), migration("2.0.0-02-second")));
         registrar.results.put("2.0.0-01-first", RESULT_SKIPPED);

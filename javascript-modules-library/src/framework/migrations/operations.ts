@@ -199,9 +199,30 @@ export const createMigrationOperations = (
       const report = jcr.forEachNode(
         { ...options, nodeType: options.from, includeSubtypes: false },
         (node) => {
-          node.setPrimaryType(options.to);
+          // Jahia's node wrapper does not implement setPrimaryType (it throws
+          // UnsupportedRepositoryOperationException) — rebind on the underlying Jackrabbit node.
+          const realNode = node.getRealNode();
+          // Jackrabbit validates EXISTING properties against the new type during setPrimaryType,
+          // so mapped properties must be read + removed before the retype and written back (under
+          // their new names, which only the new type defines) afterwards.
+          const carried: Array<{ newName: string; value: unknown; multiple: boolean }> = [];
           for (const [oldName, newName] of Object.entries(options.mapProperties ?? {})) {
-            renameOn(node, oldName, newName);
+            if (!realNode.hasProperty(oldName)) continue;
+            const property = realNode.getProperty(oldName);
+            const multiple = property.isMultiple();
+            carried.push({
+              newName,
+              value: multiple ? property.getValues() : property.getValue(),
+              multiple,
+            });
+            property.remove();
+          }
+          realNode.setPrimaryType(options.to);
+          for (const { newName, value } of carried) {
+            realNode.setProperty(newName, value as never);
+          }
+          // translation subnodes keep their own (residual-friendly) definitions — rename in place
+          for (const [oldName, newName] of Object.entries(options.mapProperties ?? {})) {
             for (const locale of existingLocales(node)) {
               renameOn(node.getI18N(locale), oldName, newName);
             }

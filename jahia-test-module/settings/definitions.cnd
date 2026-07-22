@@ -164,3 +164,17 @@
  - email (string)
  - score (long)
  - i18nText (string) internationalized
+
+[javascriptExample:migrationContent] > jnt:content, javascriptExampleMix:javascriptExampleComponent
+ - legacyColor (string)
+ - theme (string)
+ - counter (undefined)
+
+[javascriptExample:legacyMigrated] > jnt:content, javascriptExampleMix:javascriptExampleComponent
+ - oldTitle (string)
+
+[javascriptExample:newMigrated] > jnt:content, javascriptExampleMix:javascriptExampleComponent
+ - newTitle (string)
+
+[javascriptExample:doomedMigrated] > jnt:content, javascriptExampleMix:javascriptExampleComponent
+ - label (string)

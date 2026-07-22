@@ -103,7 +103,7 @@ With `locale: null` (the default), system sessions see translation subnodes as p
 
 - Returning normally records `.installed`.
 - Calling `context.skip(reason)` records `.skipped`.
-- Throwing records `.failed`, and the module's **remaining migrations are halted** (they stay pending). The module itself still starts — migration failures never break startup.
+- Throwing records `.failed`, and the module's **remaining migrations are held back** — persistently, across restarts and redeploys — until the failed record is cleared and the migration succeeds. The module itself still starts — migration failures never break startup.
 
 All three outcomes are terminal. Batches already committed before a failure stay committed (JCR has no cross-save transactions), so write migrations to be **idempotent** — the built-in helpers are idempotent by construction.
 

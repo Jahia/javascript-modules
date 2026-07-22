@@ -13,3 +13,4 @@ ADRs are numbered in the order they were accepted and are never rewritten once a
 | [0003](0003-typed-registration-wrappers.md) | Idiomatic TypeScript registration wrappers with a raw Java escape hatch | accepted |
 | [0004](0004-csrf-whitelisting-for-js-actions.md) | CSRF whitelisting of JavaScript actions is the module author's responsibility | accepted |
 | [0005](0005-js-node-validators-single-bean-validation-bridge.md) | Bridge JS node validators through a single Bean Validation bean registered for `nt:base` | accepted |
+| [0006](0006-javascript-migrations.md) | Run JavaScript migrations through a dedicated registrar backed by core's patch status store | accepted |

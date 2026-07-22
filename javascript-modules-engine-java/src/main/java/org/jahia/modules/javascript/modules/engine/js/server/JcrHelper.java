@@ -66,7 +66,10 @@ public class JcrHelper {
         try {
             return JCRTemplate.getInstance().doExecuteWithSystemSessionAsUser(null, workspace, locale, callback);
         } catch (Exception e) {
-            throw new IllegalStateException("Error while executing callback as system: " + e.getMessage(), e);
+            // include the class name: many JCR exceptions (e.g. UnsupportedRepositoryOperationException)
+            // carry a null message, and the polyglot boundary hides the Java cause chain from JS
+            throw new IllegalStateException("Error while executing callback as system: "
+                    + e.getClass().getSimpleName() + (e.getMessage() != null ? ": " + e.getMessage() : ""), e);
         }
     }
 }

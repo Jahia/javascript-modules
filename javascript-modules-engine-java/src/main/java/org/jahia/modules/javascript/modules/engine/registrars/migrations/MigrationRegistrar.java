@@ -103,9 +103,28 @@ public class MigrationRegistrar implements Registrar {
 
             String symbolicName = bundle.getSymbolicName();
             JSONObject status = getStatus(symbolicName);
+            // A recorded failure is a persistent barrier: migrations ordered after the first
+            // .failed one stay held (across restarts and redeploys) until that record is cleared
+            // and the migration succeeds — otherwise later migrations would run on the next module
+            // start even though an earlier one never completed.
+            String failedBarrier = migrations.stream()
+                    .map(entry -> String.valueOf(entry.get("name")))
+                    .filter(name -> RESULT_FAILED.equals(status.optString(STATUS_PATH_PREFIX + name)))
+                    .findFirst().orElse(null);
             List<Map<String, Object>> pending = migrations.stream()
                     .filter(entry -> !status.has(STATUS_PATH_PREFIX + entry.get("name")))
+                    .filter(entry -> failedBarrier == null
+                            || String.valueOf(entry.get("name")).compareTo(failedBarrier) < 0)
                     .collect(java.util.stream.Collectors.toList());
+            if (failedBarrier != null) {
+                long held = migrations.stream()
+                        .filter(entry -> !status.has(STATUS_PATH_PREFIX + entry.get("name")))
+                        .count() - pending.size();
+                if (held > 0) {
+                    logger.warn("Module {} has {} migration(s) held back behind failed migration {} — "
+                            + "fix it and clear its record to let them run", symbolicName, held, failedBarrier);
+                }
+            }
             if (pending.isEmpty()) {
                 logger.debug("No pending migration for module {}", symbolicName);
                 return;
