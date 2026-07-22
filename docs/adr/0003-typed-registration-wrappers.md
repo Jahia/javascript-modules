@@ -28,7 +28,7 @@ Chosen option: **1.**
 - Idiomatic context objects expose converted values (e.g. `locale` as a BCP-47 language tag via `Locale.toLanguageTag()`, parameters as `Record<string, string[]>`) and keep the raw Java objects under a `java` property (or as documented raw fields such as the `JCRNodeWrapper` itself, which is already the library's public node surface).
 - Structured return values that must cross the boundary as JSON (action results) are **pre-stringified with `JSON.stringify` in the adapter** and parsed with `new JSONObject(String)` on the Java side. This sidesteps polyglot deep-conversion issues with nested objects/arrays that broke the POC's `new JSONObject(value.as(Map.class))` approach.
 - Java types referenced in public signatures are provided by the existing java-ts-bind generation; types not yet generated (`ExtendedPropertyDefinition`, `URLResolver`, `Locale.toLanguageTag`) are added to the bind configuration with narrow method whitelists.
-- Handlers are synchronous in v1. Promise-returning handlers require explicit GraalJS promise resolution across the host boundary and are deferred.
+- Handlers may be `async`: every bridge settles returned promises through `JSPromise.settleOrThrow` (microtask-only — the server runtime has no timers or async I/O; rejections behave like synchronous throws). See [#688](https://github.com/Jahia/javascript-modules/issues/688).
 
 ### Consequences
 

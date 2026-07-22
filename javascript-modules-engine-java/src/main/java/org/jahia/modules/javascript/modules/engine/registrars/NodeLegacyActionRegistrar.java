@@ -20,6 +20,7 @@ import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
 import org.jahia.modules.javascript.modules.engine.jsengine.ContextProvider;
 import org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine;
+import org.jahia.modules.javascript.modules.engine.jsengine.JSPromise;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
@@ -119,8 +120,10 @@ public class NodeLegacyActionRegistrar extends AbstractServiceRegistrar<Action> 
                     logger.warn("JS action '{}' is no longer available in the registry", getName());
                     return ActionResult.SERVICE_UNAVAILABLE;
                 }
-                Value result = Value.asValue(entry.get("doExecute"))
-                        .execute(request, renderContext, resource, session, parameters, urlResolver);
+                Value result = JSPromise.settleOrThrow(
+                        Value.asValue(entry.get("doExecute"))
+                                .execute(request, renderContext, resource, session, parameters, urlResolver),
+                        "JS legacy node action '" + getName() + "'");
                 return convertResult(result);
             });
         }

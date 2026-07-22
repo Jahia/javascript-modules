@@ -55,7 +55,7 @@ Any other message is displayed verbatim. Alternatively, resolve the text yoursel
 ## Good to know
 
 - **Never call `session.save()` inside a validator** — it would recurse into validation.
-- **Keep validators fast**: they run synchronously on every matching session save (editing, APIs, publication-driven saves).
+- **Keep validators fast**: they run on every matching session save (editing, APIs, publication-driven saves). They may be `async`, limited to microtask-based work (the server runtime has no timers or async I/O).
 - **i18n properties**: Jahia silently drops violations attached to internationalized properties when the saving session has no locale; return a node-level violation as a fallback if that matters for your check.
 - **Failure policy**: a validator that throws fails the save with a generic node-level message (fail closed) and logs the error with the validator key; a returned violation without a string `message` is logged and ignored.
 - **GraphQL/API saves** are validated too — the violation messages appear in the mutation errors.

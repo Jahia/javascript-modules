@@ -58,15 +58,17 @@ export interface ChoiceListInitializerContext {
  * Keys live in a single platform-wide namespace shared with Java modules (last registration wins);
  * prefix them with your module name to avoid collisions.
  *
- * The callback runs synchronously on a server thread every time an editor form displays the
- * choicelist — keep it fast.
+ * The callback runs on a server thread every time an editor form displays the choicelist — keep it
+ * fast. It may be `async` (microtask-only: the server runtime has no timers or async I/O).
  *
  * @param options The initializer declaration; `key` is the name referenced from CND definitions.
  * @param resolveValues Returns the choices offered to the editor.
  */
 export const registerChoiceListInitializer = (
   { key }: { key: string },
-  resolveValues: (context: ChoiceListInitializerContext) => ChoiceListValue[],
+  resolveValues: (
+    context: ChoiceListInitializerContext,
+  ) => ChoiceListValue[] | Promise<ChoiceListValue[]>,
 ): void => {
   server.registry.add("choicelist-initializer", key, {
     // Raw adapter invoked by the Java bridge (ChoiceListInitializerRegistrar) with the
@@ -77,7 +79,7 @@ export const registerChoiceListInitializer = (
       values: List<unknown>,
       locale: Locale,
       context: JavaMap<string, unknown>,
-    ): ChoiceListValue[] =>
+    ): ChoiceListValue[] | Promise<ChoiceListValue[]> =>
       resolveValues({
         param: param ?? "",
         locale: locale ? locale.toLanguageTag() : "",

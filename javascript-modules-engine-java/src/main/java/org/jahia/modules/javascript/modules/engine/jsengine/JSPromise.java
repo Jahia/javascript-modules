@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jahia.modules.javascript.modules.engine.actions;
+package org.jahia.modules.javascript.modules.engine.jsengine;
 
 import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyExecutable;
@@ -81,6 +81,39 @@ public final class JSPromise {
                 });
         // the microtask queue is drained when invokeMember returns to the host
         return new Outcome(outcome[0], outcome[1], done[0]);
+    }
+
+    /**
+     * Settles a JS value and returns the fulfilled result, converting the two failure modes into a
+     * {@link GraalVMException}: a rejection behaves like a synchronous throw (same as a non-async
+     * callback throwing), and a never-settling promise fails with an explicit explanation.
+     *
+     * @param result the value returned by a JS callback (plain value or promise)
+     * @param what describes the callback for error messages, e.g. {@code "JS render filter 'x'"}
+     */
+    public static Value settleOrThrow(Value result, String what) {
+        Outcome outcome = settle(result);
+        if (!outcome.isSettled()) {
+            throw new GraalVMException(what + " returned a promise that did not settle; only microtask-based " +
+                    "asynchronicity is supported on the server (no timers or async I/O)");
+        }
+        if (outcome.isRejected()) {
+            throw new GraalVMException(what + " failed: " + messageOf(outcome.getError()));
+        }
+        return outcome.getValue();
+    }
+
+    private static String messageOf(Value errorValue) {
+        if (errorValue == null) {
+            return "unknown error";
+        }
+        if (errorValue.hasMembers() && errorValue.hasMember("message")) {
+            Value message = errorValue.getMember("message");
+            if (message != null && message.isString()) {
+                return message.asString();
+            }
+        }
+        return errorValue.toString();
     }
 
     private static boolean isThenable(Value value) {

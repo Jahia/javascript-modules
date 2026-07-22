@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jahia.modules.javascript.modules.engine.actions;
+package org.jahia.modules.javascript.modules.engine.jsengine;
 
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
@@ -24,6 +24,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class JSPromiseTest {
 
@@ -97,5 +98,34 @@ public class JSPromiseTest {
     public void neverSettlingPromisesAreReportedAsNotDone() {
         JSPromise.Outcome settled = run("() => new Promise(() => {})");
         assertFalse(settled.isSettled());
+    }
+
+    @Test
+    public void settleOrThrowReturnsFulfilledValues() {
+        Value fn = context.eval("js", "(async () => 'done')");
+        assertEquals("done", JSPromise.settleOrThrow(fn.execute(), "test callback").asString());
+    }
+
+    @Test
+    public void settleOrThrowConvertsRejectionsIntoGraalVMExceptions() {
+        Value fn = context.eval("js", "(async () => { throw new Error('kaboom'); })");
+        try {
+            JSPromise.settleOrThrow(fn.execute(), "test callback");
+            fail("expected a GraalVMException");
+        } catch (GraalVMException e) {
+            assertTrue(e.getMessage().contains("test callback"));
+            assertTrue(e.getMessage().contains("kaboom"));
+        }
+    }
+
+    @Test
+    public void settleOrThrowFailsExplicitlyOnNeverSettlingPromises() {
+        Value fn = context.eval("js", "(() => new Promise(() => {}))");
+        try {
+            JSPromise.settleOrThrow(fn.execute(), "test callback");
+            fail("expected a GraalVMException");
+        } catch (GraalVMException e) {
+            assertTrue(e.getMessage().contains("did not settle"));
+        }
     }
 }

@@ -69,8 +69,8 @@ export interface NodeValidatorDeclaration {
  * });
  * ```
  *
- * Validators run synchronously on every matching save — keep them fast, and never call
- * `session.save()` from a validator.
+ * Validators run on every matching save — keep them fast, and never call `session.save()` from a
+ * validator. They may be `async` (microtask-only: the server runtime has no timers or async I/O).
  *
  * @param declaration The validator declaration.
  * @param validate Returns the violations (array, single violation, or nothing when valid).
@@ -80,7 +80,11 @@ export const registerNodeValidator = (
   validate: (
     node: JCRNodeWrapper,
     context: NodeValidatorContext,
-  ) => NodeValidatorViolation[] | NodeValidatorViolation | undefined,
+  ) =>
+    | NodeValidatorViolation[]
+    | NodeValidatorViolation
+    | undefined
+    | Promise<NodeValidatorViolation[] | NodeValidatorViolation | undefined>,
 ): void => {
   server.registry.add("node-validator", `${bundleKey}_node-validator_${nodeType}_${name}`, {
     nodeType,

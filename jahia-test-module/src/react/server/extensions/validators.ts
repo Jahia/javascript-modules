@@ -28,12 +28,16 @@ registerNodeValidator({ nodeType: NODE_TYPE }, (node) => {
 });
 
 // advanced phase: only runs once the default phase passed
-registerNodeValidator({ nodeType: NODE_TYPE, name: "score-range", advanced: true }, (node) => {
-  if (node.hasProperty("score") && node.getProperty("score").getLong() > 100) {
-    return { message: "Score must be at most 100 (advanced phase)", propertyName: "score" };
-  }
-  return undefined;
-});
+// async on purpose: exercises promise settling in the validator bridge
+registerNodeValidator(
+  { nodeType: NODE_TYPE, name: "score-range", advanced: true },
+  async (node) => {
+    if (node.hasProperty("score") && node.getProperty("score").getLong() > 100) {
+      return { message: "Score must be at most 100 (advanced phase)", propertyName: "score" };
+    }
+    return undefined;
+  },
+);
 
 // skipped during content imports
 registerNodeValidator(

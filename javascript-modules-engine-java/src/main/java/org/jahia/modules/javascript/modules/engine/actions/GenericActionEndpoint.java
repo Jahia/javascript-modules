@@ -20,6 +20,7 @@ import org.graalvm.polyglot.Value;
 import org.jahia.bin.Action;
 import org.jahia.bin.ActionResult;
 import org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine;
+import org.jahia.modules.javascript.modules.engine.jsengine.JSPromise;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;

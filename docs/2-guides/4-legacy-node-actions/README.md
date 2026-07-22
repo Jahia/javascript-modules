@@ -58,7 +58,7 @@ The handler receives a context object:
 - `request` — escape hatch: the raw `HttpServletRequest` (headers, cookies, body),
 - `urlResolver` — escape hatch: the Jahia URL resolver.
 
-And returns (synchronously — no promises):
+And returns (possibly asynchronously — `async` handlers are supported, limited to microtask-based work: the server runtime has no timers or async I/O):
 
 - `json` — an object serialized as the JSON response body,
 - `statusCode` — HTTP status, default 200,
@@ -79,6 +79,6 @@ Whitelisting disables CSRF protection for those URLs, so only do it for actions 
 
 ## Good to know
 
-- **Keep handlers fast and non-blocking** — they run synchronously on a request thread.
+- **Keep handlers fast and non-blocking** — they run on a request thread.
 - **Content modifications**: use the provided `session` to read/write JCR content as the calling user; standard permissions apply, plus `requiredPermission` if you set it.
 - **Errors**: an exception thrown by the handler results in an error response; validate input and return explicit `statusCode` values (e.g. 400) for expected failures.

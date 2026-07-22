@@ -10,7 +10,8 @@ import { registerNodeLegacyAction } from "@jahia/javascript-modules-library";
 
 registerNodeLegacyAction(
   { name: "testJsActionGet", requiredMethods: ["GET"], requireAuthenticatedUser: false },
-  ({ parameters, resource }) => ({
+  // async on purpose: exercises promise settling in the legacy action bridge
+  async ({ parameters, resource }) => ({
     json: {
       echo: parameters.echo?.[0] ?? null,
       path: resource.getNode().getPath(),

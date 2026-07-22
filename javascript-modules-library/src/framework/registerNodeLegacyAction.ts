@@ -78,7 +78,9 @@ export interface NodeLegacyActionResult {
  * );
  * ```
  *
- * Handlers run synchronously on a server thread and must return their result (no promises).
+ * Handlers may be `async`: `await` over synchronous work is fully supported, but the server runtime
+ * has no timers and no asynchronous I/O — a promise relying on them never settles and the request
+ * fails.
  *
  * @param declaration The action declaration; `name` is the URL-visible action name.
  * @param handler Executes the action and returns the response to send.
@@ -91,7 +93,9 @@ export const registerNodeLegacyAction = (
     requiredPermission,
     requiredWorkspace,
   }: NodeLegacyActionDeclaration,
-  handler: (context: NodeLegacyActionContext) => NodeLegacyActionResult | undefined,
+  handler: (
+    context: NodeLegacyActionContext,
+  ) => NodeLegacyActionResult | undefined | Promise<NodeLegacyActionResult | undefined>,
 ): void => {
   server.registry.add("node-legacy-action", name, {
     ...(requiredMethods !== undefined && { requiredMethods: requiredMethods.join(",") }),
@@ -99,8 +103,9 @@ export const registerNodeLegacyAction = (
     ...(requiredPermission !== undefined && { requiredPermission }),
     ...(requiredWorkspace !== undefined && { requiredWorkspace }),
     // Raw adapter invoked by the Java bridge (NodeLegacyActionRegistrar.ActionBridge) with the
-    // Action#doExecute arguments; returns {statusCode, json?: string, redirect?, absoluteRedirect?}
-    // with json pre-stringified. Keep both shapes in sync.
+    // Action#doExecute arguments; resolves to {statusCode, json?: string, redirect?,
+    // absoluteRedirect?} with json pre-stringified (the bridge settles the promise). Keep both
+    // shapes in sync.
     doExecute: (
       request: HttpServletRequest,
       renderContext: RenderContext,
@@ -108,25 +113,27 @@ export const registerNodeLegacyAction = (
       session: JCRSessionWrapper,
       javaParameters: JavaMap<string, List<string>>,
       urlResolver: URLResolver,
-    ) => {
-      const result = handler({
-        parameters: toJsParameters(javaParameters),
-        renderContext,
-        resource,
-        session,
-        request,
-        urlResolver,
-      });
-      if (!result) return { statusCode: 200 };
-      return {
-        statusCode: result.statusCode ?? 200,
-        ...(result.json !== undefined && { json: JSON.stringify(result.json) }),
-        ...(result.redirect !== undefined && {
-          redirect: result.redirect,
-          absoluteRedirect: result.absoluteRedirect ?? false,
+    ) =>
+      Promise.resolve(
+        handler({
+          parameters: toJsParameters(javaParameters),
+          renderContext,
+          resource,
+          session,
+          request,
+          urlResolver,
         }),
-      };
-    },
+      ).then((result) => {
+        if (!result) return { statusCode: 200 };
+        return {
+          statusCode: result.statusCode ?? 200,
+          ...(result.json !== undefined && { json: JSON.stringify(result.json) }),
+          ...(result.redirect !== undefined && {
+            redirect: result.redirect,
+            absoluteRedirect: result.absoluteRedirect ?? false,
+          }),
+        };
+      }),
   });
   console.debug(`Registered node legacy action: ${name}`);
 };

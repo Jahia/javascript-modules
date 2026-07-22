@@ -13,7 +13,8 @@ import {
  */
 registerChoiceListInitializer(
   { key: "testColorsInitializer" },
-  ({ param, locale, values, java }) => {
+  // async on purpose: exercises promise settling in the choicelist bridge
+  async ({ param, locale, values, java }) => {
     const choices: ChoiceListValue[] = [
       ...values,
       { label: locale.startsWith("fr") ? "Rouge" : "Red", value: "red" },

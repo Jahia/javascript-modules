@@ -18,6 +18,7 @@ package org.jahia.modules.javascript.modules.engine.registrars;
 import org.graalvm.polyglot.Value;
 import org.jahia.modules.javascript.modules.engine.jsengine.ContextProvider;
 import org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine;
+import org.jahia.modules.javascript.modules.engine.jsengine.JSPromise;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.RenderService;
 import org.jahia.services.render.Resource;
@@ -118,7 +119,9 @@ public class RenderFilterRegistrar extends AbstractServiceRegistrar<RenderFilter
                     // both callbacks are optional: a prepare-only filter is a no-op here
                     return previousOut;
                 }
-                Value result = Value.asValue(jsFilter.get("execute")).execute(previousOut, renderContext, resource, renderChain);
+                Value result = JSPromise.settleOrThrow(
+                        Value.asValue(jsFilter.get("execute")).execute(previousOut, renderContext, resource, renderChain),
+                        "JS render filter '" + key + "' execute");
                 return result == null || result.isNull() ? previousOut : result.asString();
             });
         }
@@ -135,7 +138,9 @@ public class RenderFilterRegistrar extends AbstractServiceRegistrar<RenderFilter
                     // both callbacks are optional: an execute-only filter is a no-op here
                     return null;
                 }
-                Value result = Value.asValue(jsFilter.get("prepare")).execute(renderContext, resource, renderChain);
+                Value result = JSPromise.settleOrThrow(
+                        Value.asValue(jsFilter.get("prepare")).execute(renderContext, resource, renderChain),
+                        "JS render filter '" + key + "' prepare");
                 return result == null || result.isNull() ? null : result.asString();
             });
         }

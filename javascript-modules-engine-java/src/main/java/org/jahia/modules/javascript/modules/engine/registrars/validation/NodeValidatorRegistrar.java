@@ -18,6 +18,7 @@ package org.jahia.modules.javascript.modules.engine.registrars.validation;
 import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyObject;
 import org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine;
+import org.jahia.modules.javascript.modules.engine.jsengine.JSPromise;
 import org.jahia.modules.javascript.modules.engine.registrars.Registrar;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRStoreService;
@@ -190,7 +191,10 @@ public class NodeValidatorRegistrar implements Registrar {
                 try {
                     Map<String, Object> jsContext = new HashMap<>();
                     jsContext.put("locale", getSessionLocale(node));
-                    Value result = Value.asValue(entry.get("validate")).execute(node, ProxyObject.fromMap(jsContext));
+                    // settleOrThrow supports async validators; rejections land in the catch below
+                    Value result = JSPromise.settleOrThrow(
+                            Value.asValue(entry.get("validate")).execute(node, ProxyObject.fromMap(jsContext)),
+                            "JS node validator '" + key + "'");
                     appendViolations(violations, result, key);
                 } catch (Exception e) {
                     // fail closed: a broken validator must not let invalid content through

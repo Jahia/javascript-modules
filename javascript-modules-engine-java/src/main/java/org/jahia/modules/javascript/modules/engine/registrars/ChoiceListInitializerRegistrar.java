@@ -19,6 +19,7 @@ import org.apache.jackrabbit.value.StringValue;
 import org.graalvm.polyglot.Value;
 import org.jahia.modules.javascript.modules.engine.jsengine.ContextProvider;
 import org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine;
+import org.jahia.modules.javascript.modules.engine.jsengine.JSPromise;
 import org.jahia.services.content.nodetypes.ExtendedPropertyDefinition;
 import org.jahia.services.content.nodetypes.initializers.ChoiceListInitializerService;
 import org.jahia.services.content.nodetypes.initializers.ChoiceListValue;
@@ -117,8 +118,9 @@ public class ChoiceListInitializerRegistrar extends AbstractServiceRegistrar<Mod
                             "returning no values", key);
                     return Collections.emptyList();
                 }
-                Value result = Value.asValue(entry.get("getChoiceListValues"))
-                        .execute(epd, param, values, locale, context);
+                Value result = JSPromise.settleOrThrow(
+                        Value.asValue(entry.get("getChoiceListValues")).execute(epd, param, values, locale, context),
+                        "JS choicelist initializer '" + key + "'");
                 return convertValues(result, key);
             });
         }

@@ -36,7 +36,7 @@ export interface RenderFilterCallbacks {
     renderContext: RenderContext,
     resource: Resource,
     chain: unknown,
-  ) => string | null | undefined;
+  ) => string | null | undefined | Promise<string | null | undefined>;
   /**
    * Invoked after the resource is rendered, with the output produced so far; returns the (possibly
    * transformed) output. Returning null/undefined keeps the previous output.
@@ -48,7 +48,7 @@ export interface RenderFilterCallbacks {
     renderContext: RenderContext,
     resource: Resource,
     chain: unknown,
-  ) => string | null | undefined;
+  ) => string | null | undefined | Promise<string | null | undefined>;
 }
 
 /**
@@ -61,7 +61,8 @@ export interface RenderFilterCallbacks {
  * );
  * ```
  *
- * Filters run synchronously on every matching render — keep them fast.
+ * Filters run on every matching render — keep them fast. Callbacks may be `async` (microtask-only:
+ * the server runtime has no timers or async I/O).
  *
  * Keys live in a single platform-wide registry namespace; prefix them with your module name to
  * avoid collisions.
