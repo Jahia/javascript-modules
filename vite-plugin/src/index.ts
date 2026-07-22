@@ -66,7 +66,7 @@ export default function jahia(
        * [Glob patterns are
        * supported.](https://www.npmjs.com/package/@rollup/plugin-multi-entry#supported-input-types)
        *
-       * @default "**‍/*.server.{jsx.tsx}"
+       * @default "**‍/*.server.{js,jsx,ts,tsx}"
        */
       inputGlob?: string;
       /**
@@ -193,7 +193,7 @@ export default function jahia(
               rollupOptions: {
                 input: path.posix.join(
                   options.inputDir ?? "src",
-                  options.server?.inputGlob ?? "**/*.server.{jsx,tsx}",
+                  options.server?.inputGlob ?? "**/*.server.{js,jsx,ts,tsx}",
                 ),
                 output: {
                   dir: options.outputDir ?? "dist",

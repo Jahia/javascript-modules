@@ -28,7 +28,7 @@ registerAction(
 
 // requireAuthenticatedUser defaults to true: guests get a 401
 registerAction({ name: "testJsActionAuth", requiredMethods: ["GET"] }, ({ renderContext }) => ({
-  json: { user: renderContext.getUser().getName() },
+  json: { user: renderContext.getUser().getUsername() },
 }));
 
 registerAction(

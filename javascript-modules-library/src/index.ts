@@ -23,6 +23,18 @@ export {
   type ChoiceListValue,
   type ChoiceListInitializerContext,
 } from "./framework/registerChoiceListInitializer.js";
+export { registerMigration } from "./framework/migrations/registerMigration.js";
+export type {
+  MigrationContext,
+  MigrationDeclaration,
+  MigrationJcr,
+  MigrationLogger,
+  MigrationOperationReport,
+  MigrationOperations,
+  MigrationPropertyValue,
+  NodeSelection,
+  QuerySelection,
+} from "./framework/migrations/types.js";
 export {
   registerNodeValidator,
   type NodeValidatorProps,

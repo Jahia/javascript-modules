@@ -31,7 +31,7 @@ export default defineConfig({
 
       // Server options
       server: {
-        inputGlob: "**/*.server.{jsx,tsx}", // Computed as src/**/*.server.{jsx,tsx}
+        inputGlob: "**/*.server.{js,jsx,ts,tsx}", // Computed as src/**/*.server.{js,jsx,ts,tsx}
         outputFile: "server/index.js", // Computed as dist/server/index.js
       },
 
