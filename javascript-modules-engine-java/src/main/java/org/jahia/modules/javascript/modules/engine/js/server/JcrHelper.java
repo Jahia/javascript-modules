@@ -5,6 +5,7 @@ import java.util.Locale;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRTemplate;
 import org.jahia.services.usermanager.JahiaUserManagerService;
+import org.jahia.utils.LanguageCodeConverters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,5 +44,32 @@ public class JcrHelper {
             logger.error("Error while executing callback as guest", e);
         }
         return result;
+    }
+
+    /**
+     * Execute JCR operations on a system session (root privileges) on the given workspace and locale.
+     * This is intended for server-side code that must write to the repository, such as content patch
+     * scripts.
+     *
+     * <p>Unlike {@link #doExecuteAsGuest}, errors are NOT swallowed: they are rethrown to the caller,
+     * because callers like the content patch runner must detect failures.
+     *
+     * @param callback  the callback to execute using the JCR session
+     * @param language  the session language code (e.g. "en"), or null for a non-localized session
+     *                  (translation nodes are then visible as plain subnodes, which is usually what
+     *                  content patches want)
+     * @param workspace the workspace to open the session on ("default" or "live")
+     * @return the result of the callback
+     */
+    public Object doExecuteAsSystem(JCRCallback<Object> callback, String language, String workspace) {
+        Locale locale = language != null ? LanguageCodeConverters.languageCodeToLocale(language) : null;
+        try {
+            return JCRTemplate.getInstance().doExecuteWithSystemSessionAsUser(null, workspace, locale, callback);
+        } catch (Exception e) {
+            // include the class name: many JCR exceptions (e.g. UnsupportedRepositoryOperationException)
+            // carry a null message, and the polyglot boundary hides the Java cause chain from JS
+            throw new IllegalStateException("Error while executing callback as system: "
+                    + e.getClass().getSimpleName() + (e.getMessage() != null ? ": " + e.getMessage() : ""), e);
+        }
     }
 }

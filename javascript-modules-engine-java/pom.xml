@@ -109,6 +109,13 @@
             <artifactId>jdom2</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!-- same version as jahia-impl 8.2.1.0, used by ContentPatchRegistrar report JSON: -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20231013</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.jahia.server</groupId>
             <artifactId>jahia-impl</artifactId>
@@ -206,6 +213,18 @@
         <dependency>
             <groupId>pl.pragmatists</groupId>
             <artifactId>JUnitParams</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>4.11.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- JS language for tests exercising polyglot Value conversions against real JS objects -->
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -316,6 +335,8 @@
                                 <!-- used to generate *.d.ts from Java code: -->
                                 <ignoredUnusedDeclaredDependency>io.github.bensku:java-ts-bind
                                 </ignoredUnusedDeclaredDependency>
+                                <!-- JS language loaded at runtime by the polyglot engine in tests: -->
+                                <ignoredUnusedDeclaredDependency>org.graalvm.js:js</ignoredUnusedDeclaredDependency>
                                 <!-- only exposed in *.d.ts files, not used in Java: -->
                                 <ignoredUnusedDeclaredDependency>org.apache.jackrabbit:jackrabbit-spi-commons</ignoredUnusedDeclaredDependency>
                                 <ignoredUnusedDeclaredDependency>org.jboss.spec.javax.servlet:jboss-servlet-api_3.1_spec</ignoredUnusedDeclaredDependency>
