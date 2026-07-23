@@ -26,18 +26,6 @@ export {
   type ChoiceListValue,
   type ChoiceListInitializerContext,
 } from "./framework/registerChoiceListInitializer.js";
-export { registerContentPatch } from "./framework/contentPatches/registerContentPatch.js";
-export type {
-  ContentPatchContext,
-  ContentPatchDeclaration,
-  ContentPatchJcr,
-  ContentPatchLogger,
-  ContentPatchOperationReport,
-  ContentPatchOperations,
-  ContentPatchPropertyValue,
-  NodeSelection,
-  QuerySelection,
-} from "./framework/contentPatches/types.js";
 export {
   registerNodeValidator,
   type NodeValidatorDeclaration,

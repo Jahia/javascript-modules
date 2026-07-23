@@ -165,18 +165,4 @@
  - score (long)
  - i18nText (string) internationalized
 
-[javascriptExample:patchTestContent] > jnt:content, javascriptExampleMix:javascriptExampleComponent
- - legacyColor (string)
- - theme (string)
- - counter (undefined)
-
-[javascriptExample:patchTestLegacy] > jnt:content, javascriptExampleMix:javascriptExampleComponent
- - oldTitle (string)
-
-[javascriptExample:patchTestNew] > jnt:content, javascriptExampleMix:javascriptExampleComponent
- - newTitle (string)
-
-[javascriptExample:patchTestDoomed] > jnt:content, javascriptExampleMix:javascriptExampleComponent
- - label (string)
-
 [javascriptExample:testGenericAction] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
