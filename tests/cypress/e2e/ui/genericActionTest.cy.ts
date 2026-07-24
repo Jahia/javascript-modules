@@ -11,12 +11,12 @@ const MODULE = "javascript-modules-engine-test-module";
 const callAction = (
   name: string,
   args: unknown[],
-  headers: Record<string, string> = { "X-JS-Action": "1" },
+  headers: Record<string, string> = { "X-JS-Action": "1", "accept": "application/json" },
 ) =>
   cy.request({
     method: "POST",
     url: `/cms/render/default/en${pagePath}.jsAction.do?name=${encodeURIComponent(name)}`,
-    headers: { accept: "application/json", ...headers },
+    headers,
     body: stringify(args),
     failOnStatusCode: false,
   });
@@ -70,30 +70,44 @@ describe("Actions (.action.ts files)", () => {
     });
   });
 
-  it("surfaces thrown errors", () => {
+  it("answers the envelope even when the caller does not ask for JSON", () => {
+    // The endpoint has no other representation to offer, so it must not depend on the accept header
+    callAction(`${MODULE}/add`, [20, 22], { "X-JS-Action": "1" }).then((response) => {
+      expect(response.status).to.eq(200);
+      expect(response.headers["content-type"]).to.contain("application/json");
+      expect(parse(response.body.data)).to.eq(42);
+    });
+  });
+
+  it("surfaces thrown errors as a server error", () => {
     callAction(`${MODULE}/failOnPurpose`, []).then((response) => {
+      expect(response.status).to.eq(500);
       expect(response.body.error).to.contain("Intentional failure");
     });
   });
 
   it("rejects invalid input of safe actions with validation issues", () => {
     callAction(`${MODULE}/safeDouble`, [{ n: -1 }]).then((response) => {
+      expect(response.status).to.eq(400);
       expect(response.body.error).to.contain("n must be a positive number");
       expect(response.body.issues[0].message).to.eq("n must be a positive number");
     });
     callAction(`${MODULE}/safeDouble`, [{ n: 21 }]).then((response) => {
+      expect(response.status).to.eq(200);
       expect(parse(response.body.data)).to.eq(42);
     });
   });
 
   it("requires the X-JS-Action header (CSRF hardening)", () => {
     callAction(`${MODULE}/add`, [1, 2], {}).then((response) => {
+      expect(response.status).to.eq(400);
       expect(response.body.error).to.contain("X-JS-Action");
     });
   });
 
   it("reports unknown actions", () => {
     callAction(`${MODULE}/doesNotExist`, []).then((response) => {
+      expect(response.status).to.eq(404);
       expect(response.body.error).to.contain("Unknown action");
     });
   });

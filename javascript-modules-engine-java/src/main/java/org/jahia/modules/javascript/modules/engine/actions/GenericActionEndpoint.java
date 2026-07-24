@@ -45,8 +45,15 @@ import java.util.Map;
  *
  * <p>Exposed as the platform action {@code jsAction}: client stubs POST a devalue-serialized arguments
  * array to {@code <pageUrl>.jsAction.do?name=<module>/<export>} and receive an envelope
- * {@code {"data": "<devalue>"}} or {@code {"error": "...", "issues": [...]?}}. The envelope always
- * travels on HTTP 200 because the render servlet only writes JSON bodies for 2xx action results.
+ * {@code {"data": "<devalue>"}} or {@code {"error": "...", "issues": [...]?}}, with a status code
+ * describing the outcome (200, 400, 404 or 500).
+ *
+ * <p>The envelope is written straight to the response rather than returned as an {@link ActionResult}:
+ * {@code Render#doAction} only serializes an action's JSON when the caller asked for it (a
+ * {@code returnContentType=json} parameter or an {@code accept} header containing
+ * {@code application/json}), and silently produces an empty body otherwise. This endpoint has no
+ * other representation to offer, so it always answers JSON; returning {@code null} tells the render
+ * servlet the response is already complete.
  *
  * <p>The {@code X-JS-Action} header is required: HTML forms cannot set custom headers and cross-origin
  * scripts would need a CORS preflight that Jahia does not grant, so the endpoint is not exploitable as
@@ -83,42 +90,74 @@ public class GenericActionEndpoint extends Action {
     public ActionResult doExecute(HttpServletRequest request, RenderContext renderContext, Resource resource,
             JCRSessionWrapper session, Map<String, List<String>> parameters, URLResolver urlResolver)
             throws Exception {
+        HttpServletResponse response = renderContext.getResponse();
+
         if (request.getHeader(REQUIRED_HEADER) == null) {
-            return error("Missing " + REQUIRED_HEADER + " header");
+            logger.warn("Rejecting a call to the JS action endpoint without the {} header", REQUIRED_HEADER);
+            return error(response, HttpServletResponse.SC_BAD_REQUEST, "Missing " + REQUIRED_HEADER + " header");
         }
         String name = getParameter(parameters, "name");
         if (name == null) {
-            return error("Missing action name");
+            logger.warn("Rejecting a call to the JS action endpoint without an action name");
+            return error(response, HttpServletResponse.SC_BAD_REQUEST, "Missing action name");
         }
         String body = IOUtils.toString(request.getReader());
 
         return graalVMEngine.doWithContext(contextProvider -> {
             Map<String, Object> entry = contextProvider.getRegistry().get(REGISTRY_TYPE, name);
             if (entry == null || entry.get("execute") == null) {
-                return error("Unknown action: " + name);
+                logger.warn("Rejecting a call to unknown JS action '{}'", name);
+                return error(response, HttpServletResponse.SC_NOT_FOUND, "Unknown action: " + name);
             }
             JSPromise.Outcome outcome;
             try {
                 outcome = JSPromise.settle(Value.asValue(entry.get("execute")).execute(body));
             } catch (Exception e) {
                 logger.error("JS action '{}' failed to execute", name, e);
-                return error("Action execution failed");
+                return error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Action execution failed");
             }
             if (!outcome.isSettled()) {
                 logger.error("JS action '{}' returned a promise that did not settle; only microtask-based " +
                         "asynchronicity is supported on the server (no timers or async I/O)", name);
-                return error("Action did not settle synchronously");
+                return error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        "Action did not settle synchronously");
             }
             if (outcome.isRejected()) {
-                return error(readMessage(outcome.getError()), readIssues(outcome.getError()));
+                JSONArray issues = readIssues(outcome.getError());
+                if (issues != null) {
+                    // Input rejected by the action's schema: the caller sent something invalid
+                    return error(response, HttpServletResponse.SC_BAD_REQUEST, readMessage(outcome.getError()),
+                            issues);
+                }
+                // Anything else the function threw is a server-side failure, as in any other request
+                logger.error("JS action '{}' threw: {}", name, readMessage(outcome.getError()));
+                return error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        readMessage(outcome.getError()));
             }
             Value data = outcome.getValue();
             if (data == null || data.isNull() || !data.isString()) {
                 logger.error("JS action '{}' adapter did not return a serialized string", name);
-                return error("Action returned an unexpected result");
+                return error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        "Action returned an unexpected result");
             }
-            return new ActionResult(HttpServletResponse.SC_OK, null, new JSONObject().put("data", data.asString()));
+            return respond(response, HttpServletResponse.SC_OK, new JSONObject().put("data", data.asString()));
         });
+    }
+
+    /**
+     * Writes the envelope to the response and returns {@code null}, which tells {@code Render#doAction}
+     * that the response is complete — see this class' javadoc for why the render servlet cannot do it.
+     */
+    private static ActionResult respond(HttpServletResponse response, int status, JSONObject json) {
+        response.setStatus(status);
+        response.setContentType("application/json; charset=UTF-8");
+        try {
+            json.write(response.getWriter());
+            response.getWriter().flush();
+        } catch (Exception e) {
+            logger.error("Failed to write the JS action response", e);
+        }
+        return null;
     }
 
     private static String readMessage(Value errorValue) {
@@ -146,15 +185,15 @@ public class GenericActionEndpoint extends Action {
         return null;
     }
 
-    private static ActionResult error(String message) {
-        return error(message, null);
+    private static ActionResult error(HttpServletResponse response, int status, String message) {
+        return error(response, status, message, null);
     }
 
-    private static ActionResult error(String message, JSONArray issues) {
+    private static ActionResult error(HttpServletResponse response, int status, String message, JSONArray issues) {
         JSONObject json = new JSONObject().put("error", message);
         if (issues != null) {
             json.put("issues", issues);
         }
-        return new ActionResult(HttpServletResponse.SC_OK, null, json);
+        return respond(response, status, json);
     }
 }
