@@ -37,8 +37,9 @@ test("Project creation", async () => {
   // Create a new test-project from within the temp directory
   process.chdir(tempDir);
 
-  // Because the CLI is interactive, we use spawn it and interact with it
-  const child = spawn("node", [indexFile, "project-name"], {
+  // Because the CLI is interactive, we use spawn it and interact with it.
+  // `--interactive` forces the wizard: without a TTY the CLI would otherwise refuse to prompt.
+  const child = spawn("node", [indexFile, "project-name", "--interactive"], {
     stdio: ["pipe", "inherit", "inherit"],
   });
 

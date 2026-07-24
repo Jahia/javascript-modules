@@ -44,6 +44,18 @@ We'll create a new project using Jahia's [@jahia/create-module](https://www.npmj
 npm init @jahia/module@latest hydrogen
 ```
 
+The CLI asks you for the module name, its location and the type of module you want. Every answer can
+also be passed as a flag, which is handy for scripts, CI pipelines or coding agents: the command
+below creates the exact same project without asking anything.
+
+```bash
+# Same thing, without a single prompt
+npm init @jahia/module@latest hydrogen -- --template hello-world --yes
+```
+
+Available templates are `hello-world` (the default), `template-set` and `module`. Run
+`npm init @jahia/module@latest -- --help` to list all the flags.
+
 Once your project is ready, the tool will suggest you to run a few commands to start it. **Make sure Docker Desktop is running** and run them all in order to start your new project.
 
 Please note that git commands, while optional, are strongly recommended. If `code .` doesn't work, open your code editor and open the project folder manually.
