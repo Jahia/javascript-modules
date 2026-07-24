@@ -42,6 +42,22 @@ public class JSScript implements Script {
 
     @Override
     public String execute(Resource resource, RenderContext renderContext) throws RenderException {
+        try {
+            return render(resource, renderContext);
+        } catch (RuntimeException | RenderException e) {
+            // Jahia's render chain replaces a failed fragment with an HTML comment and logs the raw
+            // exception, whose JS frames point inside the module's bundle. Log mapped positions, and
+            // in development make the failure visible on the page rather than only in the logs.
+            logger.error("Error rendering view {}:\n{}", jsView.getRegistryKey(),
+                    ViewRenderError.stackTrace(e, graalVMEngine.getSourceMaps()));
+            if (ViewRenderError.isDevelopmentMode()) {
+                return ViewRenderError.render(jsView.getRegistryKey(), e, graalVMEngine.getSourceMaps());
+            }
+            throw e;
+        }
+    }
+
+    private String render(Resource resource, RenderContext renderContext) throws RenderException {
         String output = graalVMEngine.doWithContext(ThrowingFunction.unchecked(contextProvider -> {
             Map<String, Object> viewValues = jsView.getRegistryInstance(contextProvider);
 
