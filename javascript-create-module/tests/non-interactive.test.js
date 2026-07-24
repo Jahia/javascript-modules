@@ -53,7 +53,14 @@ const run = async (args, { cwd = tempFolder, timeout = 5_000 } = {}) => {
     `The CLI did not terminate within ${timeout}ms: it hung on a prompt.`,
   );
 
-  return { code, stdout, stderr };
+  // Node writes its own warnings to stderr (importing package.json is still experimental), and
+  // whether it does depends on the runtime version: they are not output of the CLI under test.
+  const cleanedStderr = stderr
+    .split("\n")
+    .filter((line) => !/^\(node:\d+\)|^\(Use `node --trace-warnings/.test(line))
+    .join("\n");
+
+  return { code, stdout, stderr: cleanedStderr };
 };
 
 /** Creates an empty directory to scaffold into, and returns a path inside of it. */
@@ -182,5 +189,5 @@ test("Prints the usage with --help", async () => {
   for (const template of ["hello-world", "template-set", "module"]) {
     assert.ok(stdout.includes(template), template);
   }
-  assert.equal(stderr, "");
+  assert.equal(stderr.trim(), "");
 });
