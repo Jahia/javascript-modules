@@ -1,6 +1,6 @@
 import { addNode, publishAndWaitJobEnding } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 
 describe("Verify client side component are rehydrated as expected", () => {
   before("Create test contents", () => {
@@ -65,6 +65,24 @@ describe("Verify client side component are rehydrated as expected", () => {
       cy.get('span[data-testid="counter"]').should("contain", "0");
 
       cy.get('[data-testid="ssr-child"]').should("contain", "Server-side rendered");
+    });
+
+    it(`${workspace}: Check that a component exported by name is hydrated too`, () => {
+      // A missing hydration entry would be requested as <module>/undefined.js
+      cy.intercept("GET", "**/undefined.js", () => {
+        throw new Error("An island requested undefined.js: hydration metadata is missing");
+      });
+
+      cy.visit(
+        `/cms/render/${workspace}/en/sites/${GENERIC_SITE_KEY}/home/testHydrateInBrowser.html`,
+      );
+
+      cy.get('p[data-testid="named-export-count"]').should("contain", "Named count: 5");
+      cy.get('[data-hydrated="true"]').should("exist");
+
+      // Interactivity proves the named export was resolved in the client bundle
+      cy.get('button[data-testid="named-export-button"]').click();
+      cy.get('p[data-testid="named-export-count"]').should("contain", "Named count: 6");
     });
   }
 });

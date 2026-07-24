@@ -9,6 +9,15 @@ import { buildModuleFileUrl } from "../../utils/urlBuilder/urlBuilder.js";
 import { AddResources } from "../AddResources.js";
 
 /**
+ * A component declared in a `*.client.{jsx,tsx}` file, tagged by the Vite plugin with the metadata
+ * needed to hydrate it: which client bundle to load, and which of its exports to pick up.
+ */
+type HydratableComponent = ComponentType<{ children?: ReactNode }> & {
+  __filename?: string;
+  __exportName?: string;
+};
+
+/**
  * This component creates an island of interactivity on the page, following the [Island
  * Architecture](https://www.jahia.com/blog/leveraging-the-island-architecture-in-jahia-cms)
  * paradigm.
@@ -123,9 +132,18 @@ export function Island({
   /** Base path to all javascript-modules-engine resources. */
   const base = buildModuleFileUrl("javascript", { moduleName: "javascript-modules-engine" });
 
+  const { __filename: file, __exportName: exportName } = Component as HydratableComponent;
+
+  if (!file) {
+    throw new Error(
+      `<Island> received a component without hydration metadata: ${
+        Component.displayName ?? Component.name ?? "anonymous component"
+      }. Client components must be declared in a *.client.{jsx,tsx} file and exported from it directly (\`export default\`, \`export const\` or \`export function\`); \`export { … }\` lists and re-exports are not supported.`,
+    );
+  }
+
   /** JS entry point to the client bundle loader. */
-  // @ts-expect-error __filename is added by the vite plugin
-  const entry = buildModuleFileUrl(`${Component.__filename}.js`);
+  const entry = buildModuleFileUrl(`${file}.js`);
 
   /**
    * All translations that can be used by the component on the client side. (only ship the current
@@ -196,6 +214,8 @@ export function Island({
           "style": { display: "contents" },
           "data-client-only": clientOnly ? true : undefined,
           "data-src": entry,
+          // Omitted for default exports, for which the client loader falls back to "default"
+          "data-export": exportName === "default" ? undefined : exportName,
           "data-lang": language,
           "data-bundle": bundleKey,
           "children": [
