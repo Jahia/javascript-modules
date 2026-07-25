@@ -45,9 +45,10 @@ public class JSScript implements Script {
         try {
             return render(resource, renderContext);
         } catch (RuntimeException | RenderException e) {
-            // Jahia's render chain replaces a failed fragment with an HTML comment and logs the raw
-            // exception, whose JS frames point inside the module's bundle. Log mapped positions, and
-            // in development make the failure visible on the page rather than only in the logs.
+            // Whatever the render chain does with the failure — swallow it into an HTML comment or
+            // propagate it — the exception it logs has JS frames pointing inside the module's
+            // bundle. Log mapped positions instead, and in development mode make the failure
+            // visible on the page rather than leaving it to the logs and the page source.
             logger.error("Error rendering view {}:\n{}", jsView.getRegistryKey(),
                     ViewRenderError.stackTrace(e, graalVMEngine.getSourceMaps()));
             if (ViewRenderError.isDevelopmentMode()) {

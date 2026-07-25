@@ -24,10 +24,16 @@ import java.io.StringWriter;
 /**
  * Turns a failed view render into something a developer can act on.
  *
- * <p>In production a failing view is swallowed by Jahia's render chain, which replaces the fragment
- * with an HTML comment — the page stays up, which is what a live site wants. In development that
- * silence hides the failure entirely, so the fragment is replaced by a visible box carrying the
- * message and the stack trace, with positions mapped back to the module's own sources.
+ * <p>A failing view leaves nothing useful on the page. Depending on where the failure lands in the
+ * render chain it either propagates as a server error, or is swallowed into an HTML comment by
+ * {@code AbstractFilter#getContentForError} — carrying the message in development mode, and only a
+ * timestamp pointing at the logs in production. The message a developer needs is therefore either
+ * absent from the page or hidden in its source, and the stack that reaches the logs points inside
+ * the module's bundle.
+ *
+ * <p>In development mode the fragment is replaced instead by a visible box carrying the message and
+ * the stack trace, with positions mapped back to the module's own sources. Production rendering is
+ * left untouched: what failed there before still fails the same way.
  */
 public final class ViewRenderError {
 
