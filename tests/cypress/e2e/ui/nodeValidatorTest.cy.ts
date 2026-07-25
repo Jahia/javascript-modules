@@ -5,28 +5,13 @@ import { GENERIC_SITE_KEY } from "../../support/constants";
 const pageName = "testJsValidators";
 const parentPath = `/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent`;
 
-const ADD_NODE_MUTATION = `
-  mutation addValidatedNode($parentPathOrId: String!, $name: String!, $properties: [InputJCRProperty!]) {
-    jcr {
-      addNode(
-        parentPathOrId: $parentPathOrId
-        name: $name
-        primaryNodeType: "javascriptExample:testValidation"
-        properties: $properties
-      ) {
-        uuid
-      }
-    }
-  }
-`;
-
 /** Attempts to create a testValidation node and yields the raw apollo response (errors included). */
 const tryCreate = (
   name: string,
   properties: Array<{ name: string; value: string; language?: string }>,
 ) =>
   cy.apollo({
-    mutation: ADD_NODE_MUTATION,
+    mutationFile: "graphql/addValidatedNode.graphql",
     variables: { parentPathOrId: parentPath, name, properties },
     errorPolicy: "all",
   });

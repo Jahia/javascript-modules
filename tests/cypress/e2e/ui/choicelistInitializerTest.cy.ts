@@ -11,27 +11,6 @@ interface Field {
   valueConstraints: ValueConstraint[];
 }
 
-const FORM_QUERY = `
-  query createForm($nodeType: String!, $uiLocale: String!, $locale: String!, $uuidOrPath: String!) {
-    forms {
-      createForm(primaryNodeType: $nodeType, uiLocale: $uiLocale, locale: $locale, uuidOrPath: $uuidOrPath) {
-        sections {
-          fieldSets {
-            fields {
-              name
-              valueConstraints {
-                displayValue
-                value { string }
-                properties { name value }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
 /**
  * Fetches the creation form of the test node type and returns its fields, flattened. Initializers
  * receive the CONTENT locale (the language being edited), not the UI locale.
@@ -39,7 +18,7 @@ const FORM_QUERY = `
 const getFormFields = (locale: string): Cypress.Chainable<Field[]> =>
   cy
     .apollo({
-      query: FORM_QUERY,
+      queryFile: "graphql/createForm.graphql",
       variables: {
         nodeType: "javascriptExample:testChoicelistInitializer",
         uiLocale: "en",

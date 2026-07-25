@@ -37,8 +37,7 @@ registerNodeLegacyAction(
 
 registerNodeLegacyAction(
   { name: "testJsActionRedirect", requiredMethods: ["GET"], requireAuthenticatedUser: false },
-  () => ({
-    statusCode: 302,
-    redirect: "/redirected-target",
-  }),
+  // No statusCode: the platform picks the redirect status itself (303 unless the request asks for
+  // another one). Returning a 3xx here would make Jahia answer sendError() instead of redirecting.
+  () => ({ redirect: "/redirected-target" }),
 );

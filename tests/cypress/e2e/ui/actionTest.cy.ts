@@ -7,6 +7,13 @@ const nodePath = `/sites/${GENERIC_SITE_KEY}/home/${pageName}/pagecontent/test`;
 const actionUrl = (action: string, workspace = "live") =>
   `/cms/render/${workspace}/en${nodePath}.${action}.do`;
 
+/**
+ * Jahia only writes an action's JSON body when the caller asks for it (an `accept` header holding
+ * `application/json`, or a `returnContentType=json` parameter) — legacy node actions declared in JS
+ * follow the same contract as Java ones, so a JSON-reading caller has to say so.
+ */
+const JSON_HEADERS = { accept: "application/json" };
+
 describe("JS actions", () => {
   before("Create and publish test content", () => {
     cy.login();
@@ -27,7 +34,10 @@ describe("JS actions", () => {
   });
 
   it("executes a GET action and returns JSON", () => {
-    cy.request(`${actionUrl("testJsActionGet")}?echo=hello`).then((response) => {
+    cy.request({
+      url: `${actionUrl("testJsActionGet")}?echo=hello`,
+      headers: JSON_HEADERS,
+    }).then((response) => {
       expect(response.status).to.equal(200);
       expect(response.body.echo).to.equal("hello");
       expect(response.body.path).to.equal(nodePath);
@@ -38,6 +48,7 @@ describe("JS actions", () => {
     cy.request({
       method: "POST",
       url: actionUrl("testJsActionPost"),
+      headers: JSON_HEADERS,
       form: true,
       body: { payload: "some-content" },
     }).then((response) => {
@@ -54,17 +65,20 @@ describe("JS actions", () => {
 
   it("executes an authenticated action for a logged-in user", () => {
     cy.login();
-    cy.request(actionUrl("testJsActionAuth", "default")).then((response) => {
-      expect(response.status).to.equal(200);
-      expect(response.body.user).to.equal("root");
-    });
+    cy.request({ url: actionUrl("testJsActionAuth", "default"), headers: JSON_HEADERS }).then(
+      (response) => {
+        expect(response.status).to.equal(200);
+        expect(response.body.user).to.equal("root");
+      },
+    );
     cy.logout();
   });
 
   it("sends redirects", () => {
     cy.request({ url: actionUrl("testJsActionRedirect"), followRedirect: false }).then(
       (response) => {
-        expect(response.status).to.equal(302);
+        // Jahia chooses the redirect status (303 by default), the action only chooses the target
+        expect(response.status).to.be.within(300, 308);
         expect(response.headers.location).to.contain("/redirected-target");
       },
     );
@@ -87,7 +101,10 @@ describe("JS actions", () => {
       },
     });
     cy.logout();
-    cy.request(`${actionUrl("testJsActionGet")}?echo=after-redeploy`).then((response) => {
+    cy.request({
+      url: `${actionUrl("testJsActionGet")}?echo=after-redeploy`,
+      headers: JSON_HEADERS,
+    }).then((response) => {
       expect(response.status).to.equal(200);
       expect(response.body.echo).to.equal("after-redeploy");
     });
