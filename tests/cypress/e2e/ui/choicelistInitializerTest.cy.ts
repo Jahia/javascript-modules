@@ -1,4 +1,12 @@
-import { GENERIC_SITE_KEY } from "../../support/constants";
+import { createSite, deleteSite } from "@jahia/cypress";
+
+/**
+ * A site of its own, with French enabled: the shared test site is English-only, and asking its
+ * creation form for a `fr` content locale simply falls back to English — which would make the
+ * localization assertion below pass or fail depending on the Jahia version rather than on the
+ * initializer.
+ */
+const SITE_KEY = "jsChoicelistSite";
 
 interface ValueConstraint {
   displayValue: string;
@@ -23,7 +31,7 @@ const getFormFields = (locale: string): Cypress.Chainable<Field[]> =>
         nodeType: "javascriptExample:testChoicelistInitializer",
         uiLocale: "en",
         locale,
-        uuidOrPath: `/sites/${GENERIC_SITE_KEY}/home`,
+        uuidOrPath: `/sites/${SITE_KEY}/home`,
       },
     })
     .then((response) =>
@@ -44,6 +52,24 @@ const constraintLabel = (f: Field, value: string): string =>
   f.valueConstraints.find((c) => c.value.string === value)?.displayValue;
 
 describe("JS choicelist initializers", () => {
+  before("Create a site with French enabled", () => {
+    cy.login();
+    deleteSite(SITE_KEY);
+    createSite(SITE_KEY, {
+      languages: "en,fr",
+      templateSet: "javascript-modules-engine-test-module",
+      locale: "en",
+      serverName: "localhost",
+    });
+    cy.logout();
+  });
+
+  after("Remove the site", () => {
+    cy.login();
+    deleteSite(SITE_KEY);
+    cy.logout();
+  });
+
   beforeEach("Login", () => {
     cy.login();
   });
