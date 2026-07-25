@@ -81,8 +81,11 @@
                 <configuration>
                 <instructions>
                     <_dsannotations>*</_dsannotations>
-                    <!-- those OSGI dependencies are not provided by Jahia and should be embedded in the bundle -->
-                    <Embed-Dependency>bndlib,chromeinspector,commons-pool2,pax-swissbox-bnd,graal-sdk,truffle-api,js,icu4j,regex</Embed-Dependency>
+                    <!-- those OSGI dependencies are not provided by Jahia and should be embedded in the bundle.
+                         `profiler` carries com.oracle.truffle.tools.utils.json, which chromeinspector loads when
+                         the debugger is enabled: it has to be listed, since the explicit Export-Package below
+                         stops bnd from pulling dependency classes into the bundle on its own. -->
+                    <Embed-Dependency>bndlib,chromeinspector,profiler,commons-pool2,pax-swissbox-bnd,graal-sdk,truffle-api,js,icu4j,regex</Embed-Dependency>
                     <!-- Public SDK surface for other bundles that define their own JS server extension type
                          (e.g. Formidable's form-field validators). Only this package is exported: it exposes
                          no GraalVM/polyglot or engine-internal types, so consumers stay decoupled. -->
