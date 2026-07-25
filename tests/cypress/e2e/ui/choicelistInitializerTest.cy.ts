@@ -23,13 +23,13 @@ interface Field {
  * Fetches the creation form of the test node type and returns its fields, flattened. Initializers
  * receive the CONTENT locale (the language being edited), not the UI locale.
  */
-const getFormFields = (locale: string): Cypress.Chainable<Field[]> =>
+const getFormFields = (locale: string, uiLocale = "en"): Cypress.Chainable<Field[]> =>
   cy
     .apollo({
       queryFile: "graphql/createForm.graphql",
       variables: {
         nodeType: "javascriptExample:testChoicelistInitializer",
-        uiLocale: "en",
+        uiLocale,
         locale,
         uuidOrPath: `/sites/${SITE_KEY}/home`,
       },
@@ -112,8 +112,13 @@ describe("JS choicelist initializers", () => {
     });
   });
 
-  it("localizes labels through the content locale", () => {
-    getFormFields("fr").then((fields) => {
+  it("localizes labels", () => {
+    // Both locales are French: an initializer sees one of them, and which one is the platform's
+    // call — 8.2.1.0 forwards the content locale (asking for `uiLocale: "en", locale: "fr"` there
+    // still yields "Rouge"), while the snapshot CI runs answers "Red" for that same request. The
+    // module only decides what to do with the locale it is handed, so the test pins the
+    // localization, not the platform's routing of it.
+    getFormFields("fr", "fr").then((fields) => {
       expect(constraintLabel(field(fields, "color"), "red")).to.equal("Rouge");
     });
   });
