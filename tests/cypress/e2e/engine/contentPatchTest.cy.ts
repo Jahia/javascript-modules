@@ -9,34 +9,6 @@ const MODULE_NAME = "javascript-modules-engine-test-module";
 const STATUS_PATH_PREFIX = "/javascript/content-patches/";
 const FIXTURES_PATH = "/sites/systemsite/contents/content-patch-tests";
 
-const NODE_QUERY = `
-  query migratedNode($path: String!) {
-    jcr {
-      nodeByPath(path: $path) {
-        primaryNodeType {
-          name
-        }
-        properties {
-          name
-          value
-        }
-      }
-    }
-  }
-`;
-
-const STATUS_QUERY = `
-  query contentPatchStatuses {
-    jcr {
-      nodeByPath(path: "/module-management") {
-        property(name: "j:bundlesScripts") {
-          value
-        }
-      }
-    }
-  }
-`;
-
 interface NodeResponse {
   data?: {
     jcr?: {
@@ -50,7 +22,11 @@ interface NodeResponse {
 }
 
 const getNode = (path: string) =>
-  cy.apollo({ query: NODE_QUERY, variables: { path }, errorPolicy: "all" });
+  cy.apollo({
+    queryFile: "graphql/contentPatchNode.graphql",
+    variables: { path },
+    errorPolicy: "all",
+  });
 
 const propertiesOf = (response: NodeResponse): Record<string, string> =>
   Object.fromEntries(
@@ -66,7 +42,7 @@ describe("JS content patches", () => {
   });
 
   it("records terminal statuses in the module patch status store", () => {
-    cy.apollo({ query: STATUS_QUERY }).then((response) => {
+    cy.apollo({ queryFile: "graphql/contentPatchStatuses.graphql" }).then((response) => {
       const raw = response.data?.jcr?.nodeByPath?.property?.value;
       expect(raw, "j:bundlesScripts property").to.be.a("string");
       const statuses = (JSON.parse(raw)[MODULE_NAME] ?? {}) as Record<string, string>;
