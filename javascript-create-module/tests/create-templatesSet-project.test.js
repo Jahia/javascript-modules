@@ -37,10 +37,13 @@ test("Project creation", async () => {
   // Create a new test-project from within the temp directory
   process.chdir(tempDir);
 
-  // Because the CLI is interactive, we use spawn it and interact with it
-  const child = spawn("node", [indexFile, "project-name"], {
-    stdio: ["pipe", "inherit", "inherit"],
-  });
+  // Because the CLI is interactive but spawning creates a non-interactive stdin,
+  // we create a fake TTY to work around that
+  const child = spawn(
+    "node",
+    ["--import", new URL("fake-tty.js", import.meta.url).href, indexFile, "project-name"],
+    { stdio: ["pipe", "inherit", "inherit"] },
+  );
 
   // Press enter three times to confirm the default values
   await setTimeout(100);

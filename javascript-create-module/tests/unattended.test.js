@@ -28,7 +28,7 @@ test("--yes creates a project without any prompt", async () => {
   await promisify(execFile)("node", [
     indexFile,
     "my-module",
-    "--type",
+    "--template",
     "module",
     "--output",
     output,
@@ -50,10 +50,10 @@ test("--yes rejects an invalid module name", async () => {
   assert.match(error.stderr, /must start with a lowercase letter/);
 });
 
-test("--type rejects an unknown type", async () => {
+test("--template rejects an unknown template", async () => {
   const error = await promisify(execFile)(
     "node",
-    [indexFile, "my-module", "--type", "nope", "--yes"],
+    [indexFile, "my-module", "--template", "nope", "--yes"],
     {
       cwd: tempFolder,
     },

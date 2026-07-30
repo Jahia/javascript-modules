@@ -34,7 +34,7 @@ const usage = `${styleText("bold", "Usage:")} create-module [options] [name]
 
 ${styleText("bold", "Options:")}
   ${styleText("cyanBright", "-o, --output <path>")}  Where to create the module (default: ./<name>)
-  ${styleText("cyanBright", "-t, --type <type>")}    ${Object.keys(templateOptions).join(", ")} (default: hello-world)
+  ${styleText("cyanBright", "-t, --template <tpl>")} ${Object.keys(templateOptions).join(", ")} (default: hello-world)
   ${styleText("cyanBright", "-y, --yes")}            Skip all prompts and use the values above
   ${styleText("cyanBright", "-h, --help")}           Display this message
 
@@ -47,7 +47,7 @@ const { values: flags, positionals } = (() => {
       allowPositionals: true,
       options: {
         output: { type: "string", short: "o" },
-        type: { type: "string", short: "t", default: "hello-world" },
+        template: { type: "string", short: "t", default: "hello-world" },
         yes: { type: "boolean", short: "y", default: false },
         help: { type: "boolean", short: "h", default: false },
       },
@@ -61,7 +61,7 @@ ${usage}
   }
 })();
 
-if (flags.help) {
+if (flags.help || (!process.stdin.isTTY && !flags.yes)) {
   console.log(usage);
   process.exit(0);
 }
@@ -89,7 +89,7 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
   const module = await (async () => {
     if (flags.yes) {
       if (!positionals[0]) {
-        console.log(usage);
+        console.error(usage);
         process.exit(1);
       }
 
@@ -117,7 +117,7 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
     }
   })();
 
-  const defaultOutput = path.join(process.cwd(), module);
+  const defaultOutput = flags.output || path.join(process.cwd(), module);
   const validateOutput = (/** @type {string} */ value) => {
     if (value.trim() === "") return "Path cannot be empty.";
     if (fs.existsSync(value)) return "Path already exists. Please choose a different path.";
@@ -125,15 +125,13 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
 
   const output = await (async () => {
     if (flags.yes) {
-      const output = flags.output || defaultOutput;
-
-      const validationError = validateOutput(output);
+      const validationError = validateOutput(defaultOutput);
       if (validationError) {
         console.error(styleText("redBright", validationError));
         process.exit(1);
       }
 
-      return output;
+      return defaultOutput;
     } else {
       const output = await prompts.text({
         message: "Where do you want to create the module?",
@@ -152,12 +150,12 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
 
   const templates = await (async () => {
     if (flags.yes) {
-      const type = flags.type;
+      const type = flags.template;
       if (!Object.hasOwn(templateOptions, type)) {
         console.error(
           styleText(
             "redBright",
-            `Invalid module type: ${flags.type}. Valid types are: ${Object.keys(templateOptions).join(", ")}`,
+            `Invalid module type: ${flags.template}. Valid types are: ${Object.keys(templateOptions).join(", ")}`,
           ),
         );
         process.exit(1);
