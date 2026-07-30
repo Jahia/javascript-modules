@@ -4,12 +4,67 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
-import { styleText } from "node:util";
+import { parseArgs, styleText } from "node:util";
 import pkg from "./package.json" with { type: "json" };
 
 /** Renames the `dot` directory to dotfiles and dotdirs. */
 const renameDot = (/** @type {string} */ name) =>
   name.startsWith(`dot${path.sep}`) ? `.${name.slice(4)}` : name;
+
+const templateOptions = {
+  "hello-world": {
+    // This module is created by combining 3 templates:
+    value: ["module", "template-set", "hello-world"],
+    label: "A minimal Hello World template set",
+    hint: "Recommended for discovery",
+  },
+  "template-set": {
+    value: ["module", "template-set"],
+    label: "An empty template set",
+    hint: "You want to start from scratch",
+  },
+  "module": {
+    value: ["module"],
+    label: "An empty module",
+    hint: "Slightly more than an empty directory",
+  },
+};
+
+const usage = `${styleText("bold", "Usage:")} create-module [options] [name]
+
+${styleText("bold", "Options:")}
+  ${styleText("cyanBright", "-o, --output <path>")}  Where to create the module (default: ./<name>)
+  ${styleText("cyanBright", "-t, --type <type>")}    ${Object.keys(templateOptions).join(", ")} (default: hello-world)
+  ${styleText("cyanBright", "-y, --yes")}            Skip all prompts and use the values above
+  ${styleText("cyanBright", "-h, --help")}           Display this message
+
+Name is required in non-interactive mode (when using --yes).
+`;
+
+const { values: flags, positionals } = (() => {
+  try {
+    return parseArgs({
+      allowPositionals: true,
+      options: {
+        output: { type: "string", short: "o" },
+        type: { type: "string", short: "t", default: "hello-world" },
+        yes: { type: "boolean", short: "y", default: false },
+        help: { type: "boolean", short: "h", default: false },
+      },
+    });
+  } catch (error) {
+    console.error(`${styleText("redBright", /** @type {Error} */ (error).message)}
+
+${usage}
+`);
+    process.exit(1);
+  }
+})();
+
+if (flags.help) {
+  console.log(usage);
+  process.exit(0);
+}
 
 try {
   prompts.intro("Jahia JavaScript Module Creator");
@@ -25,62 +80,104 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
     );
   }
 
-  const module = await prompts.text({
-    message: "What is the name of your module?",
-    placeholder: "a-z, 0-9 and - only",
-    initialValue: process.argv[2],
-    validate(value) {
-      if (!/^[a-z]/.test(value)) return "Module name must start with a lowercase letter.";
-      if (!/^[a-z0-9-]+$/.test(value))
-        return "Module name can only contain lowercase letters, numbers, and hyphens.";
-    },
-  });
+  const validateModuleName = (/** @type {string} */ value) => {
+    if (!/^[a-z]/.test(value)) return "Module name must start with a lowercase letter.";
+    if (!/^[a-z0-9-]+$/.test(value))
+      return "Module name can only contain lowercase letters, numbers, and hyphens.";
+  };
 
-  if (prompts.isCancel(module)) {
-    prompts.cancel("See you soon!");
-    process.exit(0);
-  }
+  const module = await (async () => {
+    if (flags.yes) {
+      if (!positionals[0]) {
+        console.log(usage);
+        process.exit(1);
+      }
 
-  const output = await prompts.text({
-    message: "Where do you want to create the module?",
-    initialValue: path.join(process.cwd(), module),
-    validate(value) {
-      if (value.trim() === "") return "Path cannot be empty.";
-      if (fs.existsSync(value)) return "Path already exists. Please choose a different path.";
-    },
-  });
+      const validationError = validateModuleName(positionals[0]);
+      if (validationError) {
+        console.error(styleText("redBright", validationError));
+        process.exit(1);
+      }
 
-  if (prompts.isCancel(output)) {
-    prompts.cancel("Goodbye!");
-    process.exit(0);
-  }
+      return positionals[0];
+    } else {
+      const module = await prompts.text({
+        message: "What is the name of your module?",
+        placeholder: "a-z, 0-9 and - only",
+        initialValue: positionals[0],
+        validate: validateModuleName,
+      });
 
-  const templates = await prompts.select({
-    message: "Which module type do you want?",
-    options: [
-      {
-        // This module is created by combining 3 templates:
-        value: ["module", "template-set", "hello-world"],
-        label: "A minimal Hello World template set",
-        hint: "Recommended for discovery",
-      },
-      {
-        value: ["module", "template-set"],
-        label: "An empty template set",
-        hint: "You want to start from scratch",
-      },
-      {
-        value: ["module"],
-        label: "An empty module",
-        hint: "Slightly more than an empty directory",
-      },
-    ],
-  });
+      if (prompts.isCancel(module)) {
+        prompts.cancel("See you soon!");
+        process.exit(0);
+      }
 
-  if (prompts.isCancel(templates)) {
-    prompts.cancel("Have a nice day!");
-    process.exit(0);
-  }
+      return module;
+    }
+  })();
+
+  const defaultOutput = path.join(process.cwd(), module);
+  const validateOutput = (/** @type {string} */ value) => {
+    if (value.trim() === "") return "Path cannot be empty.";
+    if (fs.existsSync(value)) return "Path already exists. Please choose a different path.";
+  };
+
+  const output = await (async () => {
+    if (flags.yes) {
+      const output = flags.output || defaultOutput;
+
+      const validationError = validateOutput(output);
+      if (validationError) {
+        console.error(styleText("redBright", validationError));
+        process.exit(1);
+      }
+
+      return output;
+    } else {
+      const output = await prompts.text({
+        message: "Where do you want to create the module?",
+        initialValue: defaultOutput,
+        validate: validateOutput,
+      });
+
+      if (prompts.isCancel(output)) {
+        prompts.cancel("Goodbye!");
+        process.exit(0);
+      }
+
+      return output;
+    }
+  })();
+
+  const templates = await (async () => {
+    if (flags.yes) {
+      const type = flags.type;
+      if (!Object.hasOwn(templateOptions, type)) {
+        console.error(
+          styleText(
+            "redBright",
+            `Invalid module type: ${flags.type}. Valid types are: ${Object.keys(templateOptions).join(", ")}`,
+          ),
+        );
+        process.exit(1);
+      }
+
+      return templateOptions[/** @type {keyof typeof templateOptions} */ (type)].value;
+    } else {
+      const templates = await prompts.select({
+        message: "Which module type do you want?",
+        options: Object.values(templateOptions),
+      });
+
+      if (prompts.isCancel(templates)) {
+        prompts.cancel("Have a nice day!");
+        process.exit(0);
+      }
+
+      return templates;
+    }
+  })();
 
   /** Replaces `$MODULE` with the actual module name. */
   const templatify = (/** @type {string} */ str) =>
