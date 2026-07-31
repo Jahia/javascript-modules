@@ -32,6 +32,8 @@ npm init @jahia/module@latest my-module -- --yes --template template-set --outpu
 | `-o`, `--output`   | Directory to create, must not exist yet (default to `./<name>`)                 |
 | `-t`, `--template` | `hello-world`, `template-set` or `module` (default to `hello-world`)            |
 
-Without `--yes`, the values you pass pre-fill the prompts instead of skipping them.
+Without `--yes`, the values you pass pre-fill the prompts instead of skipping them. Prompts need an
+interactive terminal: outside of one, the CLI prints the usage and exits with an error rather than
+waiting for an answer that can never come.
 
 See the [Getting Started guide](https://academy.jahia.com/tutorials-get-started/front-end-developer/setting-up-your-dev-environment#create-a-new-project) for more information.

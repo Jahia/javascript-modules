@@ -39,6 +39,7 @@ ${styleText("bold", "Options:")}
   ${styleText("cyanBright", "-h, --help")}           Display this message
 
 Name is required in non-interactive mode (when using --yes).
+Without --yes, the values above pre-fill the prompts, which require an interactive terminal.
 `;
 
 const { values: flags, positionals } = (() => {
@@ -61,9 +62,15 @@ ${usage}
   }
 })();
 
-if (flags.help || (!process.stdin.isTTY && !flags.yes)) {
+if (flags.help) {
   console.log(usage);
   process.exit(0);
+}
+
+if (!process.stdin.isTTY && !flags.yes) {
+  console.error("Error: This command requires an interactive terminal. Use --yes to skip prompts.");
+  console.error(usage);
+  process.exit(1);
 }
 
 try {
@@ -150,8 +157,8 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
 
   const templates = await (async () => {
     if (flags.yes) {
-      const type = flags.template;
-      if (!Object.hasOwn(templateOptions, type)) {
+      const tpl = flags.template;
+      if (!Object.hasOwn(templateOptions, tpl)) {
         console.error(
           styleText(
             "redBright",
@@ -161,10 +168,12 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
         process.exit(1);
       }
 
-      return templateOptions[/** @type {keyof typeof templateOptions} */ (type)].value;
+      return templateOptions[/** @type {keyof typeof templateOptions} */ (tpl)].value;
     } else {
       const templates = await prompts.select({
         message: "Which module type do you want?",
+        initialValue:
+          templateOptions[/** @type {keyof typeof templateOptions} */ (flags.template)]?.value,
         options: Object.values(templateOptions),
       });
 
