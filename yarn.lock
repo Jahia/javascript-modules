@@ -80,6 +80,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@chachalog/types@npm:^0.5.2":
+  version: 0.5.2
+  resolution: "@chachalog/types@npm:0.5.2"
+  checksum: 10c0/a5c971249adcd17db5cbd41710399113c90d0b29ae0b93fa9db57642613faf966d494c7dd24d6f08b68198d4f0642416af90c42032baa30ed6a400edee9d35eb
+  languageName: node
+  linkType: hard
+
 "@clack/core@npm:0.5.0":
   version: 0.5.0
   resolution: "@clack/core@npm:0.5.0"
@@ -2621,6 +2628,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "javascript-modules-monorepo@workspace:."
   dependencies:
+    "@chachalog/types": "npm:^0.5.2"
     "@eslint-react/eslint-plugin": "npm:^2.3.13"
     "@eslint/compat": "npm:^2.0.0"
     "@eslint/js": "npm:^9.39.2"

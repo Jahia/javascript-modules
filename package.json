@@ -15,6 +15,7 @@
     "lint": "eslint $INIT_CWD"
   },
   "devDependencies": {
+    "@chachalog/types": "^0.5.2",
     "@eslint-react/eslint-plugin": "^2.3.13",
     "@eslint/compat": "^2.0.0",
     "@eslint/js": "^9.39.2",
