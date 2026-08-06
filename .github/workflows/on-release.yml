@@ -34,13 +34,13 @@ jobs:
           git config --global --add safe.directory $GITHUB_WORKSPACE
       # Providing the SSH PRIVATE of a user part of an admin group
       # is necessary to bypass PR checks
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ssh-key: ${{ secrets.GH_SSH_PRIVATE_KEY_JAHIACI }}
 
       # Setting up the SSH agent to be able to commit back to the repository
       # https://github.com/webfactory/ssh-agent
-      - uses: webfactory/ssh-agent@v0.7.0
+      - uses: webfactory/ssh-agent@e83874834305fe9a4a2997156cb26c5de65a8555 # v0.10.0
         with:
           ssh-private-key: ${{ secrets.GH_SSH_PRIVATE_KEY_JAHIACI }}
 
@@ -69,7 +69,7 @@ jobs:
       # keep running until it reaches the timeout
       - name: Setup tmate session
         if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
+        uses: mxschmitt/action-tmate@35b54afac29c97fb54faba5b513f8fbd1882f113 # v3.24
         timeout-minutes: 15
 
   sbom:
