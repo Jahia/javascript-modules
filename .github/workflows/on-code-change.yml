@@ -17,7 +17,6 @@ jobs:
     uses: Jahia/jahia-modules-action/.github/workflows/reusable-on-code-change.yml@v2
     secrets: inherit
     with:
-      static_analysis_node_version: 20
       static_analysis_auditci_level: critical
       build_container_image: ghcr.io/jahia/jahia-docker-mvn-cache:17-jdk-noble-mvn-loaded
       module_branch: ${{ github.ref }}
