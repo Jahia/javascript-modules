@@ -56,7 +56,6 @@ jobs:
           nexus_password: ${{ secrets.NEXUS_PASSWORD }}
           mvn_settings_filepath: ".github/maven.settings.xml"
           slack-webhook-qa: ${{ secrets.SLACK_WEBHOOK_URL_RC_FOR_QA }}
-          npmjs_publish_token: ${{ secrets.NPMJS_PUBLISH_TOKEN }}
 
       - uses: jahia/jahia-modules-action/update-signature@v2
         with:
@@ -71,6 +70,22 @@ jobs:
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@35b54afac29c97fb54faba5b513f8fbd1882f113 # v3.24
         timeout-minutes: 15
+
+  publish-npm:
+    name: Publish packages to npmjs.com
+    needs: on-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - uses: jdx/mise-action@7e36c90d9ab29c415a2384db3006f3ec8a8cc654 # v4.2.4
+      - run: yarn install
+      - run: yarn workspaces foreach -A --topological-dev --include '@jahia/{create-module,javascript-modules-library,vite-plugin}' run build
+      - run: yarn workspaces foreach -Avv --include '@jahia/{create-module,javascript-modules-library,vite-plugin}' npm publish --access public --tolerate-republish --provenance
 
   sbom:
     name: SBOM processing
