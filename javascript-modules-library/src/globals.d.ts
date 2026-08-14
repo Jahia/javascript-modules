@@ -27,11 +27,11 @@ declare global {
      * existing ones.
      *
      * Do not call `registry.add` directly for server extension points (views, actions, choicelist
-     * initializers, node validators, render filters, content patches): the entry shapes consumed by
-     * the engine are internal contracts that may change between versions. Use the typed
-     * registration functions of this library instead (`jahiaComponent`, `registerNodeValidator`,
-     * `registerChoiceListInitializer`, `registerRenderFilter`, `registerNodeLegacyAction`,
-     * `registerContentPatch`, and `.action.ts` files for actions).
+     * initializers, node validators, render filters): the entry shapes consumed by the engine are
+     * internal contracts that may change between versions. Use the typed registration functions of
+     * this library instead (`jahiaComponent`, `registerNodeValidator`,
+     * `registerChoiceListInitializer`, `registerRenderFilter`, `registerNodeLegacyAction`, and
+     * `.action.ts` files for actions).
      */
     registry: RegistryHelper;
     /**

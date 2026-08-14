@@ -17,11 +17,12 @@ export interface ChoiceListValue {
 
 /** Context passed to a choicelist initializer callback. */
 export interface ChoiceListInitializerContext {
-  /** Parameter from the CND declaration `choicelist[myKey,'myParam']`; empty string when absent. */
+  /** Parameter from the CND declaration `choicelist[myKey='myParam']`; empty string when absent. */
   param: string;
   /**
-   * BCP-47 language tag of the content language being edited (not the editor's UI language), e.g.
-   * `"en"` or `"fr-FR"`.
+   * BCP-47 language tag to localize labels for, e.g. `"en"` or `"fr-FR"`. Whether the platform
+   * forwards the content language being edited or the editor's UI language varies across Jahia
+   * versions — do not build logic on that distinction.
    */
   locale: string;
   /**

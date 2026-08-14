@@ -1,4 +1,5 @@
 import { parse, stringify } from "devalue";
+import { ActionError, ActionValidationError } from "./action.js";
 
 /**
  * Registers every function exported by a `.action.ts` file as a callable action.
@@ -23,7 +24,12 @@ export const __registerActionsModule = (
   moduleName: string,
 ): void => {
   for (const [name, fn] of Object.entries(actions)) {
-    if (typeof fn !== "function") continue;
+    if (typeof fn !== "function") {
+      console.warn(
+        `Skipping non-function export "${name}" of an action file in ${moduleName}: only functions can be actions (its generated client stub will fail if called)`,
+      );
+      continue;
+    }
     server.registry.add("action", `${moduleName}/${name}`, {
       execute: (body: string) =>
         Promise.resolve()
@@ -32,11 +38,23 @@ export const __registerActionsModule = (
             (result) => stringify(result),
             (error: unknown) => {
               // Shape the rejection for the Java endpoint: a plain object with a string message
-              // and, for validation failures, pre-stringified issues.
-              const shaped: { message: string; issues?: string } = { message: messageOf(error) };
+              // and, for validation failures, pre-stringified issues. Actions are guest-callable:
+              // only deliberate error types carry their message to the caller, anything else is
+              // logged here and replaced by a generic message (unexpected messages can leak
+              // implementation details, node paths or permissions).
               const issues = (error as { issues?: unknown } | undefined)?.issues;
+              const deliberate =
+                Array.isArray(issues) ||
+                error instanceof ActionError ||
+                error instanceof ActionValidationError;
+              const shaped: { message: string; issues?: string } = {
+                message: deliberate ? messageOf(error) : "Action execution failed",
+              };
               if (Array.isArray(issues)) {
                 shaped.issues = JSON.stringify(issues);
+              }
+              if (!deliberate) {
+                console.error(`Action ${moduleName}/${name} threw: ${messageOf(error)}`);
               }
               throw shaped;
             },

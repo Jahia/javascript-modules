@@ -234,7 +234,7 @@
             <artifactId>js</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- required at runtime by org.jahia.bin.Action, exercised in ActionRegistrarTest: -->
+        <!-- required at runtime by org.jahia.bin.Action, exercised in NodeLegacyActionRegistrarTest: -->
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>

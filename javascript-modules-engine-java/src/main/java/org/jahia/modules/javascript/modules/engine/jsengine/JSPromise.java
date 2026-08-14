@@ -26,6 +26,14 @@ import org.graalvm.polyglot.proxy.ProxyExecutable;
  * the host — or never settles at all. Attaching the {@code then} handlers is itself a polyglot call, so
  * by the time it returns, microtask-resolvable chains (any composition of {@code async}/{@code await}
  * and {@code Promise.resolve}/{@code then} over synchronous work) have run to completion.
+ *
+ * <p><strong>Nested-invocation limitation:</strong> GraalJS only drains the microtask queue when the
+ * <em>last</em> JavaScript frame leaves the stack. When a callback is invoked from a nested host
+ * boundary (host → JS → host → JS, e.g. a render filter reached through {@code <Render>} inside a view,
+ * or a node validator triggered by a {@code session.save()} made from JS), outer JS frames are still on
+ * the stack, the queue is not processed, and even a trivial {@code async () => value} cannot settle.
+ * Async callbacks are therefore only supported on host-initiated invocations; nested invocations must
+ * use synchronous callbacks.
  */
 public final class JSPromise {
 
@@ -94,8 +102,10 @@ public final class JSPromise {
     public static Value settleOrThrow(Value result, String what) {
         Outcome outcome = settle(result);
         if (!outcome.isSettled()) {
-            throw new GraalVMException(what + " returned a promise that did not settle; only microtask-based " +
-                    "asynchronicity is supported on the server (no timers or async I/O)");
+            throw new GraalVMException(what + " returned a promise that did not settle. Either it relies on " +
+                    "timers or async I/O (unsupported on the server), or it was invoked from inside a running " +
+                    "JS execution (e.g. a nested render or a JS-triggered save), where the microtask queue " +
+                    "cannot be drained — use a synchronous callback there");
         }
         if (outcome.isRejected()) {
             throw new GraalVMException(what + " failed: " + messageOf(outcome.getError()));

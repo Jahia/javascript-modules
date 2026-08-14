@@ -17,6 +17,7 @@ package org.jahia.modules.javascript.modules.engine.jsengine;
 
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.proxy.ProxyExecutable;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -98,6 +99,22 @@ public class JSPromiseTest {
     public void neverSettlingPromisesAreReportedAsNotDone() {
         JSPromise.Outcome settled = run("() => new Promise(() => {})");
         assertFalse(settled.isSettled());
+    }
+
+    @Test
+    public void asyncCallbacksCannotSettleAtNestedHostBoundaries() {
+        // Pins the nested-invocation limitation documented on JSPromise: at a host → JS → host → JS
+        // boundary, outer JS frames are still on the stack, GraalJS does not drain the microtask
+        // queue, and even a trivial async callback cannot settle. If a GraalJS upgrade makes this
+        // test fail, the limitation is gone: relax the docs on JSPromise, registerRenderFilter and
+        // registerNodeValidator accordingly.
+        Value asyncFn = context.eval("js", "(async () => 42)");
+        boolean[] nestedSettled = { true };
+        ProxyExecutable hostCallback = arguments ->
+                nestedSettled[0] = JSPromise.settle(arguments[0].execute()).isSettled();
+        Value outer = context.eval("js", "((host, fn) => host(fn))");
+        outer.execute(hostCallback, asyncFn);
+        assertFalse("async callbacks are expected not to settle at nested host boundaries", nestedSettled[0]);
     }
 
     @Test

@@ -35,6 +35,11 @@ export default defineConfig({
         outputFile: "server/index.js", // Computed as dist/server/index.js
       },
 
+      // Action options (files compiled into the server bundle and stubbed in the client bundle)
+      actions: {
+        inputGlob: "**/*.action.{js,ts}", // Computed as src/**/*.action.{js,ts}
+      },
+
       // This function is called every time a build succeeds in watch mode
       watchCallback() {
         spawnSync("yarn", ["watch:callback"], { stdio: "inherit" });
