@@ -57,6 +57,10 @@ import java.util.Map;
  * {@code org.jahia.modules.javascript.modules.engine.contentpatches}, default {@code true}) can be set
  * to {@code false} on development/staging servers: pending patches are then only logged, and
  * execution is deferred to an explicit trigger.
+ *
+ * <p>The {@code dryRun} configuration property (same PID, default {@code false}) executes pending
+ * patches in dry-run mode: the {@code patch.*} helpers and sessions log what they would change
+ * without persisting, and no result is recorded in the status store — the patches stay pending.
  */
 @Component(service = Registrar.class, immediate = true,
         configurationPid = ContentPatchRegistrar.CONFIG_PID, configurationPolicy = ConfigurationPolicy.OPTIONAL)
@@ -76,6 +80,7 @@ public class ContentPatchRegistrar implements Registrar {
 
     protected GraalVMEngine graalVMEngine;
     private boolean autoRun = true;
+    private boolean dryRun = false;
 
     @Reference(cardinality = ReferenceCardinality.MANDATORY)
     public void setGraalVMEngine(GraalVMEngine graalVMEngine) {
@@ -87,6 +92,8 @@ public class ContentPatchRegistrar implements Registrar {
     public void activate(Map<String, ?> props) {
         Object value = props.get("autoRun");
         this.autoRun = value == null || Boolean.parseBoolean(value.toString());
+        Object dryRunValue = props.get("dryRun");
+        this.dryRun = dryRunValue != null && Boolean.parseBoolean(dryRunValue.toString());
     }
 
     @Override
@@ -141,10 +148,24 @@ public class ContentPatchRegistrar implements Registrar {
                 String name = String.valueOf(entry.get("name"));
                 long startTime = System.currentTimeMillis();
                 String result = executeContentPatch(bundle, String.valueOf(entry.get("key")), name);
-                status.put(STATUS_PATH_PREFIX + name, result);
-                storeStatus(symbolicName, status);
-                logger.info("ContentPatch {} of module {} finished with result {} in {}ms", name, symbolicName,
-                        result, System.currentTimeMillis() - startTime);
+                if (dryRun) {
+                    logger.info("[dry-run] ContentPatch {} of module {} would record {} ({}ms) — "
+                            + "nothing persisted, the patch stays pending", name, symbolicName,
+                            result, System.currentTimeMillis() - startTime);
+                } else {
+                    status.put(STATUS_PATH_PREFIX + name, result);
+                    try {
+                        storeStatus(symbolicName, status);
+                    } catch (RepositoryException e) {
+                        logger.error("ContentPatch {} of module {} executed with result {} but the status store "
+                                + "could not be updated: the run-once guarantee is broken and it WILL run again "
+                                + "on the next module start. Halting the module's remaining patches.",
+                                name, symbolicName, result, e);
+                        return;
+                    }
+                    logger.info("ContentPatch {} of module {} finished with result {} in {}ms", name, symbolicName,
+                            result, System.currentTimeMillis() - startTime);
+                }
                 if (RESULT_FAILED.equals(result)) {
                     logger.error("ContentPatch {} of module {} failed — halting the module's remaining patches "
                             + "(they stay pending). The module keeps starting.", name, symbolicName);
@@ -217,6 +238,6 @@ public class ContentPatchRegistrar implements Registrar {
     }
 
     protected ContentPatchSupport newContentPatchSupport(Bundle bundle) {
-        return new ContentPatchSupport(bundle, false);
+        return new ContentPatchSupport(bundle, dryRun);
     }
 }
