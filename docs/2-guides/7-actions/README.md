@@ -72,12 +72,12 @@ On invalid input the client call rejects with an error carrying the validation `
 
 Tests, server-to-server integrations and `curl` can call the endpoint directly. It always answers a JSON envelope — `{"data": "<devalue>"}` on success, `{"error": "…", "issues": [...]}` on failure — with a status describing the outcome:
 
-| Status | Meaning                                                             |
-| ------ | ------------------------------------------------------------------- |
-| `200`  | the function returned; `data` holds its devalue-encoded result      |
-| `400`  | the input was rejected by the action's schema; `issues` details why |
-| `404`  | no action is registered under that name                             |
-| `500`  | the function threw, or the runtime could not complete the call      |
+| Status | Meaning                                                                                                                              |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `200`  | the function returned; `data` holds its devalue-encoded result                                                                        |
+| `400`  | caller mistake: missing `X-JS-Action` header, missing `name` parameter, malformed body, or input rejected by the schema (`issues`)    |
+| `404`  | no action is registered under that name                                                                                               |
+| `500`  | the function threw, or the runtime could not complete the call                                                                        |
 
 ```sh
 curl -X POST "http://localhost:8080/sites/my-site/home.jsAction.do?name=my-module%2FgetExchangeRate" \

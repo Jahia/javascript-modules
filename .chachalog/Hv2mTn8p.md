@@ -3,4 +3,4 @@
 javascript-modules: patch
 ---
 
-The generic action endpoint (`<page>.jsAction.do`) now answers its JSON envelope whatever the caller's `accept` header, instead of an empty `200` when `application/json` was not requested, and carries a meaningful status: `400` for input rejected by an action's schema, `404` for an unknown action, `500` when the function throws. Calls made through the generated client stubs are unaffected. (#707)
+The generic action endpoint (`<page>.jsAction.do`) answers its JSON envelope whatever the caller's `accept` header, with a status describing the outcome: `400` for caller mistakes (missing header or name, malformed body, input rejected by an action's schema), `404` for an unknown action, `500` when the function throws. Plain HTTP callers (curl, server-to-server) can rely on the status; the generated client stubs discriminate on the envelope. (#707)
