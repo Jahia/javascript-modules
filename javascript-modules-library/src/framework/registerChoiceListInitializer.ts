@@ -17,7 +17,7 @@ export interface ChoiceListValue {
 
 /** Context passed to a choicelist initializer callback. */
 export interface ChoiceListInitializerContext {
-  /** Parameter from the CND declaration `choicelist[myKey,'myParam']`; empty string when absent. */
+  /** Parameter from the CND declaration `choicelist[myKey='myParam']`; empty string when absent. */
   param: string;
   /**
    * BCP-47 language tag of the content language being edited (not the editor's UI language), e.g.
