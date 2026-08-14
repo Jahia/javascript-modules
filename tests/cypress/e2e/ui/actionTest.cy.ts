@@ -9,7 +9,7 @@ const actionUrl = (action: string, workspace = "live") =>
 
 /**
  * Jahia only writes an action's JSON body when the caller asks for it (an `accept` header holding
- * `application/json`, or a `returnContentType=json` parameter) — legacy node actions declared in JS
+ * `application/json`, or a `jcrReturnContentType=json` parameter) — legacy node actions declared in JS
  * follow the same contract as Java ones, so a JSON-reading caller has to say so.
  */
 const JSON_HEADERS = { accept: "application/json" };

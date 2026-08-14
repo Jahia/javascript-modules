@@ -20,8 +20,9 @@ interface Field {
 }
 
 /**
- * Fetches the creation form of the test node type and returns its fields, flattened. Initializers
- * receive the CONTENT locale (the language being edited), not the UI locale.
+ * Fetches the creation form of the test node type and returns its fields, flattened. Which of the
+ * two locales an initializer receives is the platform's call and varies across Jahia versions —
+ * see the localization test below, which pins both to the same value for that reason.
  */
 const getFormFields = (locale: string, uiLocale = "en"): Cypress.Chainable<Field[]> =>
   cy
