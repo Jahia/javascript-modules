@@ -114,6 +114,9 @@ public class SourceMaps {
     public void register(Bundle bundle, String script) {
         bundles.put(bundle.getSymbolicName(), bundle);
         scriptsByBundle.computeIfAbsent(bundle.getSymbolicName(), key -> new ArrayList<>()).add(script);
+        // a lookup racing a redeploy may have cached a negative entry while the bundle was absent —
+        // evict it so the fresh map is read instead of staying unmapped until the next redeploy
+        maps.remove(bundle.getSymbolicName() + "/" + script);
     }
 
     /** Forgets a module's maps, so a redeployed module is read again. */
@@ -145,12 +148,18 @@ public class SourceMaps {
         Matcher matcher = FRAME.matcher(stackTrace);
         StringBuffer result = new StringBuffer();
         while (matcher.find()) {
-            String bundle = matcher.group(1);
-            String script = matcher.group(2);
-            Integer column = matcher.group(4) == null ? null : Integer.valueOf(matcher.group(4));
-            String mapped = resolver.resolve(bundle, script, Integer.parseInt(matcher.group(3)), column)
-                    .map(position -> bundle + "/" + position)
-                    .orElseGet(matcher::group);
+            String mapped;
+            try {
+                String bundle = matcher.group(1);
+                String script = matcher.group(2);
+                Integer column = matcher.group(4) == null ? null : Integer.valueOf(matcher.group(4));
+                mapped = resolver.resolve(bundle, script, Integer.parseInt(matcher.group(3)), column)
+                        .map(position -> bundle + "/" + position)
+                        .orElseGet(matcher::group);
+            } catch (RuntimeException e) {
+                // mapping must never mask the error being reported (e.g. a position overflowing int)
+                mapped = matcher.group();
+            }
             matcher.appendReplacement(result, Matcher.quoteReplacement(mapped));
         }
         matcher.appendTail(result);
@@ -198,6 +207,10 @@ public class SourceMaps {
 
     private static ParsedMap parseMappings(JsonNode map) {
         String sourceRoot = map.path("sourceRoot").asText("");
+        // per the source map spec, sources are resolved relative to sourceRoot
+        if (!sourceRoot.isEmpty() && !sourceRoot.endsWith("/")) {
+            sourceRoot += "/";
+        }
         List<String> sources = new ArrayList<>();
         for (JsonNode source : map.path("sources")) {
             sources.add(normalize(sourceRoot + source.asText()));

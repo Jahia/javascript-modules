@@ -73,7 +73,7 @@ public final class ViewRenderError {
     }
 
     /** The message of the innermost cause, which is the one the module author wrote. */
-    public static String message(Throwable error) {
+    private static String message(Throwable error) {
         Throwable root = error;
         while (root.getCause() != null && root.getCause() != root) {
             root = root.getCause();

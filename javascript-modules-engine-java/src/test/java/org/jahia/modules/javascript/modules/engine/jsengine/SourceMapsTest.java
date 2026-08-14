@@ -107,4 +107,51 @@ public class SourceMapsTest {
     public void GIVEN_an_unregistered_bundle_WHEN_mapping_a_position_THEN_nothing_is_returned() {
         assertFalse(new SourceMaps().map("never-registered", "dist/server/index.js", 1, 0).isPresent());
     }
+
+    @Test
+    public void GIVEN_a_position_overflowing_int_WHEN_rewriting_THEN_the_frame_is_left_untouched() {
+        // mapping must never mask the error being reported
+        String stackTrace = "\tat <js>.render(my-module/dist/server/index.js:99999999999999999999)\n";
+        assertEquals(stackTrace, SourceMaps.rewrite(stackTrace,
+                (bundle, script, line, column) -> Optional.of("never-reached:" + line)));
+    }
+
+    @Test
+    public void GIVEN_a_sourceRoot_without_trailing_slash_WHEN_parsing_THEN_sources_are_joined_with_a_separator() {
+        String map = "{\n"
+                + "  \"version\": 3,\n"
+                + "  \"sourceRoot\": \"src\",\n"
+                + "  \"sources\": [\"components/A.tsx\"],\n"
+                + "  \"names\": [],\n"
+                + "  \"mappings\": \"AAAA\"\n"
+                + "}";
+        assertEquals(Optional.of("src/components/A.tsx:1"), SourceMaps.parseMap(map).lookup(1, 0));
+    }
+
+    @Test
+    public void GIVEN_a_lookup_cached_while_the_bundle_was_absent_WHEN_registering_THEN_the_map_is_read()
+            throws Exception {
+        SourceMaps sourceMaps = new SourceMaps();
+        // a lookup racing a redeploy caches a negative entry while the bundle is unregistered
+        assertFalse(sourceMaps.map("my-module", "dist/server/index.js", 1, 0).isPresent());
+
+        java.nio.file.Path mapFile = java.nio.file.Files.createTempFile("index.js", ".map");
+        java.nio.file.Files.write(mapFile, MAP.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        org.osgi.framework.Bundle bundle = (org.osgi.framework.Bundle) java.lang.reflect.Proxy.newProxyInstance(
+                SourceMapsTest.class.getClassLoader(), new Class<?>[] { org.osgi.framework.Bundle.class },
+                (proxy, method, args) -> {
+                    switch (method.getName()) {
+                        case "getSymbolicName":
+                            return "my-module";
+                        case "getResource":
+                            return "dist/server/index.js.map".equals(args[0]) ? mapFile.toUri().toURL() : null;
+                        default:
+                            return null;
+                    }
+                });
+
+        sourceMaps.register(bundle, "dist/server/index.js");
+        assertEquals(Optional.of("src/components/Blog/default.server.tsx:10"),
+                sourceMaps.map("my-module", "dist/server/index.js", 1, 0));
+    }
 }
