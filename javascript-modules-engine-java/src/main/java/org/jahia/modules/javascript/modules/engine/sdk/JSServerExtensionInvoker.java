@@ -66,7 +66,14 @@ public interface JSServerExtensionInvoker {
          * {@link String}, {@link List}, or {@link Map}. Host objects passed as arguments (e.g. a
          * {@code JCRNodeWrapper}) are forwarded to JS as-is.
          *
-         * @throws RuntimeException if the callable is not executable or throws
+         * <p>Async callables are settled synchronously: a returned promise resolves through the microtask
+         * queue (any composition of {@code async}/{@code await} over synchronous work — no timers or async
+         * I/O), its rejection surfaces as a {@link RuntimeException}, exactly like a synchronous throw.
+         * This requires the {@link #forEach} call to be host-initiated: invoked from inside a running JS
+         * execution (a view render, a JS-triggered save), a promise cannot settle and the call fails.
+         *
+         * @throws RuntimeException if the callable is not executable, throws, or returns a promise that
+         *         cannot settle
          */
         Object call(Object callable, Object... args);
     }
