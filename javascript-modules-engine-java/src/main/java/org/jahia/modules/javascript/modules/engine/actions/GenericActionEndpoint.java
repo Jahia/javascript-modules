@@ -129,6 +129,11 @@ public class GenericActionEndpoint extends Action {
                     return error(response, HttpServletResponse.SC_BAD_REQUEST, readMessage(outcome.getError()),
                             issues);
                 }
+                if (isBadRequest(outcome.getError())) {
+                    // Malformed request body: a caller mistake, not a server failure
+                    logger.warn("Rejecting a call to JS action '{}' with a malformed body", name);
+                    return error(response, HttpServletResponse.SC_BAD_REQUEST, readMessage(outcome.getError()));
+                }
                 // Anything else the function threw is a server-side failure, as in any other request
                 logger.error("JS action '{}' threw: {}", name, readMessage(outcome.getError()));
                 return error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
@@ -158,6 +163,15 @@ public class GenericActionEndpoint extends Action {
             logger.error("Failed to write the JS action response", e);
         }
         return null;
+    }
+
+    /** Whether the adapter flagged the rejection as a caller mistake (e.g. an unparsable body). */
+    private static boolean isBadRequest(Value errorValue) {
+        if (errorValue == null || !errorValue.hasMembers() || !errorValue.hasMember("badRequest")) {
+            return false;
+        }
+        Value flag = errorValue.getMember("badRequest");
+        return flag != null && flag.isBoolean() && flag.asBoolean();
     }
 
     private static String readMessage(Value errorValue) {

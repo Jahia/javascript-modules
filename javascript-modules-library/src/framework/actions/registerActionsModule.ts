@@ -33,7 +33,16 @@ export const __registerActionsModule = (
     server.registry.add("action", `${moduleName}/${name}`, {
       execute: (body: string) =>
         Promise.resolve()
-          .then(() => fn(...(parse(body) as unknown[])))
+          .then(() => {
+            let args: unknown[];
+            try {
+              args = parse(body) as unknown[];
+            } catch {
+              // a caller mistake, not a server failure: flagged for the endpoint to answer 400
+              throw { message: "Malformed request body", badRequest: true };
+            }
+            return fn(...args);
+          })
           .then(
             (result) => stringify(result),
             (error: unknown) => {
@@ -43,15 +52,20 @@ export const __registerActionsModule = (
               // logged here and replaced by a generic message (unexpected messages can leak
               // implementation details, node paths or permissions).
               const issues = (error as { issues?: unknown } | undefined)?.issues;
+              const badRequest = (error as { badRequest?: unknown } | undefined)?.badRequest === true;
               const deliberate =
+                badRequest ||
                 Array.isArray(issues) ||
                 error instanceof ActionError ||
                 error instanceof ActionValidationError;
-              const shaped: { message: string; issues?: string } = {
+              const shaped: { message: string; issues?: string; badRequest?: boolean } = {
                 message: deliberate ? messageOf(error) : "Action execution failed",
               };
               if (Array.isArray(issues)) {
                 shaped.issues = JSON.stringify(issues);
+              }
+              if (badRequest) {
+                shaped.badRequest = true;
               }
               if (!deliberate) {
                 console.error(`Action ${moduleName}/${name} threw: ${messageOf(error)}`);
