@@ -14,9 +14,7 @@ on:
 
 jobs:
   on-code-change:
-    # TODO revert to @v2 once https://github.com/Jahia/jahia-modules-action/pull/392 is merged.
-    # The toolchain is now pinned in mise.toml only, which @v2 does not read yet.
-    uses: Jahia/jahia-modules-action/.github/workflows/reusable-on-code-change.yml@chore/js-setup
+    uses: Jahia/jahia-modules-action/.github/workflows/reusable-on-code-change.yml@v2
     secrets: inherit
     with:
       static_analysis_auditci_level: critical
