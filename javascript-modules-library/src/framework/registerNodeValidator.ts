@@ -70,7 +70,10 @@ export interface NodeValidatorDeclaration {
  * ```
  *
  * Validators run on every matching save — keep them fast, and never call `session.save()` from a
- * validator. They may be `async` (microtask-only: the server runtime has no timers or async I/O).
+ * validator. They may be `async` (microtask-only: the server runtime has no timers or async I/O)
+ * **only when the save is host-initiated** (editing UI, REST, GraphQL). A save triggered from JS
+ * server code cannot drain the microtask queue: an async validator then fails to settle and the
+ * save is rejected. Use synchronous validators if your content may be saved from JS.
  *
  * @param declaration The validator declaration.
  * @param validate Returns the violations (array, single violation, or nothing when valid).
