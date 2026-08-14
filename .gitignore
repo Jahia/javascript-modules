@@ -12,8 +12,8 @@ dist/
 internal-dist/
 node/
 node_modules/
-**/.yarn/install-state.gz
-**/.yarn/cache/
+**/.yarn/*
+!**/.yarn/patches
 javascript-modules-engine/src/main/resources/javascript/
 javascript-modules-engine/src/main/resources/META-INF/js/
 tests/artifacts/

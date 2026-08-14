@@ -31,72 +31,45 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
                 <!-- Map Yarn commands to corresponding Maven phases -->
                 <executions>
-                    <execution>
-                        <id>install node and yarn</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>install-node-and-yarn</goal>
-                        </goals>
-                    </execution>
                     <execution>
                         <id>yarn install</id>
                         <phase>initialize</phase>
                         <goals>
-                            <goal>yarn</goal>
+                            <goal>exec</goal>
                         </goals>
+                        <configuration>
+                            <!-- bare `yarn` is `yarn install` -->
+                            <executable>yarn</executable>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>yarn lint</id>
                         <phase>compile</phase>
                         <goals>
-                            <goal>yarn</goal>
+                            <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <arguments>lint</arguments>
+                            <executable>yarn</executable>
+                            <arguments>
+                                <argument>lint</argument>
+                            </arguments>
                         </configuration>
                     </execution>
                     <execution>
                         <id>yarn build</id>
                         <phase>compile</phase>
                         <goals>
-                            <goal>yarn</goal>
+                            <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <arguments>build</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>set-alpha-version</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>node ../.m2/sync-version.js ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}-alpha-${timestamp}</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>publish-alpha-tag</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>npm publish --tag alpha --access public --provenance</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>reset-version</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>node ../.m2/sync-version.js ${project.version}</arguments>
+                            <executable>yarn</executable>
+                            <arguments>
+                                <argument>build</argument>
+                            </arguments>
                         </configuration>
                     </execution>
                 </executions>
@@ -131,43 +104,22 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
                         <executions>
                             <!-- Keep the package.json in sync with the maven version -->
                             <execution>
                                 <id>sync-version</id>
                                 <phase>process-resources</phase>
                                 <goals>
-                                    <goal>yarn</goal>
+                                    <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>node ../.m2/sync-version.js ${project.version}</arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>release-perform</id>
-            <!-- publish the tgz during the release:perform task (i.e. when the profile "release-perform" is enabled) -->
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <executions>
-                            <!-- Execution bound on the "deploy" phase: -->
-                            <execution>
-                                <id>publish-package</id>
-                                <phase>deploy</phase>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>npm publish --access public --provenance</arguments>
+                                    <executable>node</executable>
+                                    <arguments>
+                                        <argument>../.m2/sync-version.js</argument>
+                                        <argument>${project.version}</argument>
+                                    </arguments>
                                 </configuration>
                             </execution>
                         </executions>

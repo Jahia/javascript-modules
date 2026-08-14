@@ -23,7 +23,7 @@
     "fixtures"
   ],
   "scripts": {
-    "build": "tsdown --publint",
+    "build": "tsdown && publint",
     "test": "yarn ./fixtures test"
   },
   "dependencies": {
@@ -41,6 +41,5 @@
   },
   "peerDependencies": {
     "vite": ">=6.0.0"
-  },
-  "packageManager": "yarn@4.15.0"
+  }
 }
