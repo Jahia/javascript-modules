@@ -42,7 +42,7 @@ export default function Rate({ initialValue }: { initialValue: number }) {
 
 As far as TypeScript is concerned this is a local function call; at runtime the client performs a network request. Arguments and return values are serialized with [devalue](https://github.com/sveltejs/devalue), so `Date`, `Map`, `Set`, `RegExp`, cyclic structures etc. survive the round trip — but functions, class instances and other non-serializable values do not.
 
-A thrown (or rejected) server error rejects the client call with an `Error` carrying the server message.
+A thrown (or rejected) server error rejects the client call with an `Error`. Only deliberate error types carry their message to the caller: throw `ActionError` (exported by the library) for user-facing failures like `throw new ActionError("Out of stock")`. Any other exception is logged on the server and replaced by a generic message in the response — actions are guest-callable, and unexpected error messages can leak implementation details.
 
 ## Safe actions (input validation)
 

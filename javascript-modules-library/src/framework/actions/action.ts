@@ -4,6 +4,19 @@ import type { StandardSchemaV1 } from "./standardSchema.js";
  * Thrown when the input of a safe action does not match its schema. Surfaced to the client as an
  * error with the validation `issues` attached.
  */
+/**
+ * An action failure whose message is meant for the caller: throw it for deliberate, user-facing
+ * errors (`throw new ActionError("Out of stock")`). Any other exception thrown by an action is
+ * logged on the server and replaced by a generic message in the response, because actions are
+ * guest-callable and unexpected error messages can leak implementation details.
+ */
+export class ActionError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ActionError";
+  }
+}
+
 export class ActionValidationError extends Error {
   readonly issues: ReadonlyArray<StandardSchemaV1.Issue>;
 
