@@ -201,5 +201,6 @@ export interface JavaContentPatchSupport {
   getModuleName(): string;
   getModuleVersion(): string;
   isNodeTypeRegistered(name: string): boolean;
+  assertOwnedNodeType(name: string): void;
   unregisterNodeType(name: string): void;
 }

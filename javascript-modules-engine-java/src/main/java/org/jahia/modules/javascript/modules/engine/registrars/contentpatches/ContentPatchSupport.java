@@ -68,6 +68,31 @@ public class ContentPatchSupport {
     }
 
     /**
+     * Asserts a node type is either absent or OWNED BY THIS MODULE (same {@code systemId} as the
+     * bundle). Definition operations must call this BEFORE mutating any content, so the refusal
+     * fires before anything is deleted or retyped.
+     *
+     * @throws IllegalArgumentException if the type belongs to another module
+     */
+    public void assertOwnedNodeType(String name) {
+        NodeTypeRegistry registry = NodeTypeRegistry.getInstance();
+        if (!registry.hasNodeType(name)) {
+            return; // fresh install: nothing registered, nothing to refuse
+        }
+        ExtendedNodeType type;
+        try {
+            type = registry.getNodeType(name);
+        } catch (NoSuchNodeTypeException e) {
+            return; // raced away, nothing to check
+        }
+        if (!bundle.getSymbolicName().equals(type.getSystemId())) {
+            throw new IllegalArgumentException("Node type " + name + " is owned by '" + type.getSystemId()
+                    + "', not by this module ('" + bundle.getSymbolicName()
+                    + "') — content patches may only alter their own definitions");
+        }
+    }
+
+    /**
      * Unregisters a node type OWNED BY THIS MODULE from the node type registry. Types registered by
      * another module (different {@code systemId}) are refused — cross-module definition surgery is
      * out of scope for JS content patches.
@@ -82,17 +107,7 @@ public class ContentPatchSupport {
                     "Node type {} is not registered on this instance, nothing to unregister", name);
             return;
         }
-        ExtendedNodeType type;
-        try {
-            type = registry.getNodeType(name);
-        } catch (NoSuchNodeTypeException e) {
-            return; // raced away, nothing to do
-        }
-        if (!bundle.getSymbolicName().equals(type.getSystemId())) {
-            throw new IllegalArgumentException("Node type " + name + " is owned by '" + type.getSystemId()
-                    + "', not by this module ('" + bundle.getSymbolicName()
-                    + "') — content patches may only remove their own definitions");
-        }
+        assertOwnedNodeType(name);
         if (dryRun) {
             getLogger(bundle.getSymbolicName()).info("[dry-run] would unregister node type {}", name);
             return;

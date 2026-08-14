@@ -103,11 +103,18 @@ export const createContentPatchOperations = (
         let touched = false;
         if (definition.isInternationalized()) {
           for (const locale of targetLocales(node, options.locales)) {
-            const translation = node.getOrCreateI18N(locale);
-            if (onlyIfMissing && translation.hasProperty(options.property)) continue;
+            if (
+              onlyIfMissing &&
+              node.hasI18N(locale) &&
+              node.getI18N(locale).hasProperty(options.property)
+            ) {
+              continue;
+            }
             const value = resolveValue(node, locale.toString());
+            // resolve the value before creating the translation subnode: a callback returning
+            // undefined must not leave behind an empty (but persisted) translation node
             if (value === undefined) continue;
-            translation.setProperty(options.property, value as never);
+            node.getOrCreateI18N(locale).setProperty(options.property, value as never);
             touched = true;
           }
         } else {
@@ -155,6 +162,9 @@ export const createContentPatchOperations = (
 
   const removeNodeType: ContentPatchOperations["removeNodeType"] = (options) =>
     guarded(options.nodeType, () => {
+      // refuse foreign types BEFORE deleting anything — the check inside unregisterNodeType would
+      // only fire after the batched content deletions have already been committed
+      support.assertOwnedNodeType(options.nodeType);
       const mode = options.ifContentExists ?? "fail";
       const report = jcr.forEachNode({ ...options, includeSubtypes: false }, (node) => {
         if (mode === "fail") {
@@ -187,12 +197,17 @@ export const createContentPatchOperations = (
     };
 
     return guarded(options.from, () => {
+      // refuse foreign types BEFORE retyping anything (also covers removeOldDefinition: false,
+      // where unregisterNodeType — and its own check — never runs)
+      support.assertOwnedNodeType(options.from);
       if (!support.isNodeTypeRegistered(options.to)) {
         throw new Error(
           `Cannot rebind ${options.from} to ${options.to}: the target type is not registered — ` +
             `is it declared in the module's current definitions?`,
         );
       }
+      // per the documented contract, the target must also be a type this module owns
+      support.assertOwnedNodeType(options.to);
       const report = jcr.forEachNode(
         { ...options, nodeType: options.from, includeSubtypes: false },
         (node) => {
