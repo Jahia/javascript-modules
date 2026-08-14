@@ -18,7 +18,15 @@ Under the hood, this project used [GraalJS](https://www.graalvm.org/latest/refer
 
 This project is a Maven multi-module project. The JavaScript module is built by Maven, which delegates the actual build process to Yarn (Maven is used as a wrapper).
 
-Therefore, to build both the backend engine and the javascript library, you simply need to run:
+Maven runs the `node` and `yarn` it finds on your `PATH`; it does not download them. The versions to use are pinned in [`mise.toml`](mise.toml), and [mise](https://mise.jdx.dev/) installs them for you:
+
+```
+mise trust && mise install
+```
+
+Any other way of putting those versions on your `PATH` works as well.
+
+Then, to build both the backend engine and the javascript library, you simply need to run:
 
 ```
 mvn clean verify

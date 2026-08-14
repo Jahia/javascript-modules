@@ -9,9 +9,27 @@ jobs:
   publish:
     name: Publish preview packages
     runs-on: ubuntu-latest
+
+    # The packages are built by Maven, not by Yarn alone: @jahia/javascript-modules-library
+    # compiles against (and ships) the TypeScript typings generated from the Java sources,
+    # and only the Maven build produces them. See javascript-modules-library/pom.xml.
+    # The image below carries a warmed-up .m2 folder, see https://github.com/Jahia/cimg-mvn-cache
+    container:
+      image: ghcr.io/jahia/jahia-docker-mvn-cache:17-jdk-noble-mvn-loaded
+      credentials:
+        username: ${{ secrets.GH_PACKAGES_USERNAME }}
+        password: ${{ secrets.GH_PACKAGES_TOKEN }}
+
+    env:
+      NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+
     steps:
+      - name: Add safe directory
+        shell: bash
+        run: git config --global --add safe.directory $GITHUB_WORKSPACE
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@7e36c90d9ab29c415a2384db3006f3ec8a8cc654 # v4.2.4
-      - run: yarn install
-      - run: yarn workspaces foreach -A --topological-dev --include '@jahia/{create-module,javascript-modules-library,vite-plugin}' run build
+      # Also runs `yarn install` and `yarn build` for the three packages
+      - run: mvn -B -ntp -s .github/maven.settings.xml -DskipTests -pl javascript-create-module,javascript-modules-library,vite-plugin -am package
       - run: yarn pkg-pr-new publish './javascript-create-module' './javascript-modules-library' './vite-plugin' --packageManager=yarn
