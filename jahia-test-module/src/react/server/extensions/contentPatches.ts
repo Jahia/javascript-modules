@@ -125,8 +125,14 @@ registerContentPatch(
     name: "1.0.0-07-skip-me",
     description: "Records .skipped without halting the following content patches",
   },
-  ({ skip }) => {
-    skip("nothing to do on this instance");
+  ({ jcr, skip }) => {
+    // skip() from inside a session callback: the throw crosses a host boundary, which used to
+    // destroy its identity and record .failed — this is the guide's "nothing to fix here" pattern
+    jcr.withSystemSession({}, (session) => {
+      if (!session.nodeExists("/sites/systemsite/contents/does-not-exist")) {
+        skip("nothing to do on this instance");
+      }
+    });
   },
 );
 

@@ -65,6 +65,11 @@ public class JcrHelper {
         Locale locale = language != null ? LanguageCodeConverters.languageCodeToLocale(language) : null;
         try {
             return JCRTemplate.getInstance().doExecuteWithSystemSessionAsUser(null, workspace, locale, callback);
+        } catch (RuntimeException e) {
+            // rethrow unchanged: a guest (JS) exception crossing this boundary arrives as an unchecked
+            // PolyglotException, and GraalVM only restores its guest identity — needed for skip()
+            // detection in content patches — when the host rethrows it as-is
+            throw e;
         } catch (Exception e) {
             // include the class name: many JCR exceptions (e.g. UnsupportedRepositoryOperationException)
             // carry a null message, and the polyglot boundary hides the Java cause chain from JS

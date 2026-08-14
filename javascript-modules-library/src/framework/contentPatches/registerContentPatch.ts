@@ -27,8 +27,11 @@ const RECOMMENDED_NAME_PATTERN = /^\d+\.\d+\.\d+-\d{2,}-[A-Za-z0-9._-]+$/;
  *
  * Execution is tracked in Jahia's module patch status store, keyed by `name`: whatever the outcome
  * (`.installed`, `.skipped`, `.failed`), a recorded content patch never runs again. A module's
- * content patches run in lexicographic order of their names; on failure the module still starts,
- * but its remaining content patches are halted (they stay pending).
+ * content patches run in lexicographic order of their names — note that unpadded numbers break that
+ * order once they reach double digits (`"10.0.0-…"` sorts before `"2.0.0-…"`); this only matters
+ * when several versions' patches are pending at once, but padding the sequence number (`-01-`,
+ * `-02-`, …) is always safe. On failure the module still starts, but its remaining content patches
+ * are halted (they stay pending).
  *
  * Content patches run synchronously on the module start thread and must NOT be async — keep heavy
  * work bounded through the built-in batching of the `patch.*` helpers and `jcr.forEachNode`.
@@ -67,6 +70,11 @@ export const registerContentPatch = (
       const log = support.getLogger(name);
       const dryRun = support.isDryRun();
       const jcr = createContentPatchJcr(dryRun, log);
+      // Skip detection is flag-based, not identity-based: when skip() is called inside a callback
+      // that crosses a host boundary (jcr.withSystemSession, jcr.forEachNode, the patch.* helpers),
+      // the thrown ContentPatchSkipped may come back wrapped in a host exception, so the caught
+      // error's type cannot be trusted.
+      let skipReason: string | undefined;
       const context: ContentPatchContext = {
         jcr,
         patch: createContentPatchOperations(jcr, support, log),
@@ -74,6 +82,7 @@ export const registerContentPatch = (
         dryRun,
         module: { name: support.getModuleName(), version: support.getModuleVersion() },
         skip: (reason) => {
+          skipReason = reason;
           throw new ContentPatchSkipped(reason);
         },
       };
@@ -82,13 +91,15 @@ export const registerContentPatch = (
         const result = run(context) as unknown;
         if (result && typeof (result as PromiseLike<unknown>).then === "function") {
           throw new Error(
-            `Content patch  returned a promise: content patches must be synchronous (do not use an async run function)`,
+            `Content patch ${name} returned a promise: content patches must be synchronous (do not use an async run function)`,
           );
         }
         return ".installed";
       } catch (error) {
-        if (error instanceof ContentPatchSkipped) {
-          log.info(`Content patch skipped: ${error.reason}`);
+        if (skipReason !== undefined || error instanceof ContentPatchSkipped) {
+          log.info(
+            `Content patch skipped: ${skipReason ?? (error as ContentPatchSkipped).reason}`,
+          );
           return ".skipped";
         }
         throw error;
