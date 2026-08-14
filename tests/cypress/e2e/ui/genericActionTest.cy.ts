@@ -79,10 +79,51 @@ describe("Actions (.action.ts files)", () => {
     });
   });
 
-  it("surfaces thrown errors as a server error", () => {
+  it("surfaces ActionError messages as a server error", () => {
     callAction(`${MODULE}/failOnPurpose`, []).then((response) => {
       expect(response.status).to.eq(500);
       expect(response.body.error).to.contain("Intentional failure");
+    });
+  });
+
+  it("masks unexpected error messages (guest-callable endpoint)", () => {
+    callAction(`${MODULE}/failInternally`, []).then((response) => {
+      expect(response.status).to.eq(500);
+      expect(response.body.error).to.not.contain("secret");
+      expect(response.body.error).to.contain("Action execution failed");
+    });
+  });
+
+  it("answers 500 on a promise that cannot settle on the server", () => {
+    callAction(`${MODULE}/neverSettles`, []).then((response) => {
+      expect(response.status).to.eq(500);
+      expect(response.body.error).to.contain("did not settle");
+    });
+  });
+
+  it("rejects a missing action name as a caller mistake", () => {
+    cy.request({
+      method: "POST",
+      url: `/cms/render/default/en${pagePath}.jsAction.do`,
+      headers: { "X-JS-Action": "1", "accept": "application/json" },
+      body: stringify([]),
+      failOnStatusCode: false,
+    }).then((response) => {
+      expect(response.status).to.eq(400);
+      expect(response.body.error).to.contain("Missing action name");
+    });
+  });
+
+  it("rejects a malformed body as a caller mistake", () => {
+    cy.request({
+      method: "POST",
+      url: `/cms/render/default/en${pagePath}.jsAction.do?name=${encodeURIComponent(`${MODULE}/add`)}`,
+      headers: { "X-JS-Action": "1", "accept": "application/json" },
+      body: "not devalue at all",
+      failOnStatusCode: false,
+    }).then((response) => {
+      expect(response.status).to.eq(400);
+      expect(response.body.error).to.contain("Malformed request body");
     });
   });
 
