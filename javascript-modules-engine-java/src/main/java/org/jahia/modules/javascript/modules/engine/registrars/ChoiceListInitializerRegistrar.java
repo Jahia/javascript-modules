@@ -115,8 +115,10 @@ public class ChoiceListInitializerRegistrar extends AbstractServiceRegistrar<Mod
                 Map<String, Object> entry = getJsInitializer(contextProvider);
                 if (entry == null || entry.get("getChoiceListValues") == null) {
                     logger.warn("JS choicelist initializer '{}' is no longer available in the registry, " +
-                            "returning no values", key);
-                    return Collections.emptyList();
+                            "passing previous values through", key);
+                    // in a chained declaration, wiping the accumulated list would drop the other
+                    // initializers' choices during a redeploy window
+                    return values != null ? values : Collections.emptyList();
                 }
                 Value result = JSPromise.settleOrThrow(
                         Value.asValue(entry.get("getChoiceListValues")).execute(epd, param, values, locale, context),
