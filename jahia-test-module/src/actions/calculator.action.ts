@@ -1,4 +1,4 @@
-import { action, type StandardSchemaV1 } from "@jahia/javascript-modules-library";
+import { action, ActionError, type StandardSchemaV1 } from "@jahia/javascript-modules-library";
 
 /**
  * Test fixtures for actions (.action.ts files): functions executed on the server, callable from the
@@ -15,9 +15,18 @@ export const echoKinds = (input: { date: Date; map: Map<string, number>; set: Se
   setHas: input.set.has("present"),
 });
 
+// an ActionError is deliberate: its message travels to the caller
 export const failOnPurpose = () => {
-  throw new Error("Intentional failure");
+  throw new ActionError("Intentional failure");
 };
+
+// any other exception is masked with a generic message (actions are guest-callable)
+export const failInternally = () => {
+  throw new Error("secret implementation detail");
+};
+
+// depends on an event that never happens: the runtime must detect it instead of hanging
+export const neverSettles = () => new Promise(() => {});
 
 /** Hand-rolled Standard Schema, to avoid pulling a validation library into the test module. */
 const positiveNumberInput: StandardSchemaV1<{ n: number }> = {
