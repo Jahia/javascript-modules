@@ -13,7 +13,7 @@ Typical uses: removing leftover values of a dropped property, backfilling a defa
 
 ## Declaring a content patch
 
-Call `registerContentPatch` at the top level of a server file (it registers the content patch as a side effect at module startup, like `registerNodeLegacyAction`). Convention: one content patch per file under `src/content-patches/`:
+Call `registerContentPatch` at the top level of a server file (it registers the content patch as a side effect at module startup, like the other `register*` helpers). Convention: one content patch per file under `src/content-patches/`:
 
 ```ts
 // src/content-patches/2.0.0-01-remove-legacy-color.server.ts
@@ -110,5 +110,6 @@ All three outcomes are terminal. Batches already committed before a failure stay
 ## Development and testing
 
 - `autoRun` (configuration PID `org.jahia.modules.javascript.modules.engine.contentpatches`, default `true`): set to `false` on development servers to log pending content patches at module start instead of running them.
+- `dryRun` (same PID, default `false`): set to `true` to rehearse pending content patches — the `patch.*` helpers and sessions log what they would change without persisting, no result is recorded, and the patches stay pending.
 - The reliable test is an end-to-end one against a real Jahia: provision the previous module version, create content, deploy the new version, and assert the transformed content — see `tests/cypress/e2e/engine/contentPatchTest.cy.ts` in the javascript-modules repository for a complete example (statuses, all five operations, skip/failure semantics).
-- To re-run a content patch on a development instance, remove its entry from the `j:bundlesScripts` property of `/module-management` (e.g. in the JCR browser) and restart the module. Dedicated CLI/GraphQL tooling for status, dry runs, and resets is planned.
+- To re-run a content patch on a development instance, remove its entry from the `j:bundlesScripts` property of `/module-management` (e.g. in the JCR browser) and restart the module. Dedicated CLI/GraphQL tooling for status and resets is planned.

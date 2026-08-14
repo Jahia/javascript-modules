@@ -221,12 +221,6 @@
             <version>4.11.0</version>
             <scope>test</scope>
         </dependency>
-        <!-- JS language for tests exercising polyglot Value conversions against real JS objects -->
-        <dependency>
-            <groupId>org.graalvm.js</groupId>
-            <artifactId>js</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
