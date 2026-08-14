@@ -73,31 +73,36 @@ Examples:
   npm init @jahia/module@latest my-module -- --template hello-world --yes
 `;
 
-/** Prints an error message followed by the usage on stderr, then exits with code 1. */
+/**
+ * Prints an error message followed by the usage on stderr, then exits with code 1.
+ *
+ * @returns {never}
+ */
 const fail = (/** @type {string} */ message) => {
   console.error(`Error: ${message}\n`);
   console.error(usage);
   process.exit(1);
 };
 
-/** @type {ReturnType<typeof parseArgs>} */
-let args;
-
-try {
-  args = parseArgs({
-    args: process.argv.slice(2),
-    allowPositionals: true,
-    options: {
-      template: { type: "string", short: "t" },
-      path: { type: "string", short: "p" },
-      yes: { type: "boolean", short: "y" },
-      interactive: { type: "boolean", short: "i" },
-      help: { type: "boolean", short: "h" },
-    },
-  });
-} catch (error) {
-  fail(error instanceof Error ? error.message : String(error));
-}
+// The IIFE (instead of let + try/catch) keeps parseArgs' inference on the literal options config,
+// so args.values gets precise per-flag types instead of string | boolean | (string | boolean)[]
+const args = (() => {
+  try {
+    return parseArgs({
+      args: process.argv.slice(2),
+      allowPositionals: true,
+      options: {
+        template: { type: "string", short: "t" },
+        path: { type: "string", short: "p" },
+        yes: { type: "boolean", short: "y" },
+        interactive: { type: "boolean", short: "i" },
+        help: { type: "boolean", short: "h" },
+      },
+    });
+  } catch (error) {
+    fail(error instanceof Error ? error.message : String(error));
+  }
+})();
 
 if (args.values.help) {
   console.log(usage);
@@ -109,11 +114,12 @@ if (args.positionals.length > 1) {
 }
 
 /**
- * Whether prompts can be displayed: a terminal is required, unless the wizard was explicitly
- * requested. Without it, a missing input is a hard error instead of a prompt: this CLI must never
- * hang in a script or a CI pipeline.
+ * Whether prompts can be displayed: a terminal on both ends is required (prompts READ from stdin
+ * and write to stdout), unless the wizard was explicitly requested. Without it, a missing input is
+ * a hard error instead of a prompt: this CLI must never hang in a script or a CI pipeline.
  */
-const canPrompt = Boolean(process.stdout.isTTY) || args.values.interactive === true;
+const canPrompt =
+  Boolean(process.stdin.isTTY && process.stdout.isTTY) || args.values.interactive === true;
 
 /** Whether any flag resolving one of the inputs was passed. */
 const hasFlags =
@@ -130,7 +136,9 @@ let module = /** @type {string | undefined} */ (args.positionals[0]);
 let output = args.values.path;
 let template = args.values.template;
 
-if (module !== undefined) {
+// In wizard mode the name prompt re-validates its prefill and lets the user correct it — the
+// historical behavior; only fail hard when no prompt will ask again.
+if (module !== undefined && !wizard) {
   const error = validateName(module);
   if (error) fail(error);
 }
@@ -226,15 +234,19 @@ Upgrade guide: ${styleText("underline", "https://nodejs.org/en/download")}
     template = answer;
   }
 
+  // Both are definitely assigned here: resolved from the command line or prompted just above
+  const moduleName = /** @type {string} */ (module);
+  const templateName = /** @type {keyof typeof TEMPLATES} */ (template);
+
   /** Replaces `$MODULE` with the actual module name. */
   const templatify = (/** @type {string} */ str) =>
     str
-      .replaceAll("$MODULE", module)
+      .replaceAll("$MODULE", moduleName)
       // A CND namespace cannot contain hyphens
-      .replaceAll("$NAMESPACE", module.replaceAll("-", ""))
+      .replaceAll("$NAMESPACE", moduleName.replaceAll("-", ""))
       .replaceAll("$VERSION", pkg.version);
 
-  for (const name of TEMPLATES[template].templates) {
+  for (const name of TEMPLATES[templateName].templates) {
     // Copy the template to the output directory
     const input = fileURLToPath(new URL(`templates/${name}/`, import.meta.url));
     for (const entry of fs.readdirSync(input, { recursive: true, withFileTypes: true })) {
