@@ -23,7 +23,7 @@
     "fixtures"
   ],
   "scripts": {
-    "build": "tsdown --publint",
+    "build": "tsdown && publint",
     "test": "yarn ./fixtures test"
   },
   "dependencies": {
