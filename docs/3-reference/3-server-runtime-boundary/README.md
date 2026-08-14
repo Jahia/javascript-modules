@@ -104,7 +104,7 @@ Nothing else on `process` — `process.env.MY_VAR`, `process.cwd()`, `process.ar
 
 | You want to…                     | Do this                                                                                                 |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Call an HTTP API                 | Do it from a `*.client.tsx` island, or from Java/OSGi and expose the result through GraalQL.            |
+| Call an HTTP API                 | Do it from a `*.client.tsx` island, or from Java/OSGi and expose the result through GraphQL.            |
 | Query content                    | Use the synchronous helpers of `@jahia/javascript-modules-library` (`useGQLQuery`, `getChildNodes`, …). |
 | Read configuration               | Use `server.config` through the library, or an OSGi configuration — not `process.env`.                  |
 | Read or write files              | Use the JCR, through the library — not `node:fs`.                                                       |

@@ -37,7 +37,8 @@ before(() => {
   fs.writeFileSync(path.join(projectDir, "package.json"), JSON.stringify({ type: "module" }));
 
   // Resolve eslint and its plugins from the monorepo instead of installing them again
-  fs.symlinkSync(path.join(repoRoot, "node_modules"), path.join(projectDir, "node_modules"));
+  // ("junction" makes the directory link work on Windows without privileges; ignored elsewhere)
+  fs.symlinkSync(path.join(repoRoot, "node_modules"), path.join(projectDir, "node_modules"), "junction");
 
   fs.mkdirSync(path.join(projectDir, "src"), { recursive: true });
 });
@@ -123,6 +124,24 @@ export default function Probe() {
   )) {
     assert.ok(message.endsWith(`See ${DOCS_URL}`), `Message does not link the docs: ${message}`);
   }
+});
+
+test("action files are restricted like server files", () => {
+  const { status, messages } = lint(
+    "src/greet.action.ts",
+    `import fs from "node:fs";
+
+export const greet = (name: string) => {
+  setTimeout(() => {}, 1);
+  return \`Hello \${name} \${fs.constants.F_OK}\`;
+};
+`,
+  );
+
+  assert.notEqual(status, 0, "ESLint should fail on an action file using unavailable APIs");
+  const rules = messages.map(({ ruleId }) => ruleId);
+  assert.ok(rules.includes("no-restricted-globals"), `Missing no-restricted-globals in ${rules}`);
+  assert.ok(rules.includes("no-restricted-imports"), `Missing no-restricted-imports in ${rules}`);
 });
 
 test("server files using available APIs pass", () => {
