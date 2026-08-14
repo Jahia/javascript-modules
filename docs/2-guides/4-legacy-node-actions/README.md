@@ -66,9 +66,14 @@ And returns (possibly asynchronously — `async` handlers are supported, limited
 
 Returning nothing sends an empty 200.
 
+Do not combine `redirect` with a `statusCode`: the platform picks the redirect status itself, and a
+3xx `statusCode` makes Jahia answer `sendError()` instead of redirecting. For actions answering a
+plain browser form POST, always return a `redirect` — a bare `json` result leaves the visitor on a
+blank page (the JSON body is only written for requests that ask for JSON).
+
 ## CSRF protection for POST actions
 
-POST, PUT and DELETE requests to `.do` URLs are blocked by Jahia's CSRF guard unless the URL is whitelisted. **This is your module's responsibility**: ship an OSGi configuration file in your module's `settings/configurations/` folder:
+POST, PUT and DELETE requests to `.do` URLs — and GET requests made with an authenticated session — are blocked by Jahia's CSRF guard unless the URL is whitelisted. **This is your module's responsibility**: ship an OSGi configuration file in your module's `settings/configurations/` folder:
 
 ```properties
 # settings/configurations/org.jahia.modules.jahiacsrfguard-mymodule.cfg

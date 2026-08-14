@@ -1,4 +1,12 @@
-import { GENERIC_SITE_KEY } from "../../support/constants";
+import { createSite, deleteSite } from "@jahia/cypress";
+
+/**
+ * A site of its own, with French enabled: the shared test site is English-only, and asking its
+ * creation form for a `fr` content locale simply falls back to English — which would make the
+ * localization assertion below pass or fail depending on the Jahia version rather than on the
+ * initializer.
+ */
+const SITE_KEY = "jsChoicelistSite";
 
 interface ValueConstraint {
   displayValue: string;
@@ -11,40 +19,20 @@ interface Field {
   valueConstraints: ValueConstraint[];
 }
 
-const FORM_QUERY = `
-  query createForm($nodeType: String!, $uiLocale: String!, $locale: String!, $uuidOrPath: String!) {
-    forms {
-      createForm(primaryNodeType: $nodeType, uiLocale: $uiLocale, locale: $locale, uuidOrPath: $uuidOrPath) {
-        sections {
-          fieldSets {
-            fields {
-              name
-              valueConstraints {
-                displayValue
-                value { string }
-                properties { name value }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
 /**
- * Fetches the creation form of the test node type and returns its fields, flattened. Initializers
- * receive the CONTENT locale (the language being edited), not the UI locale.
+ * Fetches the creation form of the test node type and returns its fields, flattened. Which of the
+ * two locales an initializer receives is the platform's call and varies across Jahia versions —
+ * see the localization test below, which pins both to the same value for that reason.
  */
-const getFormFields = (locale: string): Cypress.Chainable<Field[]> =>
+const getFormFields = (locale: string, uiLocale = "en"): Cypress.Chainable<Field[]> =>
   cy
     .apollo({
-      query: FORM_QUERY,
+      queryFile: "graphql/createForm.graphql",
       variables: {
         nodeType: "javascriptExample:testChoicelistInitializer",
-        uiLocale: "en",
+        uiLocale,
         locale,
-        uuidOrPath: `/sites/${GENERIC_SITE_KEY}/home`,
+        uuidOrPath: `/sites/${SITE_KEY}/home`,
       },
     })
     .then((response) =>
@@ -65,6 +53,24 @@ const constraintLabel = (f: Field, value: string): string =>
   f.valueConstraints.find((c) => c.value.string === value)?.displayValue;
 
 describe("JS choicelist initializers", () => {
+  before("Create a site with French enabled", () => {
+    cy.login();
+    deleteSite(SITE_KEY);
+    createSite(SITE_KEY, {
+      languages: "en,fr",
+      templateSet: "javascript-modules-engine-test-module",
+      locale: "en",
+      serverName: "localhost",
+    });
+    cy.logout();
+  });
+
+  after("Remove the site", () => {
+    cy.login();
+    deleteSite(SITE_KEY);
+    cy.logout();
+  });
+
   beforeEach("Login", () => {
     cy.login();
   });
@@ -107,8 +113,13 @@ describe("JS choicelist initializers", () => {
     });
   });
 
-  it("localizes labels through the content locale", () => {
-    getFormFields("fr").then((fields) => {
+  it("localizes labels", () => {
+    // Both locales are French: an initializer sees one of them, and which one is the platform's
+    // call — 8.2.1.0 forwards the content locale (asking for `uiLocale: "en", locale: "fr"` there
+    // still yields "Rouge"), while the snapshot CI runs answers "Red" for that same request. The
+    // module only decides what to do with the locale it is handed, so the test pins the
+    // localization, not the platform's routing of it.
+    getFormFields("fr", "fr").then((fields) => {
       expect(constraintLabel(field(fields, "color"), "red")).to.equal("Rouge");
     });
   });

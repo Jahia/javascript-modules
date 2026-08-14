@@ -1,0 +1,28 @@
+query createForm($nodeType: String!, $uiLocale: String!, $locale: String!, $uuidOrPath: String!) {
+  forms {
+    createForm(
+      primaryNodeType: $nodeType
+      uiLocale: $uiLocale
+      locale: $locale
+      uuidOrPath: $uuidOrPath
+    ) {
+      sections {
+        fieldSets {
+          fields {
+            name
+            valueConstraints {
+              displayValue
+              value {
+                string
+              }
+              properties {
+                name
+                value
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
