@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { fileURLToPath } from "node:url";
 import type { Plugin } from "rolldown";
 
 /**
@@ -22,6 +23,10 @@ const UNSUPPORTED_EXPORT = /^export\s*(?:\{|\*|default\b)|^export\s+let\b/m;
 
 /** Decides whether a module id is an action file; built from `actions.inputGlob` in index.ts. */
 export type ActionFileFilter = (id: string) => boolean;
+
+// devalue is a dependency of this plugin, not of the user's module: resolve it from here and emit
+// an absolute specifier, so the generated stub also builds under isolated layouts (pnpm, PnP)
+const DEVALUE = JSON.stringify(fileURLToPath(import.meta.resolve("devalue")));
 
 export const extractActionExports = (code: string): string[] => {
   const names = new Set<string>();
@@ -72,7 +77,7 @@ export const actionsClientStub = (moduleName: string, isActionFile: ActionFileFi
     const code = fs.readFileSync(cleanId, "utf-8");
     const names = extractActionExports(code);
     checkExports(this, cleanId, code, names);
-    return `import { parse as __jsmParse, stringify as __jsmStringify } from "devalue";
+    return `import { parse as __jsmParse, stringify as __jsmStringify } from ${DEVALUE};
 
 const __jsmCall = (name) => async (...args) => {
   // strip the template extension from the page URL, then append the action extension
@@ -85,7 +90,8 @@ const __jsmCall = (name) => async (...args) => {
   });
   if (!response.ok) throw new Error(\`Action \${name} failed with HTTP \${response.status}\`);
   const payload = await response.json();
-  if (payload.error) {
+  // presence check: an empty error message is still an error, not a payload to parse
+  if ("error" in payload) {
     const error = new Error(payload.error);
     if (payload.issues) error.issues = payload.issues;
     throw error;
