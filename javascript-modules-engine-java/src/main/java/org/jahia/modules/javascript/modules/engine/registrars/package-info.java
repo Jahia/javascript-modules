@@ -21,7 +21,7 @@
  * <p>Package layout rule: registrars whose bridge fits in a single class live flat in this package
  * (e.g. choicelists, render filters, legacy node actions, over
  * {@link org.jahia.modules.javascript.modules.engine.registrars.AbstractServiceRegistrar}); verticals
- * needing several collaborating classes get a subpackage (e.g. {@code validation}, {@code contentpatches}).
+ * needing several collaborating classes get a subpackage (e.g. {@code validation}).
  * Non-registrar surfaces live outside: the actions dispatch endpoint in {@code ..engine.actions}, the
  * exported third-party facade in {@code ..engine.sdk}, and engine plumbing in {@code ..engine.jsengine}.
  */

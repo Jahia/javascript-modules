@@ -14,15 +14,21 @@ import {
 // settings/configurations/org.jahia.modules.jahiacsrfguard-hydrogen.cfg
 registerNodeLegacyAction(
   { name: "hydrogenContact", requiredMethods: ["POST"], requireAuthenticatedUser: false },
-  ({ parameters, resource }) => {
+  ({ parameters, resource, urlResolver }) => {
+    // This action answers a plain browser form POST: it must redirect back to the page — a bare
+    // `{ json }` result would leave the visitor on a blank page (the JSON body is only written for
+    // requests asking for JSON). The redirect is relative: the action URL lives at the page's own
+    // path, so `<page>.html` resolves to the page whatever the mount point. Do not combine it
+    // with a statusCode: the platform picks the redirect status itself.
+    const page = urlResolver.getPath().split("/").pop()?.replace(/\.hydrogenContact\.do$/, ".html");
     const from = parameters.from?.[0];
     const message = parameters.message?.[0];
     if (!from || !message) {
-      return { statusCode: 400, json: { success: false, error: "Missing from or message" } };
+      return { redirect: `${page}?contact=error` };
     }
     // a real module would store the submission or notify someone here
     console.info(`Contact form submission on ${resource.getNode().getPath()} from ${from}`);
-    return { json: { success: true } };
+    return { redirect: `${page}?contact=sent` };
   },
 );
 

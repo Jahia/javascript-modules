@@ -1,3 +1,4 @@
+import { createFilter } from "@rollup/pluginutils";
 import { clientLibs, serverLibs } from "javascript-modules-engine/shared-libs.mjs";
 import fs from "node:fs";
 import path from "node:path";
@@ -138,6 +139,11 @@ export default function jahia(
   // and the generated client stubs, so both sides agree by construction.
   const moduleName = readModuleName();
 
+  // Single source of truth for "is this an action file", shared by the server bundle input,
+  // the server-side registration transform and the client-side stub generation.
+  const actionsGlob = options.actions?.inputGlob ?? "**/*.action.{js,ts}";
+  const isActionFile = createFilter(actionsGlob, null, { resolve: clientBaseDir });
+
   if (clientEntries.length === 0) {
     console.warn(
       `${styleText("yellowBright", "[@jahia/vite-plugin] Skipping client build because there are no entry files...")}
@@ -203,7 +209,7 @@ export default function jahia(
                 external: Object.keys(clientLibs),
                 plugins: [
                   // Replace .action.ts files with client-side fetch stubs
-                  actionsClientStub(moduleName),
+                  actionsClientStub(moduleName, isActionFile),
                   {
                     name: "forbid-library",
                     resolveId(id) {
@@ -237,10 +243,7 @@ export default function jahia(
                     options.server?.inputGlob ?? "**/*.server.{js,jsx,ts,tsx}",
                   ),
                   // action files are part of the server bundle (their exports get registered)
-                  path.posix.join(
-                    options.inputDir ?? "src",
-                    options.actions?.inputGlob ?? "**/*.action.{js,ts}",
-                  ),
+                  path.posix.join(options.inputDir ?? "src", actionsGlob),
                 ],
                 output: {
                   dir: options.outputDir ?? "dist",
@@ -263,7 +266,7 @@ export default function jahia(
                 plugins: [
                   multiEntry(options.server?.outputFile ?? "server/index.js"),
                   // Register the exports of .action.ts files as callable actions
-                  actionsServerRegister(moduleName),
+                  actionsServerRegister(moduleName, isActionFile),
                   // Only add the callback plugin in watch mode
                   config.build?.watch &&
                     options.watchCallback &&

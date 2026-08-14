@@ -17,6 +17,7 @@ package org.jahia.modules.javascript.modules.engine.sdk;
 
 import org.graalvm.polyglot.Value;
 import org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine;
+import org.jahia.modules.javascript.modules.engine.jsengine.JSPromise;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -46,7 +47,7 @@ public class JSServerExtensionInvokerImpl implements JSServerExtensionInvoker {
     public <T> List<T> forEach(String registryType, ExtensionHandler<T> handler) {
         return graalVMEngine.doWithContext(contextProvider -> {
             List<T> results = new ArrayList<>();
-            Invoker invoker = (callable, args) -> convert(Value.asValue(callable).execute(args));
+            Invoker invoker = JSServerExtensionInvokerImpl::invoke;
             Map<String, Object> filter = new HashMap<>();
             filter.put("type", registryType);
             for (Map<String, Object> entry : contextProvider.getRegistry().find(filter)) {
@@ -57,6 +58,15 @@ public class JSServerExtensionInvokerImpl implements JSServerExtensionInvoker {
             }
             return results;
         });
+    }
+
+    /**
+     * {@link Invoker} implementation: executes the callable, settles a possibly-async result (a
+     * rejection surfaces as a {@link org.jahia.modules.javascript.modules.engine.jsengine.GraalVMException}),
+     * then converts it to plain Java.
+     */
+    static Object invoke(Object callable, Object... args) {
+        return convert(JSPromise.settleOrThrow(Value.asValue(callable).execute(args), "JS extension callable"));
     }
 
     /** Recursively converts a GraalVM value to plain Java ({@code null}/Boolean/Long/Double/String/List/Map). */

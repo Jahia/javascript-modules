@@ -76,6 +76,12 @@ public class NodeLegacyActionRegistrar extends AbstractServiceRegistrar<Action> 
     @Override
     protected void beforeRegister(Bundle bundle, Map<String, Object> registryEntry) {
         Object key = registryEntry.get("key");
+        if ("jsAction".equals(key)) {
+            // the engine's generic action endpoint: shadowing it would break every module's client
+            // action stubs AND inherit its platform-wide CSRF-guard whitelist (*.jsAction.do)
+            throw new IllegalArgumentException("'jsAction' is reserved for the engine's generic action "
+                    + "endpoint and cannot be registered by a module");
+        }
         if (key != null
                 && templateManagerService.getTemplatePackageRegistry().getActions().containsKey(key.toString())) {
             logger.warn("An action named '{}' is already registered on this platform; the one declared by " +

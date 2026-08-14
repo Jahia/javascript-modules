@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { fileURLToPath } from "node:url";
 import type { Plugin } from "rolldown";
 
 /**
@@ -17,12 +18,15 @@ import type { Plugin } from "rolldown";
  * function <name>` / `export async function <name>` declarations are supported.
  */
 
-// keep in sync with the default `actions.inputGlob` of the plugin (index.ts)
-const ACTION_FILE = /\.action\.(ts|js)$/;
 const EXPORT_DECLARATION = /^export\s+(?:const|async\s+function|function)\s+([A-Za-z_$][\w$]*)/gm;
 const UNSUPPORTED_EXPORT = /^export\s*(?:\{|\*|default\b)|^export\s+let\b/m;
 
-export const isActionFile = (id: string): boolean => ACTION_FILE.test(id.split("?")[0]);
+/** Decides whether a module id is an action file; built from `actions.inputGlob` in index.ts. */
+export type ActionFileFilter = (id: string) => boolean;
+
+// devalue is a dependency of this plugin, not of the user's module: resolve it from here and emit
+// an absolute specifier, so the generated stub also builds under isolated layouts (pnpm, PnP)
+const DEVALUE = JSON.stringify(fileURLToPath(import.meta.resolve("devalue")));
 
 export const extractActionExports = (code: string): string[] => {
   const names = new Set<string>();
@@ -47,10 +51,10 @@ const checkExports = (
 };
 
 /** Server side: append the registration of all exported functions. */
-export const actionsServerRegister = (moduleName: string): Plugin => ({
+export const actionsServerRegister = (moduleName: string, isActionFile: ActionFileFilter): Plugin => ({
   name: "jsm-actions-server",
   transform(code, id) {
-    if (!isActionFile(id)) return;
+    if (!isActionFile(id.split("?")[0])) return;
     const names = extractActionExports(code);
     checkExports(this, id, code, names);
     if (names.length === 0) return;
@@ -65,7 +69,7 @@ __jsmRegisterActionsModule({ ${names.map((name) => `${JSON.stringify(name)}: ${n
 });
 
 /** Client side: replace the module with fetch stubs. */
-export const actionsClientStub = (moduleName: string): Plugin => ({
+export const actionsClientStub = (moduleName: string, isActionFile: ActionFileFilter): Plugin => ({
   name: "jsm-actions-client",
   load(id) {
     const cleanId = id.split("?")[0];
@@ -73,7 +77,7 @@ export const actionsClientStub = (moduleName: string): Plugin => ({
     const code = fs.readFileSync(cleanId, "utf-8");
     const names = extractActionExports(code);
     checkExports(this, cleanId, code, names);
-    return `import { parse as __jsmParse, stringify as __jsmStringify } from "devalue";
+    return `import { parse as __jsmParse, stringify as __jsmStringify } from ${DEVALUE};
 
 const __jsmCall = (name) => async (...args) => {
   // strip the template extension from the page URL, then append the action extension
@@ -86,7 +90,8 @@ const __jsmCall = (name) => async (...args) => {
   });
   if (!response.ok) throw new Error(\`Action \${name} failed with HTTP \${response.status}\`);
   const payload = await response.json();
-  if (payload.error) {
+  // presence check: an empty error message is still an error, not a payload to parse
+  if ("error" in payload) {
     const error = new Error(payload.error);
     if (payload.issues) error.issues = payload.issues;
     throw error;

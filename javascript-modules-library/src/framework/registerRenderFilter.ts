@@ -62,7 +62,9 @@ export interface RenderFilterCallbacks {
  * ```
  *
  * Filters run on every matching render — keep them fast. Callbacks may be `async` (microtask-only:
- * the server runtime has no timers or async I/O).
+ * the server runtime has no timers or async I/O) **only when the render is host-initiated**. A render
+ * started from JS — typically a nested render through the `<Render>` component — cannot drain the
+ * microtask queue, so filters that may match nested renders must use synchronous callbacks.
  *
  * Keys live in a single platform-wide registry namespace; prefix them with your module name to
  * avoid collisions.
