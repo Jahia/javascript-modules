@@ -18,7 +18,7 @@ const descriptors = (filename: string, exportName: string) =>
 const tagBinding = (identifier: string, filename: string, exportName: string) =>
   `
 ;(function (v) {
-  if (typeof v === "function" || typeof v === "object" && v)
+  if ((typeof v === "function" || typeof v === "object" && v) && Object.isExtensible(v))
     Object.defineProperties(v, ${descriptors(filename, exportName)});
 })(${identifier});
 `;
@@ -58,7 +58,9 @@ const tagBinding = (identifier: string, filename: string, exportName: string) =>
  * carry no metadata, which `<Island>` reports as an error rather than letting the browser request
  * an `undefined.js` bundle.
  *
- * The typeof check is necessary because `Object.defineProperties` can only be called on objects.
+ * The typeof check is necessary because `Object.defineProperties` can only be called on objects,
+ * and the `Object.isExtensible` check skips frozen/sealed exports (e.g. a frozen config object in a
+ * client file), which would otherwise throw and break the whole bundle evaluation.
  *
  * @param root The root of the transformation. Files outside this directory will not be transformed,
  *   files inside (and matching the glob) will have their inserted path relative to this directory.
@@ -88,7 +90,7 @@ export function insertFilename(
             declaration.start,
             `
 (function (v) {
-  if (typeof v === "function" || typeof v === "object" && v)
+  if ((typeof v === "function" || typeof v === "object" && v) && Object.isExtensible(v))
     Object.defineProperties(v, ${descriptors(filename, "default")});
   return v;
 })(`,

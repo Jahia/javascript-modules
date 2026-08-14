@@ -13,7 +13,7 @@ var foo_module_default = { pre: "_pre_1cbxx_3" };
 //#endregion
 //#region src/foo.client.tsx
 var foo_client_default = (function(v) {
-	if (typeof v === "function" || typeof v === "object" && v) Object.defineProperties(v, {
+	if ((typeof v === "function" || typeof v === "object" && v) && Object.isExtensible(v)) Object.defineProperties(v, {
 		__filename: {
 			value: "dist/client/foo.client.tsx",
 			enumerable: false,
@@ -39,7 +39,7 @@ function Named() {
 	return /* @__PURE__ */ jsx("pre", { children: "Named export!" });
 }
 (function(v) {
-	if (typeof v === "function" || typeof v === "object" && v) Object.defineProperties(v, {
+	if ((typeof v === "function" || typeof v === "object" && v) && Object.isExtensible(v)) Object.defineProperties(v, {
 		__filename: {
 			value: "dist/client/named.client.tsx",
 			enumerable: false,
@@ -55,7 +55,7 @@ function Named() {
 /** A second named export in the same file, tagged independently. */
 var AlsoNamed = () => /* @__PURE__ */ jsx("pre", { children: "Also a named export!" });
 (function(v) {
-	if (typeof v === "function" || typeof v === "object" && v) Object.defineProperties(v, {
+	if ((typeof v === "function" || typeof v === "object" && v) && Object.isExtensible(v)) Object.defineProperties(v, {
 		__filename: {
 			value: "dist/client/named.client.tsx",
 			enumerable: false,

@@ -78,7 +78,11 @@ describe("Verify client side component are rehydrated as expected", () => {
       );
 
       cy.get('p[data-testid="named-export-count"]').should("contain", "Named count: 5");
-      cy.get('[data-hydrated="true"]').should("exist");
+      // Wait for THIS island's hydration (another island's data-hydrated must not unblock the
+      // click, which would race the handler attachment)
+      cy.get('button[data-testid="named-export-button"]')
+        .closest("jsm-island")
+        .should("have.attr", "data-hydrated", "true");
 
       // Interactivity proves the named export was resolved in the client bundle
       cy.get('button[data-testid="named-export-button"]').click();

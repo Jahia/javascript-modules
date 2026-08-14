@@ -138,7 +138,7 @@ export function Island({
     throw new Error(
       `<Island> received a component without hydration metadata: ${
         Component.displayName ?? Component.name ?? "anonymous component"
-      }. Client components must be declared in a *.client.{jsx,tsx} file and exported from it directly (\`export default\`, \`export const\` or \`export function\`); \`export { … }\` lists and re-exports are not supported.`,
+      }. Client components must be declared in a *.client.{jsx,tsx} file and exported from it directly under a name (\`export default\`, \`export const Foo = …\` or \`export function Foo() {}\`); \`export { … }\` lists, re-exports and destructured exports (\`export const { Foo } = …\`) are not supported.`,
     );
   }
 
