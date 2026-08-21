@@ -38,7 +38,11 @@ before(() => {
 
   // Resolve eslint and its plugins from the monorepo instead of installing them again
   // ("junction" makes the directory link work on Windows without privileges; ignored elsewhere)
-  fs.symlinkSync(path.join(repoRoot, "node_modules"), path.join(projectDir, "node_modules"), "junction");
+  fs.symlinkSync(
+    path.join(repoRoot, "node_modules"),
+    path.join(projectDir, "node_modules"),
+    "junction",
+  );
 
   fs.mkdirSync(path.join(projectDir, "src"), { recursive: true });
 });
@@ -170,6 +174,59 @@ test("client files are not restricted", () => {
 
   return <button onClick={onClick}>{document.title}</button>;
 }
+`,
+  );
+
+  assert.deepEqual(messages, []);
+  assert.equal(status, 0);
+});
+
+test("async callbacks are rejected where Jahia can invoke them from a nested call", () => {
+  const { status, messages } = lint(
+    "src/extensions.ts",
+    `import { registerNodeValidator, registerRenderFilter } from "@jahia/javascript-modules-library";
+
+registerNodeValidator({ nodeType: "example:article" }, async () => undefined);
+
+registerRenderFilter(
+  { key: "exampleUppercase" },
+  { execute: async (previousOutput: string) => previousOutput.toUpperCase() },
+);
+`,
+  );
+
+  assert.notEqual(status, 0, "ESLint should fail on async extension-point callbacks");
+
+  const restricted = messages.filter(({ ruleId }) => ruleId === "no-restricted-syntax");
+  assert.equal(
+    restricted.length,
+    2,
+    `Both callbacks should be reported, got ${JSON.stringify(messages)}`,
+  );
+
+  for (const name of ["registerNodeValidator", "registerRenderFilter"]) {
+    assert.ok(
+      restricted.some(({ message }) => message.includes(`${name}()`)),
+      `${name} should be reported, got ${JSON.stringify(restricted)}`,
+    );
+  }
+
+  for (const { message } of restricted) {
+    assert.ok(message.endsWith(`See ${DOCS_URL}`), `Message does not link the docs: ${message}`);
+  }
+});
+
+test("synchronous extension-point callbacks pass", () => {
+  const { status, messages } = lint(
+    "src/synchronous-extensions.ts",
+    `import { registerNodeValidator, registerRenderFilter } from "@jahia/javascript-modules-library";
+
+registerNodeValidator({ nodeType: "example:article" }, () => undefined);
+
+registerRenderFilter(
+  { key: "exampleUppercase" },
+  { execute: (previousOutput: string) => previousOutput.toUpperCase() },
+);
 `,
   );
 

@@ -170,6 +170,46 @@ const serverRuntimeBoundary = {
   },
 };
 
+/**
+ * Keeps `async` out of the extension-point callbacks Jahia can invoke while JavaScript is already
+ * running: a node validator reached by a save issued from server code, a render filter reached by a
+ * `<Render>` component in a view. GraalJS drains the microtask queue only when the outermost
+ * JavaScript frame returns to the host, so a promise created by such a nested call never settles,
+ * and the save or the render fails with a promise that stays pending.
+ *
+ * Every file is linted, not only server files: these registrations are often declared in a plain
+ * module imported by a server entry point.
+ *
+ * Keep in sync with the copies in `eslint.config.js` (repository root),
+ * `samples/hydrogen/eslint.config.js` and
+ * `javascript-create-module/templates/module/eslint.config.js`.
+ *
+ * @type {import("eslint").Linter.Config}
+ * @see SERVER_RUNTIME_BOUNDARY_DOCS
+ */
+const synchronousExtensionCallbacks = {
+  rules: {
+    "no-restricted-syntax": [
+      "error",
+      ...["registerNodeValidator", "registerRenderFilter"].flatMap((name) => {
+        const asyncFunction = ":matches(ArrowFunctionExpression, FunctionExpression)[async=true]";
+        const message =
+          `The callbacks of ${name}() must be synchronous: Jahia can invoke them while JavaScript ` +
+          `is already running, where a promise never settles. See ${SERVER_RUNTIME_BOUNDARY_DOCS}`;
+        return [
+          // registerNodeValidator(declaration, async () => …)
+          { selector: `CallExpression[callee.name="${name}"] > ${asyncFunction}`, message },
+          // registerRenderFilter(declaration, { execute: async () => … })
+          {
+            selector: `CallExpression[callee.name="${name}"] Property > ${asyncFunction}`,
+            message,
+          },
+        ];
+      }),
+    ],
+  },
+};
+
 export default defineConfig(
   {
     languageOptions: {
@@ -202,6 +242,9 @@ export default defineConfig(
 
   // Server runtime boundary
   serverRuntimeBoundary,
+
+  // Extension-point callbacks that cannot be async
+  synchronousExtensionCallbacks,
   // The test module groups its server code in directories instead of using the `.server.tsx`
   // suffix, so it needs the same rules under a different glob.
   { ...serverRuntimeBoundary, files: ["jahia-test-module/src/react/server/**/*.{js,jsx,ts,tsx}"] },
