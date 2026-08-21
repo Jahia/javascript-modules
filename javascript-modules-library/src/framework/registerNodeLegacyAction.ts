@@ -78,8 +78,9 @@ export interface NodeLegacyActionResult {
  * );
  * ```
  *
- * Handlers may be `async`: `await` over synchronous work is fully supported, but the server runtime
- * has no timers and no asynchronous I/O — a promise relying on them never settles and the request
+ * Handlers may be `async`, because Jahia invokes the action from an HTTP request, with no
+ * JavaScript running: `await` over synchronous work is fully supported, but the server runtime has
+ * no timers and no asynchronous I/O — a promise relying on them never settles and the request
  * fails.
  *
  * @param declaration The action declaration; `name` is the URL-visible action name.

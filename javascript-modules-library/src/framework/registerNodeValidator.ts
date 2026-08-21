@@ -1,5 +1,6 @@
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 import type { Locale } from "java.util";
+import { assertSynchronousCallback } from "./synchronousCallback.js";
 
 /**
  * `registerNodeValidator` calls are executed synchronously during module initialization. During
@@ -70,10 +71,9 @@ export interface NodeValidatorDeclaration {
  * ```
  *
  * Validators run on every matching save — keep them fast, and never call `session.save()` from a
- * validator. They may be `async` (microtask-only: the server runtime has no timers or async I/O)
- * **only when the save is host-initiated** (editing UI, REST, GraphQL). A save triggered from JS
- * server code cannot drain the microtask queue: an async validator then fails to settle and the
- * save is rejected. Use synchronous validators if your content may be saved from JS.
+ * validator. They must be synchronous: a save triggered from server JavaScript runs the validator
+ * inside that execution, where the server runtime cannot settle a promise. An `async` validator is
+ * rejected when it is registered.
  *
  * @param declaration The validator declaration.
  * @param validate Returns the violations (array, single violation, or nothing when valid).
@@ -83,12 +83,9 @@ export const registerNodeValidator = (
   validate: (
     node: JCRNodeWrapper,
     context: NodeValidatorContext,
-  ) =>
-    | NodeValidatorViolation[]
-    | NodeValidatorViolation
-    | undefined
-    | Promise<NodeValidatorViolation[] | NodeValidatorViolation | undefined>,
+  ) => NodeValidatorViolation[] | NodeValidatorViolation | undefined,
 ): void => {
+  assertSynchronousCallback(validate, `The validator of ${nodeType} (${name})`);
   server.registry.add("node-validator", `${bundleKey}_node-validator_${nodeType}_${name}`, {
     nodeType,
     skipOnImport,

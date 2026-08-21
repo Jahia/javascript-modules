@@ -60,7 +60,9 @@ export interface ChoiceListInitializerContext {
  * prefix them with your module name to avoid collisions.
  *
  * The callback runs on a server thread every time an editor form displays the choicelist — keep it
- * fast. It may be `async` (microtask-only: the server runtime has no timers or async I/O).
+ * fast. It may be `async`, because Jahia invokes it from a request, with no JavaScript running: a
+ * returned promise can then settle (microtask-only, the server runtime has no timers or async
+ * I/O).
  *
  * @param options The initializer declaration; `key` is the name referenced from CND definitions.
  * @param resolveValues Returns the choices offered to the editor.

@@ -1,4 +1,5 @@
 import type { RenderContext, Resource } from "org.jahia.services.render";
+import { assertSynchronousCallback } from "./synchronousCallback.js";
 
 /** Declaration of a render filter. */
 export interface RenderFilterDeclaration {
@@ -36,7 +37,7 @@ export interface RenderFilterCallbacks {
     renderContext: RenderContext,
     resource: Resource,
     chain: unknown,
-  ) => string | null | undefined | Promise<string | null | undefined>;
+  ) => string | null | undefined;
   /**
    * Invoked after the resource is rendered, with the output produced so far; returns the (possibly
    * transformed) output. Returning null/undefined keeps the previous output.
@@ -48,7 +49,7 @@ export interface RenderFilterCallbacks {
     renderContext: RenderContext,
     resource: Resource,
     chain: unknown,
-  ) => string | null | undefined | Promise<string | null | undefined>;
+  ) => string | null | undefined;
 }
 
 /**
@@ -61,10 +62,9 @@ export interface RenderFilterCallbacks {
  * );
  * ```
  *
- * Filters run on every matching render — keep them fast. Callbacks may be `async` (microtask-only:
- * the server runtime has no timers or async I/O) **only when the render is host-initiated**. A render
- * started from JS — typically a nested render through the `<Render>` component — cannot drain the
- * microtask queue, so filters that may match nested renders must use synchronous callbacks.
+ * Filters run on every matching render — keep them fast. Callbacks must be synchronous: a filter
+ * can run inside a nested render, started by a `<Render>` component in a view, where the server
+ * runtime cannot settle a promise. An `async` callback is rejected when the filter is registered.
  *
  * Keys live in a single platform-wide registry namespace; prefix them with your module name to
  * avoid collisions.
@@ -85,6 +85,8 @@ export const registerRenderFilter = (
   }: RenderFilterDeclaration,
   { prepare, execute }: RenderFilterCallbacks,
 ): void => {
+  assertSynchronousCallback(prepare, `The "prepare" callback of render filter "${key}"`);
+  assertSynchronousCallback(execute, `The "execute" callback of render filter "${key}"`);
   server.registry.add("render-filter", key, {
     ...(priority !== undefined && { priority }),
     ...(description !== undefined && { description }),

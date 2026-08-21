@@ -102,6 +102,17 @@ public class JSPromiseTest {
     }
 
     @Test
+    public void asyncFunctionsCarryTheirTypeTag() {
+        // The library refuses async callbacks for the extension points reachable at a nested host
+        // boundary (assertSynchronousCallback in javascript-modules-library), and detects them with
+        // this tag. Pins that GraalJS reports it, so a runtime change is noticed here rather than by
+        // a validator that stops being rejected.
+        Value tagOf = context.eval("js", "(fn) => Object.prototype.toString.call(fn)");
+        assertEquals("[object AsyncFunction]", tagOf.execute(context.eval("js", "(async () => 42)")).asString());
+        assertEquals("[object Function]", tagOf.execute(context.eval("js", "(() => 42)")).asString());
+    }
+
+    @Test
     public void asyncCallbacksCannotSettleAtNestedHostBoundaries() {
         // Pins the nested-invocation limitation documented on JSPromise: at a host → JS → host → JS
         // boundary, outer JS frames are still on the stack, GraalJS does not drain the microtask
