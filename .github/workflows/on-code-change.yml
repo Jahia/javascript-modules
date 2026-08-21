@@ -14,20 +14,15 @@ on:
 
 jobs:
   on-code-change:
-    uses: Jahia/jahia-modules-action/.github/workflows/reusable-on-code-change.yml@v2
+    # TEMPORARY: pinned to the branch of Jahia/jahia-modules-action#405 to validate that the
+    # inputs dropped below are correctly derived. This PR is throw-away and must not be merged.
+    uses: Jahia/jahia-modules-action/.github/workflows/reusable-on-code-change.yml@ci/reduce-on-code-change-inputs
     secrets: inherit
     with:
-      static_analysis_auditci_level: critical
-      build_container_image: ghcr.io/jahia/jahia-docker-mvn-cache:17-jdk-noble-mvn-loaded
-      module_branch: ${{ github.ref }}
-      sonar_analysis_primary_release_branch: main
-      integration_tests_standalone_execute: true
       module_id: javascript-modules-engine
-      integration_tests_testrail_project: Javascript Modules Engine
-      integration_tests_jahia_image: ghcr.io/jahia/jahia-ee-dev:8-SNAPSHOT
+      build_container_image: ghcr.io/jahia/jahia-docker-mvn-cache:17-jdk-noble-mvn-loaded
       integration_tests_provisioning_manifest: provisioning-manifest-build.yml
-      integration_tests_should_use_build_artifacts: true
-      integration_tests_should_skip_testrail: true
+      integration_tests_testrail_project: Javascript Modules Engine
 
   # This workflow ensures that Windows builds are exactly the same as on other platforms
   test-on-windows:
