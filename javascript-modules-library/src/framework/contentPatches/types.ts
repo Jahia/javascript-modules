@@ -200,7 +200,55 @@ export interface JavaContentPatchSupport {
   isDryRun(): boolean;
   getModuleName(): string;
   getModuleVersion(): string;
-  isNodeTypeRegistered(name: string): boolean;
-  assertOwnedNodeType(name: string): void;
-  unregisterNodeType(name: string): void;
+  getOperations(patchName: string): JavaContentPatchOperations;
+}
+
+/**
+ * Shape of the per-workspace counters of the Java operation report. Keep in sync with
+ * `org.jahia.modules.javascript.modules.engine.contentpatches.OperationReport.WorkspaceReport`.
+ *
+ * @internal
+ */
+export interface JavaWorkspaceReport {
+  getMatched(): number;
+  getUpdated(): number;
+  getSkipped(): number;
+}
+
+/**
+ * Shape of the Java operation report. Keep in sync with
+ * `org.jahia.modules.javascript.modules.engine.contentpatches.OperationReport`.
+ *
+ * @internal
+ */
+export interface JavaOperationReport extends JavaWorkspaceReport {
+  getWorkspaceNames(): { size(): number; get(index: number): unknown };
+  getWorkspace(name: string): JavaWorkspaceReport;
+}
+
+/**
+ * Shape of the shared Java operations engine behind `patch.*` and `jcr.forEachNode` — options
+ * objects cross as Java maps, callbacks coerce to the engine's functional interfaces, `null` return
+ * values mean "leave untouched". Keep in sync with
+ * `org.jahia.modules.javascript.modules.engine.contentpatches.ContentPatchOperations`.
+ *
+ * @internal
+ */
+export interface JavaContentPatchOperations {
+  isNodeTypeRegistered(nodeType: string): boolean;
+  forEachNode(
+    options: NodeSelection | QuerySelection,
+    visitor: (node: JCRNodeWrapper) => boolean | void,
+  ): JavaOperationReport;
+  removePropertyValues(options: object): JavaOperationReport;
+  setPropertyValues(
+    options: object,
+    value?: (node: JCRNodeWrapper, locale: string | null) => unknown,
+  ): JavaOperationReport;
+  convertPropertyValues(
+    options: object,
+    convert: (value: JCRValueWrapper, node: JCRNodeWrapper) => unknown,
+  ): JavaOperationReport;
+  removeNodeType(options: object): JavaOperationReport;
+  changeNodeType(options: object): JavaOperationReport;
 }

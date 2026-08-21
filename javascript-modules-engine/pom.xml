@@ -81,8 +81,15 @@
                 <configuration>
                 <instructions>
                     <_dsannotations>*</_dsannotations>
-                    <!-- those OSGI dependencies are not provided by Jahia and should be embedded in the bundle -->
-                    <Embed-Dependency>bndlib,chromeinspector,commons-pool2,pax-swissbox-bnd,graal-sdk,truffle-api,js,icu4j,regex</Embed-Dependency>
+                    <!-- those OSGI dependencies are not provided by Jahia and should be embedded in the bundle.
+                         `profiler` carries com.oracle.truffle.tools.utils.json, which chromeinspector loads when
+                         the debugger is enabled: it has to be listed, since the explicit Export-Package below
+                         stops bnd from pulling dependency classes into the bundle on its own. -->
+                    <Embed-Dependency>bndlib,chromeinspector,profiler,commons-pool2,pax-swissbox-bnd,graal-sdk,truffle-api,js,icu4j,regex</Embed-Dependency>
+                    <!-- The language-neutral content patch API, exported for Groovy patch scripts and Java
+                         modules. Only this package is exported: it exposes no GraalVM/polyglot or
+                         engine-internal types, so consumers stay decoupled. -->
+                    <Export-Package>org.jahia.modules.javascript.modules.engine.contentpatches;version="${project.version}"</Export-Package>
                 </instructions>
                 <!-- because the Java classes of javascript-modules-engine-java are unpacked into the target/classes folder, -->
                 <!-- the dependency can and should be excluded to avoid duplicates -->

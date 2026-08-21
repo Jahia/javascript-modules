@@ -169,3 +169,20 @@
 
 [javascriptExample:patchTestDoomed] > jnt:content, javascriptExampleMix:javascriptExampleComponent
  - label (string)
+
+// Mirror of the patchTest* types for the Groovy parity spec (contentPatchGroovyParityTest.cy.ts):
+// the same operations are run through the exported Java API from a Groovy script, on separate
+// types so the two suites never interfere.
+[javascriptExample:patchTestGroovyContent] > jnt:content, javascriptExampleMix:javascriptExampleComponent
+ - legacyColor (string)
+ - theme (string)
+ - counter (undefined)
+
+[javascriptExample:patchTestGroovyLegacy] > jnt:content, javascriptExampleMix:javascriptExampleComponent
+ - oldTitle (string)
+
+[javascriptExample:patchTestGroovyNew] > jnt:content, javascriptExampleMix:javascriptExampleComponent
+ - newTitle (string)
+
+[javascriptExample:patchTestGroovyDoomed] > jnt:content, javascriptExampleMix:javascriptExampleComponent
+ - label (string)

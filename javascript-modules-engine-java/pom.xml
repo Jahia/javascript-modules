@@ -221,6 +221,13 @@
             <version>4.11.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <!-- referenced by the signatures of mocked Jahia types (JCRNodeWrapper) -->
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -336,6 +343,8 @@
                                 <ignoredUnusedDeclaredDependency>org.jboss.spec.javax.servlet:jboss-servlet-api_3.1_spec</ignoredUnusedDeclaredDependency>
                                 <ignoredUnusedDeclaredDependency>org.osgi:osgi.annotation</ignoredUnusedDeclaredDependency>
                                 <ignoredUnusedDeclaredDependency>xml-apis:xml-apis</ignoredUnusedDeclaredDependency>
+                                <!-- referenced by the signatures of mocked Jahia types, never in our code: -->
+                                <ignoredUnusedDeclaredDependency>commons-lang:commons-lang</ignoredUnusedDeclaredDependency>
                             </ignoredUnusedDeclaredDependencies>
                         </configuration>
                     </execution>

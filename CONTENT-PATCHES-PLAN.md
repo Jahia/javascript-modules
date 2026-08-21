@@ -2,6 +2,9 @@
 
 - Status: **accepted** 2026-07-21 (all §10 questions resolved)
 - Date: 2026-07-21
+
+> **Layering update (2026-08, per the review of [#697](https://github.com/Jahia/javascript-modules/pull/697) and the plan in [#725](https://github.com/Jahia/javascript-modules/issues/725)):** the guard-railed operations and the batching engine described in §4–§5 are implemented once in **Java**, in the engine-exported `…engine.contentpatches` package. The TypeScript `patch.*` / `jcr.forEachNode` surface below is unchanged but is now a thin typed façade over that engine, and Groovy patch scripts / Java modules reach the same engine through the `ContentPatchService` OSGi service — with operation-by-operation parity asserted by twin Cypress suites (`contentPatchTest.cy.ts` / `contentPatchGroovyParityTest.cy.ts`). The rest of this document remains the design record.
+
 - Baseline: branch `feature/js-server-extensions` (implementation lands directly on it); core facts verified against `Jahia/jahia@main` (8.2.3.0 prep, sha `5e20152`)
 - Developer-facing contract (API-first spec, all five use cases as real files): [CONTENT-PATCHES-DEMO.md](CONTENT-PATCHES-DEMO.md)
 

@@ -37,7 +37,7 @@ The `name` is the content patch's **run-once identity and ordering key**:
 
 Content patches run **synchronously** on the module start thread (like actions, they must not be `async`), on the **processing server only**, and by the time they run the module's new definitions are already registered.
 
-## The `migrate.*` helpers
+## The `patch.*` helpers
 
 Every helper iterates both the `default` and `live` workspaces (override with `workspaces`), commits in batches (`batchSize`, default 100), handles internationalized properties on their translation subnodes, logs progress, and no-ops gracefully when the node type was never registered on this instance (fresh installs).
 
@@ -98,6 +98,24 @@ registerContentPatch({ name: "2.0.0-02-fix-root-title" }, ({ jcr, log, skip }) =
 ```
 
 With `locale: null` (the default), system sessions see translation subnodes as plain nodes — usually what content patches want.
+
+## The same engine from Groovy and Java
+
+The operations behind `patch.*` and `jcr.forEachNode` are not implemented in JavaScript: they live in a language-neutral Java API exported by the engine bundle (`org.jahia.modules.javascript.modules.engine.contentpatches`), and the TypeScript surface above is a thin typed façade over it. Groovy `META-INF/patches` scripts and Java modules get the exact same batching, i18n handling, guard rails and dry-run through the `ContentPatchService` OSGi service — with named arguments and closures in place of object literals and arrow functions:
+
+```groovy
+def ops = org.jahia.osgi.BundleUtils.getOsgiService(
+        "org.jahia.modules.javascript.modules.engine.contentpatches.ContentPatchService", null)
+        .operations("my-module", false, log)
+
+ops.removePropertyValues(nodeType: "mymodule:banner", property: "color")
+ops.setPropertyValues(nodeType: "mymodule:banner", property: "theme", value: "light")
+ops.convertPropertyValues(nodeType: "mymodule:banner", property: "priority") { value, node ->
+    Integer.parseInt(value.getString())
+}
+```
+
+Run-once tracking for Groovy patches stays what it always was — core's `META-INF/patches` lifecycle, recorded in the same status store as JS content patches. Parity between the two faces is asserted operation by operation by twin test suites: `tests/cypress/e2e/engine/contentPatchTest.cy.ts` (TypeScript) and `tests/cypress/e2e/engine/contentPatchGroovyParityTest.cy.ts` (Groovy) run the same transformations and expect the same outcomes.
 
 ## Outcomes and failure semantics
 

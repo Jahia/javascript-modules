@@ -69,7 +69,8 @@ export const registerContentPatch = (
     execute: (support: JavaContentPatchSupport) => {
       const log = support.getLogger(name);
       const dryRun = support.isDryRun();
-      const jcr = createContentPatchJcr(dryRun, log);
+      const ops = support.getOperations(name);
+      const jcr = createContentPatchJcr(ops);
       // Skip detection is flag-based, not identity-based: when skip() is called inside a callback
       // that crosses a host boundary (jcr.withSystemSession, jcr.forEachNode, the patch.* helpers),
       // the thrown ContentPatchSkipped may come back wrapped in a host exception, so the caught
@@ -77,7 +78,7 @@ export const registerContentPatch = (
       let skipReason: string | undefined;
       const context: ContentPatchContext = {
         jcr,
-        patch: createContentPatchOperations(jcr, support, log),
+        patch: createContentPatchOperations(ops),
         log,
         dryRun,
         module: { name: support.getModuleName(), version: support.getModuleVersion() },
@@ -97,9 +98,7 @@ export const registerContentPatch = (
         return ".installed";
       } catch (error) {
         if (skipReason !== undefined || error instanceof ContentPatchSkipped) {
-          log.info(
-            `Content patch skipped: ${skipReason ?? (error as ContentPatchSkipped).reason}`,
-          );
+          log.info(`Content patch skipped: ${skipReason ?? (error as ContentPatchSkipped).reason}`);
           return ".skipped";
         }
         throw error;
