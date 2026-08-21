@@ -1,6 +1,7 @@
 import { Island, jahiaComponent } from "@jahia/javascript-modules-library";
 import SampleHydrateInBrowserReact from "$client/components/SampleHydrateInBrowserReact";
 import SampleRenderInBrowserReact from "$client/components/SampleRenderInBrowserReact";
+import { SampleNamedExportReact } from "$client/components/SampleNamedExportReact";
 
 jahiaComponent(
   {
@@ -25,6 +26,7 @@ jahiaComponent(
         >
           <p data-testid="ssr-placeholder">Server-side placeholder</p>
         </Island>
+        <Island component={SampleNamedExportReact} props={{ initialValue: 5 }} />
       </>
     );
   },
