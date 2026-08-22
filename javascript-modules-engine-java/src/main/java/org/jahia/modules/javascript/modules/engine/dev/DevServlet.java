@@ -163,6 +163,8 @@ public class DevServlet extends HttpServlet {
             throws IOException {
         if ("DELETE".equals(request.getMethod())) {
             registry.close(module);
+            // the module's pages address the installed bundle again, and lose the reload script
+            moduleListener.dropWhatJahiaDerivedFrom(module);
             writeJson(response, HttpServletResponse.SC_OK, "{\"attached\":false}");
             return;
         }
@@ -193,6 +195,9 @@ public class DevServlet extends HttpServlet {
         }
 
         registry.open(module, origin);
+        // from now on the module's pages address the development server and carry the reload script,
+        // so anything cached from before would stay stale and would never learn to reload itself
+        moduleListener.dropWhatJahiaDerivedFrom(module);
         writeJson(response, HttpServletResponse.SC_OK,
                 "{\"attached\":true,\"base\":\"" + DevServerRegistry.baseOf(module) + "\"}");
     }

@@ -144,12 +144,21 @@ public class JavascriptModuleListener implements BundleListener {
             registrar.register(bundle);
         }
 
-        // A redeploy tells the rest of Jahia to drop what it derived from the module: the HTML
-        // fragment cache above all, which development mode does not disable, and which would keep
-        // serving the views this reload just replaced. A swap raises no bundle event, so the engine
-        // has to say it itself.
-        JahiaTemplatesPackage templatePackage =
-                templateManagerService.getTemplatePackageById(bundle.getSymbolicName());
+        dropWhatJahiaDerivedFrom(bundle.getSymbolicName());
+    }
+
+    /**
+     * Tells the rest of Jahia to drop what it derived from a module: the HTML fragment cache above
+     * all, which development mode does not disable.
+     *
+     * <p>A redeploy does this through a bundle event. Nothing a development server does raises one —
+     * neither swapping the module's code nor attaching to it, though both change what pages render —
+     * so the engine has to say it itself.
+     *
+     * @param module the module's OSGi symbolic name
+     */
+    public void dropWhatJahiaDerivedFrom(String module) {
+        JahiaTemplatesPackage templatePackage = templateManagerService.getTemplatePackageById(module);
         if (templatePackage != null) {
             templateManagerService.fireTemplatePackageRedeployedEvent(templatePackage);
         }
