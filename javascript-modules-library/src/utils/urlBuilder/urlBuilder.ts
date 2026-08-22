@@ -16,6 +16,11 @@ function appendParameters(url: string, parameters: Record<string, string>): stri
 /**
  * Generate a Jahia url for the provided node.
  *
+ * For an image, prefer {@link buildImageUrl} (or the `JImage` component): it clamps the requested
+ * size to the original, picks the resize channel the node's provider honours, and can use the
+ * thumbnails Jahia pre-generates (`node.getThumbnailUrl("thumbnail")`), which are the only variants
+ * a plain instance serves.
+ *
  * @returns The final URL
  */
 export function buildNodeUrl(
@@ -45,7 +50,16 @@ export function buildNodeUrl(
     | {
         /** The query string parameters to append to the URL */
         parameters?: Record<string, string>;
-        /** Additional arguments used for building the URL, through `node.getUrl` overloads. */
+        /**
+         * Additional arguments passed to `node.getUrl(List)`, for a provider whose decorator
+         * interprets them — an external DAM mount turns `{ w: 600 }` into a signed, transformed
+         * URL.
+         *
+         * **The default provider ignores them:** core's `JCRNodeWrapperImpl.getUrl(List)` discards
+         * its parameters, so on a local `/files` asset these produce the plain URL. To resize such
+         * an image, use {@link buildImageUrl}, which picks the channel the asset's provider actually
+         * honours.
+         */
         args?: Record<string, string | number | boolean>;
       },
   context?: {
