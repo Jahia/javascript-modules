@@ -2,6 +2,7 @@ import type { JCRNodeWrapper } from "org.jahia.services.content";
 import type { RenderContext, Resource } from "org.jahia.services.render";
 import { buildImageUrl, type ImageResizeChannel } from "./buildImageUrl.js";
 import { clampToIntrinsic, readImageMeta } from "./imageMeta.js";
+import { warnIgnoredResize } from "./warnIgnoredResize.js";
 
 /**
  * How the image occupies its slot. Declaring the intent lets the library derive both `srcSet` and
@@ -184,10 +185,14 @@ export function getImageProps(
   // collapse several requested widths onto one rendition; under-claiming its width makes the
   // browser climb to a bigger candidate rather than paint an upscaled one.
   const widthByUrl = new Map<string, number>();
+  let ignoredResize = false;
   for (const candidate of requested) {
-    const { url } = buildImageUrl(node, { width: candidate }, { meta, context });
+    const { url, channel } = buildImageUrl(node, { width: candidate }, { meta, context });
+    if (channel === "query") ignoredResize = true;
     if (!widthByUrl.has(url)) widthByUrl.set(url, candidate);
   }
+
+  if (ignoredResize) warnIgnoredResize(node);
 
   const [smallest] = [...widthByUrl.keys()];
   return {

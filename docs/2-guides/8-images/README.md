@@ -104,6 +104,8 @@ This is the part that surprises people: **a plain Jahia instance does not resize
 
 So on your local instance, a `srcSet` full of `?w=` candidates is expected, and every one of them returns the same file. Nothing is broken: the markup is correct, and it starts saving bytes the moment the site runs somewhere that honours the hint. If you want to see real per-width files locally, mount a DAM or request a thumbnail width.
 
+An instance in development mode says so rather than letting you discover it: the first image that falls back to `?w=` candidates prints one warning naming that image as its example and pointing back at this section. It says the same thing for every image, so it is printed once per instance and never in production. Silence it by making the resize real — a thumbnail width, a DAM mount, or Media Optimization in front of the instance — or leave it, because locally it is only telling you what this table already says.
+
 ## Images inside an island
 
 An island's props are serialized, so a React element cannot be one of them, and its server-rendered children are frozen — a client component cannot re-render them. A gallery that swaps images on click therefore needs image **data**, which is exactly what `getImageProps` returns:

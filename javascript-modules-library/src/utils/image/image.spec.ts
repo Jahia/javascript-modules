@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 
 // `buildNodeUrl` reaches into the Jahia render context, which only exists inside the engine. The
@@ -26,6 +26,7 @@ const { readImageMeta } = await import("./imageMeta.js");
 /** A JCR file node holding an image, with just the surface the image code touches. */
 const imageNode = ({
   url = "/files/photo.jpg",
+  path,
   mimeType = "image/jpeg",
   width,
   height,
@@ -34,6 +35,7 @@ const imageNode = ({
   getUrl,
 }: {
   url?: string;
+  path?: string;
   mimeType?: string;
   width?: number;
   height?: number;
@@ -43,6 +45,11 @@ const imageNode = ({
 } = {}) =>
   ({
     url,
+    // A real node always reports a path; omitting it models the one that cannot be read
+    getPath: () => {
+      if (path === undefined) throw new Error("no path");
+      return path;
+    },
     getProvider: () => ({ isDefault: () => defaultProvider, getKey: () => "test" }),
     // A DAM decorator signs the transformed URL; the default provider discards these params
     getUrl: getUrl ?? ((params: string[]) => `${url}#signed(${params.join(",")})`),
@@ -278,5 +285,108 @@ describe("getImageProps", () => {
       "A terrace",
     );
     expect(getImageProps(node, { alt: "", layout: "fixed", width: 300 }).alt).toBe("");
+  });
+});
+
+describe("the ignored-resize warning", () => {
+  /** The engine injects `server` as a global; a test provides only the part under test. */
+  const stubDevelopmentMode = (developmentMode: boolean) => {
+    Reflect.set(globalThis, "server", {
+      config: { isDevelopmentMode: () => developmentMode },
+    });
+  };
+
+  /**
+   * The warning latches a module-scope flag — once per engine lifetime is the point of it — so each
+   * test needs its own copy of the module rather than the one a previous test already silenced.
+   */
+  let freshImageProps: typeof getImageProps;
+  beforeEach(async () => {
+    vi.resetModules();
+    ({ getImageProps: freshImageProps } = await import("./getImageProps.js"));
+  });
+
+  /** A slot of 600 on a 2000px original: candidates no thumbnail covers, so `?w=` carries them. */
+  const slot = { alt: "", layout: "fixed", width: 600 } as const;
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    Reflect.deleteProperty(globalThis, "server");
+  });
+
+  it("names the node and points at the guide", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    stubDevelopmentMode(true);
+
+    freshImageProps(imageNode({ path: "/sites/test/files/hinted.jpg", width: 2000 }), slot);
+
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain("/sites/test/files/hinted.jpg");
+    expect(warn.mock.calls[0][0]).toContain("8-images/README.md");
+  });
+
+  it("says nothing in production", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    stubDevelopmentMode(false);
+
+    freshImageProps(imageNode({ path: "/sites/test/files/production.jpg", width: 2000 }), slot);
+
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it("says nothing when there is no server bridge to ask", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    expect(() =>
+      freshImageProps(imageNode({ path: "/sites/test/files/no-bridge.jpg", width: 2000 }), slot),
+    ).not.toThrow();
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it("says nothing about the channels that do resize", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    stubDevelopmentMode(true);
+
+    // A pre-generated thumbnail width: a real resize on any instance
+    freshImageProps(imageNode({ path: "/sites/test/files/thumb.jpg", width: 2000 }), {
+      alt: "",
+      widths: [150],
+    });
+    // An external provider, whose decorator signs a transformed URL
+    freshImageProps(
+      imageNode({ path: "/sites/test/files/dam.jpg", width: 4000, defaultProvider: false }),
+      slot,
+    );
+    // Nothing to resize: every candidate clamps to the smaller original
+    freshImageProps(imageNode({ path: "/sites/test/files/small.jpg", width: 200 }), slot);
+    // A vector needs no candidates at all
+    freshImageProps(
+      imageNode({ path: "/sites/test/files/logo.svg", mimeType: "image/svg+xml" }),
+      slot,
+    );
+
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it("warns once for the instance, not per image or per render", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    stubDevelopmentMode(true);
+
+    const node = imageNode({ path: "/sites/test/files/repeated.jpg", width: 2000 });
+    freshImageProps(node, slot);
+    // Re-rendering the same image says nothing new
+    freshImageProps(node, slot);
+    // Neither does a different image: the instance, not the asset, is what ignores the parameters
+    freshImageProps(imageNode({ path: "/sites/test/files/another.jpg", width: 2000 }), slot);
+
+    expect(warn).toHaveBeenCalledTimes(1);
+  });
+
+  it("still renders when the node cannot report its path", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    stubDevelopmentMode(true);
+
+    expect(() => freshImageProps(imageNode({ width: 2000 }), slot)).not.toThrow();
+    expect(warn).toHaveBeenCalledTimes(1);
   });
 });
