@@ -13,7 +13,8 @@
     "import": "./dist/index.mjs"
   },
   "bin": {
-    "jahia-deploy": "bin/jahia-deploy.js"
+    "jahia-deploy": "bin/jahia-deploy.js",
+    "jahia-dev": "bin/jahia-dev.js"
   },
   "files": [
     "bin",
