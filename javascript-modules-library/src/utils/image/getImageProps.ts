@@ -16,11 +16,13 @@ import { clampToIntrinsic, readImageMeta } from "./imageMeta.js";
 export type ImageLayout = "constrained" | "fixed" | "full-width";
 
 /**
- * Candidate widths, in image pixels, used when the layout can stretch.
+ * Candidate file widths, in image pixels, offered for the layouts where the slot is not a single
+ * number — `constrained` below its maximum, and `full-width` always. A `fixed` slot never uses
+ * them: its width and that width doubled cover it.
  *
- * A ladder, not a set of breakpoints: candidates describe how large the _file_ can be, while
- * `sizes` describes the _slot_, so the two do not have to line up. Doubling steps keep the ladder
- * short while covering high-density screens.
+ * These are widths of _files_, not breakpoints of the layout: the slot is described by `sizes`, and
+ * the browser matches one against the other at load time. Doubling-ish steps keep the ladder short,
+ * because a candidate only pays for itself if it is meaningfully smaller than the next one up.
  */
 export const DEFAULT_BREAKPOINTS: readonly number[] = [320, 640, 960, 1280, 1920, 2560];
 
@@ -132,7 +134,7 @@ const derivedSizes = (layout: ImageLayout, width: number | undefined): string =>
  * @param options - Alternative text (required) and how the image is laid out.
  * @param context - Provided by React context on the server; pass one when calling outside a render.
  * @returns Plain, serializable `<img>` props — safe to pass through `<Island>` props.
- * @see {@link Image} for the component that renders these props.
+ * @see {@link JImage} for the component that renders these props.
  */
 export function getImageProps(
   node: JCRNodeWrapper,

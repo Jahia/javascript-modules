@@ -7,12 +7,12 @@ content:
   $subpath: document-area/content
 ---
 
-Content images come from the JCR, and rendering one well means more than pointing an `<img>` at it: a browser should download a file sized for the slot it will occupy, the space it needs should be reserved before it arrives, editing the image should flush the cached fragments that show it, and a screen reader should be told what it is. The `Image` component does all of that from one declaration.
+Content images come from the JCR, and rendering one well means more than pointing an `<img>` at it: a browser should download a file sized for the slot it will occupy, the space it needs should be reserved before it arrives, editing the image should flush the cached fragments that show it, and a screen reader should be told what it is. The `JImage` component does all of that from one declaration.
 
 ## The short version
 
 ```tsx
-import { Image, jahiaComponent } from "@jahia/javascript-modules-library";
+import { JImage, jahiaComponent } from "@jahia/javascript-modules-library";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 
 jahiaComponent(
@@ -20,7 +20,7 @@ jahiaComponent(
   ({ title, cover }: { title: string; cover?: JCRNodeWrapper }) => (
     <article>
       <h2>{title}</h2>
-      <Image node={cover} alt={title} width={400} className="cover" />
+      <JImage node={cover} alt={title} width={400} className="cover" />
     </article>
   ),
 );
@@ -39,13 +39,33 @@ The one number you provide is `width`: how wide the image's slot is, in CSS pixe
 | `full-width`            | always the viewport width; needs no `width` | heroes, full-bleed banners                 |
 
 ```tsx
-<Image node={avatar} alt={fullName} layout="fixed" width={80} />
-<Image node={hero} alt={title} layout="full-width" priority />
+<JImage node={avatar} alt={fullName} layout="fixed" width={80} />
+<JImage node={hero} alt={title} layout="full-width" priority />
 ```
 
 Everything else follows from that. `constrained` and `fixed` ask for the slot width and its 2× variant, so a high-density screen gets a sharp file; `constrained` and `full-width` also ask for the smaller sizes a narrow viewport can use. Candidates are always capped by the original — Jahia never upscales — and the original itself is only offered when it is close to the largest size actually requested, so an 8000-pixel master is never sent to fill a 640-pixel card.
 
 If you genuinely need exact control, `widths` (candidate widths, in **image** pixels) and `sizes` (a raw [sizes attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#sizes)) override the derivation. Reach for them last: hand-written values are the part of responsive images that goes stale when a layout changes.
+
+### Two different widths: the slot and the file
+
+The number you give is the **slot**: how much room the image gets in the layout, in CSS pixels. The numbers in `srcSet` are **files**: how many actual pixels each candidate contains. They are not the same thing, and that is the whole reason `srcSet` exists.
+
+A slot of 400 CSS pixels needs a 400-pixel file on an ordinary screen and an 800-pixel one on a phone with a 2× display. A slot that says "up to 400, less on a narrow screen" needs smaller files too. So one slot maps to _several_ useful file sizes, and the browser is the only party that knows which one to fetch — it is the only one that knows the viewport and the pixel density at the moment the page loads.
+
+The **candidate ladder** is the list of file widths offered for the layouts where the slot is not a single number:
+
+| `layout`      | Files offered                                              | Uses the ladder                                               |
+| ------------- | ---------------------------------------------------------- | ------------------------------------------------------------- |
+| `fixed`       | `width`, `2 × width`                                       | no — the slot is one number, so two files cover it            |
+| `constrained` | ladder entries below `width`, then `width` and `2 × width` | yes, for the narrow viewports where the image shrinks         |
+| `full-width`  | the whole ladder                                           | yes — the slot is the viewport, which varies from phone to 4K |
+
+The default ladder is `[320, 640, 960, 1280, 1920, 2560]` — doubling-ish steps, because a candidate only pays for itself if it is meaningfully smaller than the next one up. Override it per call with `breakpoints` if a layout needs a different shape.
+
+Two consequences worth knowing. Candidates stop at `2 × width`: a 3× file costs roughly twice the bytes of a 2× one for a difference few people can see, so a 3× phone gets the 2× file. And the ladder starts at 320: below that, a device asks for the 320-pixel file and scales it down, which is the right trade for the handful of viewports that narrow.
+
+So: you declare the slot, the library enumerates the files, the browser chooses. You never compute a file width by hand unless you reach for `widths`.
 
 ### Why two attributes at all
 
@@ -56,7 +76,7 @@ If you genuinely need exact control, `widths` (candidate widths, in **image** pi
 An image is lazy-loaded by default, which is wrong for the one image that is already on screen when the page opens — usually the largest, and the one the browser measures as [Largest Contentful Paint](https://web.dev/articles/lcp).
 
 ```tsx
-<Image node={hero} alt={title} layout="full-width" priority />
+<JImage node={hero} alt={title} layout="full-width" priority />
 ```
 
 `priority` loads it eagerly and at high fetch priority. Use it on one image per page.
@@ -66,7 +86,7 @@ An image is lazy-loaded by default, which is wrong for the one image that is alr
 `alt` is not optional, because a missing one is invisible until someone using a screen reader hits it. Describe what the image shows, in the page's language:
 
 ```tsx
-<Image node={photo} alt={t("alt.estate", { estate: title })} width={400} />
+<JImage node={photo} alt={t("alt.estate", { estate: title })} width={400} />
 ```
 
 An image that carries no information of its own — a decorative flourish, or one that only repeats an adjacent caption — is declared with `alt=""`. That is a deliberate statement, not a shortcut.
@@ -111,7 +131,7 @@ export default function Gallery({ images }: { images: ImageProps[] }) {
 
 ## Cache dependencies
 
-`Image` and `getImageProps` register a render cache dependency on the image node, so replacing the image in jContent flushes the fragments that display it. If you build URLs yourself with `buildImageUrl`, register it yourself:
+`JImage` and `getImageProps` register a render cache dependency on the image node, so replacing the image in jContent flushes the fragments that display it. If you build URLs yourself with `buildImageUrl`, register it yourself:
 
 ```tsx
 server.render.addCacheDependency({ node: imageNode }, renderContext);
@@ -119,7 +139,7 @@ server.render.addCacheDependency({ node: imageNode }, renderContext);
 
 ## Reference
 
-- `Image` — the component; renders an unstyled `<img>`, so pass a `className`. Server-side only.
+- `JImage` — the component; renders an unstyled `<img>`, so pass a `className`. Server-side only.
 - `getImageProps(node, options)` — the same props as plain data, for islands and for cases where you own the element.
 - `buildImageUrl(node, size)` — one URL and the channel that carried the size.
 - `readImageMeta(node)` — mime type and intrinsic dimensions, if you need them directly.

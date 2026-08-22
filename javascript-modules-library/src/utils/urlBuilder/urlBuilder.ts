@@ -16,7 +16,7 @@ function appendParameters(url: string, parameters: Record<string, string>): stri
 /**
  * Generate a Jahia url for the provided node.
  *
- * For an image, prefer {@link buildImageUrl} (or the `Image` component): it clamps the requested
+ * For an image, prefer {@link buildImageUrl} (or the `JImage` component): it clamps the requested
  * size to the original, picks the resize channel the node's provider honours, and can use the
  * thumbnails Jahia pre-generates (`node.getThumbnailUrl("thumbnail")`), which are the only variants
  * a plain instance serves.
