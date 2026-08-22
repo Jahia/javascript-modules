@@ -38,7 +38,8 @@ import static org.jahia.modules.javascript.modules.engine.jshandler.JavascriptPr
 /**
  * Listener to execute scripts at activate/deactivate time
  */
-@Component(immediate = true)
+// published under its own type as well: the development endpoint reloads a module through it
+@Component(immediate = true, service = {JavascriptModuleListener.class, BundleListener.class})
 public class JavascriptModuleListener implements BundleListener {
     private static final Logger logger = LoggerFactory.getLogger(JavascriptModuleListener.class);
     private GraalVMEngine engine;
@@ -124,10 +125,13 @@ public class JavascriptModuleListener implements BundleListener {
      * <p>Only what the server bundle carries is reloaded. Node type definitions, imported content,
      * resource bundles and static resources come from the deployed bundle and still need a redeploy.
      *
+     * <p>Synchronized: each reload bumps the engine's context version, and two of them racing leaves
+     * the pool destroying contexts a concurrent borrow is still trying to validate.
+     *
      * @param bundle a started JavaScript module
      * @param code the server bundle to run from now on
      */
-    public void reloadServerBundle(Bundle bundle, String code) {
+    public synchronized void reloadServerBundle(Bundle bundle, String code) {
         List<Registrar> hotReloadable = registrars.stream()
                 .filter(Registrar::runsOnHotReload)
                 .collect(Collectors.toList());

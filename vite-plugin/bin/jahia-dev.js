@@ -99,6 +99,7 @@ const fileServer = createServer((request, response) => {
   const relative = requested.startsWith(prefix) ? requested.slice(prefix.length) : "";
   const file = path.resolve(distDir, relative.replace(/^dist\//, ""));
 
+  if (process.env.JAHIA_DEV_TRACE) console.log(`[trace] ${requested} -> ${file}`);
   if (!file.startsWith(distDir + path.sep) || !existsSync(file) || !statSync(file).isFile()) {
     response.writeHead(404, { "Content-Type": "text/plain" }).end("Not found");
     return;
@@ -166,12 +167,23 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
   process.on(signal, () => void detach().then(() => process.exit(0)));
 }
 
+/**
+ * Locates the `vite` binary the way Node resolves a package: this module's own `node_modules`
+ * first, then every parent's, which is where a workspace keeps it.
+ */
+function findVite() {
+  for (let dir = process.cwd(); ; dir = path.dirname(dir)) {
+    const candidate = path.join(dir, "node_modules", ".bin", "vite");
+    if (existsSync(candidate)) return candidate;
+    if (path.dirname(dir) === dir) return "vite";
+  }
+}
+
 /** Pushes the freshly built server bundle into the running engine. Open pages then reload. */
-async function pushServerBundle() {
-  if (!existsSync(serverBundle)) return;
+async function pushServerBundle(code) {
   const started = Date.now();
   try {
-    const { ms } = await command("server-bundle", { body: readFileSync(serverBundle) });
+    const { ms } = await command("server-bundle", { body: code });
     log("reloaded in %s ms (engine: %s ms)", Date.now() - started, ms);
   } catch (error) {
     console.error(`${styleText("red", "[jahia dev]")} server bundle rejected: ${error.message}`);
@@ -180,21 +192,55 @@ async function pushServerBundle() {
 
 // The build is the module's own: same config, same plugins, same output the installed bundle has.
 // Its watcher is the only file watcher here, and every rebuild ends in a push.
-const viteBin = path.resolve("node_modules", ".bin", "vite");
-const build = spawn(viteBin, ["build", "--watch"], { stdio: ["ignore", "pipe", "inherit"] });
+const viteBin = findVite();
+const build = spawn(viteBin, ["build", "--watch"], {
+  stdio: ["ignore", "pipe", "inherit"],
+  // tells the plugin's watch callback to stand down: this process owns what happens after a build
+  env: { ...process.env, JAHIA_DEV: "1" },
+});
 build.on("error", (error) => fail(`Cannot start the build: ${error.message}`));
 build.on("exit", (code) => fail(`The build exited with code ${code}`));
 
-let building = false;
-build.stdout.on("data", (chunk) => {
-  process.stdout.write(chunk);
-  const output = chunk.toString();
-  if (/build started/i.test(output)) building = true;
-  if (building && /built in/i.test(output)) {
-    building = false;
-    void pushServerBundle();
+build.stdout.on("data", (chunk) => process.stdout.write(chunk));
+
+// The build writes the server bundle once per rebuild, but prints "built in" once per environment,
+// so the file is the signal and its log is not. Pushes never overlap: a swap bumps the engine's
+// context version, and two of them racing leaves the pool unable to validate any context.
+let pushing = false;
+let pending = false;
+let lastPushed = "";
+
+async function onServerBundleChanged() {
+  if (pushing) {
+    pending = true;
+    return;
   }
-});
+  pushing = true;
+  try {
+    do {
+      pending = false;
+      const built = existsSync(serverBundle) ? readFileSync(serverBundle) : null;
+      const fingerprint = built ? `${built.length}:${statSync(serverBundle).mtimeMs}` : "";
+      if (built && fingerprint !== lastPushed) {
+        lastPushed = fingerprint;
+        await pushServerBundle(built);
+      }
+    } while (pending);
+  } finally {
+    pushing = false;
+  }
+}
+
+const debounce = (fn, ms) => {
+  let timer;
+  return () => {
+    clearTimeout(timer);
+    timer = setTimeout(fn, ms);
+  };
+};
+const serverBundleChanged = debounce(() => void onServerBundleChanged(), 50);
+watch(path.dirname(serverBundle), () => serverBundleChanged());
+serverBundleChanged();
 
 // The build only watches what it builds. Everything else in a module reaches Jahia through the
 // installed bundle, so a developer editing it would otherwise see nothing happen at all.

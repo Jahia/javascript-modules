@@ -185,6 +185,13 @@ public class DevServlet extends HttpServlet {
             return;
         }
 
+        if (!isReachable(origin)) {
+            // Jahia often runs in a container, where the developer's `localhost` is not this host's:
+            // saying so here is what lets the CLI try the name the container knows it by
+            response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Jahia cannot reach " + origin);
+            return;
+        }
+
         registry.open(module, origin);
         writeJson(response, HttpServletResponse.SC_OK,
                 "{\"attached\":true,\"base\":\"" + DevServerRegistry.baseOf(module) + "\"}");
@@ -248,7 +255,9 @@ public class DevServlet extends HttpServlet {
             return;
         }
 
-        String path = request.getRequestURI().substring(request.getContextPath().length());
+        // Rebuilt from the prefix this servlet owns rather than read off the request: Jahia dispatches
+        // into OSGi through a proxy servlet mapped at /modules, so the request URI arrives without it
+        String path = DevServerRegistry.DEV_PATH + request.getPathInfo();
         String query = request.getQueryString();
         URI upstream = URI.create(origin + path + (query == null ? "" : "?" + query));
 
@@ -309,6 +318,22 @@ public class DevServlet extends HttpServlet {
             throw new IllegalArgumentException("The origin carries a path: " + value);
         }
         return URI.create(origin.getScheme() + "://" + origin.getAuthority());
+    }
+
+    /** Whether the development server answers, so that a session is never opened onto a dead origin. */
+    private boolean isReachable(URI origin) {
+        try {
+            httpClient.send(
+                    HttpRequest.newBuilder(origin).method("HEAD", HttpRequest.BodyPublishers.noBody())
+                            .timeout(Duration.ofSeconds(2)).build(),
+                    HttpResponse.BodyHandlers.discarding());
+            return true;
+        } catch (IOException e) {
+            return false;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
     }
 
     private Optional<Bundle> findModule(String module) {

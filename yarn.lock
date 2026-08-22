@@ -531,6 +531,7 @@ __metadata:
     vite: ">=6.0.0"
   bin:
     jahia-deploy: bin/jahia-deploy.js
+    jahia-dev: bin/jahia-dev.js
   languageName: unknown
   linkType: soft
 
