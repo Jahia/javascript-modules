@@ -22,7 +22,7 @@ import { buildModuleFileUrl } from "../utils/urlBuilder/urlBuilder.js";
  *
  * @returns The `<img>` element.
  */
-export function Image({
+export function JImage({
   node,
   alt,
   layout,

@@ -9,7 +9,7 @@ export { AbsoluteArea } from "./components/AbsoluteArea.js";
 export { AddContentButtons } from "./components/AddContentButtons.js";
 export { AddResources } from "./components/AddResources.js";
 export { Area } from "./components/Area.js";
-export { Image } from "./components/Image.js";
+export { JImage } from "./components/JImage.js";
 
 // Declaration and registration
 export { jahiaComponent } from "./framework/jahiaComponent.js";
