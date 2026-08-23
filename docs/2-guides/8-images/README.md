@@ -21,14 +21,7 @@ jahiaComponent(
   ({ title, cover }: { title: string; cover?: JCRNodeWrapper }) => (
     <article>
       <h2>{title}</h2>
-      <JImage
-        node={cover}
-        alt={title}
-        layout="fluid"
-        sizes="auto"
-        fallback={placeholder}
-        className="cover"
-      />
+      <JImage node={cover} alt={title} sizes="auto" fallback={placeholder} className="cover" />
     </article>
   ),
 );
@@ -36,36 +29,66 @@ jahiaComponent(
 
 That renders an `<img>` with a `src` sized for the slot, a `srcSet` of alternatives the browser can pick from, a `sizes` the browser resolves against the real box, the intrinsic dimensions that reserve its space, `loading="lazy"`, and a registered cache dependency on the image node.
 
-Three props are worth knowing before anything else:
+Three things are worth knowing before anything else:
 
-- **`layout="fluid"`** says the slot is in the normal flow and nothing in the markup knows how wide it is — a `%`, a grid cell, a column that changes at every breakpoint. On a fluid design that is most slots. It goes with a `sizes`, and `sizes="auto"` lets the browser measure the real box.
+- **You describe the slot exactly once.** Either `slotWidth`, when the markup knows the slot's width in CSS pixels, or `sizes`, when only CSS knows it — never both. `sizes="auto"` lets the browser measure the real box, and on a fluid design that is most slots.
 - **`alt` is required.** An image that carries no information of its own — a decorative flourish, or one that only repeats an adjacent caption — is declared with `alt=""`. That is a deliberate statement, not a shortcut, and it is why the prop has no default.
 - **`fallback`** is a static asset of your module, rendered when the content property is empty. Without one, a missing `node` renders nothing at all rather than a broken image. Roughly a third of real call sites want it.
 
-## Pick the layout your slot actually has
+## Pick the spelling your slot actually has
 
-The first question is not how wide the image is. It is **whether anything in your markup knows how wide it is** — and, when nothing does, whether the image sits in the normal flow or is stretched over a parent.
+Two questions, in this order.
 
-| Your slot                                                                                                | Layout                     | You also provide           |
-| -------------------------------------------------------------------------------------------------------- | -------------------------- | -------------------------- |
-| sized by CSS the view cannot read — `%`, `fr`, `rem`, a grid cell, an `aspect-ratio` box, a fixed height | `fluid`                    | `sizes` (usually `"auto"`) |
-| spans the viewport — a hero, a full-bleed banner                                                         | `full-width`               | nothing                    |
-| at most a number of CSS pixels, shrinking on a narrow viewport                                           | `constrained` (default)    | `slotWidth`                |
-| a real number of CSS pixels, always — an avatar, a fixed logo slot                                       | `fixed`                    | `slotWidth`                |
-| owned by a parent the image is positioned _over_, so it can be cropped under an overlay                  | `fill`                     | `sizes`, and parent CSS    |
-| the box comes from the `width`/`height` attributes, with no CSS at all                                   | any, with `width`+`height` | `width` **and** `height`   |
+**Does anything in the markup know how wide the slot is, in CSS pixels?** If it does, say the number with `slotWidth`. If it does not — the width comes from a `%`, a `fr`, a `rem`, a grid track, a flex line — then the only honest description is a `sizes` string, and you write that instead.
+
+**Is the image in the normal flow, or stretched over a parent that owns the box?** Everything in the normal flow is the default layout; an image positioned over its parent is `layout="fill"`.
+
+A slot is described **once**. `slotWidth` and `sizes` are two descriptions of the same box, and nothing can reconcile them, so writing both is a type error. The candidate files follow whichever one you wrote — that is what picking one is for.
+
+| Your slot                                                              | Write                                                                   |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| a real number of CSS pixels, always — an avatar, a fixed logo slot     | `layout="fixed" slotWidth={80}`                                         |
+| the viewport — a hero, a full-bleed banner                             | `layout="full-width"`                                                   |
+| a max-width container: at most N pixels, the full viewport below that  | `slotWidth={400}`                                                       |
+| a grid cell, or a column that changes at every breakpoint              | `sizes="(min-width: 64rem) 33vw, 100vw"`                                |
+| an `aspect-ratio` box — `.card { aspect-ratio: 16 / 9 }`               | `sizes="auto"`, or the string that describes the column the box sits in |
+| positioned _over_ a parent that owns the box, cropped under an overlay | `layout="fill" sizes="auto"`                                            |
+| height-constrained — `.logo-strip img { height: 3rem; width: auto }`   | `sizes="auto"`, with the caveat [below](#the-height-constrained-slot)   |
+| the box is the `width`/`height` attributes, with no CSS at all         | `layout="fixed" slotWidth={48} width={48} height={48}`                  |
 
 ```tsx
-<JImage node={card} alt="" layout="fluid" sizes="auto" className={classes.card} />
+<JImage node={avatar} alt={fullName} layout="fixed" slotWidth={80} />
 <JImage node={hero} alt={title} layout="full-width" preload />
 <JImage node={cover} alt={title} slotWidth={400} />
-<JImage node={avatar} alt={fullName} layout="fixed" slotWidth={80} />
-<JImage node={icon} alt="" width={48} height={48} />
+<JImage node={card} alt="" sizes="(min-width: 64rem) 33vw, 100vw" className={classes.card} />
+<JImage node={photo} alt="" sizes="auto" className={classes.tile} />
+<JImage node={icon} alt="" layout="fixed" slotWidth={48} width={48} height={48} />
 ```
 
-`slotWidth` is deliberately not called `width`: it is how much room the layout gives the image, in CSS pixels, while `width` is the HTML attribute that ends up in the markup. They are different numbers with different jobs, and the component accepts both.
+`slotWidth` is deliberately not called `width`: it is how much room the layout gives the image, in CSS pixels, while `width` is the HTML attribute that ends up in the markup. They are different numbers with different jobs, and the component accepts both — which is why the last row states them both. The attributes reserve the space; they do not describe the slot, because CSS can still resize the element they are on.
 
-Two slot shapes look like they need a number and do not. An **`aspect-ratio` box** (`.card { aspect-ratio: 16 / 9 }`) and a **height-constrained slot** (`.logo-strip img { height: 3rem; width: auto }`) both state a height, never a width — so their width is whatever the layout gives them, which is exactly `fluid`. Declaring a `slotWidth` your CSS contradicts is worse than declaring none: the browser is then told about a slot that does not exist.
+### The `aspect-ratio` box
+
+An **`aspect-ratio` box** (`.card { aspect-ratio: 16 / 9 }`) states a height-to-width relation and never a width. Whatever width the layout gives the box, the height follows. So the box is described by the _column_ it sits in: `sizes="(min-width: 64rem) 33vw, 100vw"` if you know that column, and `sizes="auto"` if you do not. Declaring a `slotWidth` your CSS contradicts is worse than declaring none — the browser is then told about a slot that does not exist.
+
+### The height-constrained slot
+
+A **height-constrained slot** (`.logo-strip img { height: 3rem; width: auto }`) states a height, and its width is the height times _that asset's_ aspect ratio. **No framework has a precise answer for this**, ours included: `sizes` is a statement about widths, and the browser resolves it before it knows anything about the file it is going to fetch. Astro converts the height into a width through the aspect ratio and then emits a `sizes` about the viewport's width, which is a different quantity; Next's width computation takes no height at all, and its `fill` layout rejects a caller height other than `100%`.
+
+What to write:
+
+- `sizes="auto"` is the honest answer, and the accurate one. The browser measures the real box after layout, so the height constraint is already applied by the time it picks a file. It only works on a lazily loaded image, which a logo strip below the fold is anyway.
+- If the image must load eagerly — it is the LCP element — compute the width yourself, from the CSS height and the asset's own ratio, and state it as a pixel `sizes`:
+
+  ```tsx
+  const cssHeight = 48; // .logo-strip img { height: 3rem }
+  const { intrinsicWidth = cssHeight, intrinsicHeight = cssHeight } = readImageMeta(logo);
+  const slot = Math.round((cssHeight * intrinsicWidth) / intrinsicHeight);
+
+  <JImage node={logo} alt="Acme" sizes={`${slot}px`} preload />;
+  ```
+
+  That is exact for the one asset, and it is why the library will not do it for you: it is your CSS height, not something the markup states.
 
 ## What actually resizes the image, and where
 
@@ -97,21 +120,26 @@ A slot of 400 CSS pixels needs a 400-pixel file on an ordinary screen and an 800
 
 The **candidate ladder** is the list of file widths offered for the layouts where the slot is not a single number:
 
-| Layout        | Files offered                                                     | Uses the ladder                                               |
-| ------------- | ----------------------------------------------------------------- | ------------------------------------------------------------- |
-| `fixed`       | `slotWidth`, `2 × slotWidth`                                      | no — the slot is one number, so two files cover it            |
-| `constrained` | ladder entries below `slotWidth`, then `slotWidth` and its double | yes, for the narrow viewports where the image shrinks         |
-| `full-width`  | the whole ladder                                                  | yes — the slot is the viewport, which varies from phone to 4K |
-| `fluid`       | the whole ladder                                                  | yes — the slot is unknown at build time, so offer everything  |
-| `fill`        | the whole ladder                                                  | yes, for the same reason                                      |
+| Layout                      | Files offered                                                         | Uses the ladder                                               |
+| --------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `fixed` + `slotWidth`       | `slotWidth`, `2 × slotWidth`                                          | no — the slot is one number, so two files cover it            |
+| `constrained` + `slotWidth` | ladder entries up to `2 × slotWidth`, then `slotWidth` and its double | yes, for the narrow viewports where the image shrinks         |
+| `full-width`                | the whole ladder                                                      | yes — the slot is the viewport, which varies from phone to 4K |
+| any layout + `sizes`        | the ladder entries the `sizes` string asks for                        | yes — the string is the only description, so it decides       |
 
 The default ladder is `[320, 640, 960, 1280, 1920, 2560]` — doubling-ish steps, because a candidate only pays for itself if it is meaningfully smaller than the next one up. Override it per call with `breakpoints`, or once for the whole module with [`setImageDefaults`](#module-wide-defaults).
 
 Two consequences worth knowing. Candidates stop at `2 × slotWidth`: a 3× file costs roughly twice the bytes of a 2× one for a difference few people can see, so a 3× phone gets the 2× file. And the ladder starts at 320: below that, a device asks for the 320-pixel file and scales it down, which is the right trade for the handful of viewports that narrow.
 
+### When the ladder comes from your `sizes`
+
+A `sizes` string is a description of the slot, so the candidates are derived from it and not from anything else. Each entry's source size is read — its media condition is skipped, so the `1024px` in `(min-width: 1024px) 33vw` is never mistaken for a slot width — and the two ends of the ladder stand in for the two ends of the viewport range. The narrowest slot the string can describe becomes the floor, the widest becomes the ceiling, and the ladder keeps every entry from the floor up to and including the first one that reaches **twice** the ceiling, so the widest slot is still sharp on a 2× display.
+
+`vw`, `px`, decimals and the `calc()` / `min()` / `max()` / `clamp()` functions are all read. Anything the parser cannot read — `auto`, a `%`, an `em`, a malformed string — falls back to **the whole ladder**, never to a narrow one: a ladder that is too wide costs a few bytes of markup, where one that is too narrow ships images the browser has to upscale, and says nothing about it.
+
 Candidates are always capped by the original — Jahia never upscales — and the original itself is only offered when it is close to the largest size actually requested, so an 8000-pixel master is never sent to fill a 640-pixel card.
 
-`widths` (candidate widths, in **image** pixels) overrides the ladder when you know better. It replaces the ladder, not the slot: `constrained` and `fixed` still need their `slotWidth`, because that is what `sizes` is built from.
+`widths` (candidate widths, in **image** pixels) overrides the ladder when you know better. It replaces the ladder, not the slot: the slot still has to be described, because that is what `sizes` is built from.
 
 ### Why two attributes at all
 
@@ -119,13 +147,13 @@ Candidates are always capped by the original — Jahia never upscales — and th
 
 ### `sizes="auto"`
 
-`sizes="auto"` asks the browser to measure the real box after layout, which beats any value you could derive from the markup. It is the usual answer for `fluid` and `fill`, and one thing follows from the specification: **`auto` is only read on a lazily loaded image**, so `<JImage>` sets `loading="lazy"` for you.
+`sizes="auto"` asks the browser to measure the real box after layout, which beats any value you could derive from the markup. It is the usual answer whenever only CSS knows the slot, and one thing follows from the specification: **`auto` is only read on a lazily loaded image**, so `<JImage>` sets `loading="lazy"` for you. Since nothing in the string describes the slot, the candidates are the whole ladder.
 
-That makes `auto` and `preload` contradictory. They still meet in practice, because they come from different layers — a shared wrapper defaults every image to `sizes="auto"`, a leaf view marks this one as the page's LCP element — and neither layer can see the other. The eager load wins, the layout's own `sizes` replaces `auto`, and a development instance prints one warning naming the image. To choose a better value than the fallback, describe the slot yourself: `sizes="(min-width: 60rem) 33vw, 100vw"`.
+That makes `auto` and `preload` contradictory. They still meet in practice, because they come from different layers — a shared wrapper defaults every image to `sizes="auto"`, a leaf view marks this one as the page's LCP element — and neither layer can see the other. The eager load wins, `auto` becomes `100vw`, and a development instance prints one warning naming the image. `100vw` is the safe, wasteful answer and the only one left: a slot spelled with `sizes` carries no width to derive a better one from. To get a better value, describe the slot yourself: `sizes="(min-width: 60rem) 33vw, 100vw"`.
 
 ## The `fill` layout: an image positioned over its parent
 
-`fill` is not the fluid case. It takes the image **out of the normal flow** and stretches it over the nearest positioned ancestor, which is what you want when the parent owns the box and the image is decoration inside it: a card cover under a text overlay, a banner cropped with `object-fit`.
+`fill` is not the ordinary in-flow case. It takes the image **out of the normal flow** and stretches it over the nearest positioned ancestor, which is what you want when the parent owns the box and the image is decoration inside it: a card cover under a text overlay, a banner cropped with `object-fit`.
 
 It is the one layout that carries CSS of its own, and it only works if the parent cooperates:
 
@@ -151,7 +179,7 @@ It is the one layout that carries CSS of its own, and it only works if the paren
 
 Two consequences. Since nothing in the document says how wide that parent is, `sizes` is required. And the intrinsic `width`/`height` are deliberately not emitted: they would state a box that fights the parent's. Your own `style` still wins over the positioning the component applies.
 
-If the parent has no reason to be positioned, you want `fluid` instead.
+If the parent has no reason to be positioned, drop `layout="fill"` and keep the `sizes`: an ordinary image in the normal flow, described the same way.
 
 ## Above the fold: `preload`
 
@@ -170,7 +198,7 @@ An image is lazy-loaded by default, which is wrong for the one image that is alr
 `width` and `height` are the HTML attributes. Write them and they win over the intrinsic dimensions, which is how an image takes its box from the markup and needs no CSS rule at all:
 
 ```tsx
-<JImage node={icon} alt="" width={48} height={48} />
+<JImage node={icon} alt="" layout="fixed" slotWidth={48} width={48} height={48} />
 ```
 
 **They are required together.** Two of them state one box, and half of yours with half of ours would state a wrong aspect ratio — so the component takes both or neither, and TypeScript says so at the call site. This is also the guard against the easiest mistake in this API: writing `width={400}` when you meant `slotWidth={400}`.
@@ -286,7 +314,7 @@ A background has no `srcSet`, so ask for the largest size the slot can reach and
 ```tsx
 buildNodeUrl(page, { absolute: true });
 buildImageUrl(cover, { width: 1200 }, { absolute: true }).url;
-getImageProps(cover, { alt: title, layout: "fluid", sizes: "auto", absolute: true }, context);
+getImageProps(cover, { alt: title, sizes: "auto", absolute: true }, context);
 ```
 
 The host is the **target site's** server name, not the current request's — a link to a page of another site must name that site's server. A site with no server name configured falls back to the request's own scheme, host and port, which is what makes this work on a local instance. When neither is right — a reverse proxy, a preview host, a canonical domain — name the origin yourself: `absolute: "https://www.example.com"`.

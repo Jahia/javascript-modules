@@ -186,9 +186,10 @@ describe("buildImageUrl", () => {
 });
 
 describe("getImageProps", () => {
-  it("requires a width for a constrained layout, and says why", () => {
+  it("refuses a constrained slot described neither way, and names both exits", () => {
+    // @ts-expect-error a constrained slot needs a slotWidth or a sizes
     expect(() => getImageProps(imageNode({ width: 2000 }), { alt: "" })).toThrow(
-      /layout "constrained" needs a slotWidth/,
+      /needs the slot described[\s\S]*slotWidth[\s\S]*sizes/,
     );
   });
 
@@ -209,9 +210,12 @@ describe("getImageProps", () => {
       alt: "A terrace",
       slotWidth: 960,
     });
+    // Every band up to twice the slot, 1280 included: a 1.33x screen at the full slot gets that
+    // file rather than climbing to the 1920 one
     expect(props.srcSet).toBe(
       "/files/photo.jpg?w=320 320w, /files/photo.jpg?w=640 640w, " +
-        "/files/photo.jpg?w=960 960w, /files/photo.jpg?w=1920 1920w",
+        "/files/photo.jpg?w=960 960w, /files/photo.jpg?w=1280 1280w, " +
+        "/files/photo.jpg?w=1920 1920w",
     );
     expect(props.sizes).toBe("(min-width: 960px) 960px, 100vw");
   });
@@ -309,9 +313,11 @@ describe("getImageProps", () => {
     // from a missing one used to read "(min-width: undefinedpx) undefinedpx, 100vw", which
     // browsers discard before fetching the largest candidate on every screen
     expect(() =>
+      // @ts-expect-error a constrained slot needs a slotWidth or a sizes
       getImageProps(imageNode({ width: 4000 }), { alt: "", widths: [400, 800] }),
-    ).toThrow(/layout "constrained" needs a slotWidth/);
+    ).toThrow(/needs the slot described/);
     expect(() =>
+      // @ts-expect-error a fixed slot needs a slotWidth
       getImageProps(imageNode({ width: 4000 }), { alt: "", layout: "fixed", widths: [400, 800] }),
     ).toThrow(/layout "fixed" needs a slotWidth/);
   });
@@ -400,6 +406,8 @@ describe("the development warnings", () => {
     // A pre-generated thumbnail width: a real resize on any instance
     freshImageProps(imageNode({ path: "/sites/test/files/thumb.jpg", width: 2000 }), {
       alt: "",
+      layout: "fixed",
+      slotWidth: 150,
       widths: [150],
     });
     // An external provider, whose decorator signs a transformed URL
@@ -479,13 +487,9 @@ describe("the development warnings", () => {
   });
 });
 
-describe('the "fluid" layout', () => {
-  it("draws the whole ladder for a normal-flow slot the markup cannot measure", () => {
-    const props = getImageProps(imageNode({ width: 4000 }), {
-      alt: "",
-      layout: "fluid",
-      sizes: "auto",
-    });
+describe("a slot described by its sizes", () => {
+  it("draws a ladder wide enough for the widest slot the string claims", () => {
+    const props = getImageProps(imageNode({ width: 4000 }), { alt: "", sizes: "auto" });
     for (const breakpoint of DEFAULT_BREAKPOINTS) {
       expect(props.srcSet).toContain(`${breakpoint}w`);
     }
@@ -494,40 +498,178 @@ describe('the "fluid" layout', () => {
   it("keeps the intrinsic pair, which is what reserves the space in normal flow", () => {
     const props = getImageProps(imageNode({ width: 4000, height: 2000 }), {
       alt: "",
-      layout: "fluid",
       sizes: "auto",
     });
     expect(props).toMatchObject({ width: 4000, height: 2000, loading: "lazy" });
   });
 
-  it("refuses to guess a sizes it cannot derive, and says what to write", () => {
-    expect(() => getImageProps(imageNode({ width: 4000 }), { alt: "", layout: "fluid" })).toThrow(
-      /layout "fluid" needs an explicit sizes/,
-    );
+  it("emits the string as written, rather than a derived one", () => {
+    expect(
+      getImageProps(imageNode({ width: 4000 }), {
+        alt: "",
+        sizes: "(min-width: 60rem) 33vw, 100vw",
+      }).sizes,
+    ).toBe("(min-width: 60rem) 33vw, 100vw");
   });
 
   it("offers what fill offers, since only the positioning differs", () => {
     const node = imageNode({ width: 4000, height: 2000 });
-    const fluid = getImageProps(node, { alt: "", layout: "fluid", sizes: "auto" });
+    const inFlow = getImageProps(node, { alt: "", sizes: "auto" });
     const fill = getImageProps(node, { alt: "", layout: "fill", sizes: "auto" });
-    expect(fluid.src).toBe(fill.src);
-    expect(fluid.srcSet).toBe(fill.srcSet);
-    expect(fluid.sizes).toBe(fill.sizes);
-    expect(fluid.loading).toBe(fill.loading);
+    expect(inFlow.src).toBe(fill.src);
+    expect(inFlow.srcSet).toBe(fill.srcSet);
+    expect(inFlow.sizes).toBe(fill.sizes);
+    expect(inFlow.loading).toBe(fill.loading);
     // The one difference: `fill` takes its box from the parent it is stretched over
     expect(fill.width).toBeUndefined();
+  });
+});
+
+describe("describing the slot exactly once", () => {
+  it("refuses a constrained slot described both ways, which is the disagreement it used to hide", () => {
+    expect(() =>
+      // @ts-expect-error slotWidth and sizes are two descriptions of one slot
+      getImageProps(imageNode({ width: 4000 }), {
+        alt: "",
+        slotWidth: 400,
+        sizes: "(min-width: 1024px) 33vw, 100vw",
+      }),
+    ).toThrow(/layout "constrained" takes a slotWidth or a sizes, never both/);
+  });
+
+  it("refuses a sizes on a fixed slot, whose whole meaning is that it is one number", () => {
+    expect(() =>
+      // @ts-expect-error a fixed slot is stated by its slotWidth alone
+      getImageProps(imageNode({ width: 4000 }), {
+        alt: "",
+        layout: "fixed",
+        slotWidth: 80,
+        sizes: "80px",
+      }),
+    ).toThrow(/layout "fixed" takes no sizes/);
+  });
+
+  it("refuses a slotWidth on the layouts whose width the markup never states", () => {
+    for (const layout of ["full-width", "fill"] as const) {
+      expect(() =>
+        // @ts-expect-error neither layout takes a slot width
+        getImageProps(imageNode({ width: 4000 }), {
+          alt: "",
+          layout,
+          slotWidth: 400,
+          sizes: "50vw",
+        }),
+      ).toThrow(/takes no slotWidth/);
+    }
+  });
+});
+
+describe("the ladder a sizes asks for", () => {
+  /** The candidate widths offered, read back off the `srcSet`. */
+  const ladderOf = (sizes: string, breakpoints?: readonly number[]): number[] => {
+    const props = getImageProps(imageNode({ width: 10000 }), { alt: "", sizes, breakpoints });
+    return [...(props.srcSet ?? "").matchAll(/ (\d+)w/g)].map(([, width]) => Number(width));
+  };
+
+  it("keeps the whole ladder for a slot that can be the viewport", () => {
+    expect(ladderOf("100vw")).toEqual([...DEFAULT_BREAKPOINTS]);
+  });
+
+  it("reads the source size of every media condition, not the widths inside the conditions", () => {
+    // 1024 is a breakpoint of the layout, not a slot width: reading it as one would raise the floor
+    expect(ladderOf("(min-width: 1024px) 33vw, 100vw")).toEqual([...DEFAULT_BREAKPOINTS]);
+    expect(ladderOf("(min-width: 30em) and (max-width: 50em) 25vw, 20vw")).toEqual([
+      320, 640, 960, 1280,
+    ]);
+  });
+
+  it("stops one band above twice the widest slot the string can describe", () => {
+    // 33vw of the widest viewport it plans for is 845, which a 2x screen needs 1690 pixels for
+    expect(ladderOf("33vw")).toEqual([320, 640, 960, 1280, 1920]);
+    expect(ladderOf("25vw")).toEqual([320, 640, 960, 1280]);
+  });
+
+  it("reads a decimal fraction, which a whole-number scrape would drop", () => {
+    expect(ladderOf("33.3vw")).toEqual([320, 640, 960, 1280, 1920]);
+  });
+
+  it("drops the files narrower than the narrowest the slot can be", () => {
+    expect(ladderOf("400px")).toEqual([640, 960]);
+  });
+
+  it("reads the vw and px lengths inside calc(), min(), max() and clamp()", () => {
+    // A whole-number vw scrape misses this one entirely and silently keeps every candidate
+    expect(ladderOf("calc(33vw - 2rem)")).toEqual([320, 640, 960, 1280, 1920]);
+    expect(ladderOf("calc(100vw - 2rem)")).toEqual([...DEFAULT_BREAKPOINTS]);
+    // The bounds of a math function err outward, so both of these keep more than they need to
+    expect(ladderOf("min(100vw, 400px)")).toEqual([...DEFAULT_BREAKPOINTS]);
+    expect(ladderOf("clamp(200px, 50vw, 600px)")).toEqual([...DEFAULT_BREAKPOINTS]);
+  });
+
+  it("gives up toward the whole ladder, never toward a narrow one", () => {
+    // `auto` is measured by the browser, so no ladder can be derived from it
+    expect(ladderOf("auto")).toEqual([...DEFAULT_BREAKPOINTS]);
+    // Units with no pixel value here, and a string that is not a sizes at all
+    expect(ladderOf("(min-width: 60rem) 50%, 100%")).toEqual([...DEFAULT_BREAKPOINTS]);
+    expect(ladderOf("20em")).toEqual([...DEFAULT_BREAKPOINTS]);
+    expect(ladderOf("(min-width: 60rem 33vw, 100vw")).toEqual([...DEFAULT_BREAKPOINTS]);
+    expect(ladderOf("")).toEqual([...DEFAULT_BREAKPOINTS]);
+  });
+
+  it("plans against the ladder it was given, not against the default one", () => {
+    expect(ladderOf("33vw", [480, 960, 1440])).toEqual([480, 960]);
+  });
+});
+
+describe("the slots three luxe sites were under-serving", () => {
+  /** The widest file offered, which is what decides whether a slot is served sharply. */
+  const widestCandidate = (props: ImgProps): number =>
+    Math.max(...[...(props.srcSet ?? "").matchAll(/ (\d+)w/g)].map(([, width]) => Number(width)));
+
+  it("no longer accepts the spelling that made the two descriptions disagree", () => {
+    expect(() =>
+      // @ts-expect-error the spelling every measured site used
+      getImageProps(imageNode({ width: 4000 }), {
+        alt: "",
+        slotWidth: 400,
+        sizes: "(min-width: 1024px) 33vw, 100vw",
+      }),
+    ).toThrow();
+  });
+
+  it("serves the 768px slot its own sizes claims, at 2x", () => {
+    // What the slotWidth spelling offered was [320, 400, 800]: 0.52x of the 1536 pixels a 768px
+    // slot needs on a 2x screen
+    const props = getImageProps(imageNode({ width: 4000 }), {
+      alt: "",
+      sizes: "(min-width: 1024px) 33vw, 100vw",
+    });
+    expect(widestCandidate(props)).toBeGreaterThanOrEqual(768 * 2);
+    expect(props.sizes).toBe("(min-width: 1024px) 33vw, 100vw");
+  });
+
+  it("serves the 893px slot the two LCP heroes claim, at 2x", () => {
+    const props = getImageProps(imageNode({ width: 4000 }), {
+      alt: "",
+      sizes: "(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+    });
+    expect(widestCandidate(props)).toBeGreaterThanOrEqual(893 * 2);
   });
 });
 
 describe("a missing node", () => {
   it("renders the module asset offered as a fallback", () => {
     expect(
-      getImagePropsWithContext(null, { alt: "Nothing yet", fallback: "img/placeholder.jpg" }, {}),
+      getImagePropsWithContext(
+        null,
+        { alt: "Nothing yet", slotWidth: 400, fallback: "img/placeholder.jpg" },
+        {},
+      ),
     ).toEqual({ src: "/modules/test/img/placeholder.jpg", alt: "Nothing yet" });
   });
 
   it("returns nothing at all when there is no fallback either", () => {
-    expect(getImagePropsWithContext(undefined, { alt: "" }, {})).toBeNull();
+    expect(getImagePropsWithContext(undefined, { alt: "", slotWidth: 400 }, {})).toBeNull();
   });
 });
 
@@ -554,8 +696,9 @@ describe('the "fill" layout', () => {
   });
 
   it("refuses to guess a sizes it cannot derive, and says what to write", () => {
+    // @ts-expect-error a fill slot is described by its sizes and nothing else
     expect(() => getImageProps(imageNode({ width: 4000 }), { alt: "", layout: "fill" })).toThrow(
-      /layout "fill" needs an explicit sizes/,
+      /layout "fill" needs the slot described/,
     );
   });
 

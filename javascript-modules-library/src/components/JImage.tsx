@@ -6,8 +6,7 @@ import { warnAutoSizesEager } from "../utils/image/devWarnings.js";
 import {
   getImageProps,
   isAutoSizes,
-  layoutNeedsSizes,
-  type ImageLayout,
+  type ImageSlot,
   type ImgProps,
 } from "../utils/image/getImageProps.js";
 import type { ImageSourceOptions } from "../utils/image/imageDefaults.js";
@@ -39,26 +38,13 @@ export type MarkupBox =
  * hand-listed, so adding a prop here can never silently swallow an attribute that used to reach the
  * element. Only `src` and `srcSet` are additionally withheld: the component computes them.
  */
-export interface JImageProps extends ImageSourceOptions {
+export interface JImageBaseProps extends ImageSourceOptions {
   /** The file node holding the image. When missing, `fallback` is rendered instead. */
   node?: JCRNodeWrapper | null;
   /** Alternative text; `""` declares the image decorative. */
   alt: string;
-  /**
-   * How the image occupies its slot.
-   *
-   * @default "constrained"
-   */
-  layout?: ImageLayout;
-  /** The slot width in CSS pixels. Required by the `constrained` and `fixed` layouts. */
-  slotWidth?: number;
   /** Explicit candidate widths in image pixels. Overrides the ladder the layout would derive. */
   widths?: number[];
-  /**
-   * Explicit `sizes` attribute. Required by the `fluid` and `fill` layouts. `"auto"` measures the
-   * real box and forces `loading="lazy"`, the only mode in which browsers read it.
-   */
-  sizes?: string;
   /** Candidate ladder used by every layout but `fixed`. */
   breakpoints?: readonly number[];
   /**
@@ -93,13 +79,19 @@ export interface JImageProps extends ImageSourceOptions {
    * takes its box from the markup and needs no CSS rule at all.
    *
    * Required together with `height`: half of yours and half of ours would state a wrong aspect
-   * ratio. The room the _layout_ gives the image is {@link JImageProps.slotWidth}, a different
-   * number with a different job.
+   * ratio. The room the _layout_ gives the image is `slotWidth`, a different number with a
+   * different job.
    */
   width?: number | `${number}`;
-  /** The `height` HTML attribute. Overrides the intrinsic height; see {@link JImageProps.width}. */
+  /** The `height` HTML attribute. Overrides the intrinsic height; see {@link JImageBaseProps.width}. */
   height?: number | `${number}`;
 }
+
+/**
+ * What `JImage` takes: its own props plus the slot description, which is one of the shapes
+ * {@link ImageSlot} allows and never a mix of two.
+ */
+export type JImageProps = JImageBaseProps & ImageSlot;
 
 /** The layout that has to be CSS, because "fills its parent" is not something markup can say. */
 const FILL_STYLE: CSSProperties = {
@@ -113,9 +105,9 @@ const FILL_STYLE: CSSProperties = {
  * Renders a JCR image as an `<img>`: resized `src`, `srcSet` candidates, the matching `sizes`, the
  * intrinsic dimensions that reserve its space, and a render cache dependency on the image node.
  *
- * Declare how the image sits in the page — `layout`, plus `slotWidth` for the layouts measured in
- * CSS pixels — rather than computing candidate widths by hand. On a fluid design, where no slot has
- * a pixel width, that is `layout="fluid"` with `sizes="auto"`.
+ * Describe the slot once — a `slotWidth` when the markup states its width in CSS pixels, a `sizes`
+ * when only CSS knows it — rather than computing candidate widths by hand. On a fluid design most
+ * slots are the second kind, and `sizes="auto"` lets the browser measure the real box.
  *
  * The element carries no styling of its own, except where the feature _is_ styling: `layout="fill"`
  * positions it over its parent, and `placeholder` paints a background. Anything else is your
@@ -126,7 +118,7 @@ const FILL_STYLE: CSSProperties = {
  *
  * @example
  *   ```tsx
- *   <JImage node={card} alt="" layout="fluid" sizes="auto" className={classes.card} />
+ *   <JImage node={card} alt="" sizes="auto" className={classes.card} />
  *   <JImage node={cover} alt={title} slotWidth={400} className={classes.cover} />
  *   <JImage node={hero} alt={title} layout="full-width" preload />
  *   <JImage node={icon} alt="" width={48} height={48} />
@@ -159,9 +151,12 @@ export function JImage({
   style,
   ...imgAttributes
 }: Readonly<
-  JImageProps & Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "srcSet" | keyof JImageProps>
+  JImageBaseProps & Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "srcSet" | keyof JImageProps>
 > &
-  MarkupBox): JSX.Element | null {
+  MarkupBox &
+  // Outside the `Readonly<>`, so that the union stays a union: a mapped type over it would collapse
+  // `slotWidth` and `sizes` back into two independent optionals and let a call site write both
+  ImageSlot): JSX.Element | null {
   const context = useServerContext();
 
   // Caught here rather than at the `<img>`, because the call site that writes one of the two is
@@ -177,24 +172,17 @@ export function JImage({
   // "the browser measures the box anyway": it degrades to 100vw, which downloads the largest
   // candidate on every screen. The two props legitimately come from different layers — a shared
   // wrapper defaults every image to `auto`, a leaf view marks this one as the LCP element — so the
-  // eager load wins over the default and the layout's own `sizes` replaces `auto`.
+  // eager load wins over the default, and `auto` gives way to the safe, wasteful answer — the only
+  // one left, since a slot spelled with `sizes` carries no width for the library to derive one from.
   const eagerness = preload ? "preload" : loading === "eager" ? 'loading="eager"' : undefined;
   const autoOverridden = eagerness !== undefined && isAutoSizes(sizes);
-  const requestedSizes = !autoOverridden
-    ? sizes
-    : // A layout that derives no `sizes` of its own has only the safe, wasteful answer left
-      layoutNeedsSizes(layout)
-      ? "100vw"
-      : undefined;
+  const requestedSizes = autoOverridden ? "100vw" : sizes;
 
   const image: ImgProps | null = getImageProps(
     node,
     {
       alt,
-      layout,
-      slotWidth,
       widths,
-      sizes: requestedSizes,
       breakpoints,
       cacheDependency,
       loader,
@@ -202,6 +190,9 @@ export function JImage({
       unoptimized,
       absolute,
       fallback,
+      // The union was enforced at the call site; here the three are plain optionals again, and
+      // `getImageProps` checks them once more for the caller that reached it without types
+      ...({ layout, slotWidth, sizes: requestedSizes } as ImageSlot),
     },
     context,
   );

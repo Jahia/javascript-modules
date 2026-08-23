@@ -12,6 +12,7 @@ export { Area } from "./components/Area.js";
 export {
   JImage,
   type ExtraImageAttributes,
+  type JImageBaseProps,
   type JImageProps,
   type MarkupBox,
 } from "./components/JImage.js";
@@ -53,6 +54,8 @@ export {
   DEFAULT_BREAKPOINTS,
   type ImageLayout,
   type ImageOptions,
+  type ImageOptionsBase,
+  type ImageSlot,
   type ImgProps,
 } from "./utils/image/getImageProps.js";
 export {

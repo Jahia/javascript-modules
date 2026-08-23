@@ -13,6 +13,7 @@ import {
   type ImageSourceOptions,
 } from "./imageDefaults.js";
 import { clampToIntrinsic, readImageMeta } from "./imageMeta.js";
+import { ladderFromSizes } from "./sizesLadder.js";
 
 /**
  * How the image occupies its slot. Declaring the intent lets the library derive both `srcSet` and
@@ -22,37 +23,60 @@ import { clampToIntrinsic, readImageMeta } from "./imageMeta.js";
  * wide it is — and, when nothing does, whether the image sits in the normal flow or is stretched
  * over a parent.
  *
- * - `constrained` (default): the image is at most `slotWidth` CSS pixels wide and shrinks with the
- *   viewport below that — the common case for content in a column.
+ * - `constrained` (default): an image in the normal flow. It is described _either_ by a `slotWidth`,
+ *   when the slot is at most that many CSS pixels and shrinks with the viewport below it, _or_ by a
+ *   `sizes`, when CSS the markup cannot read decides its width — a `%`, a `fr`, a grid cell, an
+ *   `aspect-ratio` box.
  * - `fixed`: the image is always `slotWidth` CSS pixels wide (an avatar, a logo slot, a card
- *   thumbnail in a fixed grid).
- * - `fluid`: a normal-flow slot whose width the markup cannot know — a `%`, a `fr`, a grid cell, an
- *   `aspect-ratio` box, a slot constrained by its height. No `slotWidth`, and `sizes` is required
- *   because nothing else can describe the box. On a fluid design this is most slots.
+ *   thumbnail in a fixed grid). It takes no `sizes`: the slot is one number.
  * - `full-width`: the image always spans the viewport (a hero, a full-bleed banner).
- * - `fill`: the image is positioned _over_ its closest positioned ancestor, which owns the box. Like
- *   `fluid` it needs a `sizes`, and unlike every other layout it carries CSS of its own and drops
- *   the intrinsic dimensions, which would fight that parent.
+ * - `fill`: the image is positioned _over_ its closest positioned ancestor, which owns the box. It
+ *   needs a `sizes`, and unlike every other layout it carries CSS of its own and drops the
+ *   intrinsic dimensions, which would fight that parent.
  */
-export type ImageLayout = "constrained" | "fixed" | "fluid" | "full-width" | "fill";
+export type ImageLayout = "constrained" | "fixed" | "full-width" | "fill";
+
+/**
+ * How the slot is described: one way per layout, never two.
+ *
+ * A `slotWidth` and a `sizes` are two descriptions of the same box, and nothing can reconcile them
+ * — so `constrained` takes exactly one of them, and the ladder of candidate files follows whichever
+ * one was written. Passing both used to be accepted, and the `sizes` was emitted while the
+ * candidates were still derived from the `slotWidth`: two claims about one slot, disagreeing
+ * silently.
+ *
+ * TypeScript rejects the combinations below; {@link getImageProps} throws on them too, for the
+ * untyped JavaScript caller and for the `{...props}` spread that defeats a union.
+ */
+export type ImageSlot =
+  /** At most `slotWidth` CSS pixels, shrinking with the viewport below that. */
+  | { layout?: "constrained"; slotWidth: number; sizes?: never }
+  /**
+   * Sized by CSS the markup cannot read, so the `sizes` string is the only description of the slot
+   * — and the one the candidate ladder is derived from. `"auto"` lets the browser measure the real
+   * box.
+   */
+  | { layout?: "constrained"; slotWidth?: never; sizes: string }
+  /** Always `slotWidth` CSS pixels. No `sizes`: the slot is one number. */
+  | { layout: "fixed"; slotWidth: number; sizes?: never }
+  /** The viewport. `sizes` defaults to `100vw`; write one only to say `"auto"`. */
+  | { layout: "full-width"; slotWidth?: never; sizes?: string }
+  /** A box owned by a positioned parent, which only `sizes` can describe. */
+  | { layout: "fill"; slotWidth?: never; sizes: string };
 
 /**
  * Candidate file widths, in image pixels, offered for the layouts where the slot is not a single
- * number — `constrained` below its maximum, `fluid`, `full-width` and `fill` always. A `fixed` slot
- * never uses them: its width and that width doubled cover it.
+ * number — `constrained` below its maximum, `full-width` and `fill` always. A `fixed` slot never
+ * uses them: its width and that width doubled cover it.
  *
  * These are widths of _files_, not breakpoints of the layout: the slot is described by `sizes`, and
  * the browser matches one against the other at load time. Doubling-ish steps keep the ladder short,
  * because a candidate only pays for itself if it is meaningfully smaller than the next one up.
+ *
+ * The two ends also stand in for the viewport range a `sizes`-described slot is planned against;
+ * see {@link ladderFromSizes}.
  */
 export const DEFAULT_BREAKPOINTS: readonly number[] = [320, 640, 960, 1280, 1920, 2560];
-
-/**
- * The layouts whose slot width nothing in the markup states, so no `sizes` can be derived for them
- * and the caller has to supply one. An unset layout is `constrained`, which derives its own.
- */
-export const layoutNeedsSizes = (layout: ImageLayout | undefined): boolean =>
-  layout === "fluid" || layout === "fill";
 
 /**
  * `<img>` props built from a JCR image node.
@@ -80,32 +104,12 @@ export interface ImgProps {
   alt: string;
 }
 
-export interface ImageOptions extends ImageSourceOptions {
+/** What {@link getImageProps} takes, apart from the slot description in {@link ImageSlot}. */
+export interface ImageOptionsBase extends ImageSourceOptions {
   /** Alternative text; `""` declares the image decorative. */
   alt: string;
-  /**
-   * How the image occupies its slot.
-   *
-   * @default "constrained"
-   */
-  layout?: ImageLayout;
-  /**
-   * The slot width in CSS pixels. Required by `constrained` and `fixed`, meaningless for the
-   * layouts whose width the markup does not state.
-   *
-   * Named apart from the `width` HTML attribute on purpose: this is how much room the layout gives
-   * the image, not a number that ends up in the markup.
-   */
-  slotWidth?: number;
   /** Explicit candidate widths in image pixels. Overrides the ladder the layout would derive. */
   widths?: number[];
-  /**
-   * Explicit `sizes` attribute. Required by the `fluid` and `fill` layouts.
-   *
-   * `"auto"` lets the browser measure the real box, which beats any value derivable from the markup
-   * — and it forces `loading="lazy"`, the only mode in which browsers read it.
-   */
-  sizes?: string;
   /** Candidate ladder used by every layout but `fixed`. */
   breakpoints?: readonly number[];
   /**
@@ -124,6 +128,14 @@ export interface ImageOptions extends ImageSourceOptions {
 }
 
 /**
+ * What {@link getImageProps} takes: the alternative text, the slot description, and the overrides.
+ *
+ * `slotWidth` is named apart from the `width` HTML attribute on purpose: it is how much room the
+ * layout gives the image, not a number that ends up in the markup.
+ */
+export type ImageOptions = ImageOptionsBase & ImageSlot;
+
+/**
  * True for a `sizes` value whose first entry is `auto`.
  *
  * The spec allows a fallback after it (`"auto, 50vw"`) for browsers that do not implement it, so
@@ -134,79 +146,118 @@ export interface ImageOptions extends ImageSourceOptions {
 export const isAutoSizes = (sizes: string | undefined): boolean =>
   sizes !== undefined && sizes.trim().split(",")[0].trim().toLowerCase() === "auto";
 
-/** The `slotWidth` the layouts measured in CSS pixels cannot work without. */
-const requireSlotWidth = (layout: ImageLayout, slotWidth: number | undefined): number => {
-  if (slotWidth === undefined) {
-    throw new Error(
-      `getImageProps: layout "${layout}" needs a slotWidth (the slot width in CSS pixels). ` +
-        `Use layout "fluid" when the slot is sized by CSS the markup cannot read, or ` +
-        `"full-width" for an image that always spans the viewport.`,
-    );
-  }
+/** A slot description the layout accepts, with the `sizes` it resolves to. */
+interface ResolvedSlot {
+  /** The `sizes` attribute this slot implies, derived when the caller wrote none. */
+  sizes: string;
+  /** The slot width in CSS pixels, when the caller described the slot with one. */
+  slotWidth?: number;
+}
 
-  return slotWidth;
-};
-
-/** The candidate widths a layout asks for, before clamping. */
-const candidateWidths = (
+/**
+ * Checks that the slot is described exactly once, the way {@link ImageSlot} says, and resolves the
+ * `sizes` that description implies.
+ *
+ * {@link ImageSlot} already rejects each of these at the call site. The throws are for the untyped
+ * JavaScript caller and for the `{...props}` spread, which defeats a union — and they name the
+ * exits rather than only the rule, because the caller reading them has just been told their view is
+ * wrong and needs to know what to write instead.
+ */
+const resolveSlot = (
   layout: ImageLayout,
   slotWidth: number | undefined,
+  sizes: string | undefined,
+): ResolvedSlot => {
+  const takesNoSlotWidth = () => {
+    if (slotWidth !== undefined) {
+      throw new Error(
+        `getImageProps: layout "${layout}" takes no slotWidth, because the slot is not a number of ` +
+          "CSS pixels the markup states. Describe it with sizes instead.",
+      );
+    }
+  };
+
+  switch (layout) {
+    case "full-width":
+      takesNoSlotWidth();
+      return { sizes: sizes ?? "100vw" };
+
+    case "fill":
+      takesNoSlotWidth();
+      if (sizes === undefined) throw new Error(needsSizes(layout));
+      return { sizes };
+
+    case "fixed":
+      if (sizes !== undefined) {
+        throw new Error(
+          'getImageProps: layout "fixed" takes no sizes, because the layout means the slot is one ' +
+            'number and slotWidth already states it. Use layout "constrained" with a sizes for a ' +
+            "slot whose width changes.",
+        );
+      }
+      if (slotWidth === undefined) {
+        throw new Error(
+          'getImageProps: layout "fixed" needs a slotWidth (the slot width in CSS pixels).',
+        );
+      }
+      return { sizes: `${slotWidth}px`, slotWidth };
+
+    case "constrained":
+      if (slotWidth !== undefined && sizes !== undefined) {
+        throw new Error(
+          'getImageProps: layout "constrained" takes a slotWidth or a sizes, never both. They are ' +
+            "two descriptions of one slot, and the candidate files can only follow one of them. " +
+            "Keep slotWidth when the slot is at most that many CSS pixels; keep sizes when CSS the " +
+            "markup cannot read decides its width.",
+        );
+      }
+      if (sizes !== undefined) return { sizes };
+      if (slotWidth === undefined) throw new Error(needsSizes(layout));
+      return { sizes: `(min-width: ${slotWidth}px) ${slotWidth}px, 100vw`, slotWidth };
+  }
+};
+
+/** Names both exits, because a caller who wrote neither has to be told there are two. */
+const needsSizes = (layout: ImageLayout): string =>
+  `getImageProps: layout "${layout}" needs the slot described, and nothing in the markup ` +
+  "describes it. Either give a slotWidth, the slot width in CSS pixels, or give a sizes — " +
+  'sizes="auto" lets the browser measure the real box, and sizes="(min-width: 60rem) 33vw, 100vw" ' +
+  "describes it yourself.";
+
+/** The candidate widths a slot asks for, before clamping. */
+const candidateWidths = (
+  layout: ImageLayout,
+  slot: ResolvedSlot,
   breakpoints: readonly number[],
 ): number[] => {
-  // The slot is the viewport, or a box the markup cannot measure: offer the whole ladder
-  if (layout === "full-width" || layoutNeedsSizes(layout)) return [...breakpoints];
+  // No number in the markup: the `sizes` string is the only description of the slot, so the ladder
+  // is derived from it rather than from a width that string never mentions
+  if (slot.slotWidth === undefined) return ladderFromSizes(slot.sizes, breakpoints);
 
-  const width = requireSlotWidth(layout, slotWidth);
-
+  const width = slot.slotWidth;
   // Two device-pixel ratios cover the realistic range; a 3x file is rarely worth its bytes
   const densities = [width, width * 2];
   if (layout === "fixed") return densities;
 
-  // Constrained: the slot shrinks with the viewport, so smaller files are useful too
-  return [...breakpoints.filter((candidate) => candidate < width), ...densities];
-};
-
-/**
- * The `sizes` attribute a layout implies.
- *
- * Reached both from the layouts that derive one and, when `widths` was explicit and no ladder was
- * asked for, from a caller who never named a slot — so it validates `slotWidth` itself rather than
- * trusting {@link candidateWidths} to have run first.
- */
-const derivedSizes = (layout: ImageLayout, slotWidth: number | undefined): string => {
-  switch (layout) {
-    case "full-width":
-      return "100vw";
-    case "fixed":
-      return `${requireSlotWidth(layout, slotWidth)}px`;
-    case "constrained": {
-      const width = requireSlotWidth(layout, slotWidth);
-      return `(min-width: ${width}px) ${width}px, 100vw`;
-    }
-    case "fluid":
-    case "fill":
-      throw new Error(
-        `getImageProps: layout "${layout}" needs an explicit sizes, because the slot is sized by ` +
-          "CSS and nothing in the markup says how wide it is. " +
-          'Use sizes="auto" to let the browser measure the real box (it loads the image lazily), ' +
-          'or describe the slot, as in sizes="(min-width: 60rem) 33vw, 100vw".',
-      );
-  }
+  // Constrained: the slot shrinks with the viewport, so every file up to the 2x one is useful — a
+  // 1.33x screen at the full slot should get the band above the slot, not the top of the ladder
+  return [...breakpoints.filter((candidate) => candidate <= 2 * width), ...densities];
 };
 
 /**
  * Builds `<img>` props from a Jahia image node: a resized `src`, a `srcSet` of candidates, the
  * matching `sizes`, and the intrinsic dimensions.
  *
- * Declare how the image sits in the page with `layout` + `slotWidth` and the candidates and `sizes`
- * are derived; on a fluid layout, where no slot has a width in CSS pixels, use `layout="fluid"`
- * with `sizes="auto"` — that is the normal case, not the escape hatch.
+ * Describe the slot once — a `slotWidth` when the markup states its width in CSS pixels, a `sizes`
+ * when only CSS knows it — and both the candidates and the `sizes` attribute follow that one
+ * description. On a fluid design most slots are the second kind, and `sizes="auto"` lets the
+ * browser measure the real box.
  *
  * @example
  *   ```tsx
  *   const context = useServerContext();
  *   <img {...getImageProps(node, { alt: "Bay view", slotWidth: 400 }, context)} />
- *   <img {...getImageProps(node, { alt: "", layout: "fluid", sizes: "auto" }, context)} />
+ *   <img {...getImageProps(node, { alt: "", sizes: "auto" }, context)} />
  *   ```;
  *
  * @param node - The file node holding the image. When missing, `options.fallback` is used instead.
@@ -248,6 +299,10 @@ export function getImageProps(
     fallback,
   } = options;
 
+  // Before the node is even looked at, so that a view describing its slot wrongly fails the same
+  // way whether or not the content property happens to be filled
+  const slot = resolveSlot(layout, slotWidth, sizes);
+
   if (!node) {
     return fallback ? { src: buildModuleFileUrl(fallback, {}, context), alt: alt.trim() } : null;
   }
@@ -274,10 +329,6 @@ export function getImageProps(
     height: layout === "fill" ? undefined : meta.intrinsicHeight,
   };
 
-  /** What the caller asked for, once the layout has had its say. */
-  const resolveSizes = (): string | undefined =>
-    layoutNeedsSizes(layout) ? (sizes ?? derivedSizes(layout, slotWidth)) : sizes;
-
   const withLoading = (props: ImgProps): ImgProps =>
     isAutoSizes(props.sizes) ? { ...props, loading: "lazy" } : props;
 
@@ -287,13 +338,13 @@ export function getImageProps(
     return withLoading({
       ...base,
       src: buildImageUrl(node, undefined, urlOptions).url,
-      sizes: resolveSizes(),
+      sizes,
     });
   }
 
   if (meta.intrinsicWidth === undefined) warnMissingIntrinsicSize(node);
 
-  const requested = (widths ?? candidateWidths(layout, slotWidth, breakpoints))
+  const requested = (widths ?? candidateWidths(layout, slot, breakpoints))
     .filter((candidate) => candidate > 0)
     .map((candidate) => clampToIntrinsic(candidate, meta.intrinsicWidth))
     .sort((a, b) => a - b);
@@ -327,8 +378,7 @@ export function getImageProps(
         ? [...widthByUrl].map(([url, candidate]) => `${commaSafe(url)} ${candidate}w`).join(", ")
         : undefined,
     // Below two candidates there is no choice to describe, so only an explicit `sizes` survives
-    sizes:
-      widthByUrl.size > 1 ? (resolveSizes() ?? derivedSizes(layout, slotWidth)) : resolveSizes(),
+    sizes: widthByUrl.size > 1 ? slot.sizes : sizes,
   });
 }
 

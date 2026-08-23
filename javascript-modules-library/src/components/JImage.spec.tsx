@@ -154,16 +154,25 @@ describe('sizes="auto"', () => {
 
   it("gives way to preload, which a shared wrapper's default cannot argue with", () => {
     const props = attributesOf(
-      JImage({ node: imageNode(), alt: "", layout: "fluid", sizes: "auto", preload: true }),
+      JImage({ node: imageNode(), alt: "", sizes: "auto", preload: true }),
     );
-    // Nothing in the markup describes a fluid slot, so the safe answer is all that is left
+    // A slot spelled with `sizes` carries no width to derive a replacement from, so the safe,
+    // wasteful answer is all that is left
     expect(props.sizes).toBe("100vw");
     expect(props).toMatchObject({ loading: "eager", fetchPriority: "high" });
   });
 
-  it("falls back to the sizes the layout derives, not to the browser default", () => {
+  it("replaces auto on an eagerly loaded image too, not only on a preloaded one", () => {
     const props = attributesOf(
-      JImage({ node: imageNode(), alt: "", slotWidth: 600, sizes: "auto", loading: "eager" }),
+      JImage({ node: imageNode(), alt: "", sizes: "auto", loading: "eager" }),
+    );
+    expect(props.sizes).toBe("100vw");
+    expect(props.loading).toBe("eager");
+  });
+
+  it("leaves a slot stated in CSS pixels alone, which never asked for auto", () => {
+    const props = attributesOf(
+      JImage({ node: imageNode(), alt: "", slotWidth: 600, loading: "eager" }),
     );
     expect(props.sizes).toBe("(min-width: 600px) 600px, 100vw");
     expect(props.loading).toBe("eager");
@@ -199,7 +208,7 @@ describe("the development warnings", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     stubDevelopmentMode(true);
 
-    freshJImage({ node: imageNode(), alt: "", layout: "fluid", sizes: "auto", preload: true });
+    freshJImage({ node: imageNode(), alt: "", sizes: "auto", preload: true });
 
     const [message, ...rest] = autoSizesMessages(warn);
     expect(rest).toHaveLength(0);
@@ -212,7 +221,7 @@ describe("the development warnings", () => {
     stubDevelopmentMode(false);
 
     const props = attributesOf(
-      freshJImage({ node: imageNode(), alt: "", layout: "fluid", sizes: "auto", preload: true }),
+      freshJImage({ node: imageNode(), alt: "", sizes: "auto", preload: true }),
     );
 
     expect(warn).not.toHaveBeenCalled();
@@ -223,7 +232,7 @@ describe("the development warnings", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     stubDevelopmentMode(true);
 
-    freshJImage({ node: imageNode(), alt: "", layout: "fluid", sizes: "auto" });
+    freshJImage({ node: imageNode(), alt: "", sizes: "auto" });
     freshJImage({ node: imageNode(), alt: "", layout: "full-width", preload: true });
 
     expect(autoSizesMessages(warn)).toHaveLength(0);
@@ -314,24 +323,36 @@ describe("placeholder", () => {
   });
 });
 
-describe('the "fluid" layout', () => {
+describe("a slot described by its sizes", () => {
   it("carries no CSS of its own: it is an ordinary image in the normal flow", () => {
-    const props = attributesOf(
-      JImage({ node: imageNode(), alt: "", layout: "fluid", sizes: "auto" }),
-    );
+    const props = attributesOf(JImage({ node: imageNode(), alt: "", sizes: "auto" }));
     expect(props.style).toBeUndefined();
     // Unlike `fill`, the intrinsic pair survives, and it is what reserves the space
     expect(props).toMatchObject({ width: 4000, height: 2000, loading: "lazy" });
+  });
+
+  it("refuses the slot described twice, in the markup and in the string", () => {
+    expect(() =>
+      // @ts-expect-error slotWidth and sizes are two descriptions of one slot
+      JImage({
+        node: imageNode(),
+        alt: "",
+        slotWidth: 400,
+        sizes: "(min-width: 1024px) 33vw, 100vw",
+      }),
+    ).toThrow(/takes a slotWidth or a sizes, never both/);
   });
 });
 
 describe("a missing node", () => {
   it("renders the module asset offered as a fallback", () => {
-    const props = attributesOf(JImage({ alt: "Nothing yet", fallback: "img/placeholder.jpg" }));
+    const props = attributesOf(
+      JImage({ alt: "Nothing yet", slotWidth: 400, fallback: "img/placeholder.jpg" }),
+    );
     expect(props.src).toBe("/modules/test-module/img/placeholder.jpg");
   });
 
   it("renders nothing at all when there is no fallback either", () => {
-    expect(JImage({ alt: "" })).toBeNull();
+    expect(JImage({ alt: "", slotWidth: 400 })).toBeNull();
   });
 });
