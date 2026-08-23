@@ -33,6 +33,7 @@ vi.mock("../urlBuilder/urlBuilder.js", async (importOriginal) => ({
 
 const { getLinkProps } = await import("./getLinkProps.js");
 const { resolveContentLink } = await import("./resolveContentLink.js");
+const { setLinkDefaults, clearLinkDefaults } = await import("./linkDefaults.js");
 
 /** A reference property: the UUID it stores, and the node it resolves to — when it does. */
 interface Reference {
@@ -150,7 +151,19 @@ describe("a target that cannot be linked to", () => {
     expect(() => getLinkProps(dead, {}, { mainNode: dead })).not.toThrow();
     const { anchor, state } = getLinkProps(dead, {}, { mainNode: dead });
     expect(anchor).toEqual({});
-    expect(state).toEqual({ navigable: false, isCurrent: false, isAncestor: false, label: "" });
+    // The node is reported as it was handed in, unread: what it cannot answer is what is missing
+    expect(state.node).toBe(dead);
+    expect(Object.keys(state).sort()).toEqual([
+      "isAncestor",
+      "isCurrent",
+      "label",
+      "navigable",
+      "node",
+    ]);
+    expect(state.navigable).toBe(false);
+    expect(state.isCurrent).toBe(false);
+    expect(state.isAncestor).toBe(false);
+    expect(state.label).toBe("");
   });
 
   it("never emits an anchor attribute with nothing to hang on", () => {
@@ -719,5 +732,186 @@ describe("resolveContentLink", () => {
     );
     expect(link?.anchor.href).toBe("/search?q=jahia#results");
     expect(link?.state.label).toBe("Find");
+  });
+});
+
+describe("narrowing the scheme allow-list", () => {
+  afterEach(() => {
+    clearLinkDefaults();
+    Reflect.deleteProperty(globalThis, "bundleKey");
+  });
+
+  /** The engine sets this global while it evaluates a module's bundle. */
+  const inModule = (name: string) => Reflect.set(globalThis, "bundleKey", name);
+
+  it("refuses a scheme the call site left out", () => {
+    const options = { allowedSchemes: ["https"] };
+    expect(getLinkProps("https://example.com", options).state.navigable).toBe(true);
+    expect(getLinkProps("http://example.com", options).state.navigable).toBe(false);
+    expect(getLinkProps("mailto:someone@example.com", options).state.navigable).toBe(false);
+  });
+
+  it("narrows every link of the module that asked for it", () => {
+    inModule("acme-module");
+    setLinkDefaults({ allowedSchemes: ["https"] });
+
+    const context = { bundleKey: "acme-module" };
+    expect(getLinkProps("https://example.com", {}, context).state.navigable).toBe(true);
+    expect(getLinkProps("http://example.com", {}, context).state.navigable).toBe(false);
+  });
+
+  it("leaves another module, and no module at all, on the built-in list", () => {
+    inModule("acme-module");
+    setLinkDefaults({ allowedSchemes: ["https"] });
+
+    expect(
+      getLinkProps("http://example.com", {}, { bundleKey: "other-module" }).state.navigable,
+    ).toBe(true);
+    expect(getLinkProps("http://example.com").state.navigable).toBe(true);
+  });
+
+  it("lets one call widen back to the module's own floor, and no further", () => {
+    inModule("acme-module");
+    setLinkDefaults({ allowedSchemes: ["https"] });
+
+    const context = { bundleKey: "acme-module" };
+    expect(
+      getLinkProps("mailto:someone@example.com", { allowedSchemes: ["https", "mailto"] }, context)
+        .state.navigable,
+    ).toBe(true);
+  });
+
+  it("cannot be used to allow a scheme the library rejects", () => {
+    for (const url of ["javascript:alert(1)", "data:text/html,x", "s3://bucket/key"]) {
+      const scheme = url.slice(0, url.indexOf(":"));
+      expect(getLinkProps(url, { allowedSchemes: [scheme, "https"] }).state.navigable).toBe(false);
+    }
+  });
+
+  it("says so in development, rather than letting the links quietly disappear", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    Reflect.set(globalThis, "server", {
+      render: { addCacheDependency },
+      config: { isDevelopmentMode: () => true },
+    });
+
+    getLinkProps("s3://bucket/key", { allowedSchemes: ["https", "s3"] });
+    expect(warn).toHaveBeenCalledOnce();
+    expect(warn.mock.calls[0][0]).toContain('"s3"');
+
+    // A property of the code, not of the URL: the second call adds nothing
+    getLinkProps("s3://other/key", { allowedSchemes: ["https", "s3"] });
+    expect(warn).toHaveBeenCalledOnce();
+
+    warn.mockRestore();
+  });
+
+  it("stays silent in production", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    Reflect.set(globalThis, "server", {
+      render: { addCacheDependency },
+      config: { isDevelopmentMode: () => false },
+    });
+
+    getLinkProps("gopher://example.com", { allowedSchemes: ["https", "gopher"] });
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it("ignores the case and the whitespace a configuration value carries", () => {
+    expect(
+      getLinkProps("https://example.com", { allowedSchemes: [" HTTPS "] }).state.navigable,
+    ).toBe(true);
+  });
+
+  it("refuses everything when the list is empty, which is a policy and not a mistake", () => {
+    expect(getLinkProps("https://example.com", { allowedSchemes: [] }).state.navigable).toBe(false);
+    // A site-relative path names no scheme, so no allow-list can judge it
+    expect(getLinkProps("/search", { allowedSchemes: [] }).state.navigable).toBe(true);
+  });
+
+  it("refuses to attach defaults outside a module's bundle evaluation", () => {
+    expect(() => setLinkDefaults({ allowedSchemes: ["https"] })).toThrow(
+      "no module to attach these defaults to",
+    );
+  });
+});
+
+describe("the node a link resolved to", () => {
+  it("hands back the node target, so a caller can read it without resolving it twice", () => {
+    const node = jcrNode({ path: "/sites/test/home/news" });
+    expect(getLinkProps(node).state.node).toBe(node);
+  });
+
+  it("reports no node for a URL target and for no target at all", () => {
+    expect(getLinkProps("https://example.com").state.node).toBeUndefined();
+    expect(getLinkProps(null).state.node).toBeUndefined();
+  });
+
+  it("hands back the reference a content node carried", () => {
+    const target = jcrNode({ identifier: "u-target", path: "/sites/test/home/news" });
+    const cta = jcrNode({ references: { "j:node": { uuid: "u-target", target } } });
+    expect(resolveContentLink(cta, {}, { renderContext })?.state.node).toBe(target);
+  });
+
+  it("reports no node when the reference did not resolve", () => {
+    const cta = jcrNode({ references: { "j:node": { uuid: "u-draft" } } });
+    const link = resolveContentLink(cta, {}, { renderContext });
+    expect(link?.state.navigable).toBe(false);
+    expect(link?.state.node).toBeUndefined();
+  });
+});
+
+describe("where a mixin-shaped link takes its label from", () => {
+  const target = jcrNode({
+    identifier: "u-target",
+    path: "/sites/test/home/news",
+    displayableName: "News",
+  });
+  const context = { renderContext };
+
+  /** A CTA mixin on a card: the card's jcr:title is the heading, not the link label. */
+  const card = jcrNode({
+    strings: { "jcr:title": "Our latest work", "acme:ctaLabel": "See the projects" },
+    references: { "j:node": { uuid: "u-target", target } },
+  });
+
+  it("takes the heading by default, which is the bug this option exists for", () => {
+    expect(resolveContentLink(card, {}, context)?.state.label).toBe("Our latest work");
+  });
+
+  it("takes the property the mixin actually stores its label in", () => {
+    expect(
+      resolveContentLink(card, { labelProperties: ["acme:ctaLabel"] }, context)?.state.label,
+    ).toBe("See the projects");
+  });
+
+  it("falls through to the target's own name when the named properties are empty", () => {
+    expect(
+      resolveContentLink(card, { labelProperties: ["acme:missing"] }, context)?.state.label,
+    ).toBe("News");
+    expect(resolveContentLink(card, { labelProperties: [] }, context)?.state.label).toBe("News");
+  });
+
+  it("skips the content node entirely on labelFrom: target", () => {
+    expect(resolveContentLink(card, { labelFrom: "target" }, context)?.state.label).toBe("News");
+  });
+
+  it("lets labelFrom win over labelProperties, as its documentation says", () => {
+    expect(
+      resolveContentLink(card, { labelFrom: "target", labelProperties: ["acme:ctaLabel"] }, context)
+        ?.state.label,
+    ).toBe("News");
+  });
+
+  it("still lets an explicit label win over both", () => {
+    expect(
+      resolveContentLink(card, { label: "Read on", labelFrom: "target" }, context)?.state.label,
+    ).toBe("Read on");
+  });
+
+  it("leaves the label of an external link empty when nothing on the node supplies one", () => {
+    const external = jcrNode({ strings: { "j:url": "https://example.com" } });
+    expect(resolveContentLink(external, { labelFrom: "target" }, context)?.state.label).toBe("");
   });
 });
