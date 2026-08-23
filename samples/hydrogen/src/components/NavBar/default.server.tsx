@@ -1,4 +1,4 @@
-import { buildNodeUrl, getChildNodes, jahiaComponent } from "@jahia/javascript-modules-library";
+import { getChildNodes, jahiaComponent, JLink } from "@jahia/javascript-modules-library";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 import classes from "./component.module.css";
 
@@ -11,24 +11,22 @@ jahiaComponent(
     componentType: "view",
     nodeType: "hydrogen:navBar",
     displayName: "NavBar",
+    // JLink emits aria-current on the page being rendered, which is not part of the fragment
+    // cache key unless the view says so. Without this the nav would be cached once and replayed,
+    // marking the same entry current on every page.
+    properties: { "cache.mainResource": "true" },
   },
-  (_, { renderContext, mainNode }) => (
+  (_, { renderContext }) => (
     <nav className={classes.nav}>
       <ul>
         {getChildPages(renderContext.getSite()).map((page) => (
           <li key={page.getPath()}>
-            <a href={buildNodeUrl(page)} aria-current={page === mainNode ? "page" : undefined}>
-              {page.getProperty("jcr:title").getString()}
-            </a>
+            {/* No children: the label comes from the page itself */}
+            <JLink node={page} />
             <ul>
               {getChildPages(page).map((page) => (
                 <li key={page.getPath()}>
-                  <a
-                    href={buildNodeUrl(page)}
-                    aria-current={page === mainNode ? "page" : undefined}
-                  >
-                    {page.getProperty("jcr:title").getString()}
-                  </a>
+                  <JLink node={page} />
                 </li>
               ))}
             </ul>
