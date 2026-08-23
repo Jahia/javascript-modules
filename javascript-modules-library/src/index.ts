@@ -9,7 +9,12 @@ export { AbsoluteArea } from "./components/AbsoluteArea.js";
 export { AddContentButtons } from "./components/AddContentButtons.js";
 export { AddResources } from "./components/AddResources.js";
 export { Area } from "./components/Area.js";
-export { JImage, type ImageAttributes, type JImageProps } from "./components/JImage.js";
+export {
+  JImage,
+  type ExtraImageAttributes,
+  type JImageProps,
+  type MarkupBox,
+} from "./components/JImage.js";
 
 // Declaration and registration
 export { jahiaComponent } from "./framework/jahiaComponent.js";
@@ -48,7 +53,7 @@ export {
   DEFAULT_BREAKPOINTS,
   type ImageLayout,
   type ImageOptions,
-  type ImageProps,
+  type ImgProps,
 } from "./utils/image/getImageProps.js";
 export {
   setImageDefaults,

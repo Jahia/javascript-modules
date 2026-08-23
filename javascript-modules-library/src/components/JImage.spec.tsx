@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 
 // `JImage` is a plain function of its props: rendering it through React would only add a tree to
@@ -83,12 +83,19 @@ describe("attribute pass-through", () => {
     expect(props).toMatchObject({ width: 4000, height: 2000, loading: "lazy" });
   });
 
-  it("stops mixing its dimensions with the caller's, which would state a wrong ratio", () => {
-    const props = attributesOf(JImage({ node: imageNode(), alt: "", slotWidth: 600, width: 48 }));
-    expect(props.width).toBe(48);
-    expect(props.height).toBeUndefined();
-    // Nothing reserves the space any more, so lazy loading would shift the layout
-    expect(props.loading).toBeUndefined();
+  it("refuses half a box, and names the prop the caller probably meant", () => {
+    // TypeScript rejects this spelling; the throw catches the JavaScript caller and the spread
+    // @ts-expect-error `width` and `height` are required together
+    expect(() => JImage({ node: imageNode(), alt: "", slotWidth: 600, width: 48 })).toThrow(
+      /pass both or neither.*slotWidth/s,
+    );
+  });
+
+  it("takes the caller's box over the intrinsic one", () => {
+    const props = attributesOf(
+      JImage({ node: imageNode(), alt: "", slotWidth: 600, width: 48, height: 24 }),
+    );
+    expect(props).toMatchObject({ width: 48, height: 24, loading: "lazy" });
   });
 });
 
@@ -145,16 +152,81 @@ describe('sizes="auto"', () => {
     expect(props).toMatchObject({ sizes: "auto", loading: "lazy" });
   });
 
-  it("refuses to be preloaded rather than silently downloading the largest candidate", () => {
-    expect(() =>
-      JImage({ node: imageNode(), alt: "", layout: "fill", sizes: "auto", preload: true }),
-    ).toThrow(/cannot be combined with preload/);
+  it("gives way to preload, which a shared wrapper's default cannot argue with", () => {
+    const props = attributesOf(
+      JImage({ node: imageNode(), alt: "", layout: "fluid", sizes: "auto", preload: true }),
+    );
+    // Nothing in the markup describes a fluid slot, so the safe answer is all that is left
+    expect(props.sizes).toBe("100vw");
+    expect(props).toMatchObject({ loading: "eager", fetchPriority: "high" });
   });
 
-  it('refuses an explicit loading="eager" for the same reason', () => {
-    expect(() =>
-      JImage({ node: imageNode(), alt: "", layout: "fill", sizes: "auto", loading: "eager" }),
-    ).toThrow(/loading="eager"/);
+  it("falls back to the sizes the layout derives, not to the browser default", () => {
+    const props = attributesOf(
+      JImage({ node: imageNode(), alt: "", slotWidth: 600, sizes: "auto", loading: "eager" }),
+    );
+    expect(props.sizes).toBe("(min-width: 600px) 600px, 100vw");
+    expect(props.loading).toBe("eager");
+  });
+});
+
+describe("the development warnings", () => {
+  /** The engine injects `server` as a global; a test provides only the parts under test. */
+  const stubDevelopmentMode = (developmentMode: boolean) => {
+    Reflect.set(globalThis, "server", {
+      render: { addCacheDependency: () => {} },
+      config: { isDevelopmentMode: () => developmentMode },
+    });
+  };
+
+  /** Each warning is printed once per engine lifetime, so each test needs its own module copy. */
+  let freshJImage: typeof JImage;
+  beforeEach(async () => {
+    vi.resetModules();
+    ({ JImage: freshJImage } = await import("./JImage.js"));
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    Reflect.set(globalThis, "server", { render: { addCacheDependency: () => {} } });
+  });
+
+  /** The `?w=` candidates warn on this instance too, so each test reads only its own message. */
+  const autoSizesMessages = (warn: { mock: { calls: unknown[][] } }): string[] =>
+    warn.mock.calls.map(([message]) => String(message)).filter((m) => m.includes('sizes="auto"'));
+
+  it('reports the image that asked for both sizes="auto" and an eager load', () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    stubDevelopmentMode(true);
+
+    freshJImage({ node: imageNode(), alt: "", layout: "fluid", sizes: "auto", preload: true });
+
+    const [message, ...rest] = autoSizesMessages(warn);
+    expect(rest).toHaveLength(0);
+    expect(message).toContain("/sites/test/files/photo.jpg");
+    expect(message).toContain('sizes="100vw"');
+  });
+
+  it("says nothing in production, where the page still renders", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    stubDevelopmentMode(false);
+
+    const props = attributesOf(
+      freshJImage({ node: imageNode(), alt: "", layout: "fluid", sizes: "auto", preload: true }),
+    );
+
+    expect(warn).not.toHaveBeenCalled();
+    expect(props.sizes).toBe("100vw");
+  });
+
+  it("says nothing when the two never met", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    stubDevelopmentMode(true);
+
+    freshJImage({ node: imageNode(), alt: "", layout: "fluid", sizes: "auto" });
+    freshJImage({ node: imageNode(), alt: "", layout: "full-width", preload: true });
+
+    expect(autoSizesMessages(warn)).toHaveLength(0);
   });
 });
 
@@ -239,6 +311,17 @@ describe("placeholder", () => {
   it("leaves the style alone by default", () => {
     const props = attributesOf(JImage({ node: imageNode(), alt: "", slotWidth: 600 }));
     expect(props.style).toBeUndefined();
+  });
+});
+
+describe('the "fluid" layout', () => {
+  it("carries no CSS of its own: it is an ordinary image in the normal flow", () => {
+    const props = attributesOf(
+      JImage({ node: imageNode(), alt: "", layout: "fluid", sizes: "auto" }),
+    );
+    expect(props.style).toBeUndefined();
+    // Unlike `fill`, the intrinsic pair survives, and it is what reserves the space
+    expect(props).toMatchObject({ width: 4000, height: 2000, loading: "lazy" });
   });
 });
 

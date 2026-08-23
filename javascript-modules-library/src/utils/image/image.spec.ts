@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
+import type { ImageOptions, ImgProps } from "./getImageProps.js";
+import type { ImageContext } from "./imageDefaults.js";
 
 // `buildNodeUrl` reaches into the Jahia render context, which only exists inside the engine. The
 // mock reproduces the two channels it offers: `parameters` become a query string (the default
@@ -27,15 +29,28 @@ vi.mock("../urlBuilder/urlBuilder.js", async () => {
 
       return toAbsoluteUrl(url, node as never, config?.absolute);
     },
-    buildModuleFileUrl: (path: string) => `/modules/test${path}`,
+    buildModuleFileUrl: (path: string) => `/modules/test/${path}`,
   };
 });
 
 const { buildImageUrl, buildBackgroundImageUrl, buildThumbnailUrl } =
   await import("./buildImageUrl.js");
 const { setImageDefaults, clearImageDefaults } = await import("./imageDefaults.js");
-const { getImageProps, inspectImageChannel, DEFAULT_BREAKPOINTS } =
-  await import("./getImageProps.js");
+const {
+  getImageProps: getImagePropsWithContext,
+  inspectImageChannel,
+  DEFAULT_BREAKPOINTS,
+} = await import("./getImageProps.js");
+
+/**
+ * The render context is required, because a call without one silently loses both the cache
+ * dependency and the module's defaults. The tests that are not about it pass an empty one.
+ */
+const getImageProps = (
+  node: JCRNodeWrapper,
+  options: ImageOptions,
+  context: ImageContext = {},
+): ImgProps => getImagePropsWithContext(node, options, context);
 const { readImageMeta } = await import("./imageMeta.js");
 
 /** A JCR file node holding an image, with just the surface the image code touches. */
@@ -289,6 +304,18 @@ describe("getImageProps", () => {
     expect(props.srcSet).toBeUndefined();
   });
 
+  it("refuses explicit widths with no slot to describe, rather than emitting undefinedpx", () => {
+    // The widths bypass the ladder, so nothing else asks for the slot — and the `sizes` derived
+    // from a missing one used to read "(min-width: undefinedpx) undefinedpx, 100vw", which
+    // browsers discard before fetching the largest candidate on every screen
+    expect(() =>
+      getImageProps(imageNode({ width: 4000 }), { alt: "", widths: [400, 800] }),
+    ).toThrow(/layout "constrained" needs a slotWidth/);
+    expect(() =>
+      getImageProps(imageNode({ width: 4000 }), { alt: "", layout: "fixed", widths: [400, 800] }),
+    ).toThrow(/layout "fixed" needs a slotWidth/);
+  });
+
   it("takes explicit widths and sizes as an escape hatch", () => {
     const props = getImageProps(imageNode({ width: 2000 }), {
       alt: "",
@@ -308,7 +335,7 @@ describe("getImageProps", () => {
   });
 });
 
-describe("the ignored-resize warning", () => {
+describe("the development warnings", () => {
   /** The engine injects `server` as a global; a test provides only the part under test. */
   const stubDevelopmentMode = (developmentMode: boolean) => {
     Reflect.set(globalThis, "server", {
@@ -320,10 +347,13 @@ describe("the ignored-resize warning", () => {
    * The warning latches a module-scope flag — once per engine lifetime is the point of it — so each
    * test needs its own copy of the module rather than the one a previous test already silenced.
    */
-  let freshImageProps: typeof getImageProps;
+  let reimported: typeof getImagePropsWithContext;
+  const freshImageProps = (node: JCRNodeWrapper, options: ImageOptions) =>
+    reimported(node, options, {});
+
   beforeEach(async () => {
     vi.resetModules();
-    ({ getImageProps: freshImageProps } = await import("./getImageProps.js"));
+    ({ getImageProps: reimported } = await import("./getImageProps.js"));
   });
 
   /** A slot of 600 on a 2000px original: candidates no thumbnail covers, so `?w=` carries them. */
@@ -408,6 +438,96 @@ describe("the ignored-resize warning", () => {
 
     expect(() => freshImageProps(imageNode({ width: 2000 }), slot)).not.toThrow();
     expect(warn).toHaveBeenCalledTimes(1);
+  });
+
+  /** Every message printed, as strings, since several warnings can be about the same render. */
+  const messagesOf = (warn: { mock: { calls: unknown[][] } }): string[] =>
+    warn.mock.calls.map(([message]) => String(message));
+
+  it("names j:width when Jahia never measured a raster image", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    stubDevelopmentMode(true);
+
+    // No `j:width`: candidates are no longer capped by the original, nothing reserves the space,
+    // and without that reservation the image is not lazy-loaded either
+    freshImageProps(imageNode({ path: "/sites/test/files/unmeasured.jpg" }), slot);
+
+    const missingSize = messagesOf(warn).filter((message) => message.includes("j:width"));
+    expect(missingSize).toHaveLength(1);
+    expect(missingSize[0]).toContain("/sites/test/files/unmeasured.jpg");
+  });
+
+  it("says nothing about j:width for an image Jahia did measure", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    stubDevelopmentMode(true);
+
+    freshImageProps(imageNode({ path: "/sites/test/files/measured.jpg", width: 2000 }), slot);
+
+    expect(messagesOf(warn).some((message) => message.includes("j:width"))).toBe(false);
+  });
+
+  it("warns once per unmeasured image, and once more for the next one", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    stubDevelopmentMode(true);
+
+    const node = imageNode({ path: "/sites/test/files/one.jpg" });
+    freshImageProps(node, slot);
+    freshImageProps(node, slot);
+    freshImageProps(imageNode({ path: "/sites/test/files/two.jpg" }), slot);
+
+    expect(messagesOf(warn).filter((message) => message.includes("j:width"))).toHaveLength(2);
+  });
+});
+
+describe('the "fluid" layout', () => {
+  it("draws the whole ladder for a normal-flow slot the markup cannot measure", () => {
+    const props = getImageProps(imageNode({ width: 4000 }), {
+      alt: "",
+      layout: "fluid",
+      sizes: "auto",
+    });
+    for (const breakpoint of DEFAULT_BREAKPOINTS) {
+      expect(props.srcSet).toContain(`${breakpoint}w`);
+    }
+  });
+
+  it("keeps the intrinsic pair, which is what reserves the space in normal flow", () => {
+    const props = getImageProps(imageNode({ width: 4000, height: 2000 }), {
+      alt: "",
+      layout: "fluid",
+      sizes: "auto",
+    });
+    expect(props).toMatchObject({ width: 4000, height: 2000, loading: "lazy" });
+  });
+
+  it("refuses to guess a sizes it cannot derive, and says what to write", () => {
+    expect(() => getImageProps(imageNode({ width: 4000 }), { alt: "", layout: "fluid" })).toThrow(
+      /layout "fluid" needs an explicit sizes/,
+    );
+  });
+
+  it("offers what fill offers, since only the positioning differs", () => {
+    const node = imageNode({ width: 4000, height: 2000 });
+    const fluid = getImageProps(node, { alt: "", layout: "fluid", sizes: "auto" });
+    const fill = getImageProps(node, { alt: "", layout: "fill", sizes: "auto" });
+    expect(fluid.src).toBe(fill.src);
+    expect(fluid.srcSet).toBe(fill.srcSet);
+    expect(fluid.sizes).toBe(fill.sizes);
+    expect(fluid.loading).toBe(fill.loading);
+    // The one difference: `fill` takes its box from the parent it is stretched over
+    expect(fill.width).toBeUndefined();
+  });
+});
+
+describe("a missing node", () => {
+  it("renders the module asset offered as a fallback", () => {
+    expect(
+      getImagePropsWithContext(null, { alt: "Nothing yet", fallback: "img/placeholder.jpg" }, {}),
+    ).toEqual({ src: "/modules/test/img/placeholder.jpg", alt: "Nothing yet" });
+  });
+
+  it("returns nothing at all when there is no fallback either", () => {
+    expect(getImagePropsWithContext(undefined, { alt: "" }, {})).toBeNull();
   });
 });
 
