@@ -14,54 +14,82 @@ Content images come from the JCR, and rendering one well means more than pointin
 ```tsx
 import { JImage, jahiaComponent } from "@jahia/javascript-modules-library";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
+import placeholder from "./placeholder.jpg";
 
 jahiaComponent(
   { nodeType: "example:article", componentType: "view" },
   ({ title, cover }: { title: string; cover?: JCRNodeWrapper }) => (
     <article>
       <h2>{title}</h2>
-      <JImage node={cover} alt={title} layout="fill" sizes="auto" className="cover" />
+      <JImage
+        node={cover}
+        alt={title}
+        layout="fluid"
+        sizes="auto"
+        fallback={placeholder}
+        className="cover"
+      />
     </article>
   ),
 );
 ```
 
-That renders an `<img>` with a `src` sized for the slot, a `srcSet` of alternatives the browser can pick from, a `sizes` the browser resolves against the real box, `loading="lazy"`, and a registered cache dependency on the image node. `fill` stretches the image over `.cover`'s nearest positioned ancestor, so give that element a `position: relative` and a height.
+That renders an `<img>` with a `src` sized for the slot, a `srcSet` of alternatives the browser can pick from, a `sizes` the browser resolves against the real box, the intrinsic dimensions that reserve its space, `loading="lazy"`, and a registered cache dependency on the image node.
+
+Three props are worth knowing before anything else:
+
+- **`layout="fluid"`** says the slot is in the normal flow and nothing in the markup knows how wide it is — a `%`, a grid cell, a column that changes at every breakpoint. On a fluid design that is most slots. It goes with a `sizes`, and `sizes="auto"` lets the browser measure the real box.
+- **`alt` is required.** An image that carries no information of its own — a decorative flourish, or one that only repeats an adjacent caption — is declared with `alt=""`. That is a deliberate statement, not a shortcut, and it is why the prop has no default.
+- **`fallback`** is a static asset of your module, rendered when the content property is empty. Without one, a missing `node` renders nothing at all rather than a broken image. Roughly a third of real call sites want it.
 
 ## Pick the layout your slot actually has
 
-The first question is not how wide the image is. It is **whether anything in your markup knows how wide it is.**
+The first question is not how wide the image is. It is **whether anything in your markup knows how wide it is** — and, when nothing does, whether the image sits in the normal flow or is stretched over a parent.
 
-| Your slot                                                                                       | Layout                     | You also provide           |
-| ----------------------------------------------------------------------------------------------- | -------------------------- | -------------------------- |
-| sized by CSS you cannot read from the view — `%`, `fr`, `rem`, a grid cell, an aspect-ratio box | `fill`                     | `sizes` (usually `"auto"`) |
-| spans the viewport — a hero, a full-bleed banner                                                | `full-width`               | nothing                    |
-| a real number of CSS pixels, always — an avatar, a fixed logo slot                              | `fixed`                    | `slotWidth`                |
-| at most a number of CSS pixels, shrinking on a narrow viewport                                  | `constrained` (default)    | `slotWidth`                |
-| the box comes from the `width`/`height` attributes, with no CSS at all                          | any, with `width`+`height` | `width`, `height`          |
-
-On a fluid design, most slots are the first row. `fill` is the ordinary case, not an escape hatch:
+| Your slot                                                                                                | Layout                     | You also provide           |
+| -------------------------------------------------------------------------------------------------------- | -------------------------- | -------------------------- |
+| sized by CSS the view cannot read — `%`, `fr`, `rem`, a grid cell, an `aspect-ratio` box, a fixed height | `fluid`                    | `sizes` (usually `"auto"`) |
+| spans the viewport — a hero, a full-bleed banner                                                         | `full-width`               | nothing                    |
+| at most a number of CSS pixels, shrinking on a narrow viewport                                           | `constrained` (default)    | `slotWidth`                |
+| a real number of CSS pixels, always — an avatar, a fixed logo slot                                       | `fixed`                    | `slotWidth`                |
+| owned by a parent the image is positioned _over_, so it can be cropped under an overlay                  | `fill`                     | `sizes`, and parent CSS    |
+| the box comes from the `width`/`height` attributes, with no CSS at all                                   | any, with `width`+`height` | `width` **and** `height`   |
 
 ```tsx
-<JImage node={card} alt="" layout="fill" sizes="auto" className={classes.card} />
+<JImage node={card} alt="" layout="fluid" sizes="auto" className={classes.card} />
 <JImage node={hero} alt={title} layout="full-width" preload />
-<JImage node={avatar} alt={fullName} layout="fixed" slotWidth={80} />
 <JImage node={cover} alt={title} slotWidth={400} />
+<JImage node={avatar} alt={fullName} layout="fixed" slotWidth={80} />
 <JImage node={icon} alt="" width={48} height={48} />
 ```
 
 `slotWidth` is deliberately not called `width`: it is how much room the layout gives the image, in CSS pixels, while `width` is the HTML attribute that ends up in the markup. They are different numbers with different jobs, and the component accepts both.
 
-### `fill` and `sizes`
+Two slot shapes look like they need a number and do not. An **`aspect-ratio` box** (`.card { aspect-ratio: 16 / 9 }`) and a **height-constrained slot** (`.logo-strip img { height: 3rem; width: auto }`) both state a height, never a width — so their width is whatever the layout gives them, which is exactly `fluid`. Declaring a `slotWidth` your CSS contradicts is worse than declaring none: the browser is then told about a slot that does not exist.
 
-`fill` stretches the image over its **closest positioned ancestor** — give that parent `position: relative` (and a height, or an `aspect-ratio`). It is the one layout that carries CSS of its own, because "fills its parent" is not something markup can say; your own `style` still wins over it.
+## What actually resizes the image, and where
 
-Since nothing in the document says how wide that parent is, `sizes` is required. `sizes="auto"` is usually the right answer: the browser measures the real box after layout, which beats any value you could derive. Two things follow from the specification:
+This is the part that surprises people, and it is worth knowing before you go looking for a bug: **a plain Jahia instance does not resize images on request.** The size travels differently depending on where the asset lives, and `buildImageUrl` reports which channel it used.
 
-- **`auto` only works on a lazily loaded image**, so `<JImage>` sets `loading="lazy"` for you.
-- **`auto` and `preload` are contradictory.** Combining them throws, rather than letting the browser quietly fall back to `100vw` and download the largest candidate on every screen. For an above-the-fold `fill` image, describe the slot instead: `sizes="(min-width: 60rem) 33vw, 100vw"`.
+| Channel     | When                                                                                 | Resizes?                                                                                                                                                                                                                                                           |
+| ----------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `loader`    | the call, or the module, supplies a `loader`                                         | Up to that loader — the library stops guessing                                                                                                                                                                                                                     |
+| `provider`  | the asset is mounted from an external provider (a DAM such as Keepeek or Cloudinary) | Yes — the provider's decorator builds a signed, transformed URL                                                                                                                                                                                                    |
+| `thumbnail` | the requested width matches a thumbnail Jahia pre-generated (150px, 350px)           | Yes, and this is the only one that works with no extra infrastructure                                                                                                                                                                                              |
+| `query`     | anything else on the default provider: the size becomes `?w=` / `?h=`                | Only behind [Media Optimization](https://academy.jahia.com/documentation/jahia-cms/jahia-8-2/developer/optional-features/media-optimization-cloudimage) (Jahia Cloud, live mode). Elsewhere the file servlet ignores the parameters and returns the original bytes |
+| `original`  | vectors, `unoptimized`, and any request that matches the original size               | Nothing to do                                                                                                                                                                                                                                                      |
 
-### Two different widths: the slot and the file
+So on your local instance, a `srcSet` full of `?w=` candidates is expected, and every one of them returns the same file. Nothing is broken: the markup is correct, and it starts saving bytes the moment the site runs somewhere that honours the hint. If you want to see real per-width files locally, mount a DAM, request a thumbnail width, or write a [loader](#your-own-url-dialect-loader).
+
+An instance in development mode says so rather than letting you discover it: the first image that falls back to `?w=` candidates prints one warning naming that image as its example and pointing back at this section. It says the same thing for every image, so it is printed once per instance and never in production.
+
+### When Jahia never measured the image
+
+Everything the library derives from the intrinsic size — capping candidates at the original, the `width`/`height` pair that reserves the space, and the `loading="lazy"` that pair makes safe — comes from two JCR properties, **`j:width` and `j:height`**. Jahia's image extractor writes them when the file is uploaded, and an asset that arrived another way (an import, a provider mount, an extractor that failed) can carry neither.
+
+Nothing about the resulting markup is invalid, which is why nobody notices. A development instance prints one warning per such image, naming it. The fix is on the content side — re-upload the file, or run the extractor over it — and until then you can state the box yourself with `width` and `height`.
+
+## Two different widths: the slot and the file
 
 The number in `slotWidth` is the **slot**: how much room the image gets in the layout, in CSS pixels. The numbers in `srcSet` are **files**: how many actual pixels each candidate contains. They are not the same thing, and that is the whole reason `srcSet` exists.
 
@@ -74,7 +102,8 @@ The **candidate ladder** is the list of file widths offered for the layouts wher
 | `fixed`       | `slotWidth`, `2 × slotWidth`                                      | no — the slot is one number, so two files cover it            |
 | `constrained` | ladder entries below `slotWidth`, then `slotWidth` and its double | yes, for the narrow viewports where the image shrinks         |
 | `full-width`  | the whole ladder                                                  | yes — the slot is the viewport, which varies from phone to 4K |
-| `fill`        | the whole ladder                                                  | yes — the slot is unknown at build time, so offer everything  |
+| `fluid`       | the whole ladder                                                  | yes — the slot is unknown at build time, so offer everything  |
+| `fill`        | the whole ladder                                                  | yes, for the same reason                                      |
 
 The default ladder is `[320, 640, 960, 1280, 1920, 2560]` — doubling-ish steps, because a candidate only pays for itself if it is meaningfully smaller than the next one up. Override it per call with `breakpoints`, or once for the whole module with [`setImageDefaults`](#module-wide-defaults).
 
@@ -82,11 +111,47 @@ Two consequences worth knowing. Candidates stop at `2 × slotWidth`: a 3× file 
 
 Candidates are always capped by the original — Jahia never upscales — and the original itself is only offered when it is close to the largest size actually requested, so an 8000-pixel master is never sent to fill a 640-pixel card.
 
-`widths` (candidate widths, in **image** pixels) overrides the ladder when you know better.
+`widths` (candidate widths, in **image** pixels) overrides the ladder when you know better. It replaces the ladder, not the slot: `constrained` and `fixed` still need their `slotWidth`, because that is what `sizes` is built from.
 
 ### Why two attributes at all
 
 `srcSet` lists files with their widths (`photo.jpg?w=640 640w`). `sizes` tells the browser how much space the image will occupy (`(min-width: 400px) 400px, 100vw`, or `auto` to measure it). The browser divides one by the other, multiplies by the screen's device pixel ratio, and downloads the smallest file that still looks sharp. Get `sizes` wrong — or omit it — and the browser assumes the image fills the viewport and downloads far more than it needs. That is the arithmetic `layout` exists to do for you.
+
+### `sizes="auto"`
+
+`sizes="auto"` asks the browser to measure the real box after layout, which beats any value you could derive from the markup. It is the usual answer for `fluid` and `fill`, and one thing follows from the specification: **`auto` is only read on a lazily loaded image**, so `<JImage>` sets `loading="lazy"` for you.
+
+That makes `auto` and `preload` contradictory. They still meet in practice, because they come from different layers — a shared wrapper defaults every image to `sizes="auto"`, a leaf view marks this one as the page's LCP element — and neither layer can see the other. The eager load wins, the layout's own `sizes` replaces `auto`, and a development instance prints one warning naming the image. To choose a better value than the fallback, describe the slot yourself: `sizes="(min-width: 60rem) 33vw, 100vw"`.
+
+## The `fill` layout: an image positioned over its parent
+
+`fill` is not the fluid case. It takes the image **out of the normal flow** and stretches it over the nearest positioned ancestor, which is what you want when the parent owns the box and the image is decoration inside it: a card cover under a text overlay, a banner cropped with `object-fit`.
+
+It is the one layout that carries CSS of its own, and it only works if the parent cooperates:
+
+```tsx
+<div className={classes.frame}>
+  <JImage node={cover} alt="" layout="fill" sizes="auto" className={classes.cover} />
+  <h3 className={classes.title}>{title}</h3>
+</div>
+```
+
+```css
+/* The parent must be positioned, and must have a height of its own — the image no longer
+   contributes one, because it is absolutely positioned. */
+.frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+}
+
+.cover {
+  object-fit: cover;
+}
+```
+
+Two consequences. Since nothing in the document says how wide that parent is, `sizes` is required. And the intrinsic `width`/`height` are deliberately not emitted: they would state a box that fights the parent's. Your own `style` still wins over the positioning the component applies.
+
+If the parent has no reason to be positioned, you want `fluid` instead.
 
 ## Above the fold: `preload`
 
@@ -96,7 +161,7 @@ An image is lazy-loaded by default, which is wrong for the one image that is alr
 <JImage node={hero} alt={title} layout="full-width" preload />
 ```
 
-`preload` loads it eagerly and at high fetch priority. Use it on one image per page.
+`preload` loads it eagerly and at high fetch priority. Use it on one image per page. It overrides `sizes="auto"`, for the reason given [above](#sizesauto).
 
 ## Every `<img>` attribute still reaches the element
 
@@ -108,7 +173,7 @@ An image is lazy-loaded by default, which is wrong for the one image that is alr
 <JImage node={icon} alt="" width={48} height={48} />
 ```
 
-They come as a pair: as soon as you write one, the library stops emitting the other from the image's intrinsic size, because half of yours and half of ours would state a wrong aspect ratio.
+**They are required together.** Two of them state one box, and half of yours with half of ours would state a wrong aspect ratio — so the component takes both or neither, and TypeScript says so at the call site. This is also the guard against the easiest mistake in this API: writing `width={400}` when you meant `slotWidth={400}`.
 
 For anything React's typings do not model — `data-*` above all — there is `attributes`, spread onto the element last. It takes a record, or a function of the image the library resolved:
 
@@ -122,15 +187,13 @@ For anything React's typings do not model — `data-*` above all — there is `a
 />
 ```
 
-## Alternative text is required
+## Alternative text
 
 `alt` is not optional, because a missing one is invisible until someone using a screen reader hits it. Describe what the image shows, in the page's language:
 
 ```tsx
 <JImage node={photo} alt={t("alt.estate", { estate: title })} slotWidth={400} />
 ```
-
-An image that carries no information of its own — a decorative flourish, or one that only repeats an adjacent caption — is declared with `alt=""`. That is a deliberate statement, not a shortcut.
 
 ## A placeholder while it loads
 
@@ -143,23 +206,9 @@ An image that carries no information of its own — a decorative flourish, or on
 
 Two limits worth knowing. The placeholder is **not removed once the image has loaded** — the component renders on the server and there is no client-side code to clear it — so it stays behind a transparent PNG. And an image Jahia has generated no thumbnail for simply gets no placeholder, rather than an error.
 
-## What actually resizes the image, and where
+`placeholder` covers the loading gap; `fallback` covers the missing node. They are different problems and can be used together.
 
-This is the part that surprises people: **a plain Jahia instance does not resize images on request.** The size travels differently depending on where the asset lives, and `buildImageUrl` reports which channel it used.
-
-| Channel     | When                                                                                 | Resizes?                                                                                                                                                                                                                                                           |
-| ----------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `loader`    | the call, or the module, supplies a `loader`                                         | Up to that loader — the library stops guessing                                                                                                                                                                                                                     |
-| `provider`  | the asset is mounted from an external provider (a DAM such as Keepeek or Cloudinary) | Yes — the provider's decorator builds a signed, transformed URL                                                                                                                                                                                                    |
-| `thumbnail` | the requested width matches a thumbnail Jahia pre-generated (150px, 350px)           | Yes, and this is the only one that works with no extra infrastructure                                                                                                                                                                                              |
-| `query`     | anything else on the default provider: the size becomes `?w=` / `?h=`                | Only behind [Media Optimization](https://academy.jahia.com/documentation/jahia-cms/jahia-8-2/developer/optional-features/media-optimization-cloudimage) (Jahia Cloud, live mode). Elsewhere the file servlet ignores the parameters and returns the original bytes |
-| `original`  | vectors, `unoptimized`, and any request that matches the original size               | Nothing to do                                                                                                                                                                                                                                                      |
-
-So on your local instance, a `srcSet` full of `?w=` candidates is expected, and every one of them returns the same file. Nothing is broken: the markup is correct, and it starts saving bytes the moment the site runs somewhere that honours the hint. If you want to see real per-width files locally, mount a DAM, request a thumbnail width, or write a loader.
-
-An instance in development mode says so rather than letting you discover it: the first image that falls back to `?w=` candidates prints one warning naming that image as its example and pointing back at this section. It says the same thing for every image, so it is printed once per instance and never in production.
-
-### Your own URL dialect: `loader`
+## Your own URL dialect: `loader`
 
 A project on a CDN, a custom DAM, or a Media Optimization setup that speaks a different dialect replaces the routing entirely. A loader is given the asset's own URL, the candidate width and the requested quality, and returns the URL to use:
 
@@ -192,24 +241,33 @@ An island's props are serialized, so a React element cannot be one of them, and 
 
 ```tsx
 // gallery.server.tsx
-import { getImageProps, Island } from "@jahia/javascript-modules-library";
+import { getImageProps, Island, useServerContext } from "@jahia/javascript-modules-library";
 
-const images = photos.map((photo) => getImageProps(photo, { alt: title, slotWidth: 800 }));
+function GalleryView({ photos, title }) {
+  const context = useServerContext();
+  const images = photos.map((photo) =>
+    getImageProps(photo, { alt: title, slotWidth: 800 }, context),
+  );
 
-<Island component={Gallery} props={{ images }} />;
+  return <Island component={Gallery} props={{ images }} />;
+}
 ```
 
 ```tsx
 // Gallery.client.tsx
-import type { ImageProps } from "@jahia/javascript-modules-library";
+import type { ImgProps } from "@jahia/javascript-modules-library";
 
-export default function Gallery({ images }: { images: ImageProps[] }) {
+export default function Gallery({ images }: { images: ImgProps[] }) {
   const [current, setCurrent] = useState(0);
   return <img {...images[current]} onClick={() => setCurrent((i) => i + 1)} />;
 }
 ```
 
-`ImageProps` is plain, serializable data, and `alt` is required there too. It carries `loading: "lazy"` when `sizes` resolved to `auto`; spread the whole object rather than picking fields out of it, or that pairing is lost.
+The `context` is not optional: it carries the render cache dependency and it names the module whose `setImageDefaults` apply, so a call without it silently loses both. Inside a view it comes from `useServerContext()`.
+
+`ImgProps` is plain, serializable data — the type of what comes _out_ of `getImageProps`, as opposed to `JImageProps`, the component's own props. `alt` is required there too. It carries `loading: "lazy"` when `sizes` resolved to `auto`; spread the whole object rather than picking fields out of it, or that pairing is lost.
+
+`getImageProps` accepts a missing node, like the component does: with a `fallback` it returns the fallback's props, and without one it returns `null`.
 
 ## Background images
 
@@ -228,7 +286,7 @@ A background has no `srcSet`, so ask for the largest size the slot can reach and
 ```tsx
 buildNodeUrl(page, { absolute: true });
 buildImageUrl(cover, { width: 1200 }, { absolute: true }).url;
-getImageProps(cover, { alt: title, layout: "fill", sizes: "auto", absolute: true });
+getImageProps(cover, { alt: title, layout: "fluid", sizes: "auto", absolute: true }, context);
 ```
 
 The host is the **target site's** server name, not the current request's — a link to a page of another site must name that site's server. A site with no server name configured falls back to the request's own scheme, host and port, which is what makes this work on a local instance. When neither is right — a reverse proxy, a preview host, a canonical domain — name the origin yourself: `absolute: "https://www.example.com"`.
@@ -244,7 +302,7 @@ server.render.addCacheDependency({ node: imageNode }, renderContext);
 ## Reference
 
 - `JImage` — the component. Renders an unstyled `<img>`, except where the feature is styling (`fill`, `placeholder`). Server-side only.
-- `getImageProps(node, options)` — the same props as plain data, for islands and for cases where you own the element.
+- `getImageProps(node, options, context)` — the same props as plain data, for islands and for cases where you own the element.
 - `buildImageUrl(node, size, options)` — one URL and the channel that carried the size.
 - `buildBackgroundImageUrl(node, size, options)` — a CSS `url("…")` value.
 - `buildThumbnailUrl(node)` — the smallest thumbnail Jahia pre-generated, or `undefined`.
