@@ -1,23 +1,127 @@
-import type { ImgHTMLAttributes, JSX } from "react";
+import type { CSSProperties, ImgHTMLAttributes, JSX } from "react";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 import { useServerContext } from "../hooks/useServerContext.js";
-import { getImageProps, type ImageLayout } from "../utils/image/getImageProps.js";
-import { buildModuleFileUrl } from "../utils/urlBuilder/urlBuilder.js";
+import { buildThumbnailUrl, cssUrl } from "../utils/image/buildImageUrl.js";
+import { warnAutoSizesEager } from "../utils/image/devWarnings.js";
+import {
+  getImageProps,
+  isAutoSizes,
+  type ImageSlot,
+  type ImgProps,
+} from "../utils/image/getImageProps.js";
+import type { ImageSourceOptions } from "../utils/image/imageDefaults.js";
+
+/**
+ * Attributes spread onto the `<img>` last, after everything the component computed.
+ *
+ * A record covers the static ones — which a plain JSX attribute already expresses. The function
+ * form is for a value that depends on the image the library resolved: an analytics attribute
+ * carrying the final `src`, a test hook naming the width actually served.
+ */
+export type ExtraImageAttributes =
+  | Record<string, string | number | boolean | undefined>
+  | ((image: ImgProps) => Record<string, string | number | boolean | undefined>);
+
+/**
+ * The `width` and `height` HTML attributes, which together state one box — and therefore travel
+ * together. Writing only one used to be legal and quietly dropped the other, which is also how a
+ * call site written against `width` as the _slot_ width type-checked and then failed at render.
+ */
+export type MarkupBox =
+  | { width: number | `${number}`; height: number | `${number}` }
+  | { width?: undefined; height?: undefined };
+
+/**
+ * What `JImage` decides for itself.
+ *
+ * The HTML attributes it accepts are everything an `<img>` takes _minus these_ — derived, not
+ * hand-listed, so adding a prop here can never silently swallow an attribute that used to reach the
+ * element. Only `src` and `srcSet` are additionally withheld: the component computes them.
+ */
+export interface JImageBaseProps extends ImageSourceOptions {
+  /** The file node holding the image. When missing, `fallback` is rendered instead. */
+  node?: JCRNodeWrapper | null;
+  /** Alternative text; `""` declares the image decorative. */
+  alt: string;
+  /** Explicit candidate widths in image pixels. Overrides the ladder the layout would derive. */
+  widths?: number[];
+  /** Candidate ladder used by every layout but `fixed`. */
+  breakpoints?: readonly number[];
+  /**
+   * Register a render cache dependency on the image node.
+   *
+   * @default true
+   */
+  cacheDependency?: boolean;
+  /**
+   * Marks the image as the page's largest above-the-fold element: it loads eagerly and at high
+   * fetch priority instead of being lazy-loaded. Use it on one image per page.
+   */
+  preload?: boolean;
+  /**
+   * A module static asset (`import placeholder from "/static/img/placeholder.jpg"`) rendered when
+   * `node` is missing, so an unfilled content property does not leave a broken image.
+   */
+  fallback?: string;
+  /**
+   * A low-quality image shown underneath while the real one downloads: `"blur"` uses the smallest
+   * thumbnail Jahia pre-generated, and a `data:image/…` value is used as given.
+   *
+   * @default "empty"
+   */
+  placeholder?: "blur" | "empty" | `data:image/${string}`;
+  /** The `placeholder="blur"` source, when the Jahia thumbnail is not the one you want. */
+  blurDataURL?: string;
+  /** Spread onto the `<img>` last. */
+  attributes?: ExtraImageAttributes;
+  /**
+   * The `width` HTML attribute. Overrides the intrinsic width — with `height`, this is how an image
+   * takes its box from the markup and needs no CSS rule at all.
+   *
+   * Required together with `height`: half of yours and half of ours would state a wrong aspect
+   * ratio. The room the _layout_ gives the image is `slotWidth`, a different number with a
+   * different job.
+   */
+  width?: number | `${number}`;
+  /** The `height` HTML attribute. Overrides the intrinsic height; see {@link JImageBaseProps.width}. */
+  height?: number | `${number}`;
+}
+
+/**
+ * What `JImage` takes: its own props plus the slot description, which is one of the shapes
+ * {@link ImageSlot} allows and never a mix of two.
+ */
+export type JImageProps = JImageBaseProps & ImageSlot;
+
+/** The layout that has to be CSS, because "fills its parent" is not something markup can say. */
+const FILL_STYLE: CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  width: "100%",
+  height: "100%",
+};
 
 /**
  * Renders a JCR image as an `<img>`: resized `src`, `srcSet` candidates, the matching `sizes`, the
  * intrinsic dimensions that reserve its space, and a render cache dependency on the image node.
  *
- * Declare how the image sits in the page — `layout` plus the slot `width` — rather than computing
- * candidate widths by hand. The element carries no styling of its own: pass a `className`.
+ * Describe the slot once — a `slotWidth` when the markup states its width in CSS pixels, a `sizes`
+ * when only CSS knows it — rather than computing candidate widths by hand. On a fluid design most
+ * slots are the second kind, and `sizes="auto"` lets the browser measure the real box.
+ *
+ * The element carries no styling of its own, except where the feature _is_ styling: `layout="fill"`
+ * positions it over its parent, and `placeholder` paints a background. Anything else is your
+ * `className`, and any `style` you pass wins over both.
  *
  * Server-side only, because it registers the cache dependency. A client component receives image
  * data instead: build it with {@link getImageProps} and pass it through `<Island props>`.
  *
  * @example
  *   ```tsx
- *   <Image node={cover} alt={title} width={400} className={classes.cover} />
- *   <Image node={hero} alt={title} layout="full-width" priority />
+ *   <JImage node={card} alt="" sizes="auto" className={classes.card} />
+ *   <JImage node={cover} alt={title} slotWidth={400} className={classes.cover} />
+ *   <JImage node={hero} alt={title} layout="full-width" preload />
+ *   <JImage node={icon} alt="" width={48} height={48} />
  *   ```;
  *
  * @returns The `<img>` element.
@@ -26,72 +130,120 @@ export function JImage({
   node,
   alt,
   layout,
-  width,
+  slotWidth,
   widths,
   sizes,
-  priority = false,
+  breakpoints,
+  cacheDependency,
+  loader,
+  quality,
+  unoptimized,
+  absolute,
+  preload = false,
   fallback,
+  placeholder = "empty",
+  blurDataURL,
+  attributes,
+  width,
+  height,
   loading,
   fetchPriority,
+  style,
   ...imgAttributes
 }: Readonly<
-  {
-    /** The file node holding the image. When missing, `fallback` is rendered instead. */
-    node?: JCRNodeWrapper | null;
-    /** Alternative text; `""` declares the image decorative. */
-    alt: string;
-    /**
-     * How the image occupies its slot.
-     *
-     * @default "constrained"
-     */
-    layout?: ImageLayout;
-    /** The slot width in CSS pixels. Required by the `constrained` and `fixed` layouts. */
-    width?: number;
-    /** Explicit candidate widths in image pixels. Escape hatch: prefer `layout` + `width`. */
-    widths?: number[];
-    /**
-     * Marks the image as the page's largest above-the-fold element: it loads eagerly, at high
-     * priority, instead of being lazy-loaded.
-     */
-    priority?: boolean;
-    /**
-     * A module static asset (`import placeholder from "/static/img/placeholder.jpg"`) rendered when
-     * `node` is missing, so an unfilled content property does not leave a broken image.
-     */
-    fallback?: string;
-  } & Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "srcSet" | "width" | "height" | "alt">
->): JSX.Element | null {
+  JImageBaseProps & Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "srcSet" | keyof JImageProps>
+> &
+  MarkupBox &
+  // Outside the `Readonly<>`, so that the union stays a union: a mapped type over it would collapse
+  // `slotWidth` and `sizes` back into two independent optionals and let a call site write both
+  ImageSlot): JSX.Element | null {
   const context = useServerContext();
 
-  const props = node
-    ? getImageProps(node, { alt, layout, width, widths, sizes }, context)
-    : fallback
-      ? { src: buildModuleFileUrl(fallback, {}, context), alt: alt.trim() }
-      : null;
+  // Caught here rather than at the `<img>`, because the call site that writes one of the two is
+  // usually one that meant `slotWidth` — and TypeScript already rejects that spelling
+  if ((width === undefined) !== (height === undefined)) {
+    throw new Error(
+      "JImage: width and height are the HTML attributes and state one box, so pass both or " +
+        "neither. If you meant how much room the layout gives the image, that is slotWidth.",
+    );
+  }
 
-  if (!props) return null;
+  // `sizes="auto"` is only read on a lazily loaded image. Loading it eagerly does not degrade to
+  // "the browser measures the box anyway": it degrades to 100vw, which downloads the largest
+  // candidate on every screen. The two props legitimately come from different layers — a shared
+  // wrapper defaults every image to `auto`, a leaf view marks this one as the LCP element — so the
+  // eager load wins over the default, and `auto` gives way to the safe, wasteful answer — the only
+  // one left, since a slot spelled with `sizes` carries no width for the library to derive one from.
+  const eagerness = preload ? "preload" : loading === "eager" ? 'loading="eager"' : undefined;
+  const autoOverridden = eagerness !== undefined && isAutoSizes(sizes);
+  const requestedSizes = autoOverridden ? "100vw" : sizes;
 
-  const { width: intrinsicWidth, height: intrinsicHeight } = props as {
-    width?: number;
-    height?: number;
-  };
+  const image: ImgProps | null = getImageProps(
+    node,
+    {
+      alt,
+      widths,
+      breakpoints,
+      cacheDependency,
+      loader,
+      quality,
+      unoptimized,
+      absolute,
+      fallback,
+      // The union was enforced at the call site; here the three are plain optionals again, and
+      // `getImageProps` checks them once more for the caller that reached it without types
+      ...({ layout, slotWidth, sizes: requestedSizes } as ImageSlot),
+    },
+    context,
+  );
+
+  if (!image) return null;
+
+  if (autoOverridden && node) warnAutoSizesEager(node, eagerness, image.sizes);
+
+  // The caller owns the box or the library does; a mix of the two states a wrong aspect ratio
+  const markupSized = width !== undefined;
+  const renderedWidth = markupSized ? width : image.width;
+  const renderedHeight = markupSized ? height : image.height;
+
+  const autoSizes = isAutoSizes(image.sizes);
+
+  // Lazy loading without reserved space causes layout shift, so it is only safe once the space is
+  // known — from the intrinsic dimensions, from the ones the caller wrote, or from the positioned
+  // parent a `fill` image is stretched over.
+  const spaceReserved =
+    layout === "fill" || (renderedWidth !== undefined && renderedHeight !== undefined);
+
+  const placeholderUrl =
+    placeholder === "empty"
+      ? undefined
+      : placeholder === "blur"
+        ? (blurDataURL ?? (node ? buildThumbnailUrl(node, { absolute, context }) : undefined))
+        : placeholder;
 
   return (
     <img
-      {...props}
+      {...image}
       {...imgAttributes}
-      // Lazy loading without reserved space causes layout shift, so it is only safe once Jahia has
-      // extracted the intrinsic dimensions.
-      loading={
-        loading ??
-        (priority
-          ? "eager"
-          : intrinsicWidth !== undefined && intrinsicHeight !== undefined
-            ? "lazy"
-            : undefined)
+      width={renderedWidth}
+      height={renderedHeight}
+      loading={loading ?? (preload ? "eager" : autoSizes || spaceReserved ? "lazy" : undefined)}
+      fetchPriority={fetchPriority ?? (preload ? "high" : undefined)}
+      style={
+        layout === "fill" || placeholderUrl
+          ? {
+              ...(layout === "fill" && FILL_STYLE),
+              ...(placeholderUrl && {
+                backgroundImage: cssUrl(placeholderUrl),
+                backgroundSize: "cover",
+                backgroundPosition: "50% 50%",
+                backgroundRepeat: "no-repeat",
+              }),
+              ...style,
+            }
+          : style
       }
-      fetchPriority={fetchPriority ?? (priority ? "high" : undefined)}
+      {...(typeof attributes === "function" ? attributes(image) : attributes)}
     />
   );
 }
