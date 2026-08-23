@@ -16,6 +16,7 @@ export {
   type JImageProps,
   type MarkupBox,
 } from "./components/JImage.js";
+export { JLink, type JLinkProps } from "./components/JLink.js";
 
 // Declaration and registration
 export { jahiaComponent } from "./framework/jahiaComponent.js";
