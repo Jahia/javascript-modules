@@ -55,6 +55,15 @@ export interface LinkState {
   isAncestor: boolean;
   /** The label to render when the caller provides no children. Empty when nothing supplies one. */
   label: string;
+  /**
+   * The node the link resolved to, when there was one: a node target, or the reference
+   * {@link resolveContentLink} read off a content node. Absent for a URL target and for a reference
+   * that did not resolve.
+   *
+   * It is called `node` and not `target` because `target` is already the anchor attribute, and the
+   * two are never the same thing.
+   */
+  node?: JCRNodeWrapper;
 }
 
 /** Everything a link needs to be rendered: the anchor attributes, and the rest. */
@@ -64,6 +73,14 @@ export interface LinkProps {
 }
 
 export interface LinkOptions {
+  /**
+   * Schemes a URL target may use, narrowing the built-in list — `http`, `https`, `mailto`, `tel`,
+   * `ftp`. A scheme outside that list is dropped rather than added, because a component cannot be
+   * the place a project loosens its own URL policy.
+   *
+   * Set it module-wide with `setLinkDefaults` and override it here for the one field that differs.
+   */
+  allowedSchemes?: readonly string[];
   /** Query string parameters. Inserted before any fragment, on node and string targets alike. */
   parameters?: Record<string, string>;
   /** Fragment, without the leading `#`. Appended last, replacing a fragment the target carries. */
@@ -132,4 +149,6 @@ export interface LinkContext {
   currentResource?: Resource;
   /** The node of the main resource — the page being rendered, not the node being rendered. */
   mainNode?: JCRNodeWrapper;
+  /** Selects the module whose `setLinkDefaults` apply. */
+  bundleKey?: string;
 }

@@ -16,7 +16,7 @@ export {
   type JImageProps,
   type MarkupBox,
 } from "./components/JImage.js";
-export { JLink, type JLinkProps } from "./components/JLink.js";
+export { JLink, type ExtraAnchorAttributes, type JLinkProps } from "./components/JLink.js";
 
 // Declaration and registration
 export { jahiaComponent } from "./framework/jahiaComponent.js";
@@ -30,6 +30,7 @@ export { useServerContext, ServerContextProvider } from "./hooks/useServerContex
 export { getChildNodes } from "./utils/jcr/getChildNodes.js";
 export { getNodeProps } from "./utils/jcr/getNodeProps.js";
 export { getNodesByJCRQuery } from "./utils/jcr/getNodesByJCRQuery.js";
+export { readNodeReference, type NodeReference } from "./utils/jcr/readNodeReference.js";
 
 // URL builder
 export {
@@ -71,7 +72,12 @@ export { readImageMeta, type ImageMeta } from "./utils/image/imageMeta.js";
 
 // Links
 export { getLinkProps } from "./utils/link/getLinkProps.js";
-export { resolveContentLink } from "./utils/link/resolveContentLink.js";
+export {
+  setLinkDefaults,
+  DEFAULT_ALLOWED_SCHEMES,
+  type LinkDefaults,
+} from "./utils/link/linkDefaults.js";
+export { resolveContentLink, type LinkLabelSource } from "./utils/link/resolveContentLink.js";
 export type {
   AnchorProps,
   LinkContext,

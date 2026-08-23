@@ -152,3 +152,162 @@ describe("a link that is not navigable", () => {
     expect(markup).toBe("Later");
   });
 });
+
+describe("attributes the component's own props cannot express", () => {
+  const node = jcrNode({ identifier: "u-other", path: "/sites/test/other" });
+
+  it("spreads a record onto the anchor", () => {
+    const markup = render(
+      <JLink node={node} attributes={{ "data-element-type": "cta", "data-index": 3 }}>
+        Other
+      </JLink>,
+    );
+    expect(markup).toBe(
+      '<a href="/sites/test/other.html" data-element-type="cta" data-index="3">Other</a>',
+    );
+  });
+
+  it("hands the resolved link to the function form, href and label together", () => {
+    const markup = render(
+      <JLink
+        node={jcrNode({ identifier: "u-home", displayableName: "Home" })}
+        attributes={({ anchor, state }) => ({
+          "data-element-url": anchor.href,
+          "data-element-text": state.label,
+          "data-element-current": state.isCurrent,
+        })}
+      />,
+    );
+    expect(markup).toBe(
+      '<a href="/sites/test/home.html" aria-current="page" data-element-url="/sites/test/home.html"' +
+        ' data-element-text="Home" data-element-current="true">Home</a>',
+    );
+  });
+
+  it("drops the keys whose value is undefined, rather than rendering them empty", () => {
+    const markup = render(
+      <JLink node={node} attributes={{ "data-set": "yes", "data-unset": undefined }}>
+        Other
+      </JLink>,
+    );
+    expect(markup).toBe('<a href="/sites/test/other.html" data-set="yes">Other</a>');
+  });
+
+  it("wins over an anchor attribute of the same name, being spread last", () => {
+    const markup = render(
+      <JLink node={node} className="base" attributes={{ className: "override" }}>
+        Other
+      </JLink>,
+    );
+    expect(markup).toBe('<a href="/sites/test/other.html" class="override">Other</a>');
+  });
+
+  it("is not called at all when the link is not navigable", () => {
+    const attributes = vi.fn(() => ({ "data-x": "1" }));
+    expect(
+      render(
+        <JLink node={jcrNode({ url: null })} attributes={attributes}>
+          Later
+        </JLink>,
+      ),
+    ).toBe("Later");
+    expect(attributes).not.toHaveBeenCalled();
+  });
+});
+
+describe("asChild", () => {
+  const node = jcrNode({ identifier: "u-other", path: "/sites/test/other" });
+  /** A design system's call to action: not a bare anchor, and the reason asChild exists. */
+  const CTA = ({ variant, ...rest }: { variant: string } & Record<string, unknown>) => (
+    <a {...rest} className={`cta cta--${variant}`} />
+  );
+
+  it("hands the anchor attributes to the element the caller rendered", () => {
+    const markup = render(
+      <JLink node={node} asChild>
+        <CTA variant="primary">Read more</CTA>
+      </JLink>,
+    );
+    expect(markup).toBe('<a href="/sites/test/other.html" class="cta cta--primary">Read more</a>');
+  });
+
+  it("carries aria-current and the extra attributes through the child too", () => {
+    const markup = render(
+      <JLink
+        node={jcrNode({ identifier: "u-home" })}
+        asChild
+        attributes={({ anchor }) => ({ "data-element-url": anchor.href })}
+      >
+        <CTA variant="ghost">Home</CTA>
+      </JLink>,
+    );
+    expect(markup).toContain('aria-current="page"');
+    expect(markup).toContain('data-element-url="/sites/test/home.html"');
+  });
+
+  it("still renders the child, without a link, when the target does not resolve", () => {
+    const markup = render(
+      <JLink node={jcrNode({ url: null })} asChild>
+        <CTA variant="primary">Coming soon</CTA>
+      </JLink>,
+    );
+    expect(markup).toBe('<a class="cta cta--primary">Coming soon</a>');
+    expect(markup).not.toContain("href");
+  });
+
+  it("renders nothing when the caller asks for nothing", () => {
+    const markup = render(
+      <JLink node={jcrNode({ url: null })} asChild whenUnresolved="none">
+        <CTA variant="primary">Coming soon</CTA>
+      </JLink>,
+    );
+    expect(markup).toBe("");
+  });
+
+  it("says what is wrong when it is given anything but one element", () => {
+    for (const children of [
+      undefined,
+      "just text",
+      [<CTA key="a" variant="a" />, <CTA key="b" variant="b" />],
+    ]) {
+      expect(() =>
+        render(
+          <JLink node={node} asChild>
+            {children}
+          </JLink>,
+        ),
+      ).toThrow("asChild renders the child as the link");
+    }
+  });
+});
+
+describe("the anchor attributes JLink accepts", () => {
+  it("still passes through the ones its own props do not claim", () => {
+    const markup = render(
+      <JLink href="/files/report.pdf" media="print" referrerPolicy="no-referrer">
+        Report
+      </JLink>,
+    );
+    expect(markup).toContain('media="print"');
+    expect(markup).toContain('referrerPolicy="no-referrer"');
+  });
+
+  it("keeps every prop it consumes off the DOM, derived from the props themselves", () => {
+    const markup = render(
+      <JLink
+        content={jcrNode({ strings: { "j:url": "https://example.com" } })}
+        typeProperty="ctaType"
+        noneValue="noLink"
+        referenceProperties={[]}
+        urlProperty="j:url"
+        labelProperties={["acme:label"]}
+        labelFrom="content"
+        allowedSchemes={["https"]}
+        whenUnresolved="children"
+      >
+        Partner
+      </JLink>,
+    );
+    expect(markup).toBe('<a href="https://example.com">Partner</a>');
+  });
+});

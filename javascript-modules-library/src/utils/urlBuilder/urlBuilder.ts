@@ -138,7 +138,10 @@ export function buildNodeUrl(
     return toAbsoluteUrl(
       buildEndpointUrl(
         (mode === "edit"
-          ? "/cms/edit/default/"
+          ? // The page builder renders from /cms/editframe/; /cms/edit/ redirects to the jContent
+            // UI instead, and only reaches the page because EditModeFilter substitutes the two —
+            // for an <a href> and nothing else
+            "/cms/editframe/default/"
           : mode === "preview"
             ? "/cms/render/default/"
             : "/cms/render/live/") +

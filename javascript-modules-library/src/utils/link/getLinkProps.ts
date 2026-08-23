@@ -2,19 +2,33 @@ import type { Locale } from "java.util";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 import type { RenderContext } from "org.jahia.services.render";
 import { appendParameters, buildNodeUrl, schemeRegExp } from "../urlBuilder/urlBuilder.js";
+import { warnUnknownAllowedSchemes } from "./devWarnings.js";
+import { DEFAULT_ALLOWED_SCHEMES, getLinkDefaults } from "./linkDefaults.js";
 import type { AnchorProps, LinkContext, LinkOptions, LinkProps, LinkTarget } from "./types.js";
 
 /** The values `jmix:link`'s `j:target` allows. Anything else omits the attribute. */
 const TARGET_ATTRIBUTES: readonly string[] = ["_blank", "_parent", "_self", "_top"];
 
 /**
- * Schemes a link may use, for every URL the library did not build itself — an author-supplied
- * `j:url` included.
+ * The schemes this call allows: the call's own list, then the module's, then the built-in one.
  *
- * React neutralises `javascript:` alone, by substituting a throwing URL rather than removing the
- * attribute; `data:`, `blob:` and `vbscript:` are covered by this list and by nothing else.
+ * Whichever is chosen is intersected with the built-in list, so the option can only ever narrow.
+ * Allowing a scheme the library rejects is not a call-site decision — `javascript:` and `data:` are
+ * the reason the list exists — and a project that wants one has to be told so rather than to
+ * discover its links quietly missing.
  */
-const ALLOWED_SCHEMES: readonly string[] = ["http", "https", "mailto", "tel", "ftp"];
+function resolveAllowedSchemes(
+  requested: readonly string[] | undefined,
+  context: LinkContext | undefined,
+): readonly string[] {
+  const asked = requested ?? getLinkDefaults(context?.bundleKey).allowedSchemes;
+  if (!asked) return DEFAULT_ALLOWED_SCHEMES;
+
+  const normalized = asked.map((scheme) => scheme.trim().toLowerCase());
+  const allowed = normalized.filter((scheme) => DEFAULT_ALLOWED_SCHEMES.includes(scheme));
+  warnUnknownAllowedSchemes(normalized.filter((scheme) => !allowed.includes(scheme)));
+  return allowed;
+}
 
 /**
  * Reproduces what a URL parser removes before it reads the scheme: ASCII tab and newline anywhere
@@ -34,7 +48,7 @@ function normalizeUrl(raw: string): string {
 }
 
 /** The URL to navigate to, or `undefined` when its scheme is not allow-listed. */
-function allowedHref(raw: string): string | undefined {
+function allowedHref(raw: string, allowedSchemes: readonly string[]): string | undefined {
   const url = normalizeUrl(raw);
   if (!url) return undefined;
 
@@ -47,7 +61,7 @@ function allowedHref(raw: string): string | undefined {
   if (url.startsWith("/")) return url[1] === "/" || url[1] === "\\" ? undefined : url;
 
   const scheme = schemeRegExp.exec(url)?.[1].toLowerCase();
-  return scheme && ALLOWED_SCHEMES.includes(scheme) ? url : undefined;
+  return scheme && allowedSchemes.includes(scheme) ? url : undefined;
 }
 
 /**
@@ -204,7 +218,7 @@ function registerCacheDependency(
  *   reads no React context of its own, so omitting it inside a render does not fall back to one. It
  *   degrades instead — without `renderContext` no cache dependency is registered, and without
  *   `mainNode` `isCurrent` and `isAncestor` are always false. Omit it only outside a render, where
- *   there is nothing to read.
+ *   there is nothing to read. Its `bundleKey` selects the module whose `setLinkDefaults` apply.
  * @returns The anchor attributes and the state of the link. Never throws.
  * @see {@link resolveContentLink} to read the target off a content node first.
  */
@@ -219,7 +233,7 @@ export function getLinkProps(
   if (!target) {
     href = undefined;
   } else if (typeof target === "string") {
-    href = allowedHref(target);
+    href = allowedHref(target, resolveAllowedSchemes(options.allowedSchemes, context));
   } else if (
     !options.language ||
     options.requireTranslation === false ||
@@ -239,6 +253,7 @@ export function getLinkProps(
   const mainPath = mainNode && read(mainNode, (main) => main.getPath());
 
   const state = {
+    node,
     navigable: href !== undefined,
     isCurrent: options.isCurrent ?? isSameNode(node, mainNode),
     isAncestor:
