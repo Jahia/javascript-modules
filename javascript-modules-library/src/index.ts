@@ -68,6 +68,19 @@ export {
 } from "./utils/image/imageDefaults.js";
 export { readImageMeta, type ImageMeta } from "./utils/image/imageMeta.js";
 
+// Links
+export { getLinkProps } from "./utils/link/getLinkProps.js";
+export { resolveContentLink } from "./utils/link/resolveContentLink.js";
+export type {
+  AnchorProps,
+  LinkContext,
+  LinkOptions,
+  LinkProps,
+  LinkState,
+  LinkTarget,
+  LinkTargetAttribute,
+} from "./utils/link/types.js";
+
 // I18n
 export { getSiteLocales } from "./utils/i18n.js";
 
