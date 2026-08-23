@@ -9,7 +9,7 @@ export { AbsoluteArea } from "./components/AbsoluteArea.js";
 export { AddContentButtons } from "./components/AddContentButtons.js";
 export { AddResources } from "./components/AddResources.js";
 export { Area } from "./components/Area.js";
-export { JImage } from "./components/JImage.js";
+export { JImage, type ImageAttributes, type JImageProps } from "./components/JImage.js";
 
 // Declaration and registration
 export { jahiaComponent } from "./framework/jahiaComponent.js";
@@ -29,14 +29,18 @@ export {
   buildEndpointUrl,
   buildNodeUrl,
   buildModuleFileUrl,
+  type AbsoluteUrlOption,
 } from "./utils/urlBuilder/urlBuilder.js";
 
 // Images
 export {
+  buildBackgroundImageUrl,
   buildImageUrl,
+  buildThumbnailUrl,
   THUMBNAIL_WIDTHS,
   type ImageResizeChannel,
   type ImageUrl,
+  type ImageUrlOptions,
 } from "./utils/image/buildImageUrl.js";
 export {
   getImageProps,
@@ -46,6 +50,14 @@ export {
   type ImageOptions,
   type ImageProps,
 } from "./utils/image/getImageProps.js";
+export {
+  setImageDefaults,
+  type ImageContext,
+  type ImageDefaults,
+  type ImageLoader,
+  type ImageLoaderProps,
+  type ImageSourceOptions,
+} from "./utils/image/imageDefaults.js";
 export { readImageMeta, type ImageMeta } from "./utils/image/imageMeta.js";
 
 // I18n
