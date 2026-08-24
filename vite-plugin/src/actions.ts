@@ -88,13 +88,17 @@ const __jsmCall = (name) => async (...args) => {
     headers: { "X-JS-Action": "1", accept: "application/json" },
     body: __jsmStringify(args),
   });
-  if (!response.ok) throw new Error(\`Action \${name} failed with HTTP \${response.status}\`);
-  const payload = await response.json();
-  // presence check: an empty error message is still an error, not a payload to parse
-  if ("error" in payload) {
+  // The endpoint answers with a JSON envelope whatever the outcome, so the body is read before the
+  // status is considered: failures carry their message — and their validation issues — in there.
+  // Presence check: an empty error message is still an error, not a payload to parse.
+  const payload = await response.json().catch(() => null);
+  if (payload && "error" in payload) {
     const error = new Error(payload.error);
     if (payload.issues) error.issues = payload.issues;
     throw error;
+  }
+  if (!response.ok || !payload) {
+    throw new Error(\`Action \${name} failed with HTTP \${response.status}\`);
   }
   return __jsmParse(payload.data);
 };

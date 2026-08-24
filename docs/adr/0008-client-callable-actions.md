@@ -30,7 +30,7 @@ Export discovery is a deliberate v1 simplification: only top-level `export const
 One engine-owned platform action, `jsAction` (`GenericActionEndpoint`), dispatches to all registered actions:
 
 - URL: `<currentPageUrl>.jsAction.do?name=<moduleName>/<exportName>` — riding the Render servlet keeps Jahia's authentication valves (calls execute as the visitor, guest included) and requires no new servlet/HTTP-whiteboard surface.
-- Request body: devalue-serialized arguments array. Response envelope: `{"data": "<devalue>"}` on success, `{"error": "...", "issues": [...]?}` on failure — always on HTTP 200, because the render servlet only writes JSON bodies for 2xx action results; the stub discriminates on the envelope.
+- Request body: devalue-serialized arguments array. Response envelope: `{"data": "<devalue>"}` on success, `{"error": "...", "issues": [...]?}` on failure — written by the endpoint itself with a status describing the outcome (200/400/404/500). The initial decision rode the render servlet's body writing, which only writes JSON for 2xx results and forced the envelope onto HTTP 200; the endpoint now completes the response on its own, so plain HTTP callers can discriminate on the status while the stub keeps discriminating on the envelope.
 - The JS adapter (library) owns all serialization: the Java endpoint pipes opaque strings and never converts structured polyglot values.
 
 ### CSRF
