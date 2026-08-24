@@ -7,7 +7,7 @@ jahiaComponent(
     displayName: "test Areas (react)",
     componentType: "view",
   },
-  () => (
+  (_, { currentNode, renderContext }) => (
     <>
       <h2>React JArea test component</h2>
 
@@ -56,6 +56,21 @@ jahiaComponent(
             stringParam2: "stringValue2",
           }}
         />
+      </div>
+
+      <h2>Area with parent node</h2>
+      <div data-testid="areaWithParent">
+        <Area name="parentArea" parent={currentNode} />
+      </div>
+
+      <h2>Area with home page as parent</h2>
+      <div data-testid="areaWithHomeParent">
+        <Area name="areaAtHomePage" parent={renderContext.getSite().getHome()} />
+      </div>
+
+      <h2>Area with site root as parent</h2>
+      <div data-testid="areaWithSiteParent">
+        <Area name="areaAtSiteRoot" parent={renderContext.getSite()} />
       </div>
     </>
   ),
