@@ -58,7 +58,6 @@ public class GraalVMEngine {
     private static final Logger logger = LoggerFactory.getLogger(GraalVMEngine.class);
 
     public static final String JS = "js";
-    private static final String UNKNOWN_SYS_PROP = "Unknown";
 
     /**
      * Mimetype used by Graal to identify ESM source code.
