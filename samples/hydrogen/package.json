@@ -37,7 +37,7 @@
     "i18next": "^25.7.3",
     "prettier": "^3.7.4",
     "react": "^19.2.3",
-    "react-i18next": "^16.5.0",
+    "react-i18next": "^17.0.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.50.0",
     "typescript-plugin-css-modules": "^5.2.0",
