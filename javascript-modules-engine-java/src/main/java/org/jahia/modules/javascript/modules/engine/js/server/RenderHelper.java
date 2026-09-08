@@ -69,12 +69,6 @@ public class RenderHelper {
     private JCRTemplate jcrTemplate;
     private RenderService renderService;
 
-    public ProxyObject transformToJsNode(JCRNodeWrapper node, boolean includeChildren, boolean includeDescendants,
-            boolean includeAllTranslations) throws RepositoryException {
-        return recursiveProxyMap(
-                JSNodeMapper.toJSNode(node, includeChildren, includeDescendants, includeAllTranslations));
-    }
-
     /**
      * Get the render parameters for the given resource
      *
