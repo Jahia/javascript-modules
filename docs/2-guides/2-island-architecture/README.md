@@ -35,6 +35,8 @@ As with all imports from `@jahia/javascript-modules-library`, the `<Island />` c
 
 Server files, files in `.server.tsx`, are used as entry points for your server code. They contain views and templates to be registered by Jahia.
 
+Server code runs in GraalJS, embedded in the Jahia JVM. It is neither Node.js nor a browser: there are no timers, no `fetch` and no Node.js built-ins. See [Server runtime boundary](https://github.com/Jahia/javascript-modules/blob/main/docs/3-reference/3-server-runtime-boundary/README.md) for the full list of what is and isn't available.
+
 Client files, files in `.client.tsx`, are used as entry points for your client code. All client files, as well as all their imports, will be made available for the browser to download. They should not contain any sensitive information, and cannot import server APIs (`@jahia/javascript-modules-library` and `.server.tsx` files).
 
 In client files, **only the default export** can be used to create an island. For instance, here is a minimal interactive button:

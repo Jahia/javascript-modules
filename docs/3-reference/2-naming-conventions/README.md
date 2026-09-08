@@ -5,3 +5,5 @@ The JavaScript Modules engine does not enforce any naming conventions, but we re
 - .client.tsx files
 - .server.tsx files
 - fullPage view
+
+The suffix is not just a convention for humans: it decides which runtime the file ends up in, and therefore which APIs it may use. See [Server runtime boundary](../3-server-runtime-boundary).
