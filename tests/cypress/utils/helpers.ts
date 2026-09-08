@@ -1,5 +1,5 @@
 /*  eslint-disable @typescript-eslint/no-explicit-any */
-import { createSite, deleteSite, addNode, publishAndWaitJobEnding } from "@jahia/cypress";
+import { createSite, deleteSite, addNode, addPage, publishAndWaitJobEnding } from "@jahia/cypress";
 
 export const addSimplePage = (
   parentPathOrId: string,
@@ -10,23 +10,17 @@ export const addSimplePage = (
   children = [],
   mixins = [],
   properties = [],
-): any => {
-  const variables = {
+): any =>
+  addPage({
     parentPathOrId: parentPathOrId,
     name: pageName,
     title: pageTitle,
-    primaryNodeType: "jnt:page",
+    language: language,
     template: template,
     mixins: mixins,
-    properties: [
-      ...properties,
-      { name: "jcr:title", value: pageTitle, language: language },
-      { name: "j:templateName", type: "STRING", value: template },
-    ],
+    properties: properties,
     children: children,
-  };
-  return addNode(variables);
-};
+  });
 
 export const addEventPageAndEvents = (
   siteKey: string,
