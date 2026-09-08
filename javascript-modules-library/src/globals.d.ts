@@ -16,6 +16,20 @@ declare global {
   declare const server: {
     /** This helper provides access to OSGi configuration */
     config: ConfigHelper;
+    /**
+     * This helper tells whether a module is currently served by a development server, so that views
+     * address its files there instead of in the deployed bundle.
+     *
+     * Declared here rather than imported from the generated Java typings: java-ts-bind emits
+     * `DevHelper` without its methods, for a reason that has not been found yet.
+     */
+    dev: {
+      /**
+       * The path the module's files are served under during development, or null — which is every
+       * module outside a development session.
+       */
+      getBase(module: string): string | null;
+    };
     /** This helper allows to perform JCR operations */
     jcr: JcrHelper;
     /** This helper provides access Jahia's GraphQL API, to execute queries and mutations */

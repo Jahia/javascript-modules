@@ -22,6 +22,7 @@
     "out": "target/java-ts-bind/types",
     "rootTypes": [
       "org.jahia.modules.javascript.modules.engine.js.server.ConfigHelper",
+      "org.jahia.modules.javascript.modules.engine.js.server.DevHelper",
       "org.jahia.modules.javascript.modules.engine.js.server.GQLHelper",
       "org.jahia.modules.javascript.modules.engine.js.server.JcrHelper",
       "org.jahia.modules.javascript.modules.engine.js.server.OSGiHelper",

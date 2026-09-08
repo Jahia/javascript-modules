@@ -17,6 +17,8 @@ package org.jahia.modules.javascript.modules.engine;
 
 import org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine;
 import org.jahia.modules.javascript.modules.engine.registrars.Registrar;
+import org.jahia.data.templates.JahiaTemplatesPackage;
+import org.jahia.services.templates.JahiaTemplateManagerService;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -36,15 +38,22 @@ import static org.jahia.modules.javascript.modules.engine.jshandler.JavascriptPr
 /**
  * Listener to execute scripts at activate/deactivate time
  */
-@Component(immediate = true)
+// published under its own type as well: the development endpoint reloads a module through it
+@Component(immediate = true, service = {JavascriptModuleListener.class, BundleListener.class})
 public class JavascriptModuleListener implements BundleListener {
     private static final Logger logger = LoggerFactory.getLogger(JavascriptModuleListener.class);
     private GraalVMEngine engine;
+    private JahiaTemplateManagerService templateManagerService;
     private final Queue<Registrar> registrars = new ConcurrentLinkedQueue<>();
 
     @Reference(cardinality = ReferenceCardinality.MANDATORY)
     public void setEngine(GraalVMEngine engine) {
         this.engine = engine;
+    }
+
+    @Reference(cardinality = ReferenceCardinality.MANDATORY)
+    public void setTemplateManagerService(JahiaTemplateManagerService templateManagerService) {
+        this.templateManagerService = templateManagerService;
     }
 
     @Reference(service = Registrar.class, policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MULTIPLE, policyOption = ReferencePolicyOption.GREEDY)
@@ -101,6 +110,57 @@ public class JavascriptModuleListener implements BundleListener {
             }
         } catch (Exception e) {
             logger.error("Cannot handle event {}", event.toString(), e);
+        }
+    }
+
+    /**
+     * Swaps a started module's server bundle for freshly built code and re-registers everything it
+     * declares, without going through an OSGi restart.
+     *
+     * <p>The registrars are unregistered first: they accumulate their OSGi service registrations, so
+     * registering twice in a row would publish a module's render filters and actions twice. The
+     * engine update between the two bumps the context version, so the registrars re-read the new
+     * registry when they borrow a context, and the reload is complete when this method returns.
+     *
+     * <p>Only what the server bundle carries is reloaded. Node type definitions, imported content,
+     * resource bundles and static resources come from the deployed bundle and still need a redeploy.
+     *
+     * <p>Synchronized: each reload bumps the engine's context version, and two of them racing leaves
+     * the pool destroying contexts a concurrent borrow is still trying to validate.
+     *
+     * @param bundle a started JavaScript module
+     * @param code the server bundle to run from now on
+     */
+    public synchronized void reloadServerBundle(Bundle bundle, String code) {
+        List<Registrar> hotReloadable = registrars.stream()
+                .filter(Registrar::runsOnHotReload)
+                .collect(Collectors.toList());
+
+        for (Registrar registrar : hotReloadable) {
+            registrar.unregister(bundle);
+        }
+        engine.updateJavascriptModuleSource(bundle, code);
+        for (Registrar registrar : hotReloadable) {
+            registrar.register(bundle);
+        }
+
+        dropWhatJahiaDerivedFrom(bundle.getSymbolicName());
+    }
+
+    /**
+     * Tells the rest of Jahia to drop what it derived from a module: the HTML fragment cache above
+     * all, which development mode does not disable.
+     *
+     * <p>A redeploy does this through a bundle event. Nothing a development server does raises one —
+     * neither swapping the module's code nor attaching to it, though both change what pages render —
+     * so the engine has to say it itself.
+     *
+     * @param module the module's OSGi symbolic name
+     */
+    public void dropWhatJahiaDerivedFrom(String module) {
+        JahiaTemplatesPackage templatePackage = templateManagerService.getTemplatePackageById(module);
+        if (templatePackage != null) {
+            templateManagerService.fireTemplatePackageRedeployedEvent(templatePackage);
         }
     }
 

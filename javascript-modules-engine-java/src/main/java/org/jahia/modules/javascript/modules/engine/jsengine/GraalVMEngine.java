@@ -28,6 +28,7 @@ import org.graalvm.polyglot.io.IOAccess;
 import org.graalvm.polyglot.proxy.ProxyObject;
 import org.jahia.modules.javascript.modules.engine.js.injector.OSGiServiceInjector;
 import org.jahia.modules.javascript.modules.engine.js.server.ConfigHelper;
+import org.jahia.modules.javascript.modules.engine.js.server.DevHelper;
 import org.jahia.modules.javascript.modules.engine.js.server.JcrHelper;
 import org.jahia.modules.javascript.modules.engine.js.server.OSGiHelper;
 import org.jahia.modules.javascript.modules.engine.js.server.RegistryHelper;
@@ -90,6 +91,40 @@ public class GraalVMEngine {
         } catch (IOException ioe) {
             logger.error("Error enabling bundle {}", bundle.getSymbolicName(), ioe);
         }
+    }
+
+    /**
+     * Replaces a module's server bundle with code pushed by its development server, without
+     * reinstalling the OSGi bundle.
+     *
+     * <p>The new source takes the place of the one read from the bundle when the module started, at
+     * the same position in the evaluation order, and the pool version is bumped: pooled contexts are
+     * recycled on their next borrow, exactly as they are after a redeploy. Callers must re-run the
+     * registrars, which is what {@code JavascriptModuleListener#reloadServerBundle} is for.
+     *
+     * <p>Development mode only — the endpoint that reaches this owns the gate, because the code is
+     * evaluated with the privileges of the module it replaces.
+     *
+     * @param bundle a started JavaScript module
+     * @param code the server bundle the module's build just produced
+     * @throws IllegalStateException when the module is not registered in the engine
+     */
+    public void updateJavascriptModuleSource(Bundle bundle, String code) {
+        if (!initScripts.containsKey(bundle)) {
+            throw new IllegalStateException(
+                    "Module " + bundle.getSymbolicName() + " is not registered in the GraalVM engine");
+        }
+        String initScript = bundle.getHeaders().get(BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT);
+        try {
+            initScripts.put(bundle, Source.newBuilder(JS, code, bundle.getSymbolicName() + "/" + initScript)
+                    .mimeType(JS_MODULE_MIMETYPE)
+                    .build());
+        } catch (IOException e) {
+            // Source.Builder declares it for readers; a string source never reaches the filesystem
+            throw new IllegalStateException("Cannot build a source for " + bundle.getSymbolicName(), e);
+        }
+        version.incrementAndGet();
+        logger.info("Updated the server bundle of {} in GraalVM engine", bundle.getSymbolicName());
     }
 
     public void disableJavascriptModule(Bundle bundle) {
@@ -279,6 +314,7 @@ public class GraalVMEngine {
         server.put("gql", new GQLHelper());
         server.put("osgi", new OSGiHelper());
         server.put("jcr", new JcrHelper());
+        server.put("dev", new DevHelper());
 
         for (Map.Entry<String, Object> entry : server.entrySet()) {
             try {

@@ -13,6 +13,7 @@
     "clean": "rm -rf dist/",
     "deploy": "jahia-deploy",
     "dev": "vite build --watch",
+    "dev:fast": "jahia-dev",
     "format": "prettier --write --list-different .",
     "lint": "eslint .",
     "package": "yarn pack --out dist/package.tgz",
