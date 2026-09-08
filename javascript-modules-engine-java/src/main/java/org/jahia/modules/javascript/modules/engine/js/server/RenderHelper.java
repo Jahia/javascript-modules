@@ -521,7 +521,7 @@ public class RenderHelper {
                                 return recursiveProxyMap((Map<String, Object>) o);
                             }
                             return o;
-                        }).collect(Collectors.toList())));
+                        }).toList()));
             }
         }
         return ProxyObject.fromMap(mapToProxy);
