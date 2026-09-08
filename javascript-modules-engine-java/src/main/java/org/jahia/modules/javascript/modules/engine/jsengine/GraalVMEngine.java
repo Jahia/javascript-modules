@@ -73,6 +73,7 @@ public class GraalVMEngine {
     private final ThreadLocal<Stack<ContextProvider>> currentContext = ThreadLocal.withInitial(Stack::new);
 
     private final Map<Bundle, Source> initScripts = Collections.synchronizedMap(new LinkedHashMap<>());
+    private final SourceMaps sourceMaps = new SourceMaps();
     private final AtomicInteger version = new AtomicInteger(0);
 
     private BundleContext bundleContext;
@@ -83,8 +84,9 @@ public class GraalVMEngine {
 
     public void enableJavascriptModule(Bundle bundle) {
         try {
-            initScripts.put(bundle,
-                    getGraalSource(bundle, bundle.getHeaders().get(BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT)));
+            String initScript = bundle.getHeaders().get(BUNDLE_HEADER_JAVASCRIPT_INIT_SCRIPT);
+            initScripts.put(bundle, getGraalSource(bundle, initScript));
+            sourceMaps.register(bundle, initScript);
             version.incrementAndGet();
             logger.info("Registered bundle {} in GraalVM engine", bundle.getSymbolicName());
         } catch (IOException ioe) {
@@ -94,9 +96,15 @@ public class GraalVMEngine {
 
     public void disableJavascriptModule(Bundle bundle) {
         if (initScripts.remove(bundle) != null) {
+            sourceMaps.unregister(bundle);
             version.incrementAndGet();
             logger.info("Unregistered bundle {} from GraalVM engine", bundle.getSymbolicName());
         }
+    }
+
+    /** Maps positions in module bundles back to the sources they were built from. */
+    public SourceMaps getSourceMaps() {
+        return sourceMaps;
     }
 
     @Activate
