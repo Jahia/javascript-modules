@@ -50,7 +50,13 @@ const load = async (element: HTMLElement) => {
   const props = rawProps ? devalue.parse(rawProps) : {};
   const hydrate = !element.dataset.clientOnly;
 
-  const { default: Component } = await import(entry);
+  // Islands built before named-export support carry no data-export attribute
+  const exportName = element.dataset.export ?? "default";
+  const { [exportName]: Component } = await import(entry);
+
+  if (!Component) {
+    throw new Error(`Client bundle ${entry} has no export named "${exportName}".`);
+  }
 
   return {
     hydrate,

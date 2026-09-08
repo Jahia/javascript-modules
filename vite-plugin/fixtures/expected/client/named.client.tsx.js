@@ -1,0 +1,1 @@
+import{jsx as e}from"react/jsx-runtime";function t(){return e(`pre`,{children:`Named export!`})}var n=()=>e(`pre`,{children:`Also a named export!`});export{n as AlsoNamed,t as Named};
