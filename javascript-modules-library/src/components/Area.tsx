@@ -1,3 +1,4 @@
+import type { JCRNodeWrapper } from "org.jahia.services.content";
 import { createElement, type JSX } from "react";
 import { useServerContext } from "../hooks/useServerContext.js";
 
@@ -8,6 +9,7 @@ import { useServerContext } from "../hooks/useServerContext.js";
  */
 export function Area({
   name,
+  parent,
   view,
   allowedNodeTypes,
   numberOfItems,
@@ -17,6 +19,16 @@ export function Area({
 }: Readonly<{
   /** The name of the area. */
   name: string;
+
+  /**
+   * Optional parent node where the area is stored in the JCR. When provided, the area is stored
+   * as a child of this node (i.e. at `<parent path>/<name>`), and the node is resolved directly
+   * by its absolute JCR path. The parent node must already exist.
+   *
+   * When omitted, the area is stored as a child of the current page node and resolved using the
+   * standard template-inheritance hierarchy (default behavior).
+   */
+  parent?: JCRNodeWrapper;
 
   /** The view to use for the area. */
   view?: string;
@@ -47,6 +59,7 @@ export function Area({
       __html: server.render.renderArea(
         {
           name,
+          parent,
           view,
           allowedNodeTypes,
           numberOfItems,
