@@ -37,6 +37,7 @@
             com.oracle.truffle.*;version="${graalvm.version}",
             com.oracle.js.*;version="${graalvm.version}"
         </export-package>
+        <sonar.sources>src,package.json,pom.xml</sonar.sources>
     </properties>
 
     <dependencies>

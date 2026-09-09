@@ -10,6 +10,10 @@
     <packaging>pom</packaging>
     <description>Vite plugin to produce a Jahia-compatible JavaScript Module.</description>
 
+    <properties>
+        <sonar.sources>src,package.json,pom.xml</sonar.sources>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
