@@ -12,6 +12,31 @@ export { Area } from "./components/Area.js";
 
 // Declaration and registration
 export { jahiaComponent } from "./framework/jahiaComponent.js";
+export { action, ActionError, ActionValidationError } from "./framework/actions/action.js";
+export { __registerActionsModule } from "./framework/actions/registerActionsModule.js";
+export type { StandardSchemaV1 } from "./framework/actions/standardSchema.js";
+export {
+  registerNodeLegacyAction,
+  type NodeLegacyActionDeclaration,
+  type NodeLegacyActionContext,
+  type NodeLegacyActionResult,
+} from "./framework/registerNodeLegacyAction.js";
+export {
+  registerChoiceListInitializer,
+  type ChoiceListValue,
+  type ChoiceListInitializerContext,
+} from "./framework/registerChoiceListInitializer.js";
+export {
+  registerNodeValidator,
+  type NodeValidatorDeclaration,
+  type NodeValidatorContext,
+  type NodeValidatorViolation,
+} from "./framework/registerNodeValidator.js";
+export {
+  registerRenderFilter,
+  type RenderFilterDeclaration,
+  type RenderFilterCallbacks,
+} from "./framework/registerRenderFilter.js";
 
 // Hooks
 export { useGQLQuery } from "./hooks/useGQLQuery.js";

@@ -24,7 +24,14 @@ declare global {
     osgi: OSGiHelper;
     /**
      * This helper provides access to Jahia's registry API, to register new UI objects or retrieving
-     * existing ones
+     * existing ones.
+     *
+     * Do not call `registry.add` directly for server extension points (views, actions, choicelist
+     * initializers, node validators, render filters): the entry shapes consumed by the engine are
+     * internal contracts that may change between versions. Use the typed registration functions of
+     * this library instead (`jahiaComponent`, `registerNodeValidator`,
+     * `registerChoiceListInitializer`, `registerRenderFilter`, `registerNodeLegacyAction`, and
+     * `.action.ts` files for actions).
      */
     registry: RegistryHelper;
     /**

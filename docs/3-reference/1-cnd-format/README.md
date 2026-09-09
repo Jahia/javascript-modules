@@ -124,6 +124,8 @@ Speaking of the UI, let's list all possible visual editor hints for string prope
 
 This hint will display a dropdown list in the UI. The list of choices is defined in the constraints, as a list of strings.
 
+You can also populate the dropdown from JavaScript by declaring your own initializer key with `registerChoiceListInitializer` and referencing it as `choicelist[myKey]` — see the [choicelist initializers guide](../../2-guides/5-choicelist-initializers/README.md).
+
 #### `choicelist[componentTypes='<types>']`
 
 The dropdown list will be populated with a list of coma-separated component types or mixins.
