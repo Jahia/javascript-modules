@@ -3,6 +3,10 @@
 .idea
 *.iml
 .env
+.project
+.classpath
+.vscode
+/.settings/
 
 # Maven
 target/

@@ -10,6 +10,10 @@
     <packaging>pom</packaging>
     <description>Javascript library (wrapped as a Maven project) used to build Javascript modules that run on Jahia.</description>
 
+    <properties>
+        <sonar.sources>src,package.json,pom.xml</sonar.sources>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

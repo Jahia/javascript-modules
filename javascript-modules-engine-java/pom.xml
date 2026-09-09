@@ -27,6 +27,10 @@
     <name>Javascript Modules Engine Java</name>
     <description>This is the Java part of the Javascript modules engine.</description>
 
+    <properties>
+        <sonar.sources>src,pom.xml</sonar.sources>
+    </properties>
+
     <dependencies>
         <!-- dependencies provided by Jahia: -->
         <dependency>
