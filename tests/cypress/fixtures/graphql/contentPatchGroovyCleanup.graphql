@@ -1,0 +1,5 @@
+mutation cleanupGroovyFixtures($pathOrId: String!) {
+  jcr(workspace: EDIT) {
+    deleteNode(pathOrId: $pathOrId)
+  }
+}

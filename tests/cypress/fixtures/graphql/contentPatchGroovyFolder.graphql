@@ -1,0 +1,11 @@
+mutation createGroovyFixturesFolder {
+  jcr(workspace: EDIT) {
+    addNode(
+      parentPathOrId: "/sites/systemsite/contents"
+      name: "content-patch-groovy-tests"
+      primaryNodeType: "jnt:contentList"
+    ) {
+      uuid
+    }
+  }
+}
