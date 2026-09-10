@@ -1,4 +1,4 @@
-import { buildNodeUrl, jahiaComponent } from "@jahia/javascript-modules-library";
+import { buildNodeUrl, JImage, jahiaComponent } from "@jahia/javascript-modules-library";
 import type { Props } from "./types.js";
 import classes from "./component.module.css";
 
@@ -14,7 +14,7 @@ jahiaComponent(
   ) => {
     return (
       <article className={classes.card}>
-        <img src={buildNodeUrl(cover)} alt="" />
+        <JImage node={cover} alt={title} width={320} />
         <h3>
           <a href={buildNodeUrl(currentNode)}>{title}</a>
         </h3>

@@ -37,13 +37,13 @@ export type Props = {
 };
 ```
 
-Let's also create a simple view to render the blog post as a card:
+Let's also create a simple view to render the blog post as a card. The cover is rendered with `JImage` rather than a plain `<img>`: it asks for a file sized for the card instead of the full-resolution original, reserves the space the image will take so the layout does not jump, and flushes the cached card when an editor replaces the picture. See the [images guide](../../2-guides/8-images/README.md) for the full story.
 
 <details>
 <summary><code>src/components/BlogPost/default.server.tsx</code></summary>
 
 ```tsx
-import { buildNodeUrl, jahiaComponent } from "@jahia/javascript-modules-library";
+import { buildNodeUrl, JImage, jahiaComponent } from "@jahia/javascript-modules-library";
 import type { Props } from "./types.js";
 import classes from "./component.module.css";
 
@@ -56,7 +56,7 @@ jahiaComponent(
   ({ "jcr:title": title, subtitle, authors, cover }: Props, { currentNode }) => {
     return (
       <article className={classes.card}>
-        <img src={buildNodeUrl(cover)} alt="" />
+        <JImage node={cover} alt={title} width={320} />
         <h3>
           <a href={buildNodeUrl(currentNode)}>{title}</a>
         </h3>
