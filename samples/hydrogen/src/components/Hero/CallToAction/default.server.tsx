@@ -1,14 +1,11 @@
-import { buildNodeUrl, jahiaComponent } from "@jahia/javascript-modules-library";
-import type { JCRNodeWrapper } from "org.jahia.services.content";
+import { jahiaComponent, JLink } from "@jahia/javascript-modules-library";
 import classes from "./component.module.css";
 
 type Props = {
-  title: string;
-} & ( // Reflect the three possible values of j:linkType
-  | { "j:linkType": "none" }
-  | { "j:linkType": "external"; "j:url": string; "j:linkTitle": string }
-  | { "j:linkType": "internal"; "j:linknode": JCRNodeWrapper }
-);
+  "title": string;
+  /** Only set on an external link, where it is the tooltip of the anchor. */
+  "j:linkTitle"?: string;
+};
 
 jahiaComponent(
   {
@@ -16,24 +13,17 @@ jahiaComponent(
     nodeType: "hydrogen:heroCallToAction",
     displayName: "Call To Action",
   },
-  (props: Props) => {
-    switch (props["j:linkType"]) {
-      case "external":
-        return (
-          <a href={props["j:url"]} title={props["j:linkTitle"]} className={classes.cta}>
-            {props.title}
-          </a>
-        );
-
-      case "internal":
-        return (
-          <a href={buildNodeUrl(props["j:linknode"])} className={classes.cta}>
-            {props.title}
-          </a>
-        );
-
-      case "none":
-        return <s>{props.title}</s>;
-    }
-  },
+  (props: Props, { currentNode }) => (
+    // `content` reads j:linkType, j:linknode and j:url off the node, so there is no switch to
+    // write. A reference that does not resolve — a page that is not published yet — renders the
+    // title without an anchor instead of breaking the section.
+    <JLink
+      content={currentNode}
+      title={props["j:linkTitle"]}
+      className={classes.cta}
+      whenUnresolved="children"
+    >
+      {props.title}
+    </JLink>
+  ),
 );

@@ -8,12 +8,25 @@ const absoluteUrlRegExp = /^(?:[a-z+]+:)?\/\//i;
 
 export { toAbsoluteUrl, type AbsoluteUrlOption } from "./absoluteUrl.js";
 
-/** URLSearchParams is not supported by Graal, this is our polyfill in the meantime */
-function appendParameters(url: string, parameters: Record<string, string>): string {
+/** An RFC 3986 scheme, up to and including its colon. Group 1 is the scheme itself. */
+export const schemeRegExp = /^([a-z][a-z0-9+.-]*):/i;
+
+/**
+ * URLSearchParams is not supported by Graal, this is our polyfill in the meantime.
+ *
+ * The parameters go before the fragment, which is where a query string belongs: appending them to
+ * `/page.html#main` gives `/page.html?a=b#main`, not `/page.html#main?a=b`.
+ */
+export function appendParameters(url: string, parameters: Record<string, string>): string {
   const querystring = Object.entries(parameters)
     .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
     .join("&");
-  return `${url}${url.includes("?") ? "&" : "?"}${querystring}`;
+  if (!querystring) return url;
+
+  const fragmentIndex = url.indexOf("#");
+  const path = fragmentIndex === -1 ? url : url.slice(0, fragmentIndex);
+  const fragment = fragmentIndex === -1 ? "" : url.slice(fragmentIndex);
+  return `${path}${path.includes("?") ? "&" : "?"}${querystring}${fragment}`;
 }
 
 /**
@@ -171,7 +184,7 @@ export function buildModuleFileUrl(
     renderContext?: RenderContext;
   } = useServerContext(),
 ): string {
-  if (/^[a-zA-Z0-9.+-]+:/.test(filePath)) {
+  if (schemeRegExp.test(filePath)) {
     // If path has a protocol (e.g. data: URI), return it as is.
     return filePath;
   }
