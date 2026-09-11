@@ -3,6 +3,6 @@
 javascript-modules: minor
 ---
 
-Fixed cached pages that kept showing a renamed or moved image or link until something else was published.
+`buildNodeUrl` now autocollects cache dependencies for the content it links to, preventing 404 errors when the linked content is renamed or moved. (#783)
 
-A view that builds a URL to other content is now refreshed when that content changes, with no extra code. Set `cache.autocollectDependencies` to `false` on a view to keep the previous behavior.
+This mechanism is enabled by default but can be disabled on a per-view basis by setting `"cache.autocollectDependencies": "false"` in the view's properties, or on a per-call basis with the new `autocollectDependency: false` option in `buildNodeUrl`.
