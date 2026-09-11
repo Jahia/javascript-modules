@@ -1,0 +1,14 @@
+mutation ($pathOrId: String!, $destParentPathOrId: String!, $destName: String!) {
+  jcr {
+    pasteNode(
+      mode: MOVE
+      pathOrId: $pathOrId
+      destParentPathOrId: $destParentPathOrId
+      destName: $destName
+    ) {
+      node {
+        path
+      }
+    }
+  }
+}
