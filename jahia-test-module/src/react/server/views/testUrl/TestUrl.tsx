@@ -6,6 +6,7 @@ import {
   buildModuleFileUrl,
   buildNodeUrl,
 } from "@jahia/javascript-modules-library";
+import type { JCRNodeWrapper } from "org.jahia.services.content";
 import goat from "./goat.png";
 
 jahiaComponent(
@@ -29,6 +30,13 @@ jahiaComponent(
     if (linkNodeRef) {
       server.render.addCacheDependency({ path: linkNodeRef.getPath() }, renderContext);
     }
+
+    // An external provider (Keepeek, for one) answers getUrl() with a URL on the DAM's own host.
+    // No such provider is mounted here, so this stands in for one: it is the only part of the node
+    // buildNodeUrl reads once autocollectDependency is off.
+    const externalProviderNode = {
+      getUrl: () => "https://media.keepeek.test/asset/1234.jpg",
+    } as unknown as JCRNodeWrapper;
 
     return (
       <>
@@ -62,6 +70,35 @@ jahiaComponent(
             )}
             alt="goat_endpoint"
           />
+        </div>
+
+        <div data-testid="image_static_resource_absolute">
+          <img
+            height="150"
+            src={buildModuleFileUrl("static/images/goat.jpg", { absolute: true })}
+            alt="goat_absolute"
+          />
+        </div>
+
+        <div data-testid="endpoint_absolute">
+          <a href={buildEndpointUrl("/graphql", { absolute: true })}>endpoint - absolute</a>
+        </div>
+
+        <div data-testid="endpoint_absolute_origin">
+          <a href={buildEndpointUrl("/graphql", { absolute: "https://origin.test/" })}>
+            endpoint - absolute with an explicit origin
+          </a>
+        </div>
+
+        <div data-testid="external_provider_absolute">
+          <a
+            href={buildNodeUrl(externalProviderNode, {
+              absolute: true,
+              autocollectDependency: false,
+            })}
+          >
+            external provider - absolute must not double the origin
+          </a>
         </div>
 
         <div data-testid="image_base64">
@@ -116,6 +153,19 @@ jahiaComponent(
                 })}
               >
                 content link - parameters
+              </a>
+            </div>
+            <div data-testid="content_link_absolute">
+              <a href={buildNodeUrl(linkNodeRef, { absolute: true })}>content link - absolute</a>
+            </div>
+            <div data-testid="content_link_absolute_origin">
+              <a href={buildNodeUrl(linkNodeRef, { absolute: "https://origin.test/" })}>
+                content link - absolute with an explicit origin
+              </a>
+            </div>
+            <div data-testid="content_link_absolute_language_fr">
+              <a href={buildNodeUrl(linkNodeRef, { absolute: true, language: "fr" })}>
+                content link - absolute FR
               </a>
             </div>
             <div data-testid="action_url">
