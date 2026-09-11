@@ -169,9 +169,6 @@ jahiaComponent(
                 absolute FR
               </span>
             </div>
-            <div data-testid="og_url_absolute">
-              <meta property="og:url" content={buildNodeUrl(linkNodeRef, { absolute: true })} />
-            </div>
             <div data-testid="action_url">
               <a
                 href={buildNodeUrl(linkNodeRef, {

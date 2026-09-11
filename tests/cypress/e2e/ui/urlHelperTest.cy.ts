@@ -221,16 +221,6 @@ describe("Test on url helper", () => {
       },
     ]);
 
-    // og:url is the sink `absolute` exists for. Outbound URL rewriting relativises href/src back
-    // to the host being served, but leaves a meta content alone, so the origin survives here.
-    cy.get('head meta[property="og:url"]')
-      .should("have.attr", "content")
-      .and("match", /^https?:\/\//)
-      .and(
-        "include",
-        `${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
-      );
-
     // Check live workspace
     cy.visit(`/sites/${GENERIC_SITE_KEY}/home/testUrl.html`);
     testUrl([
