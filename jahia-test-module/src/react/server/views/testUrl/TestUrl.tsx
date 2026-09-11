@@ -73,32 +73,33 @@ jahiaComponent(
         </div>
 
         <div data-testid="image_static_resource_absolute">
-          <img
-            height="150"
-            src={buildModuleFileUrl("static/images/goat.jpg", { absolute: true })}
-            alt="goat_absolute"
-          />
+          {/* We use data-url to avoid Jahia from stripping the host in href/src */}
+          <span data-url={buildModuleFileUrl("static/images/goat.jpg", { absolute: true })}>
+            goat - absolute
+          </span>
         </div>
 
         <div data-testid="endpoint_absolute">
-          <a href={buildEndpointUrl("/graphql", { absolute: true })}>endpoint - absolute</a>
+          <span data-url={buildEndpointUrl("/graphql", { absolute: true })}>
+            endpoint - absolute
+          </span>
         </div>
 
         <div data-testid="endpoint_absolute_origin">
-          <a href={buildEndpointUrl("/graphql", { absolute: "https://origin.test/" })}>
+          <span data-url={buildEndpointUrl("/graphql", { absolute: "https://origin.test/" })}>
             endpoint - absolute with an explicit origin
-          </a>
+          </span>
         </div>
 
         <div data-testid="external_provider_absolute">
-          <a
-            href={buildNodeUrl(externalProviderNode, {
+          <span
+            data-url={buildNodeUrl(externalProviderNode, {
               absolute: true,
               autocollectDependency: false,
             })}
           >
             external provider - absolute must not double the origin
-          </a>
+          </span>
         </div>
 
         <div data-testid="image_base64">
@@ -156,17 +157,20 @@ jahiaComponent(
               </a>
             </div>
             <div data-testid="content_link_absolute">
-              <a href={buildNodeUrl(linkNodeRef, { absolute: true })}>content link - absolute</a>
+              <span data-url={buildNodeUrl(linkNodeRef, { absolute: true })}>absolute</span>
             </div>
             <div data-testid="content_link_absolute_origin">
-              <a href={buildNodeUrl(linkNodeRef, { absolute: "https://origin.test/" })}>
-                content link - absolute with an explicit origin
-              </a>
+              <span data-url={buildNodeUrl(linkNodeRef, { absolute: "https://origin.test/" })}>
+                absolute with an explicit origin
+              </span>
             </div>
             <div data-testid="content_link_absolute_language_fr">
-              <a href={buildNodeUrl(linkNodeRef, { absolute: true, language: "fr" })}>
-                content link - absolute FR
-              </a>
+              <span data-url={buildNodeUrl(linkNodeRef, { absolute: true, language: "fr" })}>
+                absolute FR
+              </span>
+            </div>
+            <div data-testid="og_url_absolute">
+              <meta property="og:url" content={buildNodeUrl(linkNodeRef, { absolute: true })} />
             </div>
             <div data-testid="action_url">
               <a

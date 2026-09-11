@@ -165,46 +165,46 @@ describe("Test on url helper", () => {
       },
       {
         dataTestId: "content_link_absolute",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_absolute_origin",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `https://origin.test${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_absolute_language_fr",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "image_static_resource_absolute",
-        tag: "img",
-        attribute: "src",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
       },
       {
         dataTestId: "endpoint_absolute",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/graphql`,
       },
       {
         dataTestId: "endpoint_absolute_origin",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `https://origin.test${JAHIA_CONTEXT}/graphql`,
       },
       // An origin must not be prefixed onto a URL that already carries one, as an external
       // provider's does. Regression guard: buildNodeUrl once returned `<server><dam url>`.
       {
         dataTestId: "external_provider_absolute",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: "https://media.keepeek.test/asset/1234.jpg",
       },
       {
@@ -220,6 +220,16 @@ describe("Test on url helper", () => {
         expectedURL: `${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testUrl/pagecontent/test.html.ajax`,
       },
     ]);
+
+    // og:url is the sink `absolute` exists for. Outbound URL rewriting relativises href/src back
+    // to the host being served, but leaves a meta content alone, so the origin survives here.
+    cy.get('head meta[property="og:url"]')
+      .should("have.attr", "content")
+      .and("match", /^https?:\/\//)
+      .and(
+        "include",
+        `${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      );
 
     // Check live workspace
     cy.visit(`/sites/${GENERIC_SITE_KEY}/home/testUrl.html`);
@@ -298,46 +308,46 @@ describe("Test on url helper", () => {
       },
       {
         dataTestId: "content_link_absolute",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_absolute_origin",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `https://origin.test${JAHIA_CONTEXT}/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_absolute_language_fr",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "image_static_resource_absolute",
-        tag: "img",
-        attribute: "src",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
       },
       {
         dataTestId: "endpoint_absolute",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/graphql`,
       },
       {
         dataTestId: "endpoint_absolute_origin",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `https://origin.test${JAHIA_CONTEXT}/graphql`,
       },
       // An origin must not be prefixed onto a URL that already carries one, as an external
       // provider's does. Regression guard: buildNodeUrl once returned `<server><dam url>`.
       {
         dataTestId: "external_provider_absolute",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: "https://media.keepeek.test/asset/1234.jpg",
       },
       {
@@ -441,46 +451,46 @@ describe("Test on url helper", () => {
       },
       {
         dataTestId: "content_link_absolute",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/vanityUrlTest`,
       },
       {
         dataTestId: "content_link_absolute_origin",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `https://origin.test${JAHIA_CONTEXT}/cms/render/default/vanityUrlTest`,
       },
       {
         dataTestId: "content_link_absolute_language_fr",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "image_static_resource_absolute",
-        tag: "img",
-        attribute: "src",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
       },
       {
         dataTestId: "endpoint_absolute",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/graphql`,
       },
       {
         dataTestId: "endpoint_absolute_origin",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `https://origin.test${JAHIA_CONTEXT}/graphql`,
       },
       // An origin must not be prefixed onto a URL that already carries one, as an external
       // provider's does. Regression guard: buildNodeUrl once returned `<server><dam url>`.
       {
         dataTestId: "external_provider_absolute",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: "https://media.keepeek.test/asset/1234.jpg",
       },
       {
@@ -574,46 +584,46 @@ describe("Test on url helper", () => {
       },
       {
         dataTestId: "content_link_absolute",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/vanityUrlTest`,
       },
       {
         dataTestId: "content_link_absolute_origin",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `https://origin.test${JAHIA_CONTEXT}/vanityUrlTest`,
       },
       {
         dataTestId: "content_link_absolute_language_fr",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "image_static_resource_absolute",
-        tag: "img",
-        attribute: "src",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
       },
       {
         dataTestId: "endpoint_absolute",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/graphql`,
       },
       {
         dataTestId: "endpoint_absolute_origin",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: `https://origin.test${JAHIA_CONTEXT}/graphql`,
       },
       // An origin must not be prefixed onto a URL that already carries one, as an external
       // provider's does. Regression guard: buildNodeUrl once returned `<server><dam url>`.
       {
         dataTestId: "external_provider_absolute",
-        tag: "a",
-        attribute: "href",
+        tag: "span",
+        attribute: "data-url",
         expectedURL: "https://media.keepeek.test/asset/1234.jpg",
       },
       {
