@@ -41,12 +41,22 @@ export function buildNodeUrl(
          * provided by the current resource
          */
         extension?: string;
+        /**
+         * By default `node` will be added to the dependencies of the current view. Set to `false`
+         * to disable.
+         */
+        autocollectDependency?: boolean;
       }
     | {
         /** The query string parameters to append to the URL */
         parameters?: Record<string, string>;
         /** Additional arguments used for building the URL, through `node.getUrl` overloads. */
         args?: Record<string, string | number | boolean>;
+        /**
+         * By default `node` will be added to the dependencies of the current view. Set to `false`
+         * to disable.
+         */
+        autocollectDependency?: boolean;
       },
   context?: {
     /** Provided in react context, but you need to provide one otherwise. * */
