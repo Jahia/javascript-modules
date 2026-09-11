@@ -6,6 +6,7 @@ import {
   buildModuleFileUrl,
   buildNodeUrl,
 } from "@jahia/javascript-modules-library";
+import type { JCRNodeWrapper } from "org.jahia.services.content";
 import goat from "./goat.png";
 
 jahiaComponent(
@@ -29,6 +30,13 @@ jahiaComponent(
     if (linkNodeRef) {
       server.render.addCacheDependency({ path: linkNodeRef.getPath() }, renderContext);
     }
+
+    // An external provider (Keepeek, for one) answers getUrl() with a URL on the DAM's own host.
+    // No such provider is mounted here, so this stands in for one: it is the only part of the node
+    // buildNodeUrl reads once autocollectDependency is off.
+    const externalProviderNode = {
+      getUrl: () => "https://media.keepeek.test/asset/1234.jpg",
+    } as unknown as JCRNodeWrapper;
 
     return (
       <>
@@ -62,6 +70,36 @@ jahiaComponent(
             )}
             alt="goat_endpoint"
           />
+        </div>
+
+        <div data-testid="image_static_resource_absolute">
+          {/* We use data-url to avoid Jahia from stripping the host in href/src */}
+          <span data-url={buildModuleFileUrl("static/images/goat.jpg", { absolute: true })}>
+            goat - absolute
+          </span>
+        </div>
+
+        <div data-testid="endpoint_absolute">
+          <span data-url={buildEndpointUrl("/graphql", { absolute: true })}>
+            endpoint - absolute
+          </span>
+        </div>
+
+        <div data-testid="endpoint_absolute_origin">
+          <span data-url={buildEndpointUrl("/graphql", { absolute: "https://origin.test/" })}>
+            endpoint - absolute with an explicit origin
+          </span>
+        </div>
+
+        <div data-testid="external_provider_absolute">
+          <span
+            data-url={buildNodeUrl(externalProviderNode, {
+              absolute: true,
+              autocollectDependency: false,
+            })}
+          >
+            external provider - absolute must not double the origin
+          </span>
         </div>
 
         <div data-testid="image_base64">
@@ -117,6 +155,19 @@ jahiaComponent(
               >
                 content link - parameters
               </a>
+            </div>
+            <div data-testid="content_link_absolute">
+              <span data-url={buildNodeUrl(linkNodeRef, { absolute: true })}>absolute</span>
+            </div>
+            <div data-testid="content_link_absolute_origin">
+              <span data-url={buildNodeUrl(linkNodeRef, { absolute: "https://origin.test/" })}>
+                absolute with an explicit origin
+              </span>
+            </div>
+            <div data-testid="content_link_absolute_language_fr">
+              <span data-url={buildNodeUrl(linkNodeRef, { absolute: true, language: "fr" })}>
+                absolute FR
+              </span>
             </div>
             <div data-testid="action_url">
               <a
