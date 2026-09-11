@@ -90,15 +90,19 @@ export function buildNodeUrl(
     if (!mode) throw new Error("buildNodeUrl: mode is not defined and cannot be inferred.");
     if (!language) throw new Error("buildNodeUrl: language is not defined and cannot be inferred.");
 
+    // Without an explicit mode, stay on the servlet that served this request, like `${url.base}`:
+    // inside the edit frame that is /cms/editframe, and /cms/edit would nest the edit UI in itself.
+    const base =
+      config.mode === undefined && context.renderContext
+        ? context.renderContext.getURLGenerator().getBase(language)
+        : mode === "edit"
+          ? `/cms/edit/default/${language}`
+          : mode === "preview"
+            ? `/cms/render/default/${language}`
+            : `/cms/render/live/${language}`;
+
     return buildEndpointUrl(
-      (mode === "edit"
-        ? "/cms/edit/default/"
-        : mode === "preview"
-          ? "/cms/render/default/"
-          : "/cms/render/live/") +
-        language +
-        node.getPath() +
-        extension,
+      base + node.getPath() + extension,
       { parameters: config.parameters },
       context,
     );

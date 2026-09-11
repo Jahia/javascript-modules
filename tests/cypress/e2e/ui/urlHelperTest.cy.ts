@@ -146,6 +146,18 @@ describe("Test on url helper", () => {
         expectedURL: `${JAHIA_CONTEXT}/cms/render/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
+        dataTestId: "content_link_language_fr_raw",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_CONTEXT}/cms/render/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
+        dataTestId: "content_link_mode_edit_raw",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_CONTEXT}/cms/edit/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
         dataTestId: "content_link_parameters",
         tag: "a",
         attribute: "href",
@@ -263,6 +275,38 @@ describe("Test on url helper", () => {
         tag: "a",
         attribute: "href",
         expectedURL: `${JAHIA_CONTEXT}/sites/${GENERIC_SITE_KEY}/home/testUrl/pagecontent/test.html.ajax`,
+      },
+    ]);
+
+    cy.logout();
+  });
+
+  it("Generated URLs should stay inside the edit frame", function () {
+    cy.login();
+    cy.visit(`/cms/editframe/default/en/sites/${GENERIC_SITE_KEY}/home/testUrl.html`);
+
+    testUrl([
+      // An inferred mode follows the servlet that served the request, so links stay in the frame
+      // rather than reloading the whole edit UI inside it. Asserted outside an <a href>, the only
+      // place EditModeFilter rewrites /cms/edit/ into /cms/editframe/ on its own.
+      {
+        dataTestId: "content_link_language_fr_raw",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_CONTEXT}/cms/editframe/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      // An explicit mode is an entry point into that mode, not the current servlet: unchanged.
+      {
+        dataTestId: "content_link_mode_edit_raw",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_CONTEXT}/cms/edit/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
+        dataTestId: "content_link_mode_preview",
+        tag: "a",
+        attribute: "href",
+        expectedURL: `${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
     ]);
 
