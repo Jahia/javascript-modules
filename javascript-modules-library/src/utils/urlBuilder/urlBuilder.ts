@@ -74,7 +74,7 @@ export function buildNodeUrl(
   if (!node) throw new Error("Expected a node in buildNodeUrl, received undefined");
 
   if (config.autocollectDependency !== false && context.autocollectedDependencies) {
-    // getCanonicalPath accounts for mounted and versionned nodes
+    // getCanonicalPath accounts for mounted and versioned nodes
     context.autocollectedDependencies.add(node.getCanonicalPath());
   }
 

@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Registers the cache dependencies a view autocollected collected while it
+ * Registers the cache dependencies a view autocollected while it
  * rendered, so that its fragment is flushed when a node it linked to or
  * displayed changes.
  */
