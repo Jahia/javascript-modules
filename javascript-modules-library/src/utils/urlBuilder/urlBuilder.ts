@@ -41,12 +41,22 @@ export function buildNodeUrl(
          * provided by the current resource
          */
         extension?: string;
+        /**
+         * By default `node` will be added to the dependencies of the current view. Set to `false`
+         * to disable.
+         */
+        autocollectDependency?: boolean;
       }
     | {
         /** The query string parameters to append to the URL */
         parameters?: Record<string, string>;
         /** Additional arguments used for building the URL, through `node.getUrl` overloads. */
         args?: Record<string, string | number | boolean>;
+        /**
+         * By default `node` will be added to the dependencies of the current view. Set to `false`
+         * to disable.
+         */
+        autocollectDependency?: boolean;
       },
   context?: {
     /** Provided in react context, but you need to provide one otherwise. * */
@@ -63,13 +73,20 @@ export function buildNodeUrl(
     language?: string;
     extension?: string;
     args?: Record<string, string | number | boolean>;
+    autocollectDependency?: boolean;
   } = {},
   context: {
     renderContext?: RenderContext;
     currentResource?: Resource;
+    autocollectedDependencies?: Set<string>;
   } = useServerContext(),
 ): string {
   if (!node) throw new Error("Expected a node in buildNodeUrl, received undefined");
+
+  if (config.autocollectDependency !== false && context.autocollectedDependencies) {
+    // getCanonicalPath accounts for mounted and versioned nodes
+    context.autocollectedDependencies.add(node.getCanonicalPath());
+  }
 
   // URL building is an old thing in Jahia, with a lot of branches and special cases:
   // - if any of mode, language or extension is provided, we need to build the URL manually
