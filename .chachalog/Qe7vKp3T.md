@@ -7,4 +7,4 @@ javascript-modules: patch
 URL follows the servlet that served the request (`/cms/editframe`) instead of always pointing at
 `/cms/edit`. Jahia only rewrites `/cms/edit` links found in an `<a href>`, so URLs reaching the
 browser another way — island props, form actions, client-side navigation — used to reload the whole
-edit interface inside the frame.
+edit interface inside the frame. (#788)
