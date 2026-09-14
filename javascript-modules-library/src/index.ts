@@ -29,6 +29,8 @@ export {
   buildNodeUrl,
   buildModuleFileUrl,
 } from "./utils/urlBuilder/urlBuilder.js";
+export { getImageProps } from "./utils/image/getImageProps.js";
+export type { ImageProps } from "./utils/image/getImageProps.js";
 
 // I18n
 export { getSiteLocales } from "./utils/i18n.js";
