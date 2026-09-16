@@ -1,9 +1,6 @@
 import { getImageProps, jahiaComponent, JImage } from "@jahia/javascript-modules-library";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 
-const reference = (node: JCRNodeWrapper, name: string): JCRNodeWrapper | undefined =>
-  node.hasProperty(name) ? node.getProperty(name).getValue().getNode() : undefined;
-
 jahiaComponent(
   {
     nodeType: "javascriptExample:testImage",
@@ -11,11 +8,7 @@ jahiaComponent(
     displayName: "test JImage",
     componentType: "view",
   },
-  (_, { currentResource }) => {
-    const node = currentResource.getNode();
-    const image = reference(node, "image");
-    const nonImage = reference(node, "nonImage");
-
+  ({ image, nonImage }: { image?: JCRNodeWrapper; nonImage?: JCRNodeWrapper }) => {
     if (!image || !nonImage) {
       return <div data-testid="jimage_missing_fixture">Both references are required</div>;
     }

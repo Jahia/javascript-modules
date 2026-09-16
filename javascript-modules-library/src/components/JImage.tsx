@@ -1,12 +1,29 @@
-import { getImageProps } from "../utils/image/getImageProps.js";
-import type { ImgHTMLAttributes } from "react";
+import type { JCRNodeWrapper } from "org.jahia.services.content";
+import {
+  getImageProps,
+  type FixedSizeOptions,
+  type MergedOptions,
+  type ResponsiveOptions,
+} from "../utils/image/getImageProps.js";
+import type { ImgHTMLAttributes, JSX } from "react";
 
-type GetImagePropsParams = {
-  src: Parameters<typeof getImageProps>[0];
-} & Omit<Parameters<typeof getImageProps>[1], "absolute">;
-type JImageProps = GetImagePropsParams &
-  Omit<ImgHTMLAttributes<HTMLImageElement>, keyof GetImagePropsParams>;
+type CommonProps = { src: JCRNodeWrapper } & Omit<
+  ImgHTMLAttributes<HTMLImageElement>,
+  "src" | "absolute" | keyof MergedOptions
+>;
 
-export function JImage({ src, ...props }: Readonly<JImageProps>) {
-  return <img {...props} {...getImageProps(src, props)} />;
+export function JImage(options: CommonProps & FixedSizeOptions): JSX.Element;
+export function JImage(options: CommonProps & ResponsiveOptions): JSX.Element;
+export function JImage({
+  src,
+  alt,
+  loading,
+  width,
+  height,
+  srcset,
+  sizes,
+  ...props
+}: CommonProps & MergedOptions): JSX.Element {
+  // @ts-expect-error Incompatible props, per `getImageProps` overloads
+  return <img {...props} {...getImageProps(src, { alt, loading, width, height, srcset, sizes })} />;
 }
