@@ -32,7 +32,7 @@ export interface ResponsiveOptions {
    *
    * @default [2048, 1680, 1366, 724, 424, 376]
    */
-  srcset: number[];
+  srcSet?: number[];
   /**
    * Breakpoints for the responsive image.
    *
@@ -43,18 +43,19 @@ export interface ResponsiveOptions {
    *     "100vw", // Small screens: full-width image
    *   ];
    *
-   * @default loading === "lazy" ? ["auto"] : ["100vw"]
+   * @default loading === "lazy" ? ["auto", "100vw"] : ["100vw"]
    */
   sizes?: string[];
 }
 
+/** @internal */
 export interface MergedOptions {
   alt?: string;
   absolute?: boolean | string;
   loading?: "lazy" | "eager";
   width?: number;
   height?: number;
-  srcset?: number[];
+  srcSet?: number[];
   sizes?: string[];
 }
 
@@ -71,7 +72,7 @@ export interface ImageProps {
 
 /** Returns a valid dimension or `undefined`. */
 const toDimension = (value: unknown) =>
-  typeof value === "number" && Number.isFinite(value) && value > 0 ? value : undefined;
+  typeof value === "number" && Number.isFinite(value) && value > 0 ? Math.ceil(value) : undefined;
 
 const isVector = (node: JCRNodeWrapper) => {
   if (!node.hasNode("jcr:content")) return false;
@@ -86,7 +87,7 @@ const encodeComma = (url: string) => url.replaceAll(",", "%2C");
  * There is no real way to know what will resize the image, so we make this assumption:
  *
  * - If a DAM is set (node.getProvider().isDefault() === false), the DAM will resize the image
- * - Otherwise, a page filter will rewrite the image URL to a CDN for resizing
+ * - Otherwise, a page filter will rewrite the image URL to for resizing
  */
 const resizedUrl = (
   node: JCRNodeWrapper,
@@ -142,22 +143,21 @@ export function getImageProps(node: JCRNodeWrapper, options: MergedOptions): Ima
 
   // If a width or a height is explicitly set, generate "x" (pixel density) descriptors
   if (optionWidth !== undefined || optionHeight !== undefined) {
-    // Generate 3x, 2x, 1.5x, and 1x density descriptors for the srcset
+    // Generate 4x to 1x density descriptors for the srcset
     const s = optionWidth ?? optionHeight!;
-    let sizes = [3 * s, 2 * s, 1.5 * s, s];
+    let sizes = [4 * s, 3 * s, 2 * s, Math.ceil(1.5 * s), s];
 
     // If the image has intrinsic dimensions, ensure the generated sizes do not exceed them
-    // and offer the original image as the highest resolution option
     if (hasIntrinsicDimensions) {
       if (optionWidth !== undefined) {
         sizes = sizes.filter((size) => size <= intrinsicWidth);
 
-        // If the array ends up empty or the first element is not the intrinsic width, prepend it
-        if (sizes[0] !== intrinsicWidth) sizes.unshift(intrinsicWidth);
+        // If the array ends up empty (`options.width` bigger than the intrinsic width), prepend the intrinsic width
+        if (sizes.length === 0) sizes.unshift(intrinsicWidth);
       } else if (optionHeight !== undefined) {
         sizes = sizes.filter((size) => size <= intrinsicHeight);
 
-        if (sizes[0] !== intrinsicHeight) sizes.unshift(intrinsicHeight);
+        if (sizes.length === 0) sizes.unshift(intrinsicHeight);
       }
     }
 
@@ -166,17 +166,17 @@ export function getImageProps(node: JCRNodeWrapper, options: MergedOptions): Ima
       (hasIntrinsicDimensions
         ? optionHeight === undefined
           ? intrinsicWidth
-          : Math.round((intrinsicWidth * optionHeight) / intrinsicHeight)
+          : Math.ceil((intrinsicWidth * optionHeight) / intrinsicHeight)
         : undefined);
     const height =
       optionHeight ??
       (hasIntrinsicDimensions
         ? optionWidth === undefined
           ? intrinsicHeight
-          : Math.round((intrinsicHeight * optionWidth) / intrinsicWidth)
+          : Math.ceil((intrinsicHeight * optionWidth) / intrinsicWidth)
         : undefined);
 
-    // Bail early if we only have one option (i.e. `optionWidth` > `intrinsicWidth`)
+    // Bail early if we only have one option (can happen when `optionWidth` > `intrinsicWidth`)
     if (sizes.length === 1) {
       return {
         src: buildNodeUrl(node, { absolute: options.absolute }),
@@ -196,7 +196,7 @@ export function getImageProps(node: JCRNodeWrapper, options: MergedOptions): Ima
           ? (size: number) => ({
               w: String(size),
               // When both `optionWidth` and `optionHeight` are provided, preserve the requested aspect ratio
-              h: String((size * optionHeight!) / optionWidth!),
+              h: String(Math.ceil((size * optionHeight!) / optionWidth!)),
             })
           : (size: number) => ({ w: String(size) })
         : (size: number) => ({ h: String(size) });
@@ -208,10 +208,10 @@ export function getImageProps(node: JCRNodeWrapper, options: MergedOptions): Ima
     const srcSet = sizes
       .map(
         (size) =>
-          `${resizedUrl(node, sizeToArg(Math.ceil(size)), {
+          `${resizedUrl(node, sizeToArg(size), {
             absolute: options.absolute,
             autocollectDependency: false,
-          })} ${(size / s).toFixed(2)}x`,
+          })} ${(size / s).toFixed(1)}x`,
       )
       .join(", ");
 
@@ -221,20 +221,38 @@ export function getImageProps(node: JCRNodeWrapper, options: MergedOptions): Ima
   // Otherwise generate "w" (width) descriptors for the srcset
 
   // List of widths to generate
-  let widths = options.srcset?.concat().sort((a, z) => z - a) ?? [...defaultSrcSet];
+  let widths = options.srcSet?.concat().sort((a, z) => z - a) ?? [...defaultSrcSet];
+
+  // If widths is empty, bail early
+  if (widths.length === 0) {
+    return {
+      src: buildNodeUrl(node, { absolute: options.absolute }),
+      alt,
+      width: intrinsicWidth,
+      height: intrinsicHeight,
+      loading,
+    };
+  }
 
   if (hasIntrinsicDimensions) {
-    widths = widths.filter((width) => width <= intrinsicWidth);
+    const max = Math.max(...widths);
 
-    // If the array ends up empty or the first element is not the intrinsic width, prepend it
-    if (widths[0] !== intrinsicWidth) widths.unshift(intrinsicWidth);
+    widths = widths.filter((width) => width < intrinsicWidth);
+
+    // If the original image is smaller than the largest requested width (e.g. 2048px),
+    // add the original image width to the beginning of the array
+    if (intrinsicWidth <= max) widths.unshift(intrinsicWidth);
   }
 
   const sizes = options.sizes ? [...options.sizes] : [];
 
   // Ensure auto is the first value if unset when `loading` is `lazy`
-  if (loading === "lazy" && sizes[0] !== "auto") sizes.unshift("auto");
-  else if (loading === "eager" && sizes.length === 0) sizes.push("100vw");
+  if (loading === "lazy") {
+    if (sizes.length === 0) sizes.push("100vw");
+    if (sizes[0] !== "auto") sizes.unshift("auto");
+  } else if (loading === "eager" && sizes.length === 0) {
+    sizes.push("100vw");
+  }
 
   // Use the smallest image as a default `src` for the `img` element
   const src = resizedUrl(
@@ -242,16 +260,19 @@ export function getImageProps(node: JCRNodeWrapper, options: MergedOptions): Ima
     { w: String(widths[widths.length - 1]) },
     { absolute: options.absolute },
   );
-  const srcSet = widths
-    .map(
-      (width) =>
-        `${resizedUrl(
-          node,
-          { w: String(width) },
-          { absolute: options.absolute, autocollectDependency: false },
-        )} ${width}w`,
-    )
-    .join(", ");
+  const srcSet =
+    widths.length > 1
+      ? widths
+          .map(
+            (width) =>
+              `${resizedUrl(
+                node,
+                { w: String(width) },
+                { absolute: options.absolute, autocollectDependency: false },
+              )} ${width}w`,
+          )
+          .join(", ")
+      : undefined;
 
   return {
     src,
@@ -260,6 +281,6 @@ export function getImageProps(node: JCRNodeWrapper, options: MergedOptions): Ima
     width: intrinsicWidth,
     height: intrinsicHeight,
     loading,
-    sizes: sizes.join(", "),
+    sizes: srcSet === undefined ? undefined : sizes.join(", "),
   };
 }

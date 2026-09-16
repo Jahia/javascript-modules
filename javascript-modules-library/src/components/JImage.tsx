@@ -20,10 +20,17 @@ export function JImage({
   loading,
   width,
   height,
-  srcset,
+  srcSet: srcset,
   sizes,
   ...props
 }: CommonProps & MergedOptions): JSX.Element {
-  // @ts-expect-error Incompatible props, per `getImageProps` overloads
-  return <img {...props} {...getImageProps(src, { alt, loading, width, height, srcset, sizes })} />;
+  return (
+    <img
+      {...props}
+      {
+        // @ts-expect-error Incompatible props, per `getImageProps` overloads
+        ...getImageProps(src, { alt, loading, width, height, srcSet: srcset, sizes })
+      }
+    />
+  );
 }
