@@ -18,31 +18,37 @@ package org.jahia.modules.javascript.modules.engine.registrars;
 import org.graalvm.polyglot.Value;
 import org.jahia.modules.javascript.modules.engine.jsengine.ContextProvider;
 import org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine;
+import org.jahia.modules.javascript.modules.engine.jsengine.JSPromise;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.RenderService;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.filter.AbstractFilter;
 import org.jahia.services.render.filter.RenderChain;
 import org.jahia.services.render.filter.RenderFilter;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Map;
 
+/**
+ * Exposes JavaScript registry entries of type {@code render-filter} as {@link RenderFilter} OSGi
+ * services, participating in Jahia's render chain like Java {@link AbstractFilter} implementations.
+ */
 @Component(service = Registrar.class, immediate = true)
-public class RenderFilterRegistrar implements Registrar {
+public class RenderFilterRegistrar extends AbstractServiceRegistrar<RenderFilter> {
+
+    public static final String REGISTRY_TYPE = "render-filter";
 
     private RenderService renderService;
-    private BundleContext bundleContext;
 
-    private GraalVMEngine graalVMEngine;
-
-    private final Map<Bundle, Collection<ServiceRegistration<RenderFilter>>> registrations = new HashMap<>();
+    public RenderFilterRegistrar() {
+        super(RenderFilter.class, REGISTRY_TYPE);
+    }
 
     @Reference
     public void setRenderService(RenderService renderService) {
@@ -60,81 +66,87 @@ public class RenderFilterRegistrar implements Registrar {
     }
 
     @Override
-    public void register(Bundle bundle) {
-        List<Map<String, Object>> renderFilters = graalVMEngine.doWithContext(contextProvider -> {
-            Map<String, Object> filter = new HashMap<>();
-            filter.put("type", "render-filter");
-            filter.put("bundleKey", bundle.getSymbolicName());
-            return contextProvider.getRegistry().find(filter);
-        });
-
-        Set<ServiceRegistration<RenderFilter>> set = new HashSet<>();
-        registrations.put(bundle, set);
-        for (Map<String, Object> renderFilter : renderFilters) {
-            RenderFilterBridge renderFilterImpl = new RenderFilterBridge(renderFilter, graalVMEngine);
-            renderFilterImpl.setRenderService(renderService);
-            renderFilterImpl.setPriority(0);
-
-            set.add(bundleContext.registerService(RenderFilter.class, renderFilterImpl, new Hashtable<>()));
-        }
-    }
-
-    @Override
-    public void unregister(Bundle bundle) {
-        Collection<ServiceRegistration<RenderFilter>> set = registrations.remove(bundle);
-        if (set != null) {
-            for (ServiceRegistration<RenderFilter> registration : set) {
-                registration.unregister();
-            }
-        }
+    protected RenderFilter createBridge(Map<String, Object> registryEntry) {
+        RenderFilterBridge bridge = new RenderFilterBridge(registryEntry, graalVMEngine);
+        bridge.setRenderService(renderService);
+        return bridge;
     }
 
     public static class RenderFilterBridge extends AbstractFilter {
+
+        private static final Logger logger = LoggerFactory.getLogger(RenderFilterBridge.class);
+
         private final GraalVMEngine engine;
         private final String key;
 
-        public RenderFilterBridge(Map<String, Object> value, GraalVMEngine engine) {
+        public RenderFilterBridge(Map<String, Object> registryEntry, GraalVMEngine engine) {
             this.engine = engine;
-            this.key = (String) value.get("key");
-            if (value.containsKey("priority")) {
-                setPriority(Integer.parseInt(value.get("priority").toString()));
+            this.key = (String) registryEntry.get("key");
+            if (registryEntry.containsKey("priority")) {
+                setPriority(Float.parseFloat(registryEntry.get("priority").toString()));
+            } else {
+                setPriority(0);
             }
-            if (value.containsKey("description")) {
-                setDescription(value.get("description").toString());
+            if (registryEntry.containsKey("description")) {
+                setDescription(registryEntry.get("description").toString());
             }
-            if (value.containsKey("applyOnConfigurations")) {
-                this.setApplyOnConfigurations(value.get("applyOnConfigurations").toString());
+            if (registryEntry.containsKey("applyOnConfigurations")) {
+                setApplyOnConfigurations(registryEntry.get("applyOnConfigurations").toString());
             }
-            if (value.containsKey("applyOnModes")) {
-                this.setApplyOnModes(value.get("applyOnModes").toString());
+            if (registryEntry.containsKey("applyOnModes")) {
+                setApplyOnModes(registryEntry.get("applyOnModes").toString());
             }
-            if (value.containsKey("applyOnNodeTypes")) {
-                this.setApplyOnNodeTypes(value.get("applyOnNodeTypes").toString());
+            if (registryEntry.containsKey("applyOnNodeTypes")) {
+                setApplyOnNodeTypes(registryEntry.get("applyOnNodeTypes").toString());
             }
-            if (value.containsKey("applyOnTemplates")) {
-                this.setApplyOnTemplates(value.get("applyOnTemplates").toString());
+            if (registryEntry.containsKey("applyOnTemplates")) {
+                setApplyOnTemplates(registryEntry.get("applyOnTemplates").toString());
             }
-            if (value.containsKey("applyOnTemplateTypes")) {
-                this.setApplyOnTemplateTypes(value.get("applyOnTemplateTypes").toString());
+            if (registryEntry.containsKey("applyOnTemplateTypes")) {
+                setApplyOnTemplateTypes(registryEntry.get("applyOnTemplateTypes").toString());
             }
         }
 
         @Override
-        public String execute(String s, RenderContext renderContext, Resource resource, RenderChain renderChain) throws Exception {
+        public String execute(String previousOut, RenderContext renderContext, Resource resource, RenderChain renderChain) throws Exception {
             return engine.doWithContext(contextProvider -> {
-                return Value.asValue(getJsFilter(contextProvider).get("execute")).execute(s, renderContext, resource, renderChain).asString();
+                Map<String, Object> jsFilter = getJsFilter(contextProvider);
+                if (jsFilter == null) {
+                    logger.warn("JS render filter '{}' is no longer available in the registry, skipping execute", key);
+                    return previousOut;
+                }
+                if (jsFilter.get("execute") == null) {
+                    // both callbacks are optional: a prepare-only filter is a no-op here
+                    return previousOut;
+                }
+                Value result = JSPromise.settleOrThrow(
+                        Value.asValue(jsFilter.get("execute")).execute(previousOut, renderContext, resource, renderChain),
+                        "JS render filter '" + key + "' execute");
+                return result == null || result.isNull() ? previousOut : result.asString();
             });
         }
 
         @Override
         public String prepare(RenderContext renderContext, Resource resource, RenderChain renderChain) throws Exception {
             return engine.doWithContext(contextProvider -> {
-                return Value.asValue(getJsFilter(contextProvider).get("prepare")).execute(renderContext, resource, renderChain).asString();
+                Map<String, Object> jsFilter = getJsFilter(contextProvider);
+                if (jsFilter == null) {
+                    logger.warn("JS render filter '{}' is no longer available in the registry, skipping prepare", key);
+                    return null;
+                }
+                if (jsFilter.get("prepare") == null) {
+                    // both callbacks are optional: an execute-only filter is a no-op here
+                    return null;
+                }
+                Value result = JSPromise.settleOrThrow(
+                        Value.asValue(jsFilter.get("prepare")).execute(renderContext, resource, renderChain),
+                        "JS render filter '" + key + "' prepare");
+                return result == null || result.isNull() ? null : result.asString();
             });
         }
 
         private Map<String, Object> getJsFilter(ContextProvider contextProvider) {
-            return contextProvider.getRegistry().get("render-filter", key);
+            return contextProvider.getRegistry().get(REGISTRY_TYPE, key);
         }
     }
 }

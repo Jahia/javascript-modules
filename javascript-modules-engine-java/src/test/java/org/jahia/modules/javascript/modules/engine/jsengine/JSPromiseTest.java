@@ -1,0 +1,159 @@
+/*
+ * Copyright (C) 2002-2023 Jahia Solutions Group SA. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.jahia.modules.javascript.modules.engine.jsengine;
+
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.proxy.ProxyExecutable;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JSPromiseTest {
+
+    private static Context context;
+
+    @BeforeClass
+    public static void setUp() {
+        context = Context.newBuilder("js").build();
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        context.close();
+    }
+
+    private static JSPromise.Outcome run(String jsFunction) {
+        Value fn = context.eval("js", "(" + jsFunction + ")");
+        return JSPromise.settle(fn.execute());
+    }
+
+    @Test
+    public void settlesPlainValues() {
+        JSPromise.Outcome settled = run("() => 42");
+        assertTrue(settled.isSettled());
+        assertFalse(settled.isRejected());
+        assertEquals(42, settled.getValue().asInt());
+    }
+
+    @Test
+    public void settlesAsyncFunctions() {
+        JSPromise.Outcome settled = run("async () => 'hello'");
+        assertTrue("async function result should settle at the API boundary", settled.isSettled());
+        assertEquals("hello", settled.getValue().asString());
+    }
+
+    @Test
+    public void settlesAwaitChains() {
+        JSPromise.Outcome settled = run(
+                "async () => { const a = await Promise.resolve(20); const b = await Promise.resolve(22); return a + b; }");
+        assertTrue("awaited chains should settle through the microtask queue", settled.isSettled());
+        assertEquals(42, settled.getValue().asInt());
+    }
+
+    @Test
+    public void settlesThenChains() {
+        JSPromise.Outcome settled = run(
+                "() => Promise.resolve('a').then((v) => v + 'b').then((v) => v + 'c')");
+        assertTrue(settled.isSettled());
+        assertEquals("abc", settled.getValue().asString());
+    }
+
+    @Test
+    public void capturesRejections() {
+        JSPromise.Outcome settled = run("async () => { throw new Error('boom'); }");
+        assertTrue(settled.isSettled());
+        assertTrue(settled.isRejected());
+        assertEquals("boom", settled.getError().getMember("message").asString());
+    }
+
+    @Test
+    public void capturesRejectedPlainObjects() {
+        JSPromise.Outcome settled = run(
+                "() => Promise.reject({ message: 'invalid', issues: '[{\"message\":\"nope\"}]' })");
+        assertTrue(settled.isSettled());
+        assertTrue(settled.isRejected());
+        assertEquals("invalid", settled.getError().getMember("message").asString());
+        assertEquals("[{\"message\":\"nope\"}]", settled.getError().getMember("issues").asString());
+    }
+
+    @Test
+    public void neverSettlingPromisesAreReportedAsNotDone() {
+        JSPromise.Outcome settled = run("() => new Promise(() => {})");
+        assertFalse(settled.isSettled());
+    }
+
+    @Test
+    public void asyncFunctionsCarryTheirTypeTag() {
+        // The library refuses async callbacks for the extension points reachable at a nested host
+        // boundary (assertSynchronousCallback in javascript-modules-library), and detects them with
+        // this tag. Pins that GraalJS reports it, so a runtime change is noticed here rather than by
+        // a validator that stops being rejected.
+        Value tagOf = context.eval("js", "(fn) => Object.prototype.toString.call(fn)");
+        assertEquals("[object AsyncFunction]", tagOf.execute(context.eval("js", "(async () => 42)")).asString());
+        assertEquals("[object Function]", tagOf.execute(context.eval("js", "(() => 42)")).asString());
+    }
+
+    @Test
+    public void asyncCallbacksCannotSettleAtNestedHostBoundaries() {
+        // Pins the nested-invocation limitation documented on JSPromise: at a host → JS → host → JS
+        // boundary, outer JS frames are still on the stack, GraalJS does not drain the microtask
+        // queue, and even a trivial async callback cannot settle. If a GraalJS upgrade makes this
+        // test fail, the limitation is gone: relax the docs on JSPromise, registerRenderFilter and
+        // registerNodeValidator accordingly.
+        Value asyncFn = context.eval("js", "(async () => 42)");
+        boolean[] nestedSettled = { true };
+        ProxyExecutable hostCallback = arguments ->
+                nestedSettled[0] = JSPromise.settle(arguments[0].execute()).isSettled();
+        Value outer = context.eval("js", "((host, fn) => host(fn))");
+        outer.execute(hostCallback, asyncFn);
+        assertFalse("async callbacks are expected not to settle at nested host boundaries", nestedSettled[0]);
+    }
+
+    @Test
+    public void settleOrThrowReturnsFulfilledValues() {
+        Value fn = context.eval("js", "(async () => 'done')");
+        assertEquals("done", JSPromise.settleOrThrow(fn.execute(), "test callback").asString());
+    }
+
+    @Test
+    public void settleOrThrowConvertsRejectionsIntoGraalVMExceptions() {
+        Value fn = context.eval("js", "(async () => { throw new Error('kaboom'); })");
+        try {
+            JSPromise.settleOrThrow(fn.execute(), "test callback");
+            fail("expected a GraalVMException");
+        } catch (GraalVMException e) {
+            assertTrue(e.getMessage().contains("test callback"));
+            assertTrue(e.getMessage().contains("kaboom"));
+        }
+    }
+
+    @Test
+    public void settleOrThrowFailsExplicitlyOnNeverSettlingPromises() {
+        Value fn = context.eval("js", "(() => new Promise(() => {}))");
+        try {
+            JSPromise.settleOrThrow(fn.execute(), "test callback");
+            fail("expected a GraalVMException");
+        } catch (GraalVMException e) {
+            assertTrue(e.getMessage().contains("did not settle"));
+        }
+    }
+}

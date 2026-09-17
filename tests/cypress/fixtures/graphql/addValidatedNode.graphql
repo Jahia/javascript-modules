@@ -1,0 +1,16 @@
+mutation addValidatedNode(
+  $parentPathOrId: String!
+  $name: String!
+  $properties: [InputJCRProperty!]
+) {
+  jcr {
+    addNode(
+      parentPathOrId: $parentPathOrId
+      name: $name
+      primaryNodeType: "javascriptExample:testValidation"
+      properties: $properties
+    ) {
+      uuid
+    }
+  }
+}
