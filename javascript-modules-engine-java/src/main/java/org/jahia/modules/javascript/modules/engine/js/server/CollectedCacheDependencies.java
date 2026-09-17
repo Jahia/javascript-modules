@@ -111,6 +111,6 @@ public final class CollectedCacheDependencies {
             return "/.*";
         }
 
-        return "/" + Pattern.quote(String.join("/", common)) + "/.*";
+        return "/" + Pattern.quote(String.join("/", common)) + "(/.*)?";
     }
 }
