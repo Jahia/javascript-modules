@@ -2,12 +2,14 @@ package org.jahia.modules.javascript.modules.engine.js.server;
 
 import org.graalvm.polyglot.proxy.ProxyArray;
 import org.graalvm.polyglot.proxy.ProxyObject;
+import org.jahia.settings.SettingsBean;
 import org.jahia.taglibs.functions.Functions;
 
 import java.util.HashMap;
 
 /**
- * Java helper to expose OSGi configuration values to Javascript code
+ * Java helper to expose OSGi configuration values, and the mode the instance itself runs in,
+ * to Javascript code
  */
 public class ConfigHelper {
     /**
@@ -74,5 +76,19 @@ public class ConfigHelper {
      */
     public String getConfigFactoryValue(String factoryPid, String factoryIdentifier, String key) {
         return Functions.getConfigFactoryValue(factoryPid, factoryIdentifier, key);
+    }
+
+    /**
+     * Tell whether the instance runs in development mode, the {@code developmentMode} setting of
+     * {@code jahia.properties}. Javascript code uses it to emit diagnostics that help a developer
+     * and that a production instance must never pay for.
+     *
+     * @return true when the instance runs in development mode
+     */
+    public boolean isDevelopmentMode() {
+        // SettingsBean has no instance before Jahia has finished starting, and a diagnostic helper
+        // must not be the thing that fails then
+        SettingsBean settings = SettingsBean.getInstance();
+        return settings != null && settings.isDevelopmentMode();
     }
 }
