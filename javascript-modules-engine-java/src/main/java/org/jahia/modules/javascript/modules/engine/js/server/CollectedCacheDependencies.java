@@ -83,8 +83,9 @@ public final class CollectedCacheDependencies {
     }
 
     /**
-     * A regexp matching everything under the deepest path every dependency lives
-     * under, or under the repository root when they share no first segment.
+     * A regexp matching the deepest path every dependency lives under and everything
+     * below it, or everything under the repository root when they share no first
+     * segment.
      */
     private static String commonRootRegex(Collection<String> paths) {
         String[] common = null;
