@@ -36,6 +36,14 @@ export interface JahiaComponent {
   properties?: Record<string, string>;
 }
 
+/** @internal */
+export type RegistryJahiaComponent = Omit<JahiaComponent, "id"> & {
+  name: string;
+  templateType: string;
+  priority: number;
+  component: () => ReactNode;
+};
+
 /**
  * Defines and registers a Jahia component into the global registry as a view.
  *
