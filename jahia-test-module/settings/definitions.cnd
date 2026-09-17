@@ -147,6 +147,10 @@
  - image (weakreference, picker[type='image']) < 'jmix:image'
  - linknode (weakreference, picker[type='editoriallink']) internationalized < 'jmix:droppableContent', 'jnt:page'
 
+[javascriptExample:testUuidCacheDependency] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
+ // The path of the node whose title the view renders, and whose uuid it depends on.
+ - targetPath (string)
+
 [javascriptExample:testRule] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
  - triggerProp (string)
  - resultProp (string)

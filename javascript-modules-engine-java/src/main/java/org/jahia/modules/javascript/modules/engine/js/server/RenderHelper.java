@@ -488,9 +488,10 @@ public class RenderHelper {
             body = (String) attr.get("body");
         }
 
-        safePopulate(tag, attr);
         MockPageContext pageContext = new MockPageContext(renderContext);
         tag.setPageContext(pageContext);
+        // Must be called after `setPageContext` because `setUuid` reads page context
+        safePopulate(tag, attr);
         tag.doStartTag();
         try {
             if (tag instanceof BodyTagSupport && body != null) {
