@@ -6,7 +6,7 @@
     "test": "vite build && node --test"
   },
   "devDependencies": {
-    "@fontsource-variable/fira-code": "5.2.7",
+    "@fontsource-variable/fira-code": "5.3.0",
     "@jahia/javascript-modules-library": "workspace:*",
     "@jahia/vite-plugin": "workspace:*",
     "modern-normalize": "^3.0.1",
