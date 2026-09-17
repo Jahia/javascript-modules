@@ -37,7 +37,7 @@ Server files, files in `.server.tsx`, are used as entry points for your server c
 
 Client files, files in `.client.tsx`, are used as entry points for your client code. All client files, as well as all their imports, will be made available for the browser to download. They should not contain any sensitive information, and cannot import server APIs (`@jahia/javascript-modules-library` and `.server.tsx` files).
 
-In client files, **only the default export** can be used to create an island. For instance, here is a minimal interactive button:
+In client files, any component **exported directly under a name** — the default export or a named export (`export const Foo = …`, `export function Foo() {}`) — can be used to create an island; `export { … }` lists, re-exports and destructured exports are not supported. For instance, here is a minimal interactive button:
 
 ```tsx
 // Button.client.tsx

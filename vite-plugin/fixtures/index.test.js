@@ -35,3 +35,27 @@ test("@jahia/vite-plugin output snapshot", () => {
     assert.ok(fs.existsSync(assetPath), `Asset ${asset} is missing`);
   }
 });
+
+test("client components carry hydration metadata, whether exported by default or by name", () => {
+  const server = fs.readFileSync(path.join("dist", "server", "index.js"), "utf8");
+
+  /** Extracts the (__filename, __exportName) pairs injected by the insert-filename plugin. */
+  const metadata = [
+    ...server.matchAll(
+      /__filename: \{\s*value: "([^"]+)",[\s\S]*?__exportName: \{\s*value: "([^"]+)"/g,
+    ),
+  ].map(([, filename, exportName]) => ({ filename, exportName }));
+
+  assert.deepStrictEqual(metadata, [
+    // `export default function Foo()` in foo.client.tsx
+    { filename: "dist/client/foo.client.tsx", exportName: "default" },
+    // `export function Named()` and `export const AlsoNamed` in named.client.tsx
+    { filename: "dist/client/named.client.tsx", exportName: "Named" },
+    { filename: "dist/client/named.client.tsx", exportName: "AlsoNamed" },
+  ]);
+
+  // The client bundle must expose the named exports the server points at
+  const client = fs.readFileSync(path.join("dist", "client", "named.client.tsx.js"), "utf8");
+  assert.match(client, /as Named\b/);
+  assert.match(client, /as AlsoNamed\b/);
+});
