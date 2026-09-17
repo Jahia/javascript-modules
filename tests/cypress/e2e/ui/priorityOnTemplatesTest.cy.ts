@@ -1,6 +1,6 @@
 import { deleteNode } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 import "cypress-wait-until";
 
 describe("Test priority parameter on templates", () => {
@@ -15,7 +15,9 @@ describe("Test priority parameter on templates", () => {
     },
   ];
 
-  beforeEach('Login', () => { cy.login(); });
+  beforeEach("Login", () => {
+    cy.login();
+  });
 
   afterEach("Delete the test page after each test", () => {
     deleteNode(`/sites/${GENERIC_SITE_KEY}/${pageName}`);

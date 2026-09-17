@@ -1,6 +1,6 @@
 import { addNode } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 
 describe("Render should be editable", () => {
   before("Create test contents", () => {

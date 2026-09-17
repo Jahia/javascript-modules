@@ -1,5 +1,5 @@
 {
-  "include": ["node_modules/cypress", "cypress/*/*.ts"],
+  "include": ["node_modules/cypress", "cypress/*/*.ts", "cypress.config.ts"],
   "compilerOptions": {
     "types": ["@jahia/cypress", "cypress-iframe", "cypress-wait-until"],
     "noEmit": true,

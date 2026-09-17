@@ -1,13 +1,13 @@
 import { addNode, enableModule } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 import "cypress-wait-until";
 
 describe("Area test", () => {
   const pageName = "testJArea";
 
   before("Create test page and contents", () => {
-    enableModule('event', GENERIC_SITE_KEY);
+    enableModule("event", GENERIC_SITE_KEY);
 
     addSimplePage(`/sites/${GENERIC_SITE_KEY}/home`, pageName, pageName, "en", "simple", [
       {
@@ -23,12 +23,12 @@ describe("Area test", () => {
     });
   });
 
-  beforeEach('Login and visit test page', () => {
+  beforeEach("Login and visit test page", () => {
     cy.login();
     cy.visit(`/jahia/jcontent/${GENERIC_SITE_KEY}/en/pages/home/${pageName}`);
   });
 
-  afterEach('Logout', () => cy.logout());
+  afterEach("Logout", () => cy.logout());
 
   it(`${pageName}: Basic Area test`, () => {
     cy.iframe("#page-builder-frame-1").within(() => {

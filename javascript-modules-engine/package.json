@@ -12,17 +12,17 @@
   },
   "dependencies": {
     "@jahia/javascript-modules-library": "workspace:*",
-    "devalue": "5.8.1",
+    "devalue": "5.9.2",
     "fast-text-encoding": "patch:fast-text-encoding@npm%3A1.0.6#~/.yarn/patches/fast-text-encoding-npm-1.0.6-b474f65fe2.patch",
-    "i18next": "25.10.10",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "react-i18next": "16.6.6"
+    "i18next": "26.4.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-i18next": "17.0.14"
   },
   "devDependencies": {
-    "@types/node": "^22.19.3",
-    "@types/react-dom": "^19.2.3",
-    "rolldown": "^1.0.2",
-    "rollup-plugin-sbom": "^3.0.0"
+    "@types/node": "^22.20.3",
+    "@types/react-dom": "^19.3.0",
+    "rolldown": "^1.2.9",
+    "rollup-plugin-sbom": "^4.0.0"
   }
 }

@@ -115,42 +115,42 @@ export const createHydrogenSite = (siteKey: string, prepackagedSiteURL: string) 
         cy.log(`Publishing site '${siteKey}'...`);
         publishAndWaitJobEnding(`/sites/${siteKey}`, ["en"]);
       });
-  } 
-}
+  }
+};
 
 export const createTestSite = (siteKey: string) => {
-  cy.step('Cleanup previous state: delete site', () => {
+  cy.step("Cleanup previous state: delete site", () => {
     deleteSite(siteKey);
   });
 
   cy.step(`Create test site: ${siteKey}`, () => {
     createSite(siteKey, {
-      languages: 'en',
-      templateSet: 'javascript-modules-engine-test-module',
-      locale: 'en',
-      serverName: 'localhost',
+      languages: "en",
+      templateSet: "javascript-modules-engine-test-module",
+      locale: "en",
+      serverName: "localhost",
     });
 
-    addSimplePage(`/sites/${siteKey}/home`, 'testPage', 'testPage', 'en', 'simple', [
+    addSimplePage(`/sites/${siteKey}/home`, "testPage", "testPage", "en", "simple", [
       {
-        name: 'pagecontent',
-        primaryNodeType: 'jnt:contentList',
+        name: "pagecontent",
+        primaryNodeType: "jnt:contentList",
       },
     ]).then(() => {
       addNode({
         parentPathOrId: `/sites/${siteKey}/home/testPage/pagecontent`,
-        name: 'test',
-        primaryNodeType: 'javascriptExample:test',
+        name: "test",
+        primaryNodeType: "javascriptExample:test",
         properties: [
-          { name: 'jcr:title', value: 'test component' },
-          { name: 'prop1', value: 'prop1 value' },
-          { name: 'propMultiple', values: ['value 1', 'value 2', 'value 3'] },
+          { name: "jcr:title", value: "test component" },
+          { name: "prop1", value: "prop1 value" },
+          { name: "propMultiple", values: ["value 1", "value 2", "value 3"] },
           {
-            name: 'propRichText',
+            name: "propRichText",
             value: '<p data-testid="propRichTextValue">Hello this is a sample rich text</p>',
           },
         ],
       });
     });
   });
-}
+};

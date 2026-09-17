@@ -6,7 +6,7 @@ import {
   publishAndWaitJobEnding,
 } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 
 describe("Check that Javascript module settings (UI extensions, rules, configs) are correctly deployed", () => {
   before("Create test page and contents", () => {

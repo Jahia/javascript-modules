@@ -15,7 +15,16 @@ export default tseslint.config(
 
   // JS/TS recommended
   eslint.configs.recommended,
-  { files: ["**/*.ts", "**/*.tsx"], extends: tseslint.configs.recommended },
+  {
+    files: ["**/*.ts", "**/*.tsx"],
+    extends: tseslint.configs.recommended,
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
 
   // React
   eslintReact.configs["recommended-typescript"],
