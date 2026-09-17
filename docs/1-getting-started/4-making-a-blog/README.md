@@ -56,7 +56,7 @@ jahiaComponent(
   ({ "jcr:title": title, subtitle, authors, cover }: Props, { currentNode }) => {
     return (
       <article className={classes.card}>
-        <JImage node={cover} alt={title} width={320} />
+        <JImage node={cover} alt={title} slotWidth={320} />
         <h3>
           <a href={buildNodeUrl(currentNode)}>{title}</a>
         </h3>

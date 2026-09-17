@@ -1,9 +1,12 @@
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 import type { RenderContext, Resource } from "org.jahia.services.render";
 import { useServerContext } from "../../hooks/useServerContext";
+import { toAbsoluteUrl, type AbsoluteUrlOption } from "./absoluteUrl.js";
 
 // Regex that checks if the first word contains colon (http:, mail:, ftp: ..)
 const absoluteUrlRegExp = /^(?:[a-z+]+:)?\/\//i;
+
+export { toAbsoluteUrl, type AbsoluteUrlOption } from "./absoluteUrl.js";
 
 /** URLSearchParams is not supported by Graal, this is our polyfill in the meantime */
 function appendParameters(url: string, parameters: Record<string, string>): string {
@@ -32,6 +35,13 @@ export function buildNodeUrl(
         /** The query string parameters to append to the URL */
         parameters?: Record<string, string>;
         /**
+         * Return a URL with a scheme and a host, for the places a root-relative one does not work:
+         * `og:url`, `og:image`, a canonical link, JSON-LD, an email.
+         *
+         * @see {@link AbsoluteUrlOption}
+         */
+        absolute?: AbsoluteUrlOption;
+        /**
          * The mode to use to build the URL. Defines the mode or override the one provided by the
          * renderContext.
          */
@@ -50,6 +60,13 @@ export function buildNodeUrl(
     | {
         /** The query string parameters to append to the URL */
         parameters?: Record<string, string>;
+        /**
+         * Return a URL with a scheme and a host, for the places a root-relative one does not work:
+         * `og:url`, `og:image`, a canonical link, JSON-LD, an email.
+         *
+         * @see {@link AbsoluteUrlOption}
+         */
+        absolute?: AbsoluteUrlOption;
         /**
          * Additional arguments passed to `node.getUrl(List)`, for a provider whose decorator
          * interprets them — an external DAM mount turns `{ w: 600 }` into a signed, transformed
@@ -73,6 +90,7 @@ export function buildNodeUrl(
   node: JCRNodeWrapper,
   config: {
     parameters?: Record<string, string>;
+    absolute?: AbsoluteUrlOption;
     mode?: "edit" | "preview" | "live";
     language?: string;
     extension?: string;
@@ -104,16 +122,21 @@ export function buildNodeUrl(
     if (!mode) throw new Error("buildNodeUrl: mode is not defined and cannot be inferred.");
     if (!language) throw new Error("buildNodeUrl: language is not defined and cannot be inferred.");
 
-    return buildEndpointUrl(
-      (mode === "edit"
-        ? "/cms/edit/default/"
-        : mode === "preview"
-          ? "/cms/render/default/"
-          : "/cms/render/live/") +
-        language +
-        node.getPath() +
-        extension,
-      { parameters: config.parameters },
+    return toAbsoluteUrl(
+      buildEndpointUrl(
+        (mode === "edit"
+          ? "/cms/edit/default/"
+          : mode === "preview"
+            ? "/cms/render/default/"
+            : "/cms/render/live/") +
+          language +
+          node.getPath() +
+          extension,
+        { parameters: config.parameters },
+        context,
+      ),
+      node,
+      config.absolute,
       context,
     );
   }
@@ -124,7 +147,7 @@ export function buildNodeUrl(
     : node.getUrl();
   if (context.renderContext) url = context.renderContext.getResponse().encodeURL(url);
   if (config.parameters) url = appendParameters(url, config.parameters);
-  return url;
+  return toAbsoluteUrl(url, node, config.absolute, context);
 }
 
 /**
