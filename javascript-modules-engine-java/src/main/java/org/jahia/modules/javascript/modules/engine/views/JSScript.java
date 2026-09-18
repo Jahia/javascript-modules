@@ -42,6 +42,23 @@ public class JSScript implements Script {
 
     @Override
     public String execute(Resource resource, RenderContext renderContext) throws RenderException {
+        try {
+            return render(resource, renderContext);
+        } catch (RuntimeException | RenderException e) {
+            // Whatever the render chain does with the failure — swallow it into an HTML comment or
+            // propagate it — the exception it logs has JS frames pointing inside the module's
+            // bundle. Log mapped positions instead, and in development mode make the failure
+            // visible on the page rather than leaving it to the logs and the page source.
+            logger.error("Error rendering view {}:\n{}", jsView.getRegistryKey(),
+                    ViewRenderError.stackTrace(e, graalVMEngine.getSourceMaps()));
+            if (ViewRenderError.isDevelopmentMode()) {
+                return ViewRenderError.render(jsView.getRegistryKey(), e, graalVMEngine.getSourceMaps());
+            }
+            throw e;
+        }
+    }
+
+    private String render(Resource resource, RenderContext renderContext) throws RenderException {
         String output = graalVMEngine.doWithContext(ThrowingFunction.unchecked(contextProvider -> {
             Map<String, Object> viewValues = jsView.getRegistryInstance(contextProvider);
 

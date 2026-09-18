@@ -104,4 +104,10 @@ Now that your _template set_ (that's how we call a module that provides page tem
 
 Congratulations! You have successfully set up your development environment and created a new project in Jahia. In the next sections, we'll start building the project.
 
+## When a view fails
+
+The Docker instance above runs Jahia in development mode. When one of your views throws, the fragment it should have produced is replaced on the page by a red box carrying the error message and its stack trace, with positions mapped back to your own sources (`src/components/…/default.server.tsx:12`) rather than to the bundle the build produced. The rest of the page still renders, so a broken component does not take the whole page down.
+
+The same error is written to the server log, which you can follow with `docker compose logs -f jahia`. In production mode the box is not rendered — a live site keeps Jahia's default behaviour — but the log keeps the mapped stack trace.
+
 Next: [Making a Hero Section](making-a-hero-section)
