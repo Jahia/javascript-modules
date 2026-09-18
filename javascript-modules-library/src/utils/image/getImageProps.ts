@@ -110,9 +110,9 @@ const resizedUrl = (
 const defaultSrcSet = [2048, 1680, 1366, 724, 424, 376] as const;
 
 /** Builds the attributes of an `<img>` for an image node. */
-export function getImageProps(node: JCRNodeWrapper, options: FixedSizeOptions): ImageProps;
-export function getImageProps(node: JCRNodeWrapper, options: ResponsiveOptions): ImageProps;
-export function getImageProps(node: JCRNodeWrapper, options: MergedOptions): ImageProps {
+export function getImageProps(node: JCRNodeWrapper, options?: FixedSizeOptions): ImageProps;
+export function getImageProps(node: JCRNodeWrapper, options?: ResponsiveOptions): ImageProps;
+export function getImageProps(node: JCRNodeWrapper, options: MergedOptions = {}): ImageProps {
   const loading = options.loading ?? "lazy";
 
   // We'll be super conservative here, props might be missing or malformed
