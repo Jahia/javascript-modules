@@ -32,7 +32,7 @@ export default defineConfig(
   {
     rules: {
       // We know what we're doing
-      "@eslint-react/dom/no-dangerously-set-innerhtml": "off",
+      "@eslint-react/dom-no-dangerously-set-innerhtml": "off",
     },
   },
 

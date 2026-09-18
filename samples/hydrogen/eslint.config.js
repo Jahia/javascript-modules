@@ -31,4 +31,10 @@ export default tseslint.config(
 
   // Ignore the same files as .gitignore
   includeIgnoreFile(path.resolve(import.meta.dirname, ".gitignore")),
+
+  {
+    rules: {
+      "@eslint-react/dom-no-dangerously-set-innerhtml": "off",
+    },
+  }
 );
