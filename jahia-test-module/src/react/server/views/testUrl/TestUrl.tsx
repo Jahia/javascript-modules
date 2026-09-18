@@ -147,6 +147,17 @@ jahiaComponent(
                 content link - FR
               </a>
             </div>
+            {/* Avoid <a href> to prevent rewriting by EditModeFilter */}
+            <div data-testid="content_link_language_fr_raw">
+              <span data-url={buildNodeUrl(linkNodeRef, { language: "fr" })}>
+                content link - FR, outside an anchor
+              </span>
+            </div>
+            <div data-testid="content_link_mode_edit_raw">
+              <span data-url={buildNodeUrl(linkNodeRef, { mode: "edit" })}>
+                content link - edit, outside an anchor
+              </span>
+            </div>
             <div data-testid="content_link_parameters">
               <a
                 href={buildNodeUrl(linkNodeRef, {
