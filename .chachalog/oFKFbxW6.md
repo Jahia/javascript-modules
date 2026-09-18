@@ -13,4 +13,4 @@ Bumped embedded dependencies. (#658, #664, #793)
 | react-dom     | 19.2.3           | 19.3.0         |
 | react-i18next | 16.5.0           | 17.0.14        |
 
-We decided to upgrade i18next and i18next-react in a minor version because, as far as we're aware, the breaking changes remove deprecated features that were never put in place in recent codebases. If this assumption is incorrect, please reach out to us.
+We decided to upgrade i18next and react-i18next in a minor version because, as far as we're aware, the breaking changes remove deprecated features that were never put in place in recent codebases. If this assumption is incorrect, please reach out to us.
