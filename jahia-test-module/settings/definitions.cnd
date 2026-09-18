@@ -151,7 +151,16 @@
  - image (weakreference, picker[type='image']) < 'jmix:image'
 
 [javascriptExample:testImage] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
- - image (weakreference, picker[type='image']) < 'jmix:image'
+ // One reference per intrinsic width the srcset logic branches on: far above the largest
+ // default width, exactly equal to it, and below the smallest.
+ - largeImage (weakreference, picker[type='image']) < 'jmix:image'
+ - exactImage (weakreference, picker[type='image']) < 'jmix:image'
+ - smallImage (weakreference, picker[type='image']) < 'jmix:image'
+ // Its name carries a comma, which is the character a srcset splits candidates on.
+ - commaImage (weakreference, picker[type='image']) < 'jmix:image'
+ // An SVG carries jmix:image like any raster image; its mime type is what routes it to the
+ // vector branch, where no resizing is offered.
+ - vectorImage (weakreference, picker[type='image']) < 'jmix:image'
  // Unconstrained: the suite points it at a file with no jmix:image, to cover the branch where
  // the intrinsic dimensions are unknown.
  - nonImage (weakreference)
