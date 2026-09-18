@@ -156,6 +156,36 @@ Because these props will be sent to the browser, two constraints apply:
 - **Do not pass any sensitive information,** such as API keys.
 - **The props must be serializable,** which means only a subset of all JS objects can be used. The serialization is performed by [devalue](https://www.npmjs.com/package/devalue), which offers a wider range of supported types than `JSON.stringify`, but still has limitations. For instance, you cannot send a JCR node through the props of a client component.
 
+This is how an island renders images: the server view computes the `<img />` attributes from the image node with `getImageProps`, and passes the resulting plain object as a prop. The island spreads it on an `<img />`:
+
+```tsx
+// Gallery.client.tsx
+import type { ImageProps } from "@jahia/javascript-modules-library";
+
+export default function Gallery({ images }: { images: ImageProps[] }) {
+  return images.map((image) => <img key={image.src} {...image} />);
+}
+```
+
+```tsx
+// default.server.tsx
+import { getImageProps, Island, jahiaComponent } from "@jahia/javascript-modules-library";
+import type { JCRNodeWrapper } from "org.jahia.services.content";
+import Gallery from "./Gallery.client.tsx";
+
+jahiaComponent(
+  {
+    componentType: "view",
+    nodeType: "hydrogen:gallery",
+  },
+  ({ images }: { images: JCRNodeWrapper[] }) => (
+    <Island component={Gallery} props={{ images: images.map((node) => getImageProps(node)) }} />
+  ),
+);
+```
+
+`ImageProps` is a type-only import, so it is allowed in a client file.
+
 Here is an example of what you can do:
 
 ```tsx

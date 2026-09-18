@@ -144,7 +144,7 @@ In JCR, everything is a node, i.e. an entity of a tree designated by a path. The
 - A `jnt:content` node is a content node, like a Hero section or a blog post. It is rendered by a view.
 - A `jnt:page` node is a page node, the Home page or the About Us page. It is rendered by a template.
 - A `jnt:virtualsite` node is a site node, the root of a site.
-- A `jnt:file` node is a file node, like an image or a PDF. You can upload files to Jahia and reference them in your content.
+- A `jnt:file` node is a file node, like an image or a PDF. You can upload files to Jahia and reference them in your content. An image node is best rendered with the `<JImage />` component we used for the blog cover: it builds a responsive `<img />` from the node, where `buildNodeUrl` only gives you its URL.
 
 There is a lot more to learn about URL building and JCR exploration, and it's the topic of the next section.
 

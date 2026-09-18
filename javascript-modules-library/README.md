@@ -84,6 +84,47 @@ This component adds resources to the page, making sure they are loaded only once
 <AddResources type="css" resources="styles.css" />
 ```
 
+### `JImage`
+
+Renders an image node with best-in-class responsive behaviors.
+
+```tsx
+<JImage src={imageNode} />
+```
+
+If `alt` is not provided, it defaults to the image's `jcr:title` property, and if none is set, the image is considered decorative (`alt=""` is produced).
+
+This snippet produces something like the following HTML:
+
+```html
+<img
+  src="/files/default/sites/mysite/files/image.jpg?w=376"
+  srcset="
+    /files/default/sites/mysite/files/image.jpg?w=2048 2048w,
+    /files/default/sites/mysite/files/image.jpg?w=1680 1680w,
+    /files/default/sites/mysite/files/image.jpg?w=1366 1366w,
+    /files/default/sites/mysite/files/image.jpg?w=724   724w,
+    /files/default/sites/mysite/files/image.jpg?w=424   424w,
+    /files/default/sites/mysite/files/image.jpg?w=376   376w
+  "
+  sizes="auto, 100vw"
+  width="3000"
+  height="2000"
+  alt="Image Title"
+  loading="lazy"
+/>
+```
+
+On a default Jahia instance, all `?w=` URLs will serve the original image. Your production instance requires a DAM ([Cloudinary](https://www.jahia.com/integrations/cloudinary), [Keepeek](https://www.jahia.com/integrations/keepeek)) or an image resizer ([Cloudimage](https://www.jahia.com/integrations/cloudimage)) for the responsive behavior to work correctly.
+
+Images are lazy-loaded by default. For the image above the fold, typically the hero, tell the browser to fetch it first:
+
+```tsx
+<JImage src={heroImage} loading="eager" fetchPriority="high" />
+```
+
+Every other `<img />` attribute (`className`, `id`, `fetchPriority`, `decoding`, ...) is passed through as is.
+
 ## Declaration and registration
 
 ### `jahiaComponent`
@@ -220,6 +261,12 @@ const styles = buildModuleFileUrl("dist/styles.css");
 ```
 
 If the path has a protocol (e.g. `data:` URI), it will be returned as is, pairing nicely with [Vite static asset imports.](https://vite.dev/guide/assets.html#importing-asset-as-url)
+
+### `getImageProps`
+
+This is the underlying function used by the `<JImage />` component to get the image properties.
+
+Can be used directly to forward serialized image properties to an `<img />` element in an Island.
 
 ### `getSiteLocales`
 

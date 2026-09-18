@@ -43,7 +43,7 @@ Let's also create a simple view to render the blog post as a card:
 <summary><code>src/components/BlogPost/default.server.tsx</code></summary>
 
 ```tsx
-import { buildNodeUrl, jahiaComponent } from "@jahia/javascript-modules-library";
+import { buildNodeUrl, jahiaComponent, JImage } from "@jahia/javascript-modules-library";
 import type { Props } from "./types.js";
 import classes from "./component.module.css";
 
@@ -56,7 +56,8 @@ jahiaComponent(
   ({ "jcr:title": title, subtitle, authors, cover }: Props, { currentNode }) => {
     return (
       <article className={classes.card}>
-        <img src={buildNodeUrl(cover)} alt="" />
+        {/* cover's `jcr:title` property will be used as alt text */}
+        <JImage src={cover} />
         <h3>
           <a href={buildNodeUrl(currentNode)}>{title}</a>
         </h3>
