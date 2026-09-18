@@ -17,9 +17,9 @@
     "lib": ["esnext", "dom"],
     "declaration": true,
     "declarationDir": "dist",
-    "baseUrl": ".",
+    "rootDir": "./src",
     "paths": {
-      "$client/*": ["src/client/*"]
+      "$client/*": ["./src/client/*"]
     }
   },
   "include": ["src/**/*.js", "src/**/*.mjs", "src/**/*.ts", "src/**/*.tsx", "src/**/*.jsx"],
