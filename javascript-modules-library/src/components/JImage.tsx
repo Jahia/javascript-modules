@@ -9,7 +9,7 @@ import type { ImgHTMLAttributes, JSX } from "react";
 
 type CommonProps = { src: JCRNodeWrapper } & Omit<
   ImgHTMLAttributes<HTMLImageElement>,
-  "src" | "absolute" | keyof MergedOptions
+  "src" | keyof MergedOptions
 >;
 
 export function JImage(options: CommonProps & FixedSizeOptions): JSX.Element;
@@ -20,8 +20,9 @@ export function JImage({
   loading,
   width,
   height,
-  srcSet: srcset,
+  srcSet,
   sizes,
+  absolute,
   ...props
 }: CommonProps & MergedOptions): JSX.Element {
   return (
@@ -29,7 +30,7 @@ export function JImage({
       {...props}
       {
         // @ts-expect-error Incompatible props, per `getImageProps` overloads
-        ...getImageProps(src, { alt, loading, width, height, srcSet: srcset, sizes })
+        ...getImageProps(src, { alt, loading, width, height, srcSet, sizes, absolute })
       }
     />
   );
