@@ -165,7 +165,7 @@ describe("Images", () => {
     describe("density descriptors", () => {
       it("offers 4x to 1x for a requested width, and derives the height", () => {
         props("density_width").should((p) => {
-          expect(descriptors(p.srcSet)).to.deep.equal(["4.0x", "3.0x", "2.0x", "1.5x", "1.0x"]);
+          expect(descriptors(p.srcSet)).to.deep.equal(["4x", "3x", "2x", "1.5x", "1x"]);
           expect(candidateUrls(p.srcSet)[0]).to.include("w=1600");
           expect(p.width).to.equal(400);
           // 400 / 2832 * 4240, rounded up.
@@ -177,7 +177,7 @@ describe("Images", () => {
 
       it("derives the width from a requested height", () => {
         props("density_height").should((p) => {
-          expect(descriptors(p.srcSet)).to.deep.equal(["4.0x", "3.0x", "2.0x", "1.5x", "1.0x"]);
+          expect(descriptors(p.srcSet)).to.deep.equal(["4x", "3x", "2x", "1.5x", "1x"]);
           expect(candidateUrls(p.srcSet)[0]).to.include("h=2400");
           expect(p.width).to.equal(401);
           expect(p.height).to.equal(600);
@@ -198,7 +198,7 @@ describe("Images", () => {
         // 4x and 3x of 1000 are past the 2832px original. The original replaces them at its real
         // density, 2832 / 1000, so a high-density screen still gets the sharpest file there is.
         props("density_clamped").should((p) => {
-          expect(descriptors(p.srcSet)).to.deep.equal(["2.8x", "2.0x", "1.5x", "1.0x"]);
+          expect(descriptors(p.srcSet)).to.deep.equal(["2.832x", "2x", "1.5x", "1x"]);
           expect(candidateUrls(p.srcSet)[0]).to.include(`w=${IMAGES.large.width}`);
         });
       });
@@ -206,17 +206,17 @@ describe("Images", () => {
       it("keeps a density that lands exactly on the original", () => {
         // 4x of 512 is 2048, exactly the original: the boundary must be kept, not filtered out.
         props("density_exact").should((p) => {
-          expect(descriptors(p.srcSet)).to.deep.equal(["4.0x", "3.0x", "2.0x", "1.5x", "1.0x"]);
+          expect(descriptors(p.srcSet)).to.deep.equal(["4x", "3x", "2x", "1.5x", "1x"]);
           expect(candidateUrls(p.srcSet)[0]).to.include(`w=${IMAGES.exact.width}`);
         });
       });
 
       it("resizes to the requested width when only 1x fits, with the original as the top density", () => {
         // 1.5x of 2000 is past the 2832px original, so the ladder is the 2000px resize for a 1x
-        // screen and the original, at 1.4x, for anything denser. The resize is the src: a browser
+        // screen and the original, at 1.416x, for anything denser. The resize is the src: a browser
         // that ignores srcset must not download the original into a 2000px slot.
         props("density_bail").should((p) => {
-          expect(descriptors(p.srcSet)).to.deep.equal(["1.4x", "1.0x"]);
+          expect(descriptors(p.srcSet)).to.deep.equal(["1.416x", "1x"]);
           expect(p.src).to.include("w=2000");
           expect(p.width).to.equal(2000);
           expect(p.height).to.equal(2995);
@@ -233,7 +233,7 @@ describe("Images", () => {
 
       it("offers every density when the original's size is unknown", () => {
         props("density_no_intrinsic").should((p) => {
-          expect(descriptors(p.srcSet)).to.deep.equal(["4.0x", "3.0x", "2.0x", "1.5x", "1.0x"]);
+          expect(descriptors(p.srcSet)).to.deep.equal(["4x", "3x", "2x", "1.5x", "1x"]);
           expect(p.width).to.equal(400);
           // Half a pair would assert an aspect ratio the file does not support.
           expect(p.height).to.be.undefined;
@@ -374,7 +374,7 @@ describe("Images", () => {
 
     it("offers density descriptors through the same channel", () => {
       props("dam_density").should((p) => {
-        expect(descriptors(p.srcSet)).to.deep.equal(["4.0x", "3.0x", "2.0x", "1.5x", "1.0x"]);
+        expect(descriptors(p.srcSet)).to.deep.equal(["4x", "3x", "2x", "1.5x", "1x"]);
         expect(candidateUrls(p.srcSet)[0]).to.equal(`${DAM}/w_1600/asset.jpg`);
         expect(p.src).to.equal(`${DAM}/w_400/asset.jpg`);
         expect(p.width).to.equal(400);
@@ -412,13 +412,7 @@ describe("Images", () => {
 
     it("renders a fixed-size image: density descriptors, no sizes, empty alt", () => {
       attr("jimage_fixed", "srcset").then((srcSet) => {
-        expect(descriptors(srcSet as string)).to.deep.equal([
-          "4.0x",
-          "3.0x",
-          "2.0x",
-          "1.5x",
-          "1.0x",
-        ]);
+        expect(descriptors(srcSet as string)).to.deep.equal(["4x", "3x", "2x", "1.5x", "1x"]);
       });
       img("jimage_fixed").should("not.have.attr", "sizes");
       img("jimage_fixed").should("have.attr", "width", "400");

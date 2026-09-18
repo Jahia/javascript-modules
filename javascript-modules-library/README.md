@@ -117,6 +117,14 @@ This snippet produces something like the following HTML:
 
 On a default Jahia instance, all `?w=` URLs will serve the original image. Your production instance requires a DAM ([Cloudinary](https://www.jahia.com/integrations/cloudinary), [Keepeek](https://www.jahia.com/integrations/keepeek)) or an image resizer ([Cloudimage](https://www.jahia.com/integrations/cloudimage)) for the responsive behavior to work correctly.
 
+Images are lazy-loaded by default. For the image above the fold, typically the hero, tell the browser to fetch it first:
+
+```tsx
+<JImage src={heroImage} loading="eager" fetchPriority="high" />
+```
+
+Every other `<img />` attribute (`className`, `id`, `fetchPriority`, `decoding`, ...) is passed through as is.
+
 ## Declaration and registration
 
 ### `jahiaComponent`

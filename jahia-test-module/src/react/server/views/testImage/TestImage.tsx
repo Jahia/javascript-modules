@@ -77,11 +77,11 @@ jahiaComponent(
         <Case id="density_height" props={getImageProps(large, { height: 600 })} />
         <Case id="density_both" props={getImageProps(large, { width: 300, height: 300 })} />
         {/* 4x and 3x exceed the 2832px original, so they are dropped and the original takes the top
-            rung at its real density, 2.8x. */}
+            rung at its real density, 2.832x. */}
         <Case id="density_clamped" props={getImageProps(large, { width: 1000 })} />
         {/* 4x is exactly the 2048px original: the limit value, which must be kept. */}
         <Case id="density_exact" props={getImageProps(exact, { width: 512 })} />
-        {/* Only 1x fits: the original still joins as 1.4x, and the 2000px resize is the src. */}
+        {/* Only 1x fits: the original still joins as 1.416x, and the 2000px resize is the src. */}
         <Case id="density_bail" props={getImageProps(large, { width: 2000 })} />
         <Case id="density_over" props={getImageProps(large, { width: 4000 })} />
         <Case id="density_no_intrinsic" props={getImageProps(nonImage, { width: 400 })} />

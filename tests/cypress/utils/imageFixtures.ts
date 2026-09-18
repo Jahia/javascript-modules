@@ -73,7 +73,7 @@ export const setTitle = (pathOrId: string, title: string) => {
   });
 };
 
-/** The `2048w` / `4.0x` descriptor of each candidate, in the order the attribute lists them. */
+/** The `2048w` / `4x` descriptor of each candidate, in the order the attribute lists them. */
 export const descriptors = (srcSet: string | undefined): string[] =>
   srcSet === undefined ? [] : srcSet.split(", ").map((candidate) => candidate.split(" ").pop()!);
 
