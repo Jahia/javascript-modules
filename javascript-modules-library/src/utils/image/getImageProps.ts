@@ -212,7 +212,7 @@ export function getImageProps(node: JCRNodeWrapper, options: MergedOptions = {})
           `${resizedUrl(node, sizeToArg(size), {
             absolute: options.absolute,
             autocollectDependency: false,
-          })} ${(size / s).toFixed(1)}x`,
+          })} ${Number((size / s).toFixed(3))}x`,
       )
       .join(", ");
 

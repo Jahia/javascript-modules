@@ -26,12 +26,24 @@ export function JImage({
   ...props
 }: CommonProps & MergedOptions): JSX.Element {
   return (
-    <img
-      {...props}
-      {
-        // @ts-expect-error Incompatible props, per `getImageProps` overloads
-        ...getImageProps(src, { alt, loading, width, height, srcSet, sizes, absolute })
-      }
-    />
+    // Render nothing if src is null instead of throwing an error
+    // We'll see if this behavior is desirable or not with client feedback
+    src && (
+      <img
+        {...props}
+        {
+          // @ts-expect-error Incompatible props, per `getImageProps` overloads
+          ...getImageProps(src, {
+            alt,
+            loading,
+            width,
+            height,
+            srcSet,
+            sizes,
+            absolute,
+          })
+        }
+      />
+    )
   );
 }
