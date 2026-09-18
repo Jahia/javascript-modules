@@ -1,0 +1,12 @@
+mutation createGroovyFixture($name: String!, $type: String!, $properties: [InputJCRProperty]) {
+  jcr(workspace: EDIT) {
+    addNode(
+      parentPathOrId: "/sites/systemsite/contents/content-patch-groovy-tests"
+      name: $name
+      primaryNodeType: $type
+      properties: $properties
+    ) {
+      uuid
+    }
+  }
+}
