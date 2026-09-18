@@ -194,10 +194,12 @@ describe("Images", () => {
         });
       });
 
-      it("drops the densities that exceed the original", () => {
-        // 4x and 3x of 1000 are past the 2832px original, so only 2x, 1.5x and 1x survive.
+      it("drops the densities that exceed the original and offers the original on top", () => {
+        // 4x and 3x of 1000 are past the 2832px original. The original replaces them at its real
+        // density, 2832 / 1000, so a high-density screen still gets the sharpest file there is.
         props("density_clamped").should((p) => {
-          expect(descriptors(p.srcSet)).to.deep.equal(["2.0x", "1.5x", "1.0x"]);
+          expect(descriptors(p.srcSet)).to.deep.equal(["2.8x", "2.0x", "1.5x", "1.0x"]);
+          expect(candidateUrls(p.srcSet)[0]).to.include(`w=${IMAGES.large.width}`);
         });
       });
 
@@ -209,11 +211,13 @@ describe("Images", () => {
         });
       });
 
-      it("serves the original when only one density survives", () => {
-        // 1.5x of 2000 is past the 2832px original, so there is nothing to choose between.
+      it("resizes to the requested width when only 1x fits, with the original as the top density", () => {
+        // 1.5x of 2000 is past the 2832px original, so the ladder is the 2000px resize for a 1x
+        // screen and the original, at 1.4x, for anything denser. The resize is the src: a browser
+        // that ignores srcset must not download the original into a 2000px slot.
         props("density_bail").should((p) => {
-          expect(p.srcSet).to.be.undefined;
-          expect(p.src).not.to.include("w=");
+          expect(descriptors(p.srcSet)).to.deep.equal(["1.4x", "1.0x"]);
+          expect(p.src).to.include("w=2000");
           expect(p.width).to.equal(2000);
           expect(p.height).to.equal(2995);
         });

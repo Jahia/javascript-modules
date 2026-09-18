@@ -145,19 +145,20 @@ export function getImageProps(node: JCRNodeWrapper, options: MergedOptions = {})
   if (optionWidth !== undefined || optionHeight !== undefined) {
     // Generate 4x to 1x density descriptors for the srcset
     const s = optionWidth ?? optionHeight!;
-    let sizes = [4 * s, 3 * s, 2 * s, Math.ceil(1.5 * s), s];
+    const max = 4 * s;
+    let sizes = [max, 3 * s, 2 * s, Math.ceil(1.5 * s), s];
 
     // If the image has intrinsic dimensions, ensure the generated sizes do not exceed them
     if (hasIntrinsicDimensions) {
       if (optionWidth !== undefined) {
-        sizes = sizes.filter((size) => size <= intrinsicWidth);
+        sizes = sizes.filter((size) => size < intrinsicWidth);
 
-        // If the array ends up empty (`options.width` bigger than the intrinsic width), prepend the intrinsic width
-        if (sizes.length === 0) sizes.unshift(intrinsicWidth);
+        // Ensure that the original image is the highest resolution if not too big
+        if (intrinsicWidth <= max) sizes.unshift(intrinsicWidth);
       } else if (optionHeight !== undefined) {
-        sizes = sizes.filter((size) => size <= intrinsicHeight);
+        sizes = sizes.filter((size) => size < intrinsicHeight);
 
-        if (sizes.length === 0) sizes.unshift(intrinsicHeight);
+        if (intrinsicHeight <= max) sizes.unshift(intrinsicHeight);
       }
     }
 

@@ -76,11 +76,12 @@ jahiaComponent(
         <Case id="density_width" props={getImageProps(large, { width: 400 })} />
         <Case id="density_height" props={getImageProps(large, { height: 600 })} />
         <Case id="density_both" props={getImageProps(large, { width: 300, height: 300 })} />
-        {/* 4x and 3x exceed the 2832px original, so they are dropped. */}
+        {/* 4x and 3x exceed the 2832px original, so they are dropped and the original takes the top
+            rung at its real density, 2.8x. */}
         <Case id="density_clamped" props={getImageProps(large, { width: 1000 })} />
         {/* 4x is exactly the 2048px original: the limit value, which must be kept. */}
         <Case id="density_exact" props={getImageProps(exact, { width: 512 })} />
-        {/* 1.5x exceeds the original, leaving one candidate: the original itself is served. */}
+        {/* Only 1x fits: the original still joins as 1.4x, and the 2000px resize is the src. */}
         <Case id="density_bail" props={getImageProps(large, { width: 2000 })} />
         <Case id="density_over" props={getImageProps(large, { width: 4000 })} />
         <Case id="density_no_intrinsic" props={getImageProps(nonImage, { width: 400 })} />
@@ -114,7 +115,7 @@ jahiaComponent(
         <Case id="comma_escaping" props={getImageProps(comma, { srcSet: [200, 100] })} />
 
         {/* A non-default provider: every resize goes through getUrl arguments. */}
-        <Case id="dam_responsive" props={getImageProps(damNode, {})} />
+        <Case id="dam_responsive" props={getImageProps(damNode)} />
         <Case id="dam_density" props={getImageProps(damNode, { width: 400 })} />
         <Case id="dam_density_both" props={getImageProps(damNode, { width: 300, height: 300 })} />
 
