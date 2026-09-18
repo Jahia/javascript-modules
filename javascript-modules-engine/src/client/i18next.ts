@@ -4,7 +4,7 @@ import * as devalue from "devalue";
 
 i18n.use(initReactI18next).init({
   fallbackLng: "en",
-  initImmediate: false,
+  initAsync: false,
   react: { useSuspense: false },
 });
 
