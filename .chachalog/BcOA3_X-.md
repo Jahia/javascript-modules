@@ -3,4 +3,4 @@
 javascript-modules: patch
 ---
 
-Make sure graphql subrequests are handled correctly (#681)
+Handle GraphQL subrequests correctly. (#681)
