@@ -352,6 +352,44 @@ describe("Images", () => {
     });
   });
 
+  describe("DAM provider", () => {
+    // The view stands in for a DAM node: a provider that is not the default one, answering
+    // getUrl(args) with `https://media.dam.test/<args>/asset.jpg`, Cloudinary-style.
+    const DAM = "https://media.dam.test";
+
+    it("carries the resize in getUrl arguments, not in a query string", () => {
+      props("dam_responsive").should((p) => {
+        expect(p.src).to.equal(`${DAM}/w_${DEFAULT_SRCSET.at(-1)}/asset.jpg`);
+        expect(candidateUrls(p.srcSet)).to.deep.equal(
+          DEFAULT_SRCSET.map((w) => `${DAM}/w_${w}/asset.jpg`),
+        );
+        expect(descriptors(p.srcSet)).to.deep.equal(DEFAULT_SRCSET.map((w) => `${w}w`));
+        expect(p.src).not.to.include("?");
+      });
+    });
+
+    it("offers density descriptors through the same channel", () => {
+      props("dam_density").should((p) => {
+        expect(descriptors(p.srcSet)).to.deep.equal(["4.0x", "3.0x", "2.0x", "1.5x", "1.0x"]);
+        expect(candidateUrls(p.srcSet)[0]).to.equal(`${DAM}/w_1600/asset.jpg`);
+        expect(p.src).to.equal(`${DAM}/w_400/asset.jpg`);
+        expect(p.width).to.equal(400);
+        // The stand-in has no intrinsic size, so nothing can derive the height.
+        expect(p.height).to.be.undefined;
+      });
+    });
+
+    it("percent-encodes the comma a two-argument DAM path carries", () => {
+      // `w_1200,h_1200` is what a Cloudinary transformation looks like; raw, core's live-mode URL
+      // rewriter would split the candidate on it. Cloudinary accepts the encoded form.
+      props("dam_density_both").should((p) => {
+        expect(candidateUrls(p.srcSet)[0]).to.equal(`${DAM}/w_1200%2Ch_1200/asset.jpg`);
+        // A comma only ever separates candidates, so it is always followed by a space.
+        expect(p.srcSet).not.to.match(/,(?! )/, "a raw comma would split the candidate");
+      });
+    });
+  });
+
   describe("JImage", () => {
     it("renders a responsive image: src, candidate set, sizes, intrinsic size and title", () => {
       img("jimage_responsive")

@@ -41,6 +41,21 @@ jahiaComponent(
       return <div data-testid="image_missing_fixture">Every reference is required</div>;
     }
 
+    // A DAM node answers getUrl(args) with a URL on its own host, and the resize travels in those
+    // arguments rather than in a query string. No such provider is mounted here, so this stands in
+    // for one, implementing only what getImageProps reads. The URL mimics a Cloudinary path: a
+    // two-argument resize carries the comma the srcset workaround exists for.
+    const damNode = {
+      getIdentifier: () => "dam-stand-in",
+      hasProperty: () => false,
+      hasNode: () => false,
+      getProvider: () => ({ isDefault: () => false }),
+      // buildNodeUrl collects this as a cache dependency, so it must be a real node's.
+      getCanonicalPath: () => large.getCanonicalPath(),
+      getUrl: (args?: string[]) =>
+        `https://media.dam.test/${args ? `${args.map((arg) => arg.replace(":", "_")).join(",")}/` : ""}asset.jpg`,
+    } as unknown as JCRNodeWrapper;
+
     return (
       <>
         {/* Vector: the resize channel cannot scale an SVG, so no candidate set is offered. */}
@@ -97,6 +112,11 @@ jahiaComponent(
         {/* The file name carries a comma, which ends a candidate in a srcset unless it is escaped.
             The widths stay under the 300px original so that a candidate set is produced at all. */}
         <Case id="comma_escaping" props={getImageProps(comma, { srcSet: [200, 100] })} />
+
+        {/* A non-default provider: every resize goes through getUrl arguments. */}
+        <Case id="dam_responsive" props={getImageProps(damNode, {})} />
+        <Case id="dam_density" props={getImageProps(damNode, { width: 400 })} />
+        <Case id="dam_density_both" props={getImageProps(damNode, { width: 300, height: 300 })} />
 
         {/* <JImage>: the cases above cover every branch of the computed attributes; these prove
             they land on a real <img>, in the spellings a browser reads. */}
