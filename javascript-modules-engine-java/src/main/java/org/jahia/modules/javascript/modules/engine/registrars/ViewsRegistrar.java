@@ -52,7 +52,7 @@ public class ViewsRegistrar implements ScriptResolver, TemplateResolver, Registr
     private RenderService renderService;
     private GraalVMEngine graalVMEngine;
 
-    private final Map<String, Collection<JSView>> viewsPerBundle = new HashMap<>();
+    private final Map<String, Collection<JSView>> viewsPerBundle = new ConcurrentHashMap<>();
 
     private static final Map<String, Set<String>> siteJSModulesCache = new ConcurrentHashMap<>(15);
     private static final Map<String, SortedSet<JSView>> viewSetCache = new ConcurrentHashMap<>(512);

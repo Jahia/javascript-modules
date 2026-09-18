@@ -22,4 +22,17 @@ public interface Registrar {
     void register(Bundle bundle);
 
     void unregister(Bundle bundle);
+
+    /**
+     * Whether this registrar takes part in a development server's hot reload, which re-runs
+     * {@link #unregister} then {@link #register} on every save.
+     *
+     * <p>Registrars that publish what the module declares are fine with that rhythm. A registrar
+     * that also performs a one-off effect on registration is not, and must opt out: at save
+     * frequency the effect would run over and over, and its record of having run is what a redeploy
+     * is expected to produce, not an editor keystroke.
+     */
+    default boolean runsOnHotReload() {
+        return true;
+    }
 }

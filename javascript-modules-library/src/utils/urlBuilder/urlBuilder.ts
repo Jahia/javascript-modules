@@ -114,6 +114,21 @@ export function buildNodeUrl(
 }
 
 /**
+ * The path a module's files are served under while a development server is attached to it, or
+ * undefined for every module that is deployed normally.
+ *
+ * A module under `jahia dev` has its files rebuilt on the developer's machine, so addressing the
+ * copy inside the deployed bundle would show a state that is one redeploy old.
+ */
+function developmentPathOf(modulePath: string | undefined): string | undefined {
+  const module = modulePath?.split("/").pop();
+  if (!module) return undefined;
+  const base = server.dev.getBase(module);
+  // the engine hands back a path with a trailing slash; the caller adds its own separator
+  return base ? base.replace(/\/$/, "") : undefined;
+}
+
+/**
  * Build a URL for a file in a module. Note that to be accessible, the folder that contains the file
  * must be part of the jahia.static-resources in package.json.
  *
@@ -148,7 +163,7 @@ export function buildModuleFileUrl(
     ? `/modules/${config.moduleName}`
     : context.renderContext?.getURLGenerator().getCurrentModule();
   return buildEndpointUrl(
-    `${moduleName}/${filePath}`,
+    `${developmentPathOf(moduleName) ?? moduleName}/${filePath}`,
     { parameters: config.parameters },
     { renderContext: context.renderContext },
   );
