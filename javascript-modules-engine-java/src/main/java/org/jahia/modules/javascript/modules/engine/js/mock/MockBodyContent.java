@@ -8,7 +8,7 @@ import java.io.Writer;
 
 public class MockBodyContent extends BodyContent {
 
-    private MockJspWriter writer;
+    private final MockJspWriter writer;
 
 
     public MockBodyContent(MockJspWriter writer) {
@@ -25,9 +25,9 @@ public class MockBodyContent extends BodyContent {
         return writer.getString();
     }
 
-    public void writeOut(Writer writer) throws IOException {
+    public void writeOut(Writer writer) {
+        // not used
     }
-
 
     //---------------------------------------------------------------------
     // Delegating implementations of JspWriter's abstract methods
