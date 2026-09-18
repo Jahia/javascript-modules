@@ -104,23 +104,28 @@ export function buildNodeUrl(
       throw new Error("You cannot use args with mode, language or extension in buildNodeUrl.");
     }
 
-    const mode = config.mode ?? context.renderContext?.getMode();
+    const mode = config.mode;
     const language = config.language ?? context.currentResource?.getLocale().toString();
     const extension =
       config.extension ?? `.${context.currentResource?.getTemplateType() ?? "html"}`;
 
-    if (!mode) throw new Error("buildNodeUrl: mode is not defined and cannot be inferred.");
+    if (!mode && !context.renderContext)
+      throw new Error("buildNodeUrl: mode is not defined and cannot be inferred.");
     if (!language) throw new Error("buildNodeUrl: language is not defined and cannot be inferred.");
 
+    // If mode is undefined, preserve the current mode (base): edit, editframe, preview or live
+    // This ensures URLs generated in the editframe point to other editframe URLs
+    const base =
+      mode === undefined && context.renderContext
+        ? context.renderContext.getURLGenerator().getBase(language)
+        : mode === "edit"
+          ? `/cms/edit/default/${language}`
+          : mode === "preview"
+            ? `/cms/render/default/${language}`
+            : `/cms/render/live/${language}`;
+
     return buildEndpointUrl(
-      (mode === "edit"
-        ? "/cms/edit/default/"
-        : mode === "preview"
-          ? "/cms/render/default/"
-          : "/cms/render/live/") +
-        language +
-        node.getPath() +
-        extension,
+      base + node.getPath() + extension,
       { parameters: config.parameters, absolute: config.absolute },
       context,
     );
