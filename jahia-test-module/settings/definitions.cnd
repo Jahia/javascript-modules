@@ -150,6 +150,12 @@
 [javascriptExample:testAutocollectedCacheDependency] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
  - image (weakreference, picker[type='image']) < 'jmix:image'
 
+[javascriptExample:testImage] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
+ - image (weakreference, picker[type='image']) < 'jmix:image'
+ // Unconstrained: the suite points it at a file with no jmix:image, to cover the branch where
+ // the intrinsic dimensions are unknown.
+ - nonImage (weakreference)
+
 [javascriptExample:testUuidCacheDependency] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
  // The path of the node whose title the view renders, and whose uuid it depends on.
  - targetPath (string)
