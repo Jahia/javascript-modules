@@ -92,9 +92,9 @@ Renders an image node with best-in-class responsive behaviors.
 <JImage src={imageNode} />
 ```
 
-If `alt` is not provided, it defaults to the image's `jcr:title` property.
+If `alt` is not provided, it defaults to the image's `jcr:title` property, and if none is set, the image is considered decorative (`alt=""` is produced).
 
-This snippet produce something like the following HTML:
+This snippet produces something like the following HTML:
 
 ```html
 <img
@@ -258,7 +258,7 @@ If the path has a protocol (e.g. `data:` URI), it will be returned as is, pairin
 
 This is the underlying function used by the `<JImage />` component to get the image properties.
 
-Can be used directly to forward serialiazed image properties to an `<img />` element in an Island.
+Can be used directly to forward serialized image properties to an `<img />` element in an Island.
 
 ### `getSiteLocales`
 
