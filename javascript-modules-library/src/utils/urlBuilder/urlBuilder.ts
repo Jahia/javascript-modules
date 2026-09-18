@@ -26,6 +26,8 @@ export function buildNodeUrl(
     | {
         /** The query string parameters to append to the URL */
         parameters?: Record<string, string>;
+        /** Prefix the URL with `http(s)://host`. Set to a string to specify the origin explicitly. */
+        absolute?: boolean | string;
         /**
          * The mode to use to build the URL. Defines the mode or override the one provided by the
          * renderContext.
@@ -50,6 +52,8 @@ export function buildNodeUrl(
     | {
         /** The query string parameters to append to the URL */
         parameters?: Record<string, string>;
+        /** Prefix the URL with `http(s)://host`. Set to a string to specify the origin explicitly. */
+        absolute?: boolean | string;
         /** Additional arguments used for building the URL, through `node.getUrl` overloads. */
         args?: Record<string, string | number | boolean>;
         /**
@@ -69,6 +73,7 @@ export function buildNodeUrl(
   node: JCRNodeWrapper,
   config: {
     parameters?: Record<string, string>;
+    absolute?: string | boolean;
     mode?: "edit" | "preview" | "live";
     language?: string;
     extension?: string;
@@ -116,7 +121,7 @@ export function buildNodeUrl(
         language +
         node.getPath() +
         extension,
-      { parameters: config.parameters },
+      { parameters: config.parameters, absolute: config.absolute },
       context,
     );
   }
@@ -127,7 +132,8 @@ export function buildNodeUrl(
     : node.getUrl();
   if (context.renderContext) url = context.renderContext.getResponse().encodeURL(url);
   if (config.parameters) url = appendParameters(url, config.parameters);
-  return url;
+  if (absoluteUrlRegExp.test(url)) return url;
+  return toAbsolute(url, config.absolute, context.renderContext);
 }
 
 /**
@@ -145,6 +151,8 @@ export function buildModuleFileUrl(
     moduleName?: string;
     /** Querystring parameters to append to the URL */
     parameters?: Record<string, string>;
+    /** Prefix the URL with `http(s)://host`. Set to a string to specify the origin explicitly. */
+    absolute?: boolean | string;
   } = {},
   context: {
     /** Provided in react context, you need to provide one (or the module name) otherwise. */
@@ -166,7 +174,7 @@ export function buildModuleFileUrl(
     : context.renderContext?.getURLGenerator().getCurrentModule();
   return buildEndpointUrl(
     `${moduleName}/${filePath}`,
-    { parameters: config.parameters },
+    { parameters: config.parameters, absolute: config.absolute },
     { renderContext: context.renderContext },
   );
 }
@@ -178,6 +186,8 @@ export function buildEndpointUrl(
   config: {
     /** Querystring parameters to append to the URL */
     parameters?: Record<string, string>;
+    /** Prefix the URL with `http(s)://host`. Set to a string to specify the origin explicitly. */
+    absolute?: boolean | string;
   } = {},
   context: {
     /** Provided in react context, you need to provide one otherwise. */
@@ -185,9 +195,24 @@ export function buildEndpointUrl(
   } = useServerContext(),
 ): string {
   let url = endpoint;
-  if (!absoluteUrlRegExp.test(url) && context.renderContext) {
-    url = url.startsWith("/") ? context.renderContext.getRequest().getContextPath() + url : url;
-    url = context.renderContext.getResponse().encodeURL(url);
+  if (!absoluteUrlRegExp.test(url)) {
+    if (context.renderContext) {
+      url = url.startsWith("/") ? context.renderContext.getRequest().getContextPath() + url : url;
+      url = context.renderContext.getResponse().encodeURL(url);
+    }
+    url = toAbsolute(url, config.absolute, context.renderContext);
   }
   return config.parameters ? appendParameters(url, config.parameters) : url;
+}
+
+/** Makes `url` absolute if `absolute` is true or a string specifying the origin */
+function toAbsolute(url: string, absolute?: boolean | string, renderContext?: RenderContext) {
+  if (!absolute) return url;
+  if (typeof absolute === "string") return absolute.replace(/\/+$/, "") + url;
+  if (!renderContext) {
+    throw new Error(
+      `Cannot make an absolute URL for ${url}. Set absolute: "http://..." or provide a RenderContext.`,
+    );
+  }
+  return renderContext.getURLGenerator().getServer() + url;
 }

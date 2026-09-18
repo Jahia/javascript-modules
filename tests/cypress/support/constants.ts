@@ -22,3 +22,7 @@ export const HYDROGEN_POSTS = [
 export const JAHIA_CONTEXT = new URL(
   Cypress.env("JAHIA_URL") ?? "http://localhost:8080",
 ).pathname.replace(/\/$/, "");
+
+// The test site declares `localhost` as its server name, so Jahia's `${url.server}` falls back to
+// the host of the request: the origin Cypress itself browses.
+export const JAHIA_ORIGIN = new URL(Cypress.env("JAHIA_URL") ?? "http://localhost:8080").origin;

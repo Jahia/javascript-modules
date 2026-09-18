@@ -44,7 +44,8 @@ public class CollectedCacheDependenciesTest {
         assertTrue("/sites/mysite/contents/posts/item-1".matches(regexp));
         // an edited title lands on a subnode of the item
         assertTrue("/sites/mysite/contents/posts/item-1/j:translation_en".matches(regexp));
-        // the folder may itself be one of the linked nodes: renaming it must flush the fragment
+        // the folder may itself be one of the linked nodes: renaming it must flush the
+        // fragment
         assertTrue("the merged folder itself is covered",
                 "/sites/mysite/contents/posts".matches(regexp));
         assertFalse("a sibling folder is not covered",
