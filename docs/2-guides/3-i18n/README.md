@@ -34,6 +34,8 @@ We recommend adding the `i18n` attribute to:
 
 Under the hood, non-i18n fields are stored directly on the node, while i18n fields are stored as properties of `jnt:translation` child nodes named `j:translation_<language>`. You usually don't need to worry about this, properties will be handled automatically, but it can be helpful when debugging.
 
+`<JImage>` defaults to the image's `jcr:title` property for its alt text, providing a simple translation mechanism for images that don't need to be locale-specific.
+
 ## Views and Templates
 
 After the editors have created content, you will want to display it in views and templates.
