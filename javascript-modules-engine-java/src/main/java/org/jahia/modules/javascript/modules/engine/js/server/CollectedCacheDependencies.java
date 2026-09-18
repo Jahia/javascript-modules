@@ -83,7 +83,8 @@ public final class CollectedCacheDependencies {
     }
 
     /**
-     * A regexp matching the deepest path every dependency lives under and everything
+     * A regexp matching the deepest path every dependency lives under and
+     * everything
      * below it, or everything under the repository root when they share no first
      * segment.
      */
