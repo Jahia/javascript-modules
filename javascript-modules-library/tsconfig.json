@@ -19,9 +19,9 @@
     "outDir": "internal-dist",
     "declaration": true,
     "declarationDir": "dist",
-    "baseUrl": ".",
+    "rootDir": "./src",
     "paths": {
-      "*": ["target/types/*"]
+      "*": ["./target/types/*"]
     },
     "verbatimModuleSyntax": true
   },

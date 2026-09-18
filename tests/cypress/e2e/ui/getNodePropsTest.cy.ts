@@ -1,6 +1,6 @@
 import { addNode } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 
 describe("getNodeProps function test", () => {
   before("Create test page and contents", () => {
@@ -93,11 +93,15 @@ describe("getNodeProps function test", () => {
 
   beforeEach("Login and visit test page", () => {
     cy.login();
-    cy.visit(`/jahia/page-composer/default/en/sites/${GENERIC_SITE_KEY}/home/testGetNodeProps.html`);
+    cy.visit(
+      `/jahia/page-composer/default/en/sites/${GENERIC_SITE_KEY}/home/testGetNodeProps.html`,
+    );
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testGetNodeProps.html`);
   });
 
-  afterEach("Logout", () => { cy.logout(); });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
   it("Verify property values from getNodeProps", function () {
     cy.get('div[data-testid="getNodeProps_smallText"]').contains("smallTextValue");

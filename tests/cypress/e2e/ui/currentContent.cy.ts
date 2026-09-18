@@ -1,6 +1,6 @@
 import { addNode } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 
 describe("Test on currentContent injected data", () => {
   const pageName = "testCurrentContent";
@@ -29,8 +29,12 @@ describe("Test on currentContent injected data", () => {
     });
   });
 
-  beforeEach("Login", () => { cy.login(); });
-  afterEach('Logout', () => { cy.logout(); });
+  beforeEach("Login", () => {
+    cy.login();
+  });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
   it(`${pageName}: Check currentContent injected JSON node in current view`, function () {
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
