@@ -8,20 +8,15 @@ DIR="target/java-ts-bind/types"
 searches=(
     "ServiceReference\\[\\]"
     "Map\\[\\]"
-    "RangeIterator extends Iterator"
     ".*org\\.graalvm\\.polyglot.*;"
     "loadPropertiesResource(bundle: Bundle, path: string): ProxyObject;"
     "transformToJsNode(node: JCRNodeWrapper, includeChildren: boolean, includeDescendants: boolean, includeAllTranslations: boolean): ProxyObject;"
     "getRenderParameters(resource: Resource): ProxyObject;"
-    "executeQuerySync(parameters: Map): string;"
     "getConfigPids(): ProxyArray;"
     "getConfigFactoryIdentifiers(factoryPid: string): ProxyArray;"
     "getConfigValues(configPid: string): ProxyObject;"
     "getConfigFactoryValues(factoryPid: string, factoryIdentifier: string): ProxyObject;"
-    "import { ContextProvider } from 'org.jahia.modules.javascript.modules.engine.jsengine';"
-    "export class JCRNodeDecorator implements JCRNodeWrapper"
     "export class JCRSiteNode {"
-    "export class JCRWorkspaceWrapper implements Workspace {"
     "renderComponent(attr: Map<string, any>, renderContext: RenderContext): string;"
     "render(attr: Map<string, any>, renderContext: RenderContext, currentResource: Resource): string;"
     "addResources(attr: Map<string, any>, renderContext: RenderContext): string;"
@@ -35,20 +30,15 @@ searches=(
 replaces=(
     "ServiceReference<any>[]"
     "any[]"
-    "RangeIterator extends Iterator<Item>"
     ""
     "loadPropertiesResource(bundle: Bundle, path: string): any;"
     "transformToJsNode(node: JCRNodeWrapper, includeChildren: boolean, includeDescendants: boolean, includeAllTranslations: boolean): any;"
     "getRenderParameters(resource: Resource): any;"
-    "executeQuerySync(parameters: any): string;"
     "getConfigPids(): string[];"
     "getConfigFactoryIdentifiers(factoryPid: string): string[];"
     "getConfigValues(configPid: string): any;"
     "getConfigFactoryValues(factoryPid: string, factoryIdentifier: string): any;"
-    ""
-    "export interface JCRNodeDecorator extends JCRNodeWrapper"
     "export interface JCRSiteNode extends JCRNodeWrapper {"
-    "export interface JCRWorkspaceWrapper extends Workspace {"
     "renderComponent(attr: any, renderContext: RenderContext): string;"
     "render(attr: any, renderContext: RenderContext, currentResource: Resource): string;"
     "addResources(attr: any, renderContext: RenderContext): string;"
@@ -60,10 +50,25 @@ replaces=(
 )
 
 # Iterate over the arrays and perform the replacements
+# A search that matches no file is an error: the declaration it was written for has changed
+# name or shape, so the patch silently stops being applied and the generated types drift.
+# grep runs with basic regular expressions, the same dialect as the sed calls below.
+unmatched=()
 for i in "${!searches[@]}"; do
+  if ! grep -rl --include="*.d.ts" "${searches[$i]}" $DIR > /dev/null; then
+    unmatched+=("${searches[$i]}")
+    continue
+  fi
   if [[ "$OSTYPE" == "darwin"* ]]; then
      find $DIR -name "*.d.ts" -exec sed -i '' -e "s/${searches[$i]}/${replaces[$i]}/g" {} \;
   else
      find $DIR -name "*.d.ts" -exec sed -i -e "s/${searches[$i]}/${replaces[$i]}/g" {} \;
   fi
 done
+
+if [ ${#unmatched[@]} -ne 0 ]; then
+  echo "apply-patch.sh: no generated .d.ts file matches these search patterns:" >&2
+  printf '  %s\n' "${unmatched[@]}" >&2
+  echo "Fix each pattern to match the current output, or remove the obsolete entry and its replacement." >&2
+  exit 1
+fi
