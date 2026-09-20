@@ -20,6 +20,8 @@ export type {
   PropertyRef,
   QueryBuilder,
   Queryable,
+  Refs,
+  RefShape,
   ScoreRef,
   SelectorRef,
   Selectors,

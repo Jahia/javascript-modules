@@ -14,6 +14,11 @@ import { GENERIC_SITE_KEY } from "../../support/constants";
  * were read from the `QOMFormatter` output of the built models, against the two Jackrabbit fork
  * versions in use, which write them identically. A property fragment carries no selector prefix,
  * because the rewrite can move a property to another selector.
+ *
+ * Every single selector case of the view is built without an alias, so its selector is named after
+ * its node type and the formatter brackets that name. The two constants below hold the name each
+ * case writes. The `FROM` fragment stops at the node type, because the formatter writes the `AS`
+ * clause of a selector that carries the name of its own node type as it sees fit.
  */
 describe("JCR query builder test", () => {
   const scope = `/sites/${GENERIC_SITE_KEY}/contents/queryBuilder`;
@@ -32,21 +37,25 @@ describe("JCR query builder test", () => {
   const patternScope = `/sites/${GENERIC_SITE_KEY}/contents/queryBuilderPattern`;
   const patternNode = (name: string) => `${patternScope}/pattern-${name}`;
 
+  /** The selector name of a query built without an alias, as the formatter writes it. */
+  const e = `[jnt:event]`;
+  const n = `[javascriptExample:testGetNodeProps]`;
+
   /** What every statement of a single selector case holds, whatever the rewrite added. */
-  const single = [`SELECT e.*`, `FROM [jnt:event] AS e`, `ISDESCENDANTNODE(e, ['${scope}'])`];
+  const single = [`SELECT ${e}.*`, `FROM [jnt:event]`, `ISDESCENDANTNODE(${e}, ['${scope}'])`];
 
   /** The same fragments for a case scoped to the pattern fixture folder. */
   const singlePattern = [
-    `SELECT n.*`,
-    `FROM [javascriptExample:testGetNodeProps] AS n`,
-    `ISDESCENDANTNODE(n, ['${patternScope}'])`,
+    `SELECT ${n}.*`,
+    `FROM [javascriptExample:testGetNodeProps]`,
+    `ISDESCENDANTNODE(${n}, ['${patternScope}'])`,
   ];
 
   const fragments: Record<string, string[]> = {
     property: [...single, `[jcr:title] = 'Event 1'`],
     path: [...single, `ORDER BY`, `[jcr:title]`],
     page: [...single, `ORDER BY`, `[jcr:title]`],
-    fullText: [...single, `CONTAINS(e.*, 'Event')`, `ORDER BY SCORE(e) DESC`],
+    fullText: [...single, `CONTAINS(${e}.*, 'Event')`, `ORDER BY SCORE(${e}) DESC`],
     date: [...single, `startDate >= CAST('2000-01-01T00:00:00.000Z' AS DATE)`],
     bind: [...single, `startDate >= CAST('2000-01-01T00:00:00.000Z' AS DATE)`],
     join: [
@@ -57,7 +66,7 @@ describe("JCR query builder test", () => {
     ],
     mixed: [
       ...single,
-      `NOT ISSAMENODE(e, ['${scope}/event-1'])`,
+      `NOT ISSAMENODE(${e}, ['${scope}/event-1'])`,
       `[jcr:title] LIKE 'Event%'`,
       `LOWER(`,
       `LENGTH(`,
@@ -67,18 +76,18 @@ describe("JCR query builder test", () => {
     ],
     mixedPlain: [
       ...single,
-      `NOT ISSAMENODE(e, ['${scope}/event-1'])`,
+      `NOT ISSAMENODE(${e}, ['${scope}/event-1'])`,
       `[jcr:title] LIKE 'Event%'`,
-      `LENGTH(e.eventsType) > CAST('3' AS LONG)`,
+      `LENGTH(${e}.eventsType) > CAST('3' AS LONG)`,
       `ORDER BY LOWER(`,
     ],
     negated: [...single, `NOT `, `[jcr:language] IS NOT NULL`, `UPPER(`, `= 'MEETING'`],
-    lengthOnPlain: [...single, `LENGTH(e.eventsType) > CAST('3' AS LONG)`],
-    lengthOnI18n: [...single, `LENGTH(e.[jcr:title]) > CAST('3' AS LONG)`],
-    upperOnI18n: [...single, `UPPER(e.[jcr:title]) = 'EVENT 1'`],
-    notOnI18n: [...single, `NOT e.[jcr:title] = 'Event 1'`],
-    lowerOrderOnI18n: [...single, `ORDER BY LOWER(e.[jcr:title]) DESC`],
-    lowerOrderOnPlain: [...single, `ORDER BY LOWER(e.eventsType) DESC`],
+    lengthOnPlain: [...single, `LENGTH(${e}.eventsType) > CAST('3' AS LONG)`],
+    lengthOnI18n: [...single, `LENGTH(${e}.[jcr:title]) > CAST('3' AS LONG)`],
+    upperOnI18n: [...single, `UPPER(${e}.[jcr:title]) = 'EVENT 1'`],
+    notOnI18n: [...single, `NOT ${e}.[jcr:title] = 'Event 1'`],
+    lowerOrderOnI18n: [...single, `ORDER BY LOWER(${e}.[jcr:title]) DESC`],
+    lowerOrderOnPlain: [...single, `ORDER BY LOWER(${e}.eventsType) DESC`],
     literals: [
       ...single,
       `stringProp = 'text'`,
@@ -117,8 +126,8 @@ describe("JCR query builder test", () => {
     containsCased: [...singlePattern, `smallText LIKE '%eetu%'`],
     lowerContains: [...singlePattern, `LOWER(`, `LIKE '%eetu%'`],
     lowerContainsLiteral: [...singlePattern, `LOWER(`, String.raw`LIKE '%0\% o%'`],
-    localNameEndsWith: [...singlePattern, `LOCALNAME(n) LIKE '%-percent'`],
-    localNameContains: [...singlePattern, `LOCALNAME(n) LIKE '%-under%'`],
+    localNameEndsWith: [...singlePattern, `LOCALNAME(${n}) LIKE '%-percent'`],
+    localNameContains: [...singlePattern, `LOCALNAME(${n}) LIKE '%-under%'`],
     multiContains: [...singlePattern, String.raw`multipleSmallText LIKE '%0\% o%'`],
     fullTextStem: [...singlePattern, `CONTAINS(`, `'seat')`],
     fullTextWildcard: [...singlePattern, `CONTAINS(`, `'seats*')`],

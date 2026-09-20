@@ -11,7 +11,7 @@ This plan defines a TypeScript query builder for Jahia JavaScript modules. The b
 
 The guiding principle is fewer features and good performance by default. A developer who uses the builder gets a query whose limit and offset reach Lucene, unless a name in the call chain says otherwise. Every public function that produces a construct Jackrabbit runs in memory carries the suffix `Slow`, in the factory and in the facade. A query cannot execute before `.limit(n)` is called, and the explicit escape hatch is `.unboundedSlow()`.
 
-Romain made nine decisions, and section 13 quotes them verbatim. The builder lives in `@jahia/javascript-modules-library` as a pure TypeScript `src/query/` sub-module, next to `getNodesByJCRQuery` and `useJCRQuery`, which accept a built query. The builder binds to the QOM factory of the session, because QOM is the lowest level Jackrabbit offers, see section 3. The API has two layers: functions that mirror `QueryObjectModelFactory`, and a chainable facade such as `from("jnt:page", "p").where(...).orderBy(...).limit(10)`. Coverage is the full JCR 2.0 QOM, joins included. Constructs that Jahia's Jackrabbit does not execute are documented and, where possible, typed as unsupported.
+Romain made nine decisions, and section 13 quotes them verbatim. The builder lives in `@jahia/javascript-modules-library` as a pure TypeScript `src/query/` sub-module, next to `getNodesByJCRQuery` and `useJCRQuery`, which accept a built query. The builder binds to the QOM factory of the session, because QOM is the lowest level Jackrabbit offers, see section 3. The API has two layers: functions that mirror `QueryObjectModelFactory`, and a chainable facade such as `from("jnt:page").where(...).orderBy(...).limit(10)`. Coverage is the full JCR 2.0 QOM, joins included. Constructs that Jahia's Jackrabbit does not execute are documented and, where possible, typed as unsupported.
 
 ## 2. Verified ground truth
 
@@ -160,7 +160,7 @@ The design has four parts. They are a pure TypeScript query model, a factory lay
 ```
 src/query/model.ts       plain immutable objects, one interface per spec interface
 src/query/factory.ts     qom.selector(), qom.comparison(), qom.joinSlow(), ... (28 functions, 5 renamed)
-src/query/builder.ts     from("jnt:page", "p").where(...).orderBy(...).limit(10)   -> Executable
+src/query/builder.ts     from("jnt:page").where(...).orderBy(...).limit(10)        -> Executable
         |
         v
 src/query/qom.ts         toQOM(model, session, bindings) -> javax.jcr.query.qom.QueryObjectModel
@@ -179,28 +179,28 @@ Rejected alternatives:
 
 The eight examples below show the facade and the factory mixed. Each comment gives `getStatement()` as the fork formats it for the model as it is built. Every example calls `.limit()`, because a builder without a limit does not compile as a `Queryable`.
 
-Two facts changed these comments after the phase 2 implementation. The sink emits one wildcard column per selector, per section 7.1, so the formatter writes `SELECT p.*` where an empty column list would write `SELECT *`. And `createQuery` rewrites the query before the object model exists, per section 2.1, so the statement a live query reports also carries whatever the rewrite added, which in a localised session is a `jcr:language` constraint per selector without one.
+Two facts changed these comments after the phase 2 implementation. The sink emits one wildcard column per selector, per section 7.1, so the formatter writes the selector name and a `.*` where an empty column list would write `SELECT *`. A selector that declared no alias carries the name of its node type, which is the name those comments repeat. And `createQuery` rewrites the query before the object model exists, per section 2.1, so the statement a live query reports also carries whatever the rewrite added, which in a localised session is a `jcr:language` constraint per selector without one.
 
 ```ts
 // 1. Property filter
-from("jnt:page", "p").where(({ p }) => p.prop("jcr:title").eq("Home")).limit(20);
-// SELECT p.* FROM [jnt:page] AS p WHERE p.[jcr:title] = 'Home'
+from("jnt:page").where((p) => p.prop("jcr:title").eq("Home")).limit(20);
+// SELECT [jnt:page].* FROM [jnt:page] WHERE [jnt:page].[jcr:title] = 'Home'
 // 2. Path scope
-from("jnt:news", "n").where(({ n }) => n.isDescendantOf("/sites/acme/contents")).limit(50);
-// SELECT n.* FROM [jnt:news] AS n WHERE ISDESCENDANTNODE(n, ['/sites/acme/contents'])
+from("jnt:news").where((n) => n.isDescendantOf("/sites/acme/contents")).limit(50);
+// SELECT [jnt:news].* FROM [jnt:news] WHERE ISDESCENDANTNODE([jnt:news], ['/sites/acme/contents'])
 // 3. Ordering with pages. Every call returns a new builder, so one base serves several pages.
-const news = from("jnt:news", "n").orderBy(({ n }) => n.prop("date").desc()).limit(10);
-getNodesByJCRQuery(session, news.offset(20)); // SELECT n.* FROM [jnt:news] AS n ORDER BY n.date DESC
+const news = from("jnt:news").orderBy((n) => n.prop("date").desc()).limit(10);
+getNodesByJCRQuery(session, news.offset(20)); // SELECT [jnt:news].* FROM [jnt:news] ORDER BY [jnt:news].date DESC
 // 4. Full text and score ordering, both sorted in Lucene
-from("jnt:article", "a").where(({ a }) => a.fullText("graal*")).orderBy(({ a }) => a.score().desc()).limit(10);
-// SELECT a.* FROM [jnt:article] AS a WHERE CONTAINS(a.*, 'graal*') ORDER BY SCORE(a) DESC
+from("jnt:article").where((a) => a.fullText("graal*")).orderBy((a) => a.score().desc()).limit(10);
+// SELECT [jnt:article].* FROM [jnt:article] WHERE CONTAINS([jnt:article].*, 'graal*') ORDER BY SCORE([jnt:article]) DESC
 // 5. Typed date literal
-from("jnt:event", "e").where(({ e }) => e.prop("startDate").ge(date("2026-09-01T00:00:00.000+02:00"))).limit(100);
-// SELECT e.* FROM [jnt:event] AS e WHERE e.startDate >= CAST('2026-09-01T00:00:00.000+02:00' AS DATE)
+from("jnt:event").where((e) => e.prop("startDate").ge(date("2026-09-01T00:00:00.000+02:00"))).limit(100);
+// SELECT [jnt:event].* FROM [jnt:event] WHERE [jnt:event].startDate >= CAST('2026-09-01T00:00:00.000+02:00' AS DATE)
 // 6. Bind variable, replaced by a typed literal in the sink
-const upcoming = from("jnt:event", "e").where(({ e }) => e.prop("startDate").ge($("since"))).limit(5);
+const upcoming = from("jnt:event").where((e) => e.prop("startDate").ge($("since"))).limit(5);
 getNodesByJCRQuery(session, upcoming.bind({ since: date(startOfMonth) }));
-// SELECT e.* FROM [jnt:event] AS e WHERE e.startDate >= CAST('2026-09-01T00:00:00.000+02:00' AS DATE)
+// SELECT [jnt:event].* FROM [jnt:event] WHERE [jnt:event].startDate >= CAST('2026-09-01T00:00:00.000+02:00' AS DATE)
 // 7. Join, runs in memory. getNodes() returns the nodes of the left selector: pages that have a published child.
 from("jnt:page", "p").joinSlow("jnt:content", "c").on(({ c, p }) => c.isChildOf(p))
   .where(({ c }) => c.prop("j:published").eq(true))
@@ -208,13 +208,13 @@ from("jnt:page", "p").joinSlow("jnt:content", "c").on(({ c, p }) => c.isChildOf(
   .limit(20);
 // SELECT p.*, c.[jcr:title] AS childTitle FROM [jnt:page] AS p INNER JOIN [jnt:content] AS c ON ISCHILDNODE(c, p) WHERE c.[j:published] = true
 // 8. NOT and OR, facade and factory mixed, then a LENGTH predicate and a LOWER ordering that run in memory
-from("jnt:page", "p").where(({ p }) => and(
+from("jnt:page").where((p) => and(
   not(p.prop("j:published").eq(true)),
   or(p.prop("jcr:title").like("A%"),
-     qom.comparison(qom.lowerCase(qom.propertyValue("p", "jcr:title")), Operator.EQUAL_TO, literal("home"))),
-)).whereSlow(({ p }) => p.prop("jcr:title").lengthSlow().gtSlow(3))
-  .orderBySlow(({ p }) => p.prop("jcr:title").lower().descSlow()).limit(50);
-// SELECT p.* FROM [jnt:page] AS p WHERE (NOT p.[j:published] = true) AND (p.[jcr:title] LIKE 'A%' OR LOWER(p.[jcr:title]) = 'home') AND LENGTH(p.[jcr:title]) > CAST('3' AS LONG) ORDER BY LOWER(p.[jcr:title]) DESC
+     qom.comparison(qom.lowerCase(qom.propertyValue("jnt:page", "jcr:title")), Operator.EQUAL_TO, literal("home"))),
+)).whereSlow((p) => p.prop("jcr:title").lengthSlow().gtSlow(3))
+  .orderBySlow((p) => p.prop("jcr:title").lower().descSlow()).limit(50);
+// SELECT [jnt:page].* FROM [jnt:page] WHERE (NOT [jnt:page].[j:published] = true) AND ([jnt:page].[jcr:title] LIKE 'A%' OR LOWER([jnt:page].[jcr:title]) = 'home') AND LENGTH([jnt:page].[jcr:title]) > CAST('3' AS LONG) ORDER BY LOWER([jnt:page].[jcr:title]) DESC
 // This example returns nothing in a localised session: `LENGTH` over the internationalised
 // `jcr:title` reads the node itself, where the translated value does not live. See section 14.
 ```
@@ -302,20 +302,26 @@ The `selector` signature is the R2 fix. A default parameter `selectorName: S = n
 ```ts
 type Speed = "fast" | "slow";  type Bound = "call limit(n) or unboundedSlow() before executing" | "limitSet";
 type NoLimit = "call limit(n) or unboundedSlow() before executing";
-export function from<T extends string, A extends string>(nodeType: T, alias: A): QueryBuilder<A, NoLimit>;
-export function from<S extends string>(model: QueryModel<S>): QueryBuilder<S, NoLimit>;  // lifts a factory-built query
-interface QueryBuilder<A extends string, B extends Bound> {
-  where(c: Arg<A, Constraint<A, "fast">>): QueryBuilder<A, B>;      whereSlow(c: Arg<A, Constraint<A>>): QueryBuilder<A, B>;
-  orderBy(...o: Arg<A, Ordering<A, "fast">>[]): QueryBuilder<A, B>;  orderBySlow(...o: Arg<A, Ordering<A>>[]): QueryBuilder<A, B>;
-  select(...c: Arg<A, Column<A>>[]): QueryBuilder<A, B>;   // the one name for it; columns() was removed
-  joinSlow<T extends string, C extends string>(nodeType: T, alias: C, joinType?: JoinType): JoinClause<A, C, B>;  // JoinClause has on(cond) only
-  limit(n: number): QueryBuilder<A, "limitSet">;   unboundedSlow(): QueryBuilder<A, "limitSet">;   // unboundedSlow stores -1
-  offset(n: number): QueryBuilder<A, B>;          bind(values: Bindings): QueryBuilder<A, B>;
+type RefShape = "unaliased" | "aliased";   // which selector references the callbacks receive
+export function from<T extends string, A extends string>(nodeType: T, alias: A): QueryBuilder<A, NoLimit, "aliased">;
+export function from<T extends string>(nodeType: T): QueryBuilder<T, NoLimit, "unaliased">;  // the selector is named after the node type
+export function from<S extends string>(model: QueryModel<S>): QueryBuilder<S, NoLimit, "aliased">;  // lifts a factory-built query
+interface QueryBuilder<A extends string, B extends Bound, S extends RefShape = "aliased"> {
+  where(c: Arg<A, S, Constraint<A, "fast">>): QueryBuilder<A, B, S>;      whereSlow(c: Arg<A, S, Constraint<A>>): QueryBuilder<A, B, S>;
+  orderBy(...o: Arg<A, S, Ordering<A, "fast">>[]): QueryBuilder<A, B, S>;  orderBySlow(...o: Arg<A, S, Ordering<A>>[]): QueryBuilder<A, B, S>;
+  select(...c: Arg<A, S, Column<A>>[]): QueryBuilder<A, B, S>;   // the one name for it; columns() was removed
+  joinSlow<T extends string, C extends string>(nodeType: S extends "unaliased" ? JoinNeedsAlias : T, alias: C, joinType?: JoinType): JoinClause<A, C, B>;  // JoinClause has on(cond) only
+  limit(n: number): QueryBuilder<A, "limitSet", S>;   unboundedSlow(): QueryBuilder<A, "limitSet", S>;   // unboundedSlow stores -1
+  offset(n: number): QueryBuilder<A, B, S>;          bind(values: Bindings): QueryBuilder<A, B, S>;
   build(options?: { strict?: boolean }): QueryModel<A>;   diagnose(): Diagnostic[];
   readonly model: QueryModel<A>;  readonly execution: { limit?: number; offset?: number; bindings?: Bindings };
 }
-export type Executable<A extends string = string> = QueryBuilder<A, "limitSet">;   export type Queryable = string | Executable;
-type Arg<A extends string, N> = N | ((s: { readonly [K in A]: SelectorRef<K> }) => N);
+// Executable states what the seams read, so a builder of either shape widens to it.
+export interface Executable<A extends string = string> { readonly __limit?: "limitSet"; build(options?: { strict?: boolean }): QueryModel<A>; diagnose(): Diagnostic[]; readonly model: QueryModel<A>; readonly execution: ExecutionOptions; }
+export type Queryable = string | Executable;
+type Selectors<A extends string> = { readonly [K in A]: SelectorRef<K> };
+type Refs<A extends string, S extends RefShape> = S extends "unaliased" ? SelectorRef<A> : Selectors<A>;
+type Arg<A extends string, S extends RefShape, N> = N | ((refs: Refs<A, S>) => N);
 type LiteralArg = string | number | boolean | bigint | Date | Literal | BindVariableValue;   type Bindings = Record<string, Exclude<LiteralArg, BindVariableValue>>;
 ```
 
@@ -325,13 +331,13 @@ type LiteralArg = string | number | boolean | bigint | Date | Literal | BindVari
 
 The full text method is named `fullText` and not `contains`, because `contains` is a substring match in Prisma and in Drizzle while this one is a JCR full text search over the analysed index. The pattern lab of section 14 measured the two to be different operations, so `contains` is the right name for the substring match and `fullText` for the term search. Five methods fold into other constructs inside the library, so each is as fast as the operators it folds to: `in` folds to `=` comparisons joined with `OR` and throws on an empty list, `between` folds to `>=` and `<=` with both ends included, `startsWith`, `endsWith` and `contains` build `LIKE 'text%'`, `LIKE '%text'` and `LIKE '%text%'` and escape the `%`, the `_` and the backslash of the text, and `notExists()` is `NOT PropertyExistence`. The three text methods are absent from `NameRef`, because `NAME()` with `LIKE` fails at execution. There is no `isNull()`: the JCR has no null value, so the absence test carries one name, `notExists()`.
 
-The `alias` parameter is required, so the callback never needs `({ "jnt:page": p })` destructuring. The alias-less form `SELECT * FROM [jnt:page]` stays reachable through `qom.selector("jnt:page")`. `NameRef` and `LocalNameRef` have no `lower()` or `upper()`, because those transforms move the comparison into memory. The factory path `qom.comparisonSlow(qom.lowerCase(qom.nodeName("p")), ...)` expresses them. Top-level helpers are `and(...c)`, `or(...c)`, `not(c)` and `$(name)`, and `and`, `or` and `not` propagate `"slow"` when any child is `"slow"`. `.limit()`, `.offset()` and `.bind()` write to `execution` and never to `model`, so `toQOM` never sees them.
+The `alias` parameter is optional. Without it the callbacks receive the one selector reference, which the call site names, as in `.where((p) => ...)`, and the selector carries the name of its node type. With it the callbacks receive a record keyed by alias, as in `.where(({ p }) => ...)`, which is the form a join needs to tell its two sides apart. `joinSlow` is therefore typed on the aliased shape only: on a builder that declared no alias, the compiler refuses the node type and prints `call from(nodeType, alias) first, because a join names both sides`. `NameRef` and `LocalNameRef` have no `lower()` or `upper()`, because those transforms move the comparison into memory. The factory path `qom.comparisonSlow(qom.lowerCase(qom.nodeName("p")), ...)` expresses them. Top-level helpers are `and(...c)`, `or(...c)`, `not(c)` and `$(name)`, and `and`, `or` and `not` propagate `"slow"` when any child is `"slow"`. `.limit()`, `.offset()` and `.bind()` write to `execution` and never to `model`, so `toQOM` never sees them.
 
 ### 6.5 Type safety and validation
 
 Compile time. R2 verified five items on TypeScript 5.9.3. `Operator`, `JoinType` and `Order` are string-literal unions, `lengthSlow()` exists on `PropertyRef` only, and a join has no `build()` until `.on()` is called. `where()` rejects an undeclared alias in `s.q` or a factory-built `Constraint<"q">`. Union inference holds through nested `and` and `or` with facade and factory nodes mixed. Three items are new in this revision, and each gets a `@ts-expect-error` fixture in phase 1:
 
-- `getNodesByJCRQuery(session, builder)` does not compile before `.limit(n)` or `.unboundedSlow()`, because `Queryable` accepts `QueryBuilder<A, "limitSet">` only. R2 verified that `QueryBuilder<"n">` is assignable to `QueryBuilder<string>`, and the two-parameter form needs the same check.
+- `getNodesByJCRQuery(session, builder)` does not compile before `.limit(n)` or `.unboundedSlow()`, because `Queryable` accepts an `Executable` only, which is a builder whose limit marker reads `"limitSet"`. A builder of either callback shape and of any selector union widens to the wide `Executable` the seams take, and the two-parameter form needs the same check.
 - `where()` rejects a `"slow"` constraint, and `orderBy()` rejects a `"slow"` ordering.
 - The fast `qom.comparison` rejects `Length`, `FullTextSearchScore`, `NodeName` outside `=`, and `NodeLocalName` outside `=` and `LIKE`.
 

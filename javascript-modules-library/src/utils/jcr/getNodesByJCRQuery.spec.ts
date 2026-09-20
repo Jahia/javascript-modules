@@ -159,7 +159,7 @@ describe("getNodesByJCRQuery, a JCR-SQL2 statement", () => {
 describe("getNodesByJCRQuery, a built query", () => {
   test("it goes through the object model factory and reads the carried values", () => {
     const { session, methods, firstArgs } = lab(["one"]);
-    const nodes = getNodesByJCRQuery(session, from("jnt:page", "p").limit(10).offset(20));
+    const nodes = getNodesByJCRQuery(session, from("jnt:page").limit(10).offset(20));
 
     assert.deepEqual(nodes, ["one"]);
     assert.deepEqual(methods(), [
@@ -176,13 +176,13 @@ describe("getNodesByJCRQuery, a built query", () => {
 
   test("it needs no positional limit, so the falsy limit guard does not apply", () => {
     const { session } = lab(["one"]);
-    assert.deepEqual(getNodesByJCRQuery(session, from("jnt:page", "p").limit(10)), ["one"]);
+    assert.deepEqual(getNodesByJCRQuery(session, from("jnt:page").limit(10)), ["one"]);
   });
 
   test("a builder with no limit throws UNSUPPORTED, whatever the caller's language", () => {
     const { session, calls } = lab();
     // What a `.jsx` module reaches the seam with, because it never sees the type state.
-    const unbounded = from("jnt:page", "p") as unknown as Executable<"p">;
+    const unbounded = from("jnt:page") as unknown as Executable<"jnt:page">;
     const error = caught(() => getNodesByJCRQuery(session, unbounded));
 
     assert.equal(error?.code, "UNSUPPORTED");
@@ -192,7 +192,7 @@ describe("getNodesByJCRQuery, a built query", () => {
 
   test("a positional limit next to the carried one throws LIMIT_CONFLICT", () => {
     const { session, calls } = lab();
-    const error = caught(() => getNodesByJCRQuery(session, from("jnt:page", "p").limit(10), 20));
+    const error = caught(() => getNodesByJCRQuery(session, from("jnt:page").limit(10), 20));
 
     assert.equal(error?.code, "LIMIT_CONFLICT");
     assert.deepEqual(calls, []);
@@ -201,7 +201,7 @@ describe("getNodesByJCRQuery, a built query", () => {
   test("a positional offset next to the carried one throws LIMIT_CONFLICT", () => {
     const { session } = lab();
     const error = caught(() =>
-      getNodesByJCRQuery(session, from("jnt:page", "p").limit(10).offset(20), undefined, 30),
+      getNodesByJCRQuery(session, from("jnt:page").limit(10).offset(20), undefined, 30),
     );
 
     assert.equal(error?.code, "LIMIT_CONFLICT");
@@ -211,7 +211,7 @@ describe("getNodesByJCRQuery, a built query", () => {
   test("a positional offset of zero next to the carried one throws too", () => {
     const { session } = lab();
     const error = caught(() =>
-      getNodesByJCRQuery(session, from("jnt:page", "p").limit(10).offset(20), undefined, 0),
+      getNodesByJCRQuery(session, from("jnt:page").limit(10).offset(20), undefined, 0),
     );
 
     assert.equal(error?.code, "LIMIT_CONFLICT");
@@ -220,17 +220,14 @@ describe("getNodesByJCRQuery, a built query", () => {
 
   test("an omitted offset leaves the carried one in place", () => {
     const { session, firstArgs } = lab();
-    getNodesByJCRQuery(session, from("jnt:page", "p").limit(10).offset(20));
+    getNodesByJCRQuery(session, from("jnt:page").limit(10).offset(20));
     assert.deepEqual(firstArgs("setOffset"), [20]);
   });
 
   test("a missing session is guarded, and runs nothing", () => {
     const { calls } = lab();
     const { returned } = captureWarn(() =>
-      getNodesByJCRQuery(
-        undefined as unknown as JCRSessionWrapper,
-        from("jnt:page", "p").limit(10),
-      ),
+      getNodesByJCRQuery(undefined as unknown as JCRSessionWrapper, from("jnt:page").limit(10)),
     );
 
     assert.deepEqual(returned, []);

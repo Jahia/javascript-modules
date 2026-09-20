@@ -31,7 +31,7 @@ function lab() {
     },
     getStatement() {
       calls.push({ method: "getStatement", args: [] });
-      return "SELECT * FROM [jnt:page] AS p";
+      return "SELECT * FROM [jnt:page]";
     },
     execute() {
       calls.push({ method: "execute", args: [] });
@@ -147,7 +147,7 @@ describe("executeQuery, a JCR-SQL2 statement", () => {
 describe("executeQuery, a built query", () => {
   test("it goes through the object model factory and reads the values the query carries", () => {
     const { session, methods, firstArgs } = lab();
-    executeQuery(session, from("jnt:page", "p").limit(10).offset(20));
+    executeQuery(session, from("jnt:page").limit(10).offset(20));
 
     assert.deepEqual(methods(), [
       "factory.selector",
@@ -164,25 +164,25 @@ describe("executeQuery, a built query", () => {
 
   test("unboundedSlow carries -1, so setLimit is never called", () => {
     const { session, methods } = lab();
-    executeQuery(session, from("jnt:page", "p").unboundedSlow());
+    executeQuery(session, from("jnt:page").unboundedSlow());
     assert.equal(methods().includes("setLimit"), false);
   });
 
   test("it logs the statement the host formatted, at debug level", () => {
     const { session } = lab();
     const written = captureDebug(() => {
-      executeQuery(session, from("jnt:page", "p").limit(10));
+      executeQuery(session, from("jnt:page").limit(10));
     });
 
-    assert.deepEqual(written, ["Running JCR query: SELECT * FROM [jnt:page] AS p"]);
+    assert.deepEqual(written, ["Running JCR query: SELECT * FROM [jnt:page]"]);
   });
 
   test("it hands the bound values to the sink", () => {
     const { session, calls } = lab();
     executeQuery(
       session,
-      from("jnt:event", "e")
-        .where(({ e }) => e.prop("startDate").ge($("since")))
+      from("jnt:event")
+        .where((e) => e.prop("startDate").ge($("since")))
         .limit(5)
         .bind({ since: 42 }),
     );
@@ -197,8 +197,8 @@ describe("executeQuery, a built query", () => {
     const error = caught(() =>
       executeQuery(
         session,
-        from("jnt:event", "e")
-          .where(({ e }) => e.prop("startDate").ge($("since")))
+        from("jnt:event")
+          .where((e) => e.prop("startDate").ge($("since")))
           .limit(5),
       ),
     );
@@ -211,9 +211,7 @@ describe("executeQuery, a built query", () => {
 describe("executeQuery, conflicts and refusals", () => {
   test("a carried limit and a passed limit throw LIMIT_CONFLICT before any host call", () => {
     const { session, calls } = lab();
-    const error = caught(() =>
-      executeQuery(session, from("jnt:page", "p").limit(10), { limit: 20 }),
-    );
+    const error = caught(() => executeQuery(session, from("jnt:page").limit(10), { limit: 20 }));
 
     assert.equal(error?.code, "LIMIT_CONFLICT");
     assert.equal(error?.at, "execution.limit");
@@ -223,7 +221,7 @@ describe("executeQuery, conflicts and refusals", () => {
   test("a carried offset and a passed offset throw LIMIT_CONFLICT", () => {
     const { session } = lab();
     const error = caught(() =>
-      executeQuery(session, from("jnt:page", "p").limit(10).offset(20), { offset: 30 }),
+      executeQuery(session, from("jnt:page").limit(10).offset(20), { offset: 30 }),
     );
 
     assert.equal(error?.code, "LIMIT_CONFLICT");
@@ -232,7 +230,7 @@ describe("executeQuery, conflicts and refusals", () => {
 
   test("a passed offset is used when the query carries none", () => {
     const { session, firstArgs } = lab();
-    executeQuery(session, from("jnt:page", "p").limit(10), { offset: 30 });
+    executeQuery(session, from("jnt:page").limit(10), { offset: 30 });
     assert.deepEqual(firstArgs("setOffset"), [30]);
   });
 
@@ -240,8 +238,8 @@ describe("executeQuery, conflicts and refusals", () => {
     const negated = lab();
     executeQuery(
       negated.session,
-      from("jnt:page", "p")
-        .where(({ p }) => not(p.prop("j:published").eq(true)))
+      from("jnt:page")
+        .where((p) => not(p.prop("j:published").eq(true)))
         .limit(10),
     );
     assert.equal(negated.methods().includes("factory.not"), true);
@@ -250,8 +248,8 @@ describe("executeQuery, conflicts and refusals", () => {
     const upperCased = lab();
     executeQuery(
       upperCased.session,
-      from("jnt:page", "p")
-        .where(({ p }) => p.prop("jcr:title").upper().eq("HOME"))
+      from("jnt:page")
+        .where((p) => p.prop("jcr:title").upper().eq("HOME"))
         .limit(10),
     );
     assert.equal(upperCased.methods().includes("factory.upperCase"), true);
@@ -262,7 +260,7 @@ describe("executeQuery, conflicts and refusals", () => {
     const { session, calls } = lab();
     // The type state already refuses this call, and a JavaScript caller does not see the types, so
     // the cast is what a `.jsx` module reaches the seam with.
-    const unbounded = from("jnt:page", "p") as unknown as Executable<"p">;
+    const unbounded = from("jnt:page") as unknown as Executable<"jnt:page">;
     const error = caught(() => executeQuery(session, unbounded));
 
     assert.equal(error?.code, "UNSUPPORTED");
@@ -274,14 +272,14 @@ describe("executeQuery, conflicts and refusals", () => {
 
   test("a limit passed in the options satisfies the rule for a builder that carries none", () => {
     const { session, firstArgs } = lab();
-    const unbounded = from("jnt:page", "p") as unknown as Executable<"p">;
+    const unbounded = from("jnt:page") as unknown as Executable<"jnt:page">;
     executeQuery(session, unbounded, { limit: 10 });
     assert.deepEqual(firstArgs("setLimit"), [10]);
   });
 
   test("unboundedSlow satisfies the rule, because the call asked for it", () => {
     const { session, methods } = lab();
-    executeQuery(session, from("jnt:page", "p").unboundedSlow());
+    executeQuery(session, from("jnt:page").unboundedSlow());
     assert.equal(methods().includes("execute"), true);
   });
 
@@ -290,8 +288,8 @@ describe("executeQuery, conflicts and refusals", () => {
     const error = caught(() =>
       executeQuery(
         session,
-        from("jnt:page", "p")
-          .whereSlow(({ p }) => p.name().likeSlow("home%"))
+        from("jnt:page")
+          .whereSlow((p) => p.name().likeSlow("home%"))
           .limit(10),
       ),
     );

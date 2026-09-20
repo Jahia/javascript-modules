@@ -23,7 +23,7 @@ const session = currentNode.getSession();
 const a = getNodesByJCRQuery(session, "SELECT * FROM [jnt:news]", 10);
 
 // The same query, built
-const b = getNodesByJCRQuery(session, from("jnt:news", "n").limit(10));
+const b = getNodesByJCRQuery(session, from("jnt:news").limit(10));
 ```
 
 Prefer the builder. A statement is a string, so you escape by hand every value that you put in it. A mistake gives a syntax error at runtime, or a query that reads more content than you meant. The builder puts each value in a typed literal, so a title that contains a quote is safe. The compiler also checks the query while you write it.
@@ -34,20 +34,22 @@ The examples below also use `and`, `not`, `date`, `double`, `$`, `qom`, `Operato
 
 ## A first query
 
-`from()` takes a node type and an alias. The alias is the name the callbacks receive.
+`from()` takes a node type. Each callback receives the selector of that node type, and the call site gives it the name it wants.
 
 ```tsx
-const news = from("jnt:news", "n")
-  .where(({ n }) => n.isDescendantOf(`/sites/${siteKey}/contents`))
-  .orderBy(({ n }) => n.prop("date").desc())
+const news = from("jnt:news")
+  .where((n) => n.isDescendantOf(`/sites/${siteKey}/contents`))
+  .orderBy((n) => n.prop("date").desc())
   .limit(10);
 
 const nodes = getNodesByJCRQuery(session, news);
 // For a site key of "acme", Jahia formats this query as:
-// SELECT n.* FROM [jnt:news] AS n WHERE ISDESCENDANTNODE(n, ['/sites/acme/contents']) ORDER BY n.date DESC
+// SELECT [jnt:news].* FROM [jnt:news] WHERE ISDESCENDANTNODE([jnt:news], ['/sites/acme/contents']) ORDER BY [jnt:news].date DESC
 ```
 
-A query with no explicit column selects one wildcard column per selector, which is why the statement above starts with `SELECT n.*`. `select()` names the columns of the statement, as the join example below does. It shapes the statement and nothing else: `getNodesByJCRQuery` and `useJCRQuery` return nodes whatever the columns say, so a named column is not a field of the result. Read the value from the node that comes back.
+A selector that carries no alias is named after its node type, which is the name you read in the statement above. Pass an alias as the second argument of `from()` to name it yourself. A query then hands its callbacks a record keyed by alias, as in `.where(({ n }) => ...)`, which is how a join tells its two sides apart. The join example below is written that way.
+
+A query with no explicit column selects one wildcard column per selector, which is why the statement above starts with `SELECT [jnt:news].*`. `select()` names the columns of the statement, as the join example below does. It shapes the statement and nothing else: `getNodesByJCRQuery` and `useJCRQuery` return nodes whatever the columns say, so a named column is not a field of the result. Read the value from the node that comes back.
 
 A builder is immutable, so every call returns a new builder and the base is never changed. One base therefore serves several pages:
 
@@ -67,10 +69,10 @@ A statement takes the same decision explicitly. `useJCRQuery({ query })` without
 A comparison accepts a plain JavaScript value, and the builder wraps that value in a typed literal. Use an explicit constructor when the property type is not the type that the value infers.
 
 ```tsx
-from("jnt:event", "e")
-  .where(({ e }) => e.prop("startDate").ge(date("2026-09-01T00:00:00.000+02:00")))
+from("jnt:event")
+  .where((e) => e.prop("startDate").ge(date("2026-09-01T00:00:00.000+02:00")))
   .limit(100);
-// SELECT e.* FROM [jnt:event] AS e WHERE e.startDate >= CAST('2026-09-01T00:00:00.000+02:00' AS DATE)
+// SELECT [jnt:event].* FROM [jnt:event] WHERE [jnt:event].startDate >= CAST('2026-09-01T00:00:00.000+02:00' AS DATE)
 ```
 
 `date()` accepts a `Date` or an ISO 8601 string that carries milliseconds and a zone. A string without a time is refused, so `date("2026-09-01")` throws. The other constructors are `long()`, `double()`, `decimal()`, `name()`, `path()`, `reference()`, `weakReference()` and `uri()`.
@@ -78,8 +80,8 @@ from("jnt:event", "e")
 A value that the query does not know yet goes in a bind variable, and `bind()` gives that variable a value at execution:
 
 ```tsx
-const upcoming = from("jnt:event", "e")
-  .where(({ e }) => e.prop("startDate").ge($("since")))
+const upcoming = from("jnt:event")
+  .where((e) => e.prop("startDate").ge($("since")))
   .limit(5);
 
 const events = getNodesByJCRQuery(session, upcoming.bind({ since: new Date() }));
@@ -92,11 +94,11 @@ The builder replaces each variable with a typed literal before the query reaches
 `fullText()` builds a full text constraint, and `score()` gives the relevance that Lucene computed for a node. Both constructs are served by the index, and an ordering on the score is sorted in Lucene as well.
 
 ```tsx
-from("jnt:article", "a")
-  .where(({ a }) => a.fullText("graal*"))
-  .orderBy(({ a }) => a.score().desc())
+from("jnt:article")
+  .where((a) => a.fullText("graal*"))
+  .orderBy((a) => a.score().desc())
   .limit(10);
-// SELECT a.* FROM [jnt:article] AS a WHERE CONTAINS(a.*, 'graal*') ORDER BY SCORE(a) DESC
+// SELECT [jnt:article].* FROM [jnt:article] WHERE CONTAINS([jnt:article].*, 'graal*') ORDER BY SCORE([jnt:article]) DESC
 ```
 
 `fullText()` on a selector searches every property of the node. Call it on a property reference to search one property, as in `a.prop("body").fullText("graal*")`. A comparison on the score is the slow case, so its methods are named `gtSlow()`, `eqSlow()` and so on.
@@ -118,8 +120,8 @@ A wildcard may sit anywhere, the first position included, and Jahia serves every
 Three methods take literal text instead of a pattern and escape it for you, so a `%` or a `_` in the text matches itself:
 
 ```tsx
-from("jnt:news", "n")
-  .where(({ n }) =>
+from("jnt:news")
+  .where((n) =>
     or(
       n.prop("jcr:title").startsWith("50% off"), // LIKE '50\% off%'
       n.prop("jcr:title").endsWith(" off"), // LIKE '% off'
@@ -142,8 +144,8 @@ Escape `%`, `_` and the backslash, and nothing else, when you write a pattern by
 Three more methods build a constraint that would otherwise be written by hand. Each folds into index operators, so `where()` accepts them all.
 
 ```tsx
-from("jnt:news", "n")
-  .where(({ n }) =>
+from("jnt:news")
+  .where((n) =>
     and(
       n.prop("category").in(["sport", "culture", "science"]),
       n.prop("readingTime").between(2, 10),
@@ -165,13 +167,13 @@ Jahia's query engine serves most constraints from the Lucene index, and it evalu
 
 ```tsx
 // Served by the index
-from("jnt:page", "p")
-  .where(({ p }) => p.prop("jcr:title").like("A%"))
+from("jnt:page")
+  .where((p) => p.prop("jcr:title").like("A%"))
   .limit(20);
 
 // Evaluated in memory, so the name carries `Slow` and only `whereSlow` accepts it
-from("jnt:page", "p")
-  .whereSlow(({ p }) => p.prop("longText").lengthSlow().gtSlow(3))
+from("jnt:page")
+  .whereSlow((p) => p.prop("longText").lengthSlow().gtSlow(3))
   .limit(20);
 ```
 
@@ -200,17 +202,19 @@ from("jnt:page", "p")
 The `qom` factory is the escape hatch for a construct that the facade does not express, and a factory node mixes into a builder callback:
 
 ```tsx
-from("jnt:page", "p")
-  .where(({ p }) =>
+from("jnt:page")
+  .where(() =>
     qom.comparison(
-      qom.lowerCase(qom.propertyValue("p", "jcr:title")),
+      qom.lowerCase(qom.propertyValue("jnt:page", "jcr:title")),
       Operator.EQUAL_TO,
       literal("home"),
     ),
   )
   .limit(50);
-// SELECT p.* FROM [jnt:page] AS p WHERE LOWER(p.[jcr:title]) = 'home'
+// SELECT [jnt:page].* FROM [jnt:page] WHERE LOWER([jnt:page].[jcr:title]) = 'home'
 ```
+
+A factory call names its selector with a string, so it needs the name the query gave that selector. Above it is `jnt:page`, the node type, because the query declared no alias. `p.selectorName` on the reference the callback receives holds the same name.
 
 `LENGTH` carries one more limit. Over an internationalized property it matches nothing, because the translated value lives on a `jnt:translation` child node while `LENGTH` reads the node itself. Use `LENGTH` on a property that is not internationalized.
 
@@ -239,8 +243,8 @@ One finding is expected rather than exceptional. Every ordered query carries the
 `limit` and `offset` are not applied to the result in JavaScript. Both values travel to Lucene, which receives `offset + limit` as a bound and stops the hit loop there. The cost of a bounded query is the cost of one page, and not the cost of the whole result set.
 
 ```tsx
-const page = from("jnt:news", "n")
-  .orderBy(({ n }) => n.prop("date").desc())
+const page = from("jnt:news")
+  .orderBy((n) => n.prop("date").desc())
   .limit(20)
   .offset(40);
 ```
@@ -307,23 +311,26 @@ An offset has to walk the rows it skips. Carry the last value of the previous pa
 ```tsx
 const PAGE = 20;
 
-const firstPage = from("jnt:news", "n")
-  .where(({ n }) => n.isDescendantOf(`/sites/${siteKey}/contents`))
-  .orderBy(({ n }) => n.prop("date").desc())
+const firstPage = from("jnt:news")
+  .where((n) => n.isDescendantOf(`/sites/${siteKey}/contents`))
+  .orderBy((n) => n.prop("date").desc())
   .limit(PAGE);
 
-const nextPage = from("jnt:news", "n")
-  .where(({ n }) =>
+const nextPage = from("jnt:news")
+  .where((n) =>
     and(n.isDescendantOf(`/sites/${siteKey}/contents`), n.prop("date").lt(date(lastDateOfPage))),
   )
-  .orderBy(({ n }) => n.prop("date").desc())
+  .orderBy((n) => n.prop("date").desc())
   .limit(PAGE);
 ```
 
 Every page then costs the same as the first page, because no row is skipped and walked. The ordering property must be unique. When two nodes share a value on a page boundary, one of the two nodes is skipped or repeated. Add a second ordering on the identifier when the value can repeat:
 
 ```tsx
-.orderBy(({ n }) => n.prop("date").desc(), ({ n }) => n.prop("jcr:uuid").asc())
+.orderBy(
+  (n) => n.prop("date").desc(),
+  (n) => n.prop("jcr:uuid").asc(),
+)
 ```
 
 ## A stable list while content changes
@@ -335,9 +342,9 @@ const identifiers: string[] = [];
 const PAGE = 100;
 
 for (let offset = 0; ; offset += PAGE) {
-  const query = from("jnt:content", "n")
-    .where(({ n }) => and(n.isDescendantOf(scope), not(n.prop("jcr:language").exists())))
-    .orderBy(({ n }) => n.prop("jcr:uuid").asc())
+  const query = from("jnt:content")
+    .where((n) => and(n.isDescendantOf(scope), not(n.prop("jcr:language").exists())))
+    .orderBy((n) => n.prop("jcr:uuid").asc())
     .limit(PAGE)
     .offset(offset);
 

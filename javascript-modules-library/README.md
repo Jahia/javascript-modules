@@ -183,7 +183,7 @@ const pages = useJCRQuery({ query: "SELECT * FROM [jnt:page]", limit: 20 });
 
 // A query built with `from()`, which carries its own limit and offset
 const news = useJCRQuery({
-  query: from("jnt:news", "n").limit(10).offset(20),
+  query: from("jnt:news").limit(10).offset(20),
 });
 ```
 
@@ -243,7 +243,7 @@ This function is used to get nodes by a JCR query.
 const pages = getNodesByJCRQuery(session, "SELECT * FROM [jnt:page]", limit, offset);
 
 // A built query carries its own limit and offset, so both parameters are left out
-const news = getNodesByJCRQuery(session, from("jnt:news", "n").limit(10).offset(20));
+const news = getNodesByJCRQuery(session, from("jnt:news").limit(10).offset(20));
 ```
 
 A built query must have a limit before it is accepted here, and the compiler enforces it. A positional `limit` or `offset` next to a built query that carries one throws a `QueryError` whose code is `LIMIT_CONFLICT`. Only one of the two values could win.
@@ -255,16 +255,16 @@ This group builds a JCR query as a typed object instead of a JCR SQL2 string. Th
 ```tsx
 import { from, getNodesByJCRQuery } from "@jahia/javascript-modules-library";
 
-const news = from("jnt:news", "n")
-  .where(({ n }) => n.isDescendantOf("/sites/acme/contents"))
-  .orderBy(({ n }) => n.prop("date").desc())
+const news = from("jnt:news")
+  .where((n) => n.isDescendantOf("/sites/acme/contents"))
+  .orderBy((n) => n.prop("date").desc())
   .limit(10);
 
 const nodes = getNodesByJCRQuery(session, news);
-// SELECT n.* FROM [jnt:news] AS n WHERE ISDESCENDANTNODE(n, ['/sites/acme/contents']) ORDER BY n.date DESC
+// SELECT [jnt:news].* FROM [jnt:news] WHERE ISDESCENDANTNODE([jnt:news], ['/sites/acme/contents']) ORDER BY [jnt:news].date DESC
 ```
 
-A query with no explicit column names one wildcard column per selector, which is why every statement below starts with `SELECT n.*` and not with `SELECT *`. That column is what makes Jahia's internationalization rewrite see the selector, so a built query and the statement it mirrors return the same nodes. The statements in this file are the ones the formatter writes for the model as it is built. A localized session adds a `jcr:language` constraint to every selector.
+A selector that carries no alias is named after its node type, which is the name the statement above repeats. A query with no explicit column names one wildcard column per selector, which is why every statement below starts with that name and a `.*` and not with `SELECT *`. That column is what makes Jahia's internationalization rewrite see the selector, so a built query and the statement it mirrors return the same nodes. The statements in this file are the ones the formatter writes for the model as it is built. A localized session adds a `jcr:language` constraint to every selector.
 
 Three rules shape this API:
 
@@ -279,8 +279,8 @@ The guide `docs/2-guides/4-querying/README.md` covers pagination, total counts a
 This function creates a bind variable, which the query carries until `bind()` gives it a value. It is the short name of `bindVariable`.
 
 ```tsx
-const upcoming = from("jnt:event", "e")
-  .where(({ e }) => e.prop("startDate").ge($("since")))
+const upcoming = from("jnt:event")
+  .where((e) => e.prop("startDate").ge($("since")))
   .limit(5);
 
 getNodesByJCRQuery(session, upcoming.bind({ since: new Date() }));
@@ -293,8 +293,8 @@ The sink replaces each variable with a typed literal before it calls the host. A
 This function combines constraints with `AND`. It takes one constraint or more, and one constraint folds to itself.
 
 ```tsx
-from("jnt:page", "p")
-  .where(({ p }) => and(p.prop("j:published").eq(true), p.prop("jcr:title").like("A%")))
+from("jnt:page")
+  .where((p) => and(p.prop("j:published").eq(true), p.prop("jcr:title").like("A%")))
   .limit(20);
 ```
 
@@ -303,8 +303,8 @@ from("jnt:page", "p")
 This function creates a `DATE` literal out of a `Date` or an ISO 8601 string that carries milliseconds and a zone. A string without a time or without milliseconds is refused, because Jackrabbit reads the string at fixed offsets, so `date("2026-09-01")` throws.
 
 ```tsx
-from("jnt:event", "e")
-  .where(({ e }) => e.prop("startDate").ge(date("2026-09-01T00:00:00.000+02:00")))
+from("jnt:event")
+  .where((e) => e.prop("startDate").ge(date("2026-09-01T00:00:00.000+02:00")))
   .limit(100);
 ```
 
@@ -332,18 +332,20 @@ This function creates a `DOUBLE` literal out of a number, a bigint or a string. 
 
 ### `from`
 
-This function starts a query. It takes a node type and an alias, and the alias is the name the callbacks receive.
+This function starts a query over one node type. Each callback then receives the selector of that node type, and the call site names it.
 
 ```tsx
-from("jnt:page", "p")
-  .where(({ p }) => p.prop("jcr:title").eq("Home"))
+from("jnt:page")
+  .where((p) => p.prop("jcr:title").eq("Home"))
   .limit(20);
-// SELECT p.* FROM [jnt:page] AS p WHERE p.[jcr:title] = 'Home'
+// SELECT [jnt:page].* FROM [jnt:page] WHERE [jnt:page].[jcr:title] = 'Home'
 ```
+
+A second argument names the selector. The callbacks then receive a record keyed by that alias, as in `.where(({ p }) => ...)`. A join names both of its sides, so it needs a builder that was started with an alias. On a builder started without one, the compiler refuses the node type passed to `joinSlow` and prints what to call instead. The join example at the end of this section is written that way.
 
 It also lifts a model that `qom.createQuery` built, so that the factory and the builder mix in one query.
 
-The builder has `where`, `whereSlow`, `orderBy`, `orderBySlow`, `select`, `joinSlow`, `limit`, `unboundedSlow`, `offset`, `bind`, `build` and `diagnose`. `select` names the columns of the statement and changes nothing the two seams hand back: both return the nodes of the left selector whatever the columns say. The callback receives one reference per alias, and a reference gives `prop(name)`, `fullText(expression)`, `all()`, `isDescendantOf(path)`, `isChildOf(path)`, `isSameAs(path)`, `name()`, `localName()` and `score()`.
+The builder has `where`, `whereSlow`, `orderBy`, `orderBySlow`, `select`, `joinSlow`, `limit`, `unboundedSlow`, `offset`, `bind`, `build` and `diagnose`. `select` names the columns of the statement and changes nothing the two seams hand back: both return the nodes of the left selector whatever the columns say. The callback receives the one selector reference of a query that declared no alias, and a record of one reference per alias otherwise. A reference gives `prop(name)`, `fullText(expression)`, `all()`, `isDescendantOf(path)`, `isChildOf(path)`, `isSameAs(path)`, `name()`, `localName()` and `score()`.
 
 `fullText` runs a JCR full text search over the analysed index. It matches whole terms and it is not a substring match, which is what `contains` means in Prisma and in Drizzle. The terms are stemmed and lower case, so `fullText("seat")` finds a value of `500 seats` while `fullText("seats*")` finds nothing, because a wildcard term is not stemmed and the index holds the stem. Use `contains` for a substring of the characters of one property.
 
@@ -396,10 +398,10 @@ This function creates a `NAME` literal, which is the type a comparison on `NAME(
 This function negates a constraint.
 
 ```tsx
-from("jnt:page", "p")
-  .where(({ p }) => not(p.prop("j:published").eq(true)))
+from("jnt:page")
+  .where((p) => not(p.prop("j:published").eq(true)))
   .limit(50);
-// SELECT p.* FROM [jnt:page] AS p WHERE NOT p.[j:published] = true
+// SELECT [jnt:page].* FROM [jnt:page] WHERE NOT [jnt:page].[j:published] = true
 ```
 
 One case fails at execution. Jahia's query rewriter rebuilds a `NOT` with a null child once it has changed the node under it. The rewriter changes that node for a property it moves to a `jnt:translation` selector. That redirect needs an internationalized property in a localized session, so a negation over any other property runs. `diagnose` reports the risk as a `none` finding marked `conditional`, and the builder does not refuse the query.
@@ -461,7 +463,7 @@ The object it returns is the host query, not a builder. Calling `execute()` on i
 
 ### `unchecked`
 
-This function accepts a constraint whose selector name is held in a `string` variable, and defers the selector check to `build()`. Use it when an alias cannot be a literal type, for instance when it comes from a configuration value.
+This function accepts a constraint whose selector name is held in a `string` variable, and defers the selector check to `build()`. Use it when the selector name cannot be a literal type, for instance when it comes from a configuration value.
 
 ### `uri`
 

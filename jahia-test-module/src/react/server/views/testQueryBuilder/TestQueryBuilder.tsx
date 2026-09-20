@@ -199,33 +199,33 @@ jahiaComponent(
     );
 
     // 1. A property filter, with the path scope every case shares.
-    const property = from("jnt:event", "e")
-      .where(({ e }) => and(e.isDescendantOf(scope), e.prop("jcr:title").eq("Event 1")))
+    const property = from("jnt:event")
+      .where((e) => and(e.isDescendantOf(scope), e.prop("jcr:title").eq("Event 1")))
       .limit(20);
 
     // 2. A path scope on its own, ordered on a property.
-    const all = from("jnt:event", "e")
-      .where(({ e }) => e.isDescendantOf(scope))
-      .orderBy(({ e }) => e.prop("jcr:title").asc());
+    const all = from("jnt:event")
+      .where((e) => e.isDescendantOf(scope))
+      .orderBy((e) => e.prop("jcr:title").asc());
 
     // 3. One page of the same query. The base is unchanged, because a builder is immutable.
     const page = all.limit(2).offset(2);
 
     // 4. Full text search, ordered on the relevance score. Both are native Lucene constructs.
-    const fullText = from("jnt:event", "e")
-      .where(({ e }) => and(e.isDescendantOf(scope), e.fullText("Event")))
-      .orderBy(({ e }) => e.score().desc())
+    const fullText = from("jnt:event")
+      .where((e) => and(e.isDescendantOf(scope), e.fullText("Event")))
+      .orderBy((e) => e.score().desc())
       .limit(10);
 
     // 5. A typed date literal.
-    const dateLiteral = from("jnt:event", "e")
-      .where(({ e }) => and(e.isDescendantOf(scope), e.prop("startDate").ge(date(EPOCH))))
+    const dateLiteral = from("jnt:event")
+      .where((e) => and(e.isDescendantOf(scope), e.prop("startDate").ge(date(EPOCH))))
       .limit(10);
 
     // 6. The same query through a bind variable. The sink inlines the value as a typed literal, so
     // the statement is the one of case 5.
-    const bind = from("jnt:event", "e")
-      .where(({ e }) => and(e.isDescendantOf(scope), e.prop("startDate").ge($("since"))))
+    const bind = from("jnt:event")
+      .where((e) => and(e.isDescendantOf(scope), e.prop("startDate").ge($("since"))))
       .limit(10)
       .bind({ since: date(EPOCH) });
 
@@ -251,44 +251,44 @@ jahiaComponent(
     // and `LENGTH` reads the property from the node itself, where a translated value does not
     // live. The `lengthOnI18n` and `lengthOnPlain` probes below isolate that, and `mixedPlain`
     // repeats this case over a property that is not internationalised.
-    const mixed = from("jnt:event", "e")
-      .where(({ e }) =>
+    const mixed = from("jnt:event")
+      .where((e) =>
         and(
           e.isDescendantOf(scope),
           not(e.isSameAs(`${scope}/event-1`)),
           or(
             e.prop("jcr:title").like("Event%"),
             qom.comparison(
-              qom.lowerCase(qom.propertyValue("e", "jcr:title")),
+              qom.lowerCase(qom.propertyValue("jnt:event", "jcr:title")),
               Operator.EQUAL_TO,
               literal("event 2"),
             ),
           ),
         ),
       )
-      .whereSlow(({ e }) => e.prop("jcr:title").lengthSlow().gtSlow(3))
-      .orderBySlow(({ e }) => e.prop("jcr:title").lower().descSlow())
+      .whereSlow((e) => e.prop("jcr:title").lengthSlow().gtSlow(3))
+      .orderBySlow((e) => e.prop("jcr:title").lower().descSlow())
       .limit(50);
 
     // The same constructs with the `LENGTH` predicate moved to `eventsType`, which the fixture sets
     // on every event and which is not internationalised. This is the case that returns rows.
-    const mixedPlain = from("jnt:event", "e")
-      .where(({ e }) =>
+    const mixedPlain = from("jnt:event")
+      .where((e) =>
         and(
           e.isDescendantOf(scope),
           not(e.isSameAs(`${scope}/event-1`)),
           or(
             e.prop("jcr:title").like("Event%"),
             qom.comparison(
-              qom.lowerCase(qom.propertyValue("e", "jcr:title")),
+              qom.lowerCase(qom.propertyValue("jnt:event", "jcr:title")),
               Operator.EQUAL_TO,
               literal("event 2"),
             ),
           ),
         ),
       )
-      .whereSlow(({ e }) => e.prop("eventsType").lengthSlow().gtSlow(3))
-      .orderBySlow(({ e }) => e.prop("jcr:title").lower().descSlow())
+      .whereSlow((e) => e.prop("eventsType").lengthSlow().gtSlow(3))
+      .orderBySlow((e) => e.prop("jcr:title").lower().descSlow())
       .limit(50);
 
     // 9. A NOT and an UPPER over a property. Both reach Jahia: they fail only for a property the
@@ -296,8 +296,8 @@ jahiaComponent(
     // localised session, and `diagnose()` reports that risk without refusing the query. The two
     // properties here are not internationalised. `jcr:language` is the one the snapshot loop of
     // the querying guide negates, and `eventsType` is set on every event of the fixture.
-    const negated = from("jnt:event", "e")
-      .where(({ e }) =>
+    const negated = from("jnt:event")
+      .where((e) =>
         and(
           e.isDescendantOf(scope),
           not(e.prop("jcr:language").exists()),
@@ -308,8 +308,8 @@ jahiaComponent(
 
     // One literal of every type the builder can write. The query is never executed: it is here so
     // that the statement proves the value factory accepted each type code.
-    const literals = from("jnt:event", "e")
-      .where(({ e }) =>
+    const literals = from("jnt:event")
+      .where((e) =>
         and(
           e.isDescendantOf(scope),
           or(
@@ -345,29 +345,29 @@ jahiaComponent(
     // child, while `eventsType` is a plain property of the node itself. The plan expects `NOT` and
     // `UPPER` to fail over a property the rewrite moves to a translation selector, and says nothing
     // about `LENGTH`. Each probe changes one thing only.
-    const lengthOnPlain = from("jnt:event", "e")
-      .where(({ e }) => e.isDescendantOf(scope))
-      .whereSlow(({ e }) => e.prop("eventsType").lengthSlow().gtSlow(3))
+    const lengthOnPlain = from("jnt:event")
+      .where((e) => e.isDescendantOf(scope))
+      .whereSlow((e) => e.prop("eventsType").lengthSlow().gtSlow(3))
       .limit(10);
-    const lengthOnI18n = from("jnt:event", "e")
-      .where(({ e }) => e.isDescendantOf(scope))
-      .whereSlow(({ e }) => e.prop("jcr:title").lengthSlow().gtSlow(3))
+    const lengthOnI18n = from("jnt:event")
+      .where((e) => e.isDescendantOf(scope))
+      .whereSlow((e) => e.prop("jcr:title").lengthSlow().gtSlow(3))
       .limit(10);
-    const upperOnI18n = from("jnt:event", "e")
-      .where(({ e }) => and(e.isDescendantOf(scope), e.prop("jcr:title").upper().eq("EVENT 1")))
+    const upperOnI18n = from("jnt:event")
+      .where((e) => and(e.isDescendantOf(scope), e.prop("jcr:title").upper().eq("EVENT 1")))
       .limit(10);
-    const notOnI18n = from("jnt:event", "e")
-      .where(({ e }) => and(e.isDescendantOf(scope), not(e.prop("jcr:title").eq("Event 1"))))
+    const notOnI18n = from("jnt:event")
+      .where((e) => and(e.isDescendantOf(scope), not(e.prop("jcr:title").eq("Event 1"))))
       .limit(10);
 
     // The same question for an in memory ordering, which reads the property once per hit.
-    const lowerOrderOnI18n = from("jnt:event", "e")
-      .where(({ e }) => e.isDescendantOf(scope))
-      .orderBySlow(({ e }) => e.prop("jcr:title").lower().descSlow())
+    const lowerOrderOnI18n = from("jnt:event")
+      .where((e) => e.isDescendantOf(scope))
+      .orderBySlow((e) => e.prop("jcr:title").lower().descSlow())
       .limit(10);
-    const lowerOrderOnPlain = from("jnt:event", "e")
-      .where(({ e }) => e.isDescendantOf(scope))
-      .orderBySlow(({ e }) => e.prop("eventsType").lower().descSlow())
+    const lowerOrderOnPlain = from("jnt:event")
+      .where((e) => e.isDescendantOf(scope))
+      .orderBySlow((e) => e.prop("eventsType").lower().descSlow())
       .limit(10);
 
     // The reference literal check. `JCRValueFactoryImpl` remaps REFERENCE to WEAKREFERENCE, so a
@@ -379,13 +379,11 @@ jahiaComponent(
     const referenced = session.nodeExists(`${scope}/event-1`)
       ? session.getNode(`${scope}/event-1`).getIdentifier()
       : "00000000-0000-0000-0000-000000000000";
-    const strongRef = from("javascriptExample:testGetNodeProps", "n")
-      .where(({ n }) =>
-        and(n.isDescendantOf(scope), n.prop("weakreference").eq(reference(referenced))),
-      )
+    const strongRef = from("javascriptExample:testGetNodeProps")
+      .where((n) => and(n.isDescendantOf(scope), n.prop("weakreference").eq(reference(referenced))))
       .limit(10);
-    const weakRef = from("javascriptExample:testGetNodeProps", "n")
-      .where(({ n }) =>
+    const weakRef = from("javascriptExample:testGetNodeProps")
+      .where((n) =>
         and(n.isDescendantOf(scope), n.prop("weakreference").eq(weakReference(referenced))),
       )
       .limit(10);
@@ -393,8 +391,8 @@ jahiaComponent(
     // 10. The folded predicates, all four in one query. Each folds into index operators, so
     // `where()` takes them. `eventsType` is `meeting` on every event of the fixture and it is not
     // internationalised, and no event carries `jcr:language` on the node itself.
-    const predicates = from("jnt:event", "e")
-      .where(({ e }) =>
+    const predicates = from("jnt:event")
+      .where((e) =>
         and(
           e.isDescendantOf(scope),
           e.prop("eventsType").in(["meeting", "webinar"]),
@@ -411,72 +409,70 @@ jahiaComponent(
     // The fixture holds one `testGetNodeProps` node per interesting value: `50% off`, `500 seats`,
     // `meeting`, `mee_ing`, `MeetUp` and `a\b`, plus one node whose multi-valued `multipleSmallText`
     // holds `50% off` next to an unrelated value.
-    const patternBase = from("javascriptExample:testGetNodeProps", "n");
+    const patternBase = from("javascriptExample:testGetNodeProps");
 
     // `startsWith("50%")` writes `50\%%`. One node means the backslash is the escape character the
     // JCR specification defines, two mean the `%` stayed a wildcard, and none mean the backslash
     // reached the index as a character. It returned one node, the `50% off` one.
     const startsWithLiteral = patternBase
-      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").startsWith("50%")))
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").startsWith("50%")))
       .limit(10);
     // The control, with the wildcard written on purpose through the raw pattern method. It must
     // return both `50% off` and `500 seats`, so a run that returns nothing for both cases is a
     // broken fixture and not an answer about the escaping.
     const likeWildcard = patternBase
-      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").like("50%")))
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").like("50%")))
       .limit(10);
     // The same pair for the other wildcard. The escaped form selects `mee_ing` alone, the raw one
     // selects `meeting` as well, which is what makes `_` a wildcard and the escape real.
     const startsWithUnderscore = patternBase
-      .where(({ n }) =>
-        and(n.isDescendantOf(patternScope), n.prop("smallText").startsWith("mee_ing")),
-      )
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").startsWith("mee_ing")))
       .limit(10);
     const likeUnderscore = patternBase
-      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").like("mee_ing")))
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").like("mee_ing")))
       .limit(10);
     // An escaped backslash matches one literal backslash, which is the third escape.
     const startsWithBackslash = patternBase
-      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").startsWith("a\\b")))
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").startsWith("a\\b")))
       .limit(10);
     // The leading wildcard, which the engine accepts and serves from the index.
     const endsWithLiteral = patternBase
-      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").endsWith(" off")))
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").endsWith(" off")))
       .limit(10);
     // The surrounding wildcard, with an escaped `%` in the middle of the text.
     const containsLiteral = patternBase
-      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").contains("0% o")))
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").contains("0% o")))
       .limit(10);
     // `LIKE` compares the whole stored value and not its terms, so a substring needs `contains()`.
     const likeWholeValue = patternBase
-      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").like("off")))
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").like("off")))
       .limit(10);
     // `LIKE` is case sensitive, and the case transform is how a caller opts out of that. The first
     // case returns nothing and the second returns the `MeetUp` node.
     const containsCased = patternBase
-      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").contains("eetu")))
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").contains("eetu")))
       .limit(10);
     const lowerContains = patternBase
-      .where(({ n }) =>
+      .where((n) =>
         and(n.isDescendantOf(patternScope), n.prop("smallText").lower().contains("eetu")),
       )
       .limit(10);
     // The escape survives the case transform, which uses a different term enumeration.
     const lowerContainsLiteral = patternBase
-      .where(({ n }) =>
+      .where((n) =>
         and(n.isDescendantOf(patternScope), n.prop("smallText").lower().contains("0% o")),
       )
       .limit(10);
     // A local name takes the same pattern language, leading wildcard included.
     const localNameEndsWith = patternBase
-      .where(({ n }) => and(n.isDescendantOf(patternScope), n.localName().endsWith("-percent")))
+      .where((n) => and(n.isDescendantOf(patternScope), n.localName().endsWith("-percent")))
       .limit(10);
     const localNameContains = patternBase
-      .where(({ n }) => and(n.isDescendantOf(patternScope), n.localName().contains("-under")))
+      .where((n) => and(n.isDescendantOf(patternScope), n.localName().contains("-under")))
       .limit(10);
     // A multi-valued property matches when any one of its values matches.
     const multiContains = patternBase
-      .where(({ n }) =>
+      .where((n) =>
         and(n.isDescendantOf(patternScope), n.prop("multipleSmallText").contains("0% o")),
       )
       .limit(10);
@@ -485,16 +481,16 @@ jahiaComponent(
     // because those four characters are there. The wildcard form is not stemmed, so `seats*` misses
     // the stem the index holds and returns nothing.
     const fullTextStem = patternBase
-      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").fullText("seat")))
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").fullText("seat")))
       .limit(10);
     const fullTextWildcard = patternBase
-      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").fullText("seats*")))
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").fullText("seats*")))
       .limit(10);
 
     // A page of a query ordered on the identifier, which is the stable tiebreaker.
-    const stable = from("jnt:event", "e")
-      .where(({ e }) => e.isDescendantOf(scope))
-      .orderBy(({ e }) => e.prop("jcr:uuid").asc())
+    const stable = from("jnt:event")
+      .where((e) => e.isDescendantOf(scope))
+      .orderBy((e) => e.prop("jcr:uuid").asc())
       .limit(2)
       .offset(2);
 

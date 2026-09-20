@@ -90,8 +90,8 @@ describe("toQOM, walk order", () => {
   test("it builds every child before the node that holds it", () => {
     const { session, methods } = lab();
     toQOM(
-      from("jnt:page", "p")
-        .where(({ p }) => p.prop("jcr:title").eq("Home"))
+      from("jnt:page")
+        .where((p) => p.prop("jcr:title").eq("Home"))
         .limit(10).model,
       session,
     );
@@ -110,9 +110,9 @@ describe("toQOM, walk order", () => {
   test("it passes the source, the constraint, the orderings and the columns to createQuery", () => {
     const { session, firstArgs } = lab();
     toQOM(
-      from("jnt:page", "p")
-        .where(({ p }) => p.prop("jcr:title").eq("Home"))
-        .orderBy(({ p }) => p.prop("jcr:lastModified").desc()).model,
+      from("jnt:page")
+        .where((p) => p.prop("jcr:title").eq("Home"))
+        .orderBy((p) => p.prop("jcr:lastModified").desc()).model,
       session,
     );
 
@@ -166,7 +166,7 @@ describe("toQOM, walk order", () => {
   test("it builds the property value a LENGTH holds before the LENGTH", () => {
     const { session, methods } = lab();
     toQOM(
-      from("jnt:page", "p").whereSlow(({ p }) => p.prop("jcr:title").lengthSlow().gtSlow(3)).model,
+      from("jnt:page").whereSlow((p) => p.prop("jcr:title").lengthSlow().gtSlow(3)).model,
       session,
     );
 
@@ -177,7 +177,7 @@ describe("toQOM, walk order", () => {
 describe("toQOM, explicit nulls", () => {
   test("a query without a constraint passes null to createQuery", () => {
     const { session, firstArgs } = lab();
-    toQOM(from("jnt:page", "p").model, session);
+    toQOM(from("jnt:page").model, session);
     assert.equal(firstArgs("createQuery")?.[1], null);
   });
 
@@ -198,41 +198,38 @@ describe("toQOM, explicit nulls", () => {
 
   test("a wildcard column of the model keeps its two null slots", () => {
     const { session, argsOf } = lab();
-    toQOM(from("jnt:page", "p").select(({ p }) => p.all()).model, session);
-    assert.deepEqual(argsOf("column"), [["p", null, null]]);
+    toQOM(from("jnt:page").select((p) => p.all()).model, session);
+    assert.deepEqual(argsOf("column"), [["jnt:page", null, null]]);
   });
 
   test("a column without an alias passes a null column name", () => {
     const { session, argsOf } = lab();
     toQOM(
-      from("jnt:page", "p").select(
-        ({ p }) => p.prop("jcr:title").as(),
-        ({ p }) => p.prop("jcr:title").as("title"),
+      from("jnt:page").select(
+        (p) => p.prop("jcr:title").as(),
+        (p) => p.prop("jcr:title").as("title"),
       ).model,
       session,
     );
 
     assert.deepEqual(argsOf("column"), [
-      ["p", "jcr:title", null],
-      ["p", "jcr:title", "title"],
+      ["jnt:page", "jcr:title", null],
+      ["jnt:page", "jcr:title", "title"],
     ]);
   });
 
   test("a full text search over every property passes a null property name", () => {
     const { session, firstArgs } = lab();
-    toQOM(from("jnt:article", "a").where(({ a }) => a.fullText("graal*")).model, session);
+    toQOM(from("jnt:article").where((a) => a.fullText("graal*")).model, session);
     const args = firstArgs("fullTextSearch");
-    assert.equal(args?.[0], "a");
+    assert.equal(args?.[0], "jnt:article");
     assert.equal(args?.[1], null);
     assert.equal((args?.[2] as { node: string }).node, "literal");
   });
 
   test("a full text search over one property keeps that name", () => {
     const { session, firstArgs } = lab();
-    toQOM(
-      from("jnt:article", "a").where(({ a }) => a.prop("body").fullText("graal*")).model,
-      session,
-    );
+    toQOM(from("jnt:article").where((a) => a.prop("body").fullText("graal*")).model, session);
     assert.equal(firstArgs("fullTextSearch")?.[1], "body");
   });
 });
@@ -268,8 +265,8 @@ describe("toQOM, literals", () => {
 });
 
 describe("toQOM, bind variables", () => {
-  const upcoming = from("jnt:event", "e")
-    .where(({ e }) => e.prop("startDate").ge($("since")))
+  const upcoming = from("jnt:event")
+    .where((e) => e.prop("startDate").ge($("since")))
     .limit(5);
 
   test("a bound variable is inlined as a typed literal, and never reaches the host", () => {
@@ -298,7 +295,7 @@ describe("toQOM, bind variables", () => {
   test("a missing binding inside a full text search is found too", () => {
     const { session, calls } = lab();
     const error = caught(() =>
-      toQOM(from("jnt:article", "a").where(({ a }) => a.fullText($("words"))).model, session),
+      toQOM(from("jnt:article").where((a) => a.fullText($("words"))).model, session),
     );
 
     assert.equal(error?.code, "UNBOUND_VARIABLE");
@@ -310,9 +307,9 @@ describe("toQOM, bind variables", () => {
     const { session } = lab();
     const error = caught(() =>
       toQOM(
-        from("jnt:page", "p")
-          .where(({ p }) => p.prop("a").eq(1))
-          .where(({ p }) => p.prop("b").eq($("b"))).model,
+        from("jnt:page")
+          .where((p) => p.prop("a").eq(1))
+          .where((p) => p.prop("b").eq($("b"))).model,
         session,
         {},
       ),
@@ -376,13 +373,10 @@ describe("toQOM, every construct", () => {
 
   test("property existence and not reach their factory method", () => {
     const { session, methods, firstArgs } = lab();
-    toQOM(
-      from("jnt:page", "p").where(({ p }) => qom.not(p.prop("jcr:title").exists())).model,
-      session,
-    );
+    toQOM(from("jnt:page").where((p) => qom.not(p.prop("jcr:title").exists())).model, session);
 
     assert.deepEqual(methods().slice(1, 3), ["propertyExistence", "not"]);
-    assert.deepEqual(firstArgs("propertyExistence"), ["p", "jcr:title"]);
+    assert.deepEqual(firstArgs("propertyExistence"), ["jnt:page", "jcr:title"]);
   });
 
   test("the four join conditions reach their factory method with the Java argument order", () => {
@@ -432,23 +426,17 @@ describe("toQOM, every construct", () => {
 
   test("an ascending ordering and a descending ordering reach different methods", () => {
     const ascending = lab();
-    toQOM(
-      from("jnt:page", "p").orderBy(({ p }) => p.prop("jcr:title").asc()).model,
-      ascending.session,
-    );
+    toQOM(from("jnt:page").orderBy((p) => p.prop("jcr:title").asc()).model, ascending.session);
     assert.equal(ascending.methods().includes("ascending"), true);
 
     const descending = lab();
-    toQOM(
-      from("jnt:page", "p").orderBy(({ p }) => p.prop("jcr:title").desc()).model,
-      descending.session,
-    );
+    toQOM(from("jnt:page").orderBy((p) => p.prop("jcr:title").desc()).model, descending.session);
     assert.equal(descending.methods().includes("descending"), true);
   });
 
   test("the operator travels as the wire constant", () => {
     const { session, firstArgs } = lab();
-    toQOM(from("jnt:page", "p").where(({ p }) => p.prop("jcr:title").like("A%")).model, session);
+    toQOM(from("jnt:page").where((p) => p.prop("jcr:title").like("A%")).model, session);
     assert.equal(firstArgs("comparison")?.[1], Operator.LIKE);
   });
 });

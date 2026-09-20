@@ -60,11 +60,22 @@ export type Bound = "call limit(n) or unboundedSlow() before executing" | "limit
 /** The state of a builder that has no limit yet, which is the first member of {@link Bound}. */
 type NoLimit = "call limit(n) or unboundedSlow() before executing";
 
+/**
+ * Which selector references a callback receives. A query started without an alias hands the
+ * callback the one reference, and a query that declares aliases hands it the record.
+ */
+export type RefShape = "unaliased" | "aliased";
+
 /** The typed selector references a callback receives, one per declared alias. */
 export type Selectors<A extends string> = { readonly [K in A]: SelectorRef<K> };
 
-/** A model node, or a callback that builds one from the declared selector references. */
-export type Arg<A extends string, N> = N | ((selectors: Selectors<A>) => N);
+/** What a callback receives: the one reference of a query that declared no alias, or the record. */
+export type Refs<A extends string, S extends RefShape> = S extends "unaliased"
+  ? SelectorRef<A>
+  : Selectors<A>;
+
+/** A model node, or a callback that builds one from the selector references. */
+export type Arg<A extends string, S extends RefShape, N> = N | ((refs: Refs<A, S>) => N);
 
 /*
  * Selector references.
@@ -765,17 +776,24 @@ function fold<A extends string, P extends Speed>(
  * The builder.
  */
 
+/**
+ * What the compiler prints in place of the node type when `joinSlow()` is called on a builder that
+ * declared no alias. It is module local on purpose: it is a message, not a surface.
+ */
+type JoinNeedsAlias = "call from(nodeType, alias) first, because a join names both sides";
+
 /** The `on()` clause a join needs before the chain continues. A join has no `build()` without it. */
 export interface JoinClause<A extends string, C extends string, B extends Bound> {
   /** The join condition, which may name the aliases of both sides. */
-  on(condition: Arg<A | C, JoinCondition<A | C>>): QueryBuilder<A | C, B>;
+  on(condition: Arg<A | C, "aliased", JoinCondition<A | C>>): QueryBuilder<A | C, B, "aliased">;
 }
 
 /**
- * An immutable query under construction. `A` is the union of the declared aliases, and `B` says
- * whether a limit was set.
+ * An immutable query under construction. `A` is the union of the declared selector names, `B` says
+ * whether a limit was set, and `S` says what a callback receives: the one reference of a query
+ * started without an alias, or the record keyed by alias.
  */
-export interface QueryBuilder<A extends string, B extends Bound> {
+export interface QueryBuilder<A extends string, B extends Bound, S extends RefShape = "aliased"> {
   /**
    * Phantom marker for the limit state. It exists at compile time only and the object never carries
    * it. It is named `__limit` because the compiler prints this property name next to the value of
@@ -783,22 +801,25 @@ export interface QueryBuilder<A extends string, B extends Bound> {
    */
   readonly __limit?: B;
   /** Adds a constraint that runs on the index. Repeated calls are joined with `AND`. */
-  where(constraint: Arg<A, Constraint<A, "fast">>): QueryBuilder<A, B>;
+  where(constraint: Arg<A, S, Constraint<A, "fast">>): QueryBuilder<A, B, S>;
   /** Adds a constraint of any speed. Repeated calls are joined with `AND`. */
-  whereSlow(constraint: Arg<A, Constraint<A>>): QueryBuilder<A, B>;
+  whereSlow(constraint: Arg<A, S, Constraint<A>>): QueryBuilder<A, B, S>;
   /**
    * Joins another node type. Named `Slow` because Jahia's engine runs both sides unbounded and
    * merges the rows in memory. The chain continues through `on()`.
+   *
+   * A join names both sides, so it needs a builder that was started with an alias. On a builder
+   * started without one, the compiler refuses the node type and prints what to call instead.
    */
   joinSlow<T extends string, C extends string>(
-    nodeType: T,
+    nodeType: S extends "unaliased" ? JoinNeedsAlias : T,
     alias: C,
     joinType?: JoinType,
   ): JoinClause<A, C, B>;
   /** Appends orderings that Lucene sorts natively. */
-  orderBy(...orderings: Arg<A, Ordering<A, "fast">>[]): QueryBuilder<A, B>;
+  orderBy(...orderings: Arg<A, S, Ordering<A, "fast">>[]): QueryBuilder<A, B, S>;
   /** Appends orderings of any speed. */
-  orderBySlow(...orderings: Arg<A, Ordering<A>>[]): QueryBuilder<A, B>;
+  orderBySlow(...orderings: Arg<A, S, Ordering<A>>[]): QueryBuilder<A, B, S>;
   /**
    * Appends columns to the statement. An empty column list writes `SELECT *`.
    *
@@ -806,19 +827,19 @@ export interface QueryBuilder<A extends string, B extends Bound> {
    * nodes of the left selector whatever the columns say, so a named column is not a field of the
    * result. Read the value from the node that comes back.
    */
-  select(...columns: Arg<A, Column<A>>[]): QueryBuilder<A, B>;
+  select(...columns: Arg<A, S, Column<A>>[]): QueryBuilder<A, B, S>;
   /** Sets the execution limit, which is what makes the builder executable. */
-  limit(count: number): QueryBuilder<A, "limitSet">;
+  limit(count: number): QueryBuilder<A, "limitSet", S>;
   /**
    * Runs without a limit. Named `Slow` because the search then walks every hit. It stores `-1`,
    * which is the value the JCR `setLimit` contract reads as unbounded. `diagnose()` reports it as a
    * `full-scan` finding.
    */
-  unboundedSlow(): QueryBuilder<A, "limitSet">;
+  unboundedSlow(): QueryBuilder<A, "limitSet", S>;
   /** Sets the execution offset. It never enters the model. */
-  offset(count: number): QueryBuilder<A, B>;
+  offset(count: number): QueryBuilder<A, B, S>;
   /** Binds values for the bind variables of the model. Repeated calls merge. */
-  bind(values: Bindings): QueryBuilder<A, B>;
+  bind(values: Bindings): QueryBuilder<A, B, S>;
   /**
    * Runs the cross-node checks and returns the model. With `strict`, it also throws on a diagnostic
    * whose level is `none`, which is a query that fails at execution. A `none` finding marked
@@ -845,25 +866,51 @@ export interface QueryBuilder<A extends string, B extends Bound> {
   readonly execution: ExecutionOptions;
 }
 
-/** A builder that may be executed, which is one whose limit was set. */
-export type Executable<A extends string = string> = QueryBuilder<A, "limitSet">;
+/**
+ * A builder that may be executed, which is one whose limit was set.
+ *
+ * It states what the seams read instead of naming a `QueryBuilder`, so that a builder of any
+ * selector union and of either callback shape widens to it.
+ */
+export interface Executable<A extends string = string> {
+  /** The limit marker of {@link QueryBuilder}, pinned to the one state that may be executed. */
+  readonly __limit?: "limitSet";
+  /** See {@link QueryBuilder.build}. */
+  build(options?: { strict?: boolean }): QueryModel<A>;
+  /** See {@link QueryBuilder.diagnose}. */
+  diagnose(): Diagnostic[];
+  /** See {@link QueryBuilder.model}. */
+  readonly model: QueryModel<A>;
+  /** See {@link QueryBuilder.execution}. */
+  readonly execution: ExecutionOptions;
+}
 
 /** What the execution seams accept: a JCR-SQL2 statement, or a builder that carries its limit. */
 export type Queryable = string | Executable;
 
-function resolveArg<A extends string, N>(arg: Arg<A, N>, selectors: Selectors<A>): N {
-  return typeof arg === "function" ? (arg as (s: Selectors<A>) => N)(selectors) : arg;
+function resolveArg<A extends string, S extends RefShape, N>(
+  arg: Arg<A, S, N>,
+  refs: Refs<A, S>,
+): N {
+  return typeof arg === "function" ? (arg as (r: Refs<A, S>) => N)(refs) : arg;
 }
 
-function selectorsFor<A extends string>(aliases: readonly string[]): Selectors<A> {
-  const selectors: Record<string, SelectorRef<string>> = {};
-  for (const alias of aliases) {
-    selectors[alias] = selectorRef(alias);
+function refsFor<A extends string, S extends RefShape>(
+  names: readonly string[],
+  shape: S,
+): Refs<A, S> {
+  if (shape === "unaliased") {
+    return selectorRef(names[0]) as Refs<A, S>;
   }
 
-  // The map is built from the aliases the source declares, which is exactly the union `A`. The
+  const selectors: Record<string, SelectorRef<string>> = {};
+  for (const name of names) {
+    selectors[name] = selectorRef(name);
+  }
+
+  // The map is built from the names the source declares, which is exactly the union `A`. The
   // compiler cannot see that, so the shape is asserted once here.
-  return selectors as unknown as Selectors<A>;
+  return selectors as unknown as Refs<A, S>;
 }
 
 function assertCount(count: number, what: string, at: string): void {
@@ -876,13 +923,18 @@ function assertCount(count: number, what: string, at: string): void {
   }
 }
 
-class Chain<A extends string, B extends Bound> implements QueryBuilder<A, B> {
+class Chain<A extends string, B extends Bound, S extends RefShape> implements QueryBuilder<
+  A,
+  B,
+  S
+> {
   declare readonly __limit?: B;
 
   readonly model: QueryModel<A>;
   readonly execution: ExecutionOptions;
 
-  private readonly selectors: Selectors<A>;
+  private readonly shape: S;
+  private readonly refs: Refs<A, S>;
 
   constructor(
     source: Source<A>,
@@ -890,10 +942,12 @@ class Chain<A extends string, B extends Bound> implements QueryBuilder<A, B> {
     orderings: readonly Ordering<A>[],
     columns: readonly Column<A>[],
     execution: ExecutionOptions,
+    shape: S,
   ) {
     this.model = qom.createQuery(source, constraint, orderings, columns);
     this.execution = execution;
-    this.selectors = selectorsFor<A>(declaredSelectors(source));
+    this.shape = shape;
+    this.refs = refsFor<A, S>(declaredSelectors(source), shape);
   }
 
   private next<B2 extends Bound>(
@@ -901,8 +955,15 @@ class Chain<A extends string, B extends Bound> implements QueryBuilder<A, B> {
     orderings: readonly Ordering<A>[],
     columns: readonly Column<A>[],
     execution: ExecutionOptions,
-  ): Chain<A, B2> {
-    return new Chain<A, B2>(this.model.source, constraint, orderings, columns, execution);
+  ): Chain<A, B2, S> {
+    return new Chain<A, B2, S>(
+      this.model.source,
+      constraint,
+      orderings,
+      columns,
+      execution,
+      this.shape,
+    );
   }
 
   private added(constraint: Constraint<A>): Constraint<A> {
@@ -910,51 +971,57 @@ class Chain<A extends string, B extends Bound> implements QueryBuilder<A, B> {
     return current === null ? constraint : qom.and(current, constraint);
   }
 
-  where(constraint: Arg<A, Constraint<A, "fast">>): QueryBuilder<A, B> {
+  where(constraint: Arg<A, S, Constraint<A, "fast">>): QueryBuilder<A, B, S> {
     return this.whereSlow(constraint);
   }
 
-  whereSlow(constraint: Arg<A, Constraint<A>>): QueryBuilder<A, B> {
-    const resolved = resolveArg(constraint, this.selectors);
+  whereSlow(constraint: Arg<A, S, Constraint<A>>): QueryBuilder<A, B, S> {
+    const resolved = resolveArg(constraint, this.refs);
     return this.next<B>(this.added(resolved), this.model.orderings, this.model.columns, {
       ...this.execution,
     });
   }
 
   joinSlow<T extends string, C extends string>(
-    nodeType: T,
+    nodeType: S extends "unaliased" ? JoinNeedsAlias : T,
     alias: C,
     joinType: JoinType = JoinType.INNER,
   ): JoinClause<A, C, B> {
-    const right = qom.selector(nodeType, alias);
-    const selectors = selectorsFor<A | C>([...declaredSelectors(this.model.source), alias]);
+    const right = qom.selector(nodeType as string, alias);
+    const refs = refsFor<A | C, "aliased">(
+      [...declaredSelectors(this.model.source), alias],
+      "aliased",
+    );
 
     return {
-      on: (condition: Arg<A | C, JoinCondition<A | C>>): QueryBuilder<A | C, B> => {
+      on: (
+        condition: Arg<A | C, "aliased", JoinCondition<A | C>>,
+      ): QueryBuilder<A | C, B, "aliased"> => {
         const source = qom.joinSlow<A, C>(
           this.model.source,
           right,
           joinType,
-          resolveArg(condition, selectors),
+          resolveArg(condition, refs),
         );
 
-        return new Chain<A | C, B>(
+        return new Chain<A | C, B, "aliased">(
           source,
           this.model.constraint,
           this.model.orderings,
           this.model.columns,
           { ...this.execution },
+          "aliased",
         );
       },
     };
   }
 
-  orderBy(...orderings: Arg<A, Ordering<A, "fast">>[]): QueryBuilder<A, B> {
+  orderBy(...orderings: Arg<A, S, Ordering<A, "fast">>[]): QueryBuilder<A, B, S> {
     return this.orderBySlow(...orderings);
   }
 
-  orderBySlow(...orderings: Arg<A, Ordering<A>>[]): QueryBuilder<A, B> {
-    const resolved = orderings.map((ordering) => resolveArg(ordering, this.selectors));
+  orderBySlow(...orderings: Arg<A, S, Ordering<A>>[]): QueryBuilder<A, B, S> {
+    const resolved = orderings.map((ordering) => resolveArg(ordering, this.refs));
     return this.next<B>(
       this.model.constraint,
       [...this.model.orderings, ...resolved],
@@ -963,8 +1030,8 @@ class Chain<A extends string, B extends Bound> implements QueryBuilder<A, B> {
     );
   }
 
-  select(...columns: Arg<A, Column<A>>[]): QueryBuilder<A, B> {
-    const resolved = columns.map((column) => resolveArg(column, this.selectors));
+  select(...columns: Arg<A, S, Column<A>>[]): QueryBuilder<A, B, S> {
+    const resolved = columns.map((column) => resolveArg(column, this.refs));
     return this.next<B>(
       this.model.constraint,
       this.model.orderings,
@@ -973,21 +1040,21 @@ class Chain<A extends string, B extends Bound> implements QueryBuilder<A, B> {
     );
   }
 
-  limit(count: number): QueryBuilder<A, "limitSet"> {
+  limit(count: number): QueryBuilder<A, "limitSet", S> {
     assertCount(count, "limit()", "execution.limit");
     return this.withExecution<"limitSet">({ limit: count });
   }
 
-  unboundedSlow(): QueryBuilder<A, "limitSet"> {
+  unboundedSlow(): QueryBuilder<A, "limitSet", S> {
     return this.withExecution<"limitSet">({ limit: -1 });
   }
 
-  offset(count: number): QueryBuilder<A, B> {
+  offset(count: number): QueryBuilder<A, B, S> {
     assertCount(count, "offset()", "execution.offset");
     return this.withExecution<B>({ offset: count });
   }
 
-  bind(values: Bindings): QueryBuilder<A, B> {
+  bind(values: Bindings): QueryBuilder<A, B, S> {
     if (!values || typeof values !== "object") {
       throw new QueryError(
         "UNSUPPORTED",
@@ -999,7 +1066,7 @@ class Chain<A extends string, B extends Bound> implements QueryBuilder<A, B> {
     return this.withExecution<B>({ bindings: { ...this.execution.bindings, ...values } });
   }
 
-  private withExecution<B2 extends Bound>(patch: ExecutionOptions): QueryBuilder<A, B2> {
+  private withExecution<B2 extends Bound>(patch: ExecutionOptions): QueryBuilder<A, B2, S> {
     return this.next<B2>(this.model.constraint, this.model.orderings, this.model.columns, {
       ...this.execution,
       ...patch,
@@ -1034,12 +1101,15 @@ class Chain<A extends string, B extends Bound> implements QueryBuilder<A, B> {
 }
 
 /**
- * Starts a query over one node type, under a required alias, or lifts a model the factory built.
+ * Starts a query over one node type, with or without an alias, or lifts a model the factory built.
+ *
+ * Without an alias, the callbacks receive the one selector reference, which the call site names:
+ * `.where((n) => ...)`. The selector then carries the node type as its name, which is the `SELECT *
+ * FROM [jnt:news]` statement. With an alias, the callbacks receive a record keyed by alias, which
+ * is what a join needs to tell its two sides apart: `.on(({ c, p }) => ...)`.
  *
  * Every chain call returns a new builder, so one base serves several pages, and the builder is
- * never thenable: nothing runs until an execution seam receives it. The alias is required, so a
- * callback destructures it by name. The alias-less `SELECT * FROM [jnt:page]` form stays reachable
- * through `qom.selector("jnt:page")` and the second signature below.
+ * never thenable: nothing runs until an execution seam receives it.
  *
  * @remarks
  *   Jahia support: a query without a limit cannot be executed. `Queryable` accepts a builder whose
@@ -1047,8 +1117,13 @@ class Chain<A extends string, B extends Bound> implements QueryBuilder<A, B> {
  *   without one. The escape hatch is `unboundedSlow()`.
  * @example
  *   ```ts
- *   from("jnt:page", "p")
- *     .where(({ p }) => p.prop("jcr:title").eq("Home"))
+ *   from("jnt:page")
+ *     .where((p) => p.prop("jcr:title").eq("Home"))
+ *     .limit(20);
+ *
+ *   from("jnt:contentFolder", "p")
+ *     .joinSlow("jnt:event", "c")
+ *     .on(({ c, p }) => c.isChildOf(p))
  *     .limit(20);
  *   ```;
  *
@@ -1057,30 +1132,40 @@ class Chain<A extends string, B extends Bound> implements QueryBuilder<A, B> {
 export function from<T extends string, A extends string>(
   nodeType: T,
   alias: A,
-): QueryBuilder<A, NoLimit>;
-export function from<S extends string>(model: QueryModel<S>): QueryBuilder<S, NoLimit>;
+): QueryBuilder<A, NoLimit, "aliased">;
+export function from<T extends string>(nodeType: T): QueryBuilder<T, NoLimit, "unaliased">;
+export function from<S extends string>(model: QueryModel<S>): QueryBuilder<S, NoLimit, "aliased">;
 export function from(
   nodeTypeOrModel: string | QueryModel,
   alias?: string,
-): QueryBuilder<string, NoLimit> {
+): QueryBuilder<string, NoLimit, RefShape> {
   if (typeof nodeTypeOrModel !== "string") {
     const model = nodeTypeOrModel;
-    return new Chain<string, NoLimit>(
+    return new Chain<string, NoLimit, "aliased">(
       model.source,
       model.constraint,
       model.orderings,
       model.columns,
       {},
+      "aliased",
     );
   }
 
-  if (typeof alias !== "string") {
-    throw new QueryError(
-      "INVALID_NAME",
-      `from() needs a selector alias, got ${String(alias)}. Use qom.selector() for the alias-less form`,
-      "source.selectorName",
-    );
-  }
-
-  return new Chain<string, NoLimit>(qom.selector(nodeTypeOrModel, alias), null, [], [], {});
+  return alias === undefined
+    ? new Chain<string, NoLimit, "unaliased">(
+        qom.selector(nodeTypeOrModel),
+        null,
+        [],
+        [],
+        {},
+        "unaliased",
+      )
+    : new Chain<string, NoLimit, "aliased">(
+        qom.selector(nodeTypeOrModel, alias),
+        null,
+        [],
+        [],
+        {},
+        "aliased",
+      );
 }

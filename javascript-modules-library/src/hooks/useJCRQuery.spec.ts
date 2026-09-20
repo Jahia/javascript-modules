@@ -13,7 +13,7 @@ declare const useJCRQuery: typeof import("./useJCRQuery.js").useJCRQuery;
 
 export function overloadFixtures(): void {
   const statement = "SELECT * FROM [jnt:page]";
-  const builder = from("jnt:page", "p").limit(10);
+  const builder = from("jnt:page").limit(10);
 
   // The deprecated form, which now throws because it carries no limit.
   useJCRQuery({ query: statement });
@@ -36,7 +36,7 @@ export function overloadFixtures(): void {
   useJCRQuery({ query: builder, offset: 20 });
 
   // @ts-expect-error a query whose limit was not set is not executable
-  useJCRQuery({ query: from("jnt:page", "p") });
+  useJCRQuery({ query: from("jnt:page") });
 
   // @ts-expect-error the query is required
   useJCRQuery({});

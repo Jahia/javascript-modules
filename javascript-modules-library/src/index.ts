@@ -97,6 +97,8 @@ export type {
   QueryBuilder,
   QueryErrorCode,
   QueryModel,
+  Refs,
+  RefShape,
   SameNode,
   SameNodeJoinCondition,
   ScoreRef,
