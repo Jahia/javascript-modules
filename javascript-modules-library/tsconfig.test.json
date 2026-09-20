@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Tests run from plain JavaScript in Node, so no declaration output is needed
+    "declaration": false,
+    "declarationDir": null,
+    "outDir": "target/test-dist",
+    // `node:test` and `node:assert` need the Node types, which the publish build has no use for
+    "types": ["node"]
+  },
+  // Unlike the publish build, the test build compiles the `*.spec.ts` files. It is scoped to the
+  // pure query layer, so that `yarn test` runs on a plain checkout: everything outside it imports
+  // the ambient Java modules, which only the Maven build writes under `target/types`.
+  "include": ["src/query/**/*.ts"],
+  "exclude": ["node_modules"]
+}
