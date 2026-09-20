@@ -220,7 +220,7 @@ describe("toQOM, explicit nulls", () => {
 
   test("a full text search over every property passes a null property name", () => {
     const { session, firstArgs } = lab();
-    toQOM(from("jnt:article", "a").where(({ a }) => a.contains("graal*")).model, session);
+    toQOM(from("jnt:article", "a").where(({ a }) => a.fullText("graal*")).model, session);
     const args = firstArgs("fullTextSearch");
     assert.equal(args?.[0], "a");
     assert.equal(args?.[1], null);
@@ -230,7 +230,7 @@ describe("toQOM, explicit nulls", () => {
   test("a full text search over one property keeps that name", () => {
     const { session, firstArgs } = lab();
     toQOM(
-      from("jnt:article", "a").where(({ a }) => a.prop("body").contains("graal*")).model,
+      from("jnt:article", "a").where(({ a }) => a.prop("body").fullText("graal*")).model,
       session,
     );
     assert.equal(firstArgs("fullTextSearch")?.[1], "body");
@@ -298,7 +298,7 @@ describe("toQOM, bind variables", () => {
   test("a missing binding inside a full text search is found too", () => {
     const { session, calls } = lab();
     const error = caught(() =>
-      toQOM(from("jnt:article", "a").where(({ a }) => a.contains($("words"))).model, session),
+      toQOM(from("jnt:article", "a").where(({ a }) => a.fullText($("words"))).model, session),
     );
 
     assert.equal(error?.code, "UNBOUND_VARIABLE");

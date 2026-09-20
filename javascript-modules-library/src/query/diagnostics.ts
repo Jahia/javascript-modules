@@ -28,7 +28,9 @@ import type {
  * - `partial`: the query runs with different semantics.
  * - `deep-offset`: the offset makes the search run again with a doubled heap.
  * - `full-scan`: the hit loop never breaks early.
- * - `environment`: the cost or the outcome depends on a condition the model cannot show.
+ * - `environment`: the cost or the outcome depends on a setting or an installation detail that the
+ *   model cannot show. It is raised by the construct it concerns, so a query without such a
+ *   construct carries no `environment` finding.
  */
 export type DiagnosticLevel = "none" | "partial" | "deep-offset" | "full-scan" | "environment";
 
@@ -52,8 +54,11 @@ export interface ExecutionOptions {
   readonly bindings?: Bindings;
 }
 
-const ENVIRONMENT_REASON =
-  "Four conditions decide the real cost and the model cannot show them: jahia.jackrabbit.useNativeSort set to false, extra JCR providers, render mode, and the session locale.";
+const NATIVE_SORT_REASON =
+  "This query is ordered, and Jahia sorts an ordering in Lucene only while jahia.jackrabbit.useNativeSort is true, which is the default. With that setting off, every accepted row is listed and sorted in memory, so the limit no longer bounds the search.";
+
+const PROVIDERS_REASON =
+  "This query skips rows, and an offset is applied per JCR provider. On an installation that mounts a provider next to the default one, provider 1 runs once more without a limit when it returns no row under the offset.";
 
 const I18N_REWRITE_REASON =
   "The query rewriter rebuilds a NOT or an UPPER with a null child once it has changed the node under it, and the query then fails. It changes that node for a property it moves to a jnt:translation selector, which needs an internationalised property in a localised session. The model sees neither condition, so this finding reports the risk and does not refuse the query.";
@@ -217,6 +222,13 @@ function diagnoseSource(source: Source, at: string, found: Diagnostic[]): void {
     return;
   }
 
+  found.push({
+    level: "full-scan",
+    at,
+    reason:
+      "Jahia's engine runs both sides of a join with offset 0 and limit -1 and merges the rows in memory, so no limit reaches Lucene and the hit loop never breaks early.",
+  });
+
   if (source.joinType === JoinType.RIGHT_OUTER) {
     found.push({
       level: "partial",
@@ -257,10 +269,20 @@ function diagnoseColumn(column: Column, at: string, found: Diagnostic[]): void {
 }
 
 function diagnoseExecution(execution: ExecutionOptions, found: Diagnostic[]): void {
+  // An earlier revision left an unbounded execution to the `unboundedSlow()` name alone. The name
+  // is at the call site and the finding is at the review, and a query that returns every matching
+  // node is the costliest thing this layer can report, so it is reported here as well.
+  if (execution.limit !== undefined && execution.limit < 0) {
+    found.push({
+      level: "full-scan",
+      at: "execution.limit",
+      reason: "This query returns every matching node.",
+    });
+  }
+
   // The Lucene heap is `clamp(offset + limit, 32, 32768)`, and it refills by doubling once the hit
   // loop walks past it, so the offset alone does not say whether a refill happens. A negative limit
-  // means unbounded, which section 6.6 of the plan covers with the `unboundedSlow()` name instead
-  // of a finding, so it does not widen the window here.
+  // means unbounded, so it does not widen the window here.
   const window = (execution.offset ?? 0) + Math.max(execution.limit ?? 0, 0);
 
   if (window > DEEP_OFFSET_THRESHOLD) {
@@ -270,17 +292,26 @@ function diagnoseExecution(execution: ExecutionOptions, found: Diagnostic[]): vo
       reason: `offset + limit is ${window}, above ${DEEP_OFFSET_THRESHOLD}, so Jackrabbit clamps the heap and runs the search again with a doubled heap. Use keyset pagination instead.`,
     });
   }
+
+  if ((execution.offset ?? 0) > 0) {
+    found.push({ level: "environment", at: "execution.offset", reason: PROVIDERS_REASON });
+  }
 }
 
 /**
  * Reports what the model and the execution options say about how Jahia's Jackrabbit will run this
- * query. The last entry is always the fixed `environment` one, because a reader needs the four
- * hidden conditions next to the findings.
+ * query.
+ *
+ * A query that carries nothing worth reporting returns an empty array, so a caller can treat any
+ * finding as a signal. An `environment` finding is raised by a construct whose cost depends on a
+ * condition the model cannot show, and never on its own. An ordering always raises one, because the
+ * native sort setting always decides how an ordering runs.
  *
  * @param model The query model to inspect.
- * @param execution The limit, offset and bindings, when they are known. Without them, the
- *   `deep-offset` finding is left out, because it reads `offset + limit`.
- * @returns Every finding, in model order, followed by the fixed environment entry.
+ * @param execution The limit, offset and bindings, when they are known. Without them, the findings
+ *   that read the limit and the offset are left out.
+ * @returns Every finding, in model order, then the findings of the execution options. An empty
+ *   array means that nothing was found.
  */
 export function diagnose(model: QueryModel, execution?: ExecutionOptions): Diagnostic[] {
   const found: Diagnostic[] = [];
@@ -295,6 +326,10 @@ export function diagnose(model: QueryModel, execution?: ExecutionOptions): Diagn
     diagnoseOrdering(ordering, `orderings[${index}]`, found);
   });
 
+  if (model.orderings.length > 0) {
+    found.push({ level: "environment", at: "orderings", reason: NATIVE_SORT_REASON });
+  }
+
   model.columns.forEach((column: Column, index: number) => {
     diagnoseColumn(column, `columns[${index}]`, found);
   });
@@ -303,6 +338,5 @@ export function diagnose(model: QueryModel, execution?: ExecutionOptions): Diagn
     diagnoseExecution(execution, found);
   }
 
-  found.push({ level: "environment", at: "$", reason: ENVIRONMENT_REASON });
   return found;
 }

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test, { describe } from "node:test";
 import type { JCRSessionWrapper } from "org.jahia.services.content";
 import { from } from "../../query/builder.js";
+import type { Executable } from "../../query/builder.js";
 import { QueryError } from "../../query/validate.js";
 import { getNodesByJCRQuery } from "./getNodesByJCRQuery.js";
 
@@ -176,6 +177,17 @@ describe("getNodesByJCRQuery, a built query", () => {
   test("it needs no positional limit, so the falsy limit guard does not apply", () => {
     const { session } = lab(["one"]);
     assert.deepEqual(getNodesByJCRQuery(session, from("jnt:page", "p").limit(10)), ["one"]);
+  });
+
+  test("a builder with no limit throws UNSUPPORTED, whatever the caller's language", () => {
+    const { session, calls } = lab();
+    // What a `.jsx` module reaches the seam with, because it never sees the type state.
+    const unbounded = from("jnt:page", "p") as unknown as Executable<"p">;
+    const error = caught(() => getNodesByJCRQuery(session, unbounded));
+
+    assert.equal(error?.code, "UNSUPPORTED");
+    assert.equal(error?.at, "execution.limit");
+    assert.deepEqual(calls, []);
   });
 
   test("a positional limit next to the carried one throws LIMIT_CONFLICT", () => {

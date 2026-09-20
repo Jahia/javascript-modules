@@ -104,7 +104,7 @@ describe("where", () => {
       qom.descendantNode("n", "/sites/acme/contents"),
     );
     assert.deepEqual(
-      from("jnt:article", "a").where(({ a }) => a.contains("graal*")).model.constraint,
+      from("jnt:article", "a").where(({ a }) => a.fullText("graal*")).model.constraint,
       qom.fullTextSearch("a", null, literal("graal*")),
     );
     assert.deepEqual(
@@ -163,13 +163,13 @@ describe("the selector references", () => {
     }
   });
 
-  test("exists, contains, asc and desc take the plain names", () => {
+  test("exists, fullText, asc and desc take the plain names", () => {
     assert.deepEqual(
       from("jnt:page", "p").where(({ p }) => p.prop("jcr:title").exists()).model.constraint,
       qom.propertyExistence("p", "jcr:title"),
     );
     assert.deepEqual(
-      from("jnt:page", "p").where(({ p }) => p.prop("jcr:title").contains("home")).model.constraint,
+      from("jnt:page", "p").where(({ p }) => p.prop("jcr:title").fullText("home")).model.constraint,
       qom.fullTextSearch("p", "jcr:title", literal("home")),
     );
     assert.deepEqual(
@@ -248,13 +248,6 @@ describe("the selector references", () => {
     );
   });
 
-  test("columns() is the same call as select()", () => {
-    assert.deepEqual(
-      from("jnt:page", "p").columns(({ p }) => p.all()).model.columns,
-      from("jnt:page", "p").select(({ p }) => p.all()).model.columns,
-    );
-  });
-
   test("repeated select calls append", () => {
     assert.deepEqual(
       from("jnt:page", "p")
@@ -277,6 +270,204 @@ describe("the selector references", () => {
       qom.ascending(qom.propertyValue("n", "jcr:uuid")),
       qom.ascending(qom.propertyValue("n", "jcr:title")),
     ]);
+  });
+});
+
+describe("the folded predicates", () => {
+  const constraintOf = (
+    build: (selectors: { p: import("./builder.js").SelectorRef<"p"> }) => unknown,
+  ) => from("jnt:page", "p").where(build as never).model.constraint;
+
+  test("in() folds to = comparisons joined with OR, in the order of the list", () => {
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("cat").in(["a", "b", "c"])),
+      qom.or(
+        qom.or(
+          qom.comparison(qom.propertyValue("p", "cat"), Operator.EQUAL_TO, literal("a")),
+          qom.comparison(qom.propertyValue("p", "cat"), Operator.EQUAL_TO, literal("b")),
+        ),
+        qom.comparison(qom.propertyValue("p", "cat"), Operator.EQUAL_TO, literal("c")),
+      ),
+    );
+  });
+
+  test("in() with one value folds to that one comparison", () => {
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("cat").in(["a"])),
+      qom.comparison(qom.propertyValue("p", "cat"), Operator.EQUAL_TO, literal("a")),
+    );
+  });
+
+  test("in() with an empty list throws, because it would match nothing", () => {
+    assert.equal(
+      errorCode(() => from("jnt:page", "p").where(({ p }) => p.prop("cat").in([]))),
+      "NULL_CONSTRAINT",
+    );
+  });
+
+  test("in() types each value on its own, as a comparison does", () => {
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("mixed").in([1, "a", true])),
+      qom.or(
+        qom.or(
+          qom.comparison(qom.propertyValue("p", "mixed"), Operator.EQUAL_TO, literal(1)),
+          qom.comparison(qom.propertyValue("p", "mixed"), Operator.EQUAL_TO, literal("a")),
+        ),
+        qom.comparison(qom.propertyValue("p", "mixed"), Operator.EQUAL_TO, literal(true)),
+      ),
+    );
+  });
+
+  test("in() is available on a case transform, a name and a local name", () => {
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("jcr:title").lower().in(["home"])),
+      qom.comparison(
+        qom.lowerCase(qom.propertyValue("p", "jcr:title")),
+        Operator.EQUAL_TO,
+        literal("home"),
+      ),
+    );
+    assert.deepEqual(
+      constraintOf(({ p }) => p.name().in(["home"])),
+      qom.comparison(qom.nodeName("p"), Operator.EQUAL_TO, literal("home")),
+    );
+    assert.deepEqual(
+      constraintOf(({ p }) => p.localName().in(["home"])),
+      qom.comparison(qom.nodeLocalName("p"), Operator.EQUAL_TO, literal("home")),
+    );
+  });
+
+  test("between() folds to >= and <=, both ends included", () => {
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("count").between(1, 10)),
+      qom.and(
+        qom.comparison(
+          qom.propertyValue("p", "count"),
+          Operator.GREATER_THAN_OR_EQUAL_TO,
+          literal(1),
+        ),
+        qom.comparison(
+          qom.propertyValue("p", "count"),
+          Operator.LESS_THAN_OR_EQUAL_TO,
+          literal(10),
+        ),
+      ),
+    );
+  });
+
+  test("between() takes typed literals, so a date range stays a date range", () => {
+    const low = date("2026-01-01T00:00:00.000Z");
+    const high = date("2026-12-31T00:00:00.000Z");
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("startDate").between(low, high)),
+      qom.and(
+        qom.comparison(qom.propertyValue("p", "startDate"), Operator.GREATER_THAN_OR_EQUAL_TO, low),
+        qom.comparison(qom.propertyValue("p", "startDate"), Operator.LESS_THAN_OR_EQUAL_TO, high),
+      ),
+    );
+  });
+
+  test("between() is available on a case transform", () => {
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("jcr:title").lower().between("a", "b")),
+      qom.and(
+        qom.comparison(
+          qom.lowerCase(qom.propertyValue("p", "jcr:title")),
+          Operator.GREATER_THAN_OR_EQUAL_TO,
+          literal("a"),
+        ),
+        qom.comparison(
+          qom.lowerCase(qom.propertyValue("p", "jcr:title")),
+          Operator.LESS_THAN_OR_EQUAL_TO,
+          literal("b"),
+        ),
+      ),
+    );
+  });
+
+  test("startsWith() builds a LIKE whose pattern ends in a wildcard", () => {
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("jcr:title").startsWith("Home")),
+      qom.comparison(qom.propertyValue("p", "jcr:title"), Operator.LIKE, literal("Home%")),
+    );
+  });
+
+  test("startsWith() escapes the two LIKE wildcards and the escape character itself", () => {
+    const pattern = (prefix: string) => {
+      const constraint = constraintOf(({ p }) => p.prop("jcr:title").startsWith(prefix));
+      return (constraint as { operand2: { value: string } }).operand2.value;
+    };
+
+    assert.equal(pattern("50% off"), "50\\% off%");
+    // The pattern the `startsWithPercent` case of the test module sends to a live Jackrabbit.
+    assert.equal(pattern("50%"), "50\\%%");
+    assert.equal(pattern("a_b"), "a\\_b%");
+    assert.equal(pattern("c:\\temp"), "c:\\\\temp%");
+    assert.equal(pattern("%_\\"), "\\%\\_\\\\%");
+    assert.equal(pattern(""), "%");
+  });
+
+  test("startsWith() refuses a value that is not a string", () => {
+    assert.equal(
+      errorCode(() =>
+        from("jnt:page", "p").where(({ p }) => p.prop("jcr:title").startsWith(3 as never)),
+      ),
+      "UNSUPPORTED",
+    );
+  });
+
+  test("startsWith() is available on a case transform and on a local name", () => {
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("jcr:title").lower().startsWith("ho")),
+      qom.comparison(
+        qom.lowerCase(qom.propertyValue("p", "jcr:title")),
+        Operator.LIKE,
+        literal("ho%"),
+      ),
+    );
+    assert.deepEqual(
+      constraintOf(({ p }) => p.localName().startsWith("home")),
+      qom.comparison(qom.nodeLocalName("p"), Operator.LIKE, literal("home%")),
+    );
+  });
+
+  test("notExists() and isNull() are the same constraint, which is the negated existence", () => {
+    const expected = qom.not(qom.propertyExistence("p", "subtitle"));
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("subtitle").notExists()),
+      expected,
+    );
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("subtitle").isNull()),
+      expected,
+    );
+  });
+
+  test("notExists() is the exact negation of exists()", () => {
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("subtitle").notExists()),
+      qom.not(constraintOf(({ p }) => p.prop("subtitle").exists()) as never),
+    );
+  });
+});
+
+describe("fullText", () => {
+  test("on a selector it searches every property, and on a property only that one", () => {
+    assert.deepEqual(
+      from("jnt:article", "a").where(({ a }) => a.fullText("graal*")).model.constraint,
+      qom.fullTextSearch("a", null, literal("graal*")),
+    );
+    assert.deepEqual(
+      from("jnt:article", "a").where(({ a }) => a.prop("body").fullText("graal*")).model.constraint,
+      qom.fullTextSearch("a", "body", literal("graal*")),
+    );
+  });
+
+  test("it takes a bind variable as well as a plain value", () => {
+    assert.deepEqual(
+      from("jnt:article", "a").where(({ a }) => a.fullText($("words"))).model.constraint,
+      qom.fullTextSearch("a", null, $("words")),
+    );
   });
 });
 
@@ -485,7 +676,6 @@ describe("immutability", () => {
       base.orderBy(({ p }) => p.prop("a").asc()),
       base.orderBySlow(({ p }) => p.prop("a").lower().ascSlow()),
       base.select(({ p }) => p.all()),
-      base.columns(({ p }) => p.all()),
       base.limit(10),
       base.unboundedSlow(),
       base.offset(10),
@@ -572,10 +762,7 @@ describe("build", () => {
     assert.deepEqual(upperCased.build({ strict: true }), upperCased.model);
     assert.deepEqual(
       negated.diagnose().map((finding) => [finding.level, finding.conditional]),
-      [
-        ["none", true],
-        ["environment", undefined],
-      ],
+      [["none", true]],
     );
   });
 
@@ -601,10 +788,23 @@ describe("diagnose", () => {
     );
   });
 
-  test("it always ends with the environment entry", () => {
-    const findings = from("jnt:page", "p").diagnose();
-    assert.equal(findings.length, 1);
-    assert.equal(findings[0].level, "environment");
+  test("a query with nothing to report gives an empty list", () => {
+    assert.deepEqual(from("jnt:page", "p").diagnose(), []);
+    assert.deepEqual(
+      from("jnt:page", "p")
+        .where(({ p }) => p.prop("jcr:title").eq("Home"))
+        .limit(10)
+        .diagnose(),
+      [],
+    );
+  });
+
+  test("unboundedSlow() reports a full scan of its own", () => {
+    const findings = from("jnt:page", "p").unboundedSlow().diagnose();
+    assert.deepEqual(
+      findings.map((finding) => [finding.level, finding.at]),
+      [["full-scan", "execution.limit"]],
+    );
   });
 });
 
@@ -688,10 +888,29 @@ export function speedFixtures(): void {
 
   // The fast chain calls accept every fast construct, facade and factory mixed.
   base.where(({ p }) => and(p.prop("jcr:title").eq("Home"), p.name().eq("home")));
-  base.where(({ p }) => or(p.localName().like("home%"), p.contains("graal*")));
+  base.where(({ p }) => or(p.localName().like("home%"), p.fullText("graal*")));
   base.where(({ p }) => not(p.prop("j:published").eq(true)));
   base.where(qom.comparison(title, Operator.EQUAL_TO, literal("Home")));
   base.orderBy(({ p }) => p.score().asc());
+
+  // The folded predicates are built on index operators, so where() takes them all.
+  base.where(({ p }) => p.prop("cat").in(["a", "b"]));
+  base.where(({ p }) => p.prop("count").between(1, 10));
+  base.where(({ p }) => p.prop("jcr:title").startsWith("Home"));
+  base.where(({ p }) => p.prop("subtitle").notExists());
+  base.where(({ p }) => p.prop("subtitle").isNull());
+  base.where(({ p }) => p.prop("jcr:title").lower().in(["home"]));
+  base.where(({ p }) => p.prop("jcr:title").lower().between("a", "b"));
+  base.where(({ p }) => p.prop("jcr:title").lower().startsWith("ho"));
+  base.where(({ p }) => p.name().in(["home"]));
+  base.where(({ p }) => p.localName().in(["home"]));
+  base.where(({ p }) => p.localName().startsWith("home"));
+
+  // @ts-expect-error NAME() with LIKE is not an index operator, so the reference has no startsWith()
+  base.whereSlow(({ p }) => p.name().startsWith("home"));
+
+  // @ts-expect-error a score has no value list, because = on a score runs in memory
+  base.whereSlow(({ p }) => p.score().in([0.5]));
 }
 
 export function selectorFixtures(): void {
@@ -716,6 +935,12 @@ export function selectorFixtures(): void {
 
   // @ts-expect-error a column built for a foreign selector is rejected
   base.select(qom.column("q", "jcr:title"));
+
+  // @ts-expect-error columns() was removed, and select() is the one name for it
+  base.columns(({ p }) => p.all());
+
+  // @ts-expect-error contains() was renamed fullText(), because it is not a substring match
+  base.where(({ p }) => p.contains("graal*"));
 
   // A join widens the alias union, so both sides are reachable in the callbacks.
   base

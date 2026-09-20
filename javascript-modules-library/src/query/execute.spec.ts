@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test, { describe } from "node:test";
 import type { JCRSessionWrapper } from "org.jahia.services.content";
 import { from, not } from "./builder.js";
+import type { Executable } from "./builder.js";
 import { executeQuery } from "./execute.js";
 import { $ } from "./literal.js";
 import { QueryError } from "./validate.js";
@@ -255,6 +256,33 @@ describe("executeQuery, conflicts and refusals", () => {
     );
     assert.equal(upperCased.methods().includes("factory.upperCase"), true);
     assert.equal(upperCased.methods().includes("execute"), true);
+  });
+
+  test("a builder with no limit throws UNSUPPORTED before any host call", () => {
+    const { session, calls } = lab();
+    // The type state already refuses this call, and a JavaScript caller does not see the types, so
+    // the cast is what a `.jsx` module reaches the seam with.
+    const unbounded = from("jnt:page", "p") as unknown as Executable<"p">;
+    const error = caught(() => executeQuery(session, unbounded));
+
+    assert.equal(error?.code, "UNSUPPORTED");
+    assert.equal(error?.at, "execution.limit");
+    assert.match(String(error?.message), /limit\(n\)/);
+    assert.match(String(error?.message), /unboundedSlow\(\)/);
+    assert.deepEqual(calls, []);
+  });
+
+  test("a limit passed in the options satisfies the rule for a builder that carries none", () => {
+    const { session, firstArgs } = lab();
+    const unbounded = from("jnt:page", "p") as unknown as Executable<"p">;
+    executeQuery(session, unbounded, { limit: 10 });
+    assert.deepEqual(firstArgs("setLimit"), [10]);
+  });
+
+  test("unboundedSlow satisfies the rule, because the call asked for it", () => {
+    const { session, methods } = lab();
+    executeQuery(session, from("jnt:page", "p").unboundedSlow());
+    assert.equal(methods().includes("execute"), true);
   });
 
   test("a query whose diagnostic level is none throws UNSUPPORTED before any host call", () => {

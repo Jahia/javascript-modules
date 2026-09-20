@@ -20,8 +20,23 @@ describe("JCR query builder test", () => {
   const event = (index: number) => `${scope}/event-${index}`;
   const page = `/sites/${GENERIC_SITE_KEY}/home/queryBuilder`;
 
+  /**
+   * The escaping fixture, in its own folder so that its two events never enter the counts the cases
+   * scoped to `scope` assert.
+   */
+  const escapeScope = `/sites/${GENERIC_SITE_KEY}/contents/queryBuilderEscape`;
+  const percentEvent = `${escapeScope}/escape-percent`;
+  const plainEvent = `${escapeScope}/escape-plain`;
+
   /** What every statement of a single selector case holds, whatever the rewrite added. */
   const single = [`SELECT e.*`, `FROM [jnt:event] AS e`, `ISDESCENDANTNODE(e, ['${scope}'])`];
+
+  /** The same fragments for a case scoped to the escaping fixture folder. */
+  const singleEscape = [
+    `SELECT e.*`,
+    `FROM [jnt:event] AS e`,
+    `ISDESCENDANTNODE(e, ['${escapeScope}'])`,
+  ];
 
   const fragments: Record<string, string[]> = {
     property: [...single, `[jcr:title] = 'Event 1'`],
@@ -76,6 +91,22 @@ describe("JCR query builder test", () => {
       `weakProp = CAST('22222222-2222-2222-2222-222222222222' AS WEAKREFERENCE)`,
       `uriProp = CAST('https://www.jahia.com' AS URI)`,
     ],
+    predicates: [
+      ...single,
+      `eventsType = 'meeting'`,
+      `eventsType = 'webinar'`,
+      `startDate >= CAST('2000-01-01T00:00:00.000Z' AS DATE)`,
+      `startDate <= CAST('2099-01-01T00:00:00.000Z' AS DATE)`,
+      `[jcr:language] IS NOT NULL`,
+    ],
+    startsWithPlain: [...single, `eventsType LIKE 'meet%'`],
+    // The prefix holds a `%`, which `startsWith` escapes with a backslash, so the pattern reads
+    // `50\%%`: a literal `50%`, then the trailing wildcard the method adds. Unlike the fragments
+    // above, this one was not read from a live statement. It predicts that the formatter writes the
+    // backslash through, because the only escape the SQL2 string literal grammar defines is a
+    // doubled quote. The node assertion below is what reads the engine's own behaviour.
+    startsWithPercent: [...singleEscape, String.raw`eventsType LIKE '50\%%'`],
+    startsWithDigits: [...singleEscape, `eventsType LIKE '50%'`],
     stable: [...single, `ORDER BY`, `[jcr:uuid]`],
   };
 
@@ -140,6 +171,30 @@ describe("JCR query builder test", () => {
         addEvent(GENERIC_SITE_KEY, initEvent(3));
         addEvent(GENERIC_SITE_KEY, initEvent(4));
         addEvent(GENERIC_SITE_KEY, initEvent(5));
+
+        // The escaping fixture. `escape-percent` holds a literal `%` in `eventsType`, and
+        // `escape-plain` starts with the same two digits without one, so a prefix of `50%` tells a
+        // working escape from an ignored one: one node against two.
+        addNode({
+          parentPathOrId: `/sites/${GENERIC_SITE_KEY}/contents`,
+          name: "queryBuilderEscape",
+          primaryNodeType: "jnt:contentFolder",
+        }).then(() => {
+          addEvent(GENERIC_SITE_KEY, {
+            parentPath: escapeScope,
+            name: "escape-percent",
+            title: "Escape percent",
+            startDate: new Date(),
+            eventsType: "50% off",
+          });
+          addEvent(GENERIC_SITE_KEY, {
+            parentPath: escapeScope,
+            name: "escape-plain",
+            title: "Escape plain",
+            startDate: new Date(),
+            eventsType: "500 seats",
+          });
+        });
 
         // The node the reference cases compare against. Its `weakreference` property holds the
         // identifier of `event-1`, which is the only value both literal types can point at.
@@ -264,6 +319,34 @@ describe("JCR query builder test", () => {
       event(2),
       event(1),
     ]);
+  });
+
+  it("folds a value list, a range and an absence test into index operators", () => {
+    visitView();
+    paths("predicates").then((found) => {
+      expect([...found].sort()).to.deep.equal([event(1), event(2), event(3), event(4), event(5)]);
+    });
+  });
+
+  it("escapes the LIKE wildcards of a startsWith prefix", () => {
+    visitView();
+    paths("startsWithPlain").then((found) => {
+      expect([...found].sort()).to.deep.equal([event(1), event(2), event(3), event(4), event(5)]);
+    });
+    // `mee_ing` matches `meeting` when the underscore stays a wildcard, and nothing once it is
+    // escaped, which is what this case reads.
+    paths("startsWithWildcard").should("have.length", 0);
+  });
+
+  it("matches a literal percent sign in a startsWith prefix", () => {
+    visitView();
+    // The control first: the fixture folder holds two events whose `eventsType` starts with `50`.
+    paths("startsWithDigits").then((found) => {
+      expect([...found].sort()).to.deep.equal([percentEvent, plainEvent]);
+    });
+    // The prefix `50%` is written as `50\%%`. One node means the backslash escape works, two mean
+    // the `%` stayed a wildcard, and none mean the backslash reached the index as a character.
+    paths("startsWithPercent").should("deep.equal", [percentEvent]);
   });
 
   it("executes a reference literal exactly as a weak reference one", () => {

@@ -39,14 +39,26 @@ import { QueryError, declaredSelectors, validateModel } from "./validate.js";
  * The fluent facade over the factory layer. `from()` starts a chain, every chain call returns a new
  * builder, and `build()` hands back the query model the factory would have produced by hand.
  *
- * Two things are enforced by the types rather than at run time. A builder is executable only after
- * `limit()` or `unboundedSlow()` was called, which is what the `B` type parameter tracks. And a
- * method without the `Slow` suffix can only produce a construct that Jahia's Jackrabbit runs on the
- * Lucene index, which is what the speed marker of the model tracks.
+ * Two things are enforced by the types. A builder is executable only after `limit()` or
+ * `unboundedSlow()` was called, which is what the `B` type parameter tracks. And a method without
+ * the `Slow` suffix can only produce a construct that Jahia's Jackrabbit runs on the Lucene index,
+ * which is what the speed marker of the model tracks.
+ *
+ * The limit is also enforced at run time, in `executeQuery`, because a type check does not reach a
+ * JavaScript caller or an `as` cast. The speed marker is not, because a slow construct runs, and
+ * only costs more.
  */
 
-/** Whether a builder carries an execution limit. Only `"limitSet"` is executable. */
-export type Bound = "noLimit" | "limitSet";
+/**
+ * Whether a builder carries an execution limit. Only `"limitSet"` is executable.
+ *
+ * The first member spells out the fix, because its name is what the compiler prints when a builder
+ * without a limit reaches an execution seam.
+ */
+export type Bound = "call limit(n) or unboundedSlow() before executing" | "limitSet";
+
+/** The state of a builder that has no limit yet, which is the first member of {@link Bound}. */
+type NoLimit = "call limit(n) or unboundedSlow() before executing";
 
 /** The typed selector references a callback receives, one per declared alias. */
 export type Selectors<A extends string> = { readonly [K in A]: SelectorRef<K> };
@@ -67,8 +79,16 @@ export interface SelectorRef<K extends string = string> {
   readonly selectorName: K;
   /** The value of one property of this selector. */
   prop(propertyName: string): PropertyRef<K>;
-  /** Full text search over every property of the node, which is `CONTAINS(alias.*, expression)`. */
-  contains(expression: LiteralArg): FullTextSearch<K>;
+  /**
+   * JCR full text search over every property of the node, which is `CONTAINS(alias.*, expression)`.
+   *
+   * This is a search over the analysed index and not a substring match. The expression is the JCR
+   * full text grammar, so it carries terms, quoted phrases, `OR`, a leading `-` for exclusion and a
+   * trailing `*` for a prefix. It matches whole terms, so `fullText("graal")` matches a node whose
+   * text holds the word `graal` and not one that only holds `graaljs`. Use `prop(name).like()` or
+   * `prop(name).startsWith()` for a match on the characters of one property.
+   */
+  fullText(expression: LiteralArg): FullTextSearch<K>;
   /** Every property of this selector as one wildcard column, which is `alias.*`. */
   all(): Column<K>;
   /** The node must be a descendant of the node at this absolute path. */
@@ -117,14 +137,55 @@ export interface PropertyRef<K extends string = string> {
   ge(value: LiteralArg): Comparison<K, "fast">;
   /** `property LIKE value`, with `%` and `_` as wildcards. */
   like(value: LiteralArg): Comparison<K, "fast">;
+  /**
+   * The property must equal one of these values, which folds to `=` comparisons joined with `OR`.
+   * An empty list throws, because it would be a constraint that matches nothing.
+   *
+   * The fold writes one comparison per value, so keep the list short. Lucene bounds how many
+   * clauses one boolean query may hold, and a list of hundreds of values is better expressed as a
+   * path scope or as a node type than as a value list.
+   */
+  in(values: readonly LiteralArg[]): Constraint<K, "fast">;
+  /**
+   * The property must be between the two values, both ends included, which folds to `>=` and `<=`
+   * joined with `AND`.
+   */
+  between(low: LiteralArg, high: LiteralArg): Constraint<K, "fast">;
+  /**
+   * The property must start with this text, which is `LIKE 'prefix%'`. The `%` and `_` characters
+   * of the prefix are escaped for you, so they match themselves.
+   */
+  startsWith(prefix: string): Comparison<K, "fast">;
   /** Orders ascending on this property, which Lucene sorts natively. */
   asc(): Ordering<K, "fast">;
   /** Orders descending on this property, which Lucene sorts natively. */
   desc(): Ordering<K, "fast">;
   /** The node must have this property. */
   exists(): PropertyExistence<K>;
-  /** Full text search over this property only. */
-  contains(expression: LiteralArg): FullTextSearch<K>;
+  /**
+   * The node must not have this property, which is `NOT (alias.[property] IS NOT NULL)`.
+   *
+   * The JCR has no null value. A property is either present on the node or absent from it, so this
+   * is a test of absence and never a comparison against a null. The JCR specification defines `IS
+   * NOT NULL` over a property as a test of existence, so by that definition a property that holds
+   * an empty string exists and this constraint does not match it, and a property whose value comes
+   * from a node type default exists as well.
+   */
+  notExists(): Not<K, "fast">;
+  /**
+   * The same constraint as {@link PropertyRef.notExists}, under the name the field uses for it. The
+   * JCR has no null value, so "is null" here means that the property is absent from the node.
+   */
+  isNull(): Not<K, "fast">;
+  /**
+   * JCR full text search over this property only, which is `CONTAINS(alias.[property],
+   * expression)`.
+   *
+   * This is a search over the analysed index and not a substring match, so it matches whole terms.
+   * Use {@link PropertyRef.like} or {@link PropertyRef.startsWith} for a match on the characters of
+   * the value.
+   */
+  fullText(expression: LiteralArg): FullTextSearch<K>;
   /** Joins this property to the property of another selector on equal values. */
   equals<O extends string>(other: PropertyRef<O>): EquiJoinCondition<K | O>;
   /** Selects this property as a column, optionally under a column name. */
@@ -164,6 +225,19 @@ export interface CaseRef<K extends string = string> {
   ge(value: LiteralArg): Comparison<K, "fast">;
   /** `LOWER(property) LIKE value` */
   like(value: LiteralArg): Comparison<K, "fast">;
+  /**
+   * The transformed value must equal one of these values, which folds to `=` comparisons joined
+   * with `OR`. An empty list throws.
+   */
+  in(values: readonly LiteralArg[]): Constraint<K, "fast">;
+  /** The transformed value must be between the two values, both ends included. */
+  between(low: LiteralArg, high: LiteralArg): Constraint<K, "fast">;
+  /**
+   * The transformed value must start with this text, which is `LIKE 'prefix%'`. The `%` and `_`
+   * characters of the prefix are escaped for you. Write the prefix in the case the transform
+   * produces, so `lower().startsWith("ho")` and not `lower().startsWith("Ho")`.
+   */
+  startsWith(prefix: string): Comparison<K, "fast">;
   /** Orders ascending on the transformed value, which costs one node load per collected document. */
   ascSlow(): Ordering<K, "slow">;
   /** Orders descending on the transformed value, which costs one node load per collected document. */
@@ -177,6 +251,12 @@ export interface CaseRef<K extends string = string> {
 export interface NameRef<K extends string = string> {
   /** `NAME(alias) = value`, the one form the index serves. */
   eq(value: LiteralArg): Comparison<K, "fast">;
+  /**
+   * The node name must be one of these values, which folds to `=` comparisons joined with `OR`. It
+   * stays on the index, because `=` is the operator the index serves for a name. An empty list
+   * throws.
+   */
+  in(values: readonly LiteralArg[]): Constraint<K, "fast">;
   /** `NAME(alias) <> value`, evaluated in memory. */
   neSlow(value: LiteralArg): Comparison<K, "slow">;
   /** `NAME(alias) < value`, evaluated in memory. */
@@ -201,6 +281,16 @@ export interface LocalNameRef<K extends string = string> {
   eq(value: LiteralArg): Comparison<K, "fast">;
   /** `LOCALNAME(alias) LIKE value`, served by the index. */
   like(value: LiteralArg): Comparison<K, "fast">;
+  /**
+   * The local name must be one of these values, which folds to `=` comparisons joined with `OR`. An
+   * empty list throws.
+   */
+  in(values: readonly LiteralArg[]): Constraint<K, "fast">;
+  /**
+   * The local name must start with this text, which is `LOCALNAME(alias) LIKE 'prefix%'`. The `%`
+   * and `_` characters of the prefix are escaped for you.
+   */
+  startsWith(prefix: string): Comparison<K, "fast">;
   /** `LOCALNAME(alias) <> value`, evaluated in memory. */
   neSlow(value: LiteralArg): Comparison<K, "slow">;
   /** `LOCALNAME(alias) < value`, evaluated in memory. */
@@ -282,6 +372,42 @@ function staticOperand(value: LiteralArg): StaticOperand {
   return isBindVariable(value) ? value : literal(value);
 }
 
+/** The characters `LIKE` reads as wildcards, and the backslash that escapes them. */
+const LIKE_SPECIAL = /[\\%_]/g;
+
+/**
+ * Turns a plain prefix into the `LIKE` pattern that matches it. The JCR-SQL2 `LIKE` operand reads
+ * `%` and `_` as wildcards and a backslash as the escape character, so a prefix that holds one of
+ * the three is escaped here and matches itself.
+ */
+function likePrefixPattern(prefix: string, at: string): string {
+  if (typeof prefix !== "string") {
+    throw new QueryError(
+      "UNSUPPORTED",
+      `startsWith() needs a string prefix, got ${String(prefix)}`,
+      at,
+    );
+  }
+
+  return `${prefix.replace(LIKE_SPECIAL, "\\$&")}%`;
+}
+
+/**
+ * Folds a list of values into one constraint joined with `OR`, one comparison per value. An empty
+ * list would be a constraint that matches nothing, which is never what the caller meant, so it
+ * throws instead.
+ */
+function anyOf<K extends string, P extends Speed>(
+  values: readonly LiteralArg[],
+  comparisonFor: (value: LiteralArg) => Comparison<K, P>,
+): Constraint<K, P> {
+  if (!Array.isArray(values) || values.length === 0) {
+    throw new QueryError("NULL_CONSTRAINT", "in() needs at least one value", "constraint");
+  }
+
+  return fold(values.map(comparisonFor), "in()", qom.or);
+}
+
 function slowComparison<K extends string>(
   operand: DynamicOperand<K>,
   operator: Operator,
@@ -302,6 +428,13 @@ function caseRef<K extends string>(operand: FastOperand<K>): CaseRef<K> {
     gt: (value) => fast(Operator.GREATER_THAN, value),
     ge: (value) => fast(Operator.GREATER_THAN_OR_EQUAL_TO, value),
     like: (value) => fast(Operator.LIKE, value),
+    in: (values) => anyOf<K, "fast">(values, (value) => fast(Operator.EQUAL_TO, value)),
+    between: (low, high) =>
+      qom.and(
+        fast(Operator.GREATER_THAN_OR_EQUAL_TO, low),
+        fast(Operator.LESS_THAN_OR_EQUAL_TO, high),
+      ),
+    startsWith: (prefix) => fast(Operator.LIKE, likePrefixPattern(prefix, "constraint.operand2")),
     ascSlow: () => qom.ascendingSlow(operand),
     descSlow: () => qom.descendingSlow(operand),
   };
@@ -322,8 +455,12 @@ function lengthRef<K extends string>(operand: Length<K>): LengthRef<K> {
 }
 
 function nameRef<K extends string>(operand: NodeName<K>): NameRef<K> {
+  const equalTo = (value: LiteralArg): Comparison<K, "fast"> =>
+    qom.comparison(operand, Operator.EQUAL_TO, staticOperand(value));
+
   return {
-    eq: (value) => qom.comparison(operand, Operator.EQUAL_TO, staticOperand(value)),
+    eq: equalTo,
+    in: (values) => anyOf<K, "fast">(values, equalTo),
     neSlow: (value) => slowComparison(operand, Operator.NOT_EQUAL_TO, value),
     ltSlow: (value) => slowComparison(operand, Operator.LESS_THAN, value),
     leSlow: (value) => slowComparison(operand, Operator.LESS_THAN_OR_EQUAL_TO, value),
@@ -336,9 +473,19 @@ function nameRef<K extends string>(operand: NodeName<K>): NameRef<K> {
 }
 
 function localNameRef<K extends string>(operand: NodeLocalName<K>): LocalNameRef<K> {
+  const equalTo = (value: LiteralArg): Comparison<K, "fast"> =>
+    qom.comparison(operand, Operator.EQUAL_TO, staticOperand(value));
+
   return {
-    eq: (value) => qom.comparison(operand, Operator.EQUAL_TO, staticOperand(value)),
+    eq: equalTo,
     like: (value) => qom.comparison(operand, Operator.LIKE, staticOperand(value)),
+    in: (values) => anyOf<K, "fast">(values, equalTo),
+    startsWith: (prefix) =>
+      qom.comparison(
+        operand,
+        Operator.LIKE,
+        staticOperand(likePrefixPattern(prefix, "constraint.operand2")),
+      ),
     neSlow: (value) => slowComparison(operand, Operator.NOT_EQUAL_TO, value),
     ltSlow: (value) => slowComparison(operand, Operator.LESS_THAN, value),
     leSlow: (value) => slowComparison(operand, Operator.LESS_THAN_OR_EQUAL_TO, value),
@@ -378,10 +525,19 @@ function propertyRef<K extends string>(selectorName: K, propertyName: string): P
     gt: (value) => fast(Operator.GREATER_THAN, value),
     ge: (value) => fast(Operator.GREATER_THAN_OR_EQUAL_TO, value),
     like: (value) => fast(Operator.LIKE, value),
+    in: (values) => anyOf<K, "fast">(values, (value) => fast(Operator.EQUAL_TO, value)),
+    between: (low, high) =>
+      qom.and(
+        fast(Operator.GREATER_THAN_OR_EQUAL_TO, low),
+        fast(Operator.LESS_THAN_OR_EQUAL_TO, high),
+      ),
+    startsWith: (prefix) => fast(Operator.LIKE, likePrefixPattern(prefix, "constraint.operand2")),
     asc: () => qom.ascending(operand),
     desc: () => qom.descending(operand),
     exists: () => qom.propertyExistence(selectorName, propertyName),
-    contains: (expression) =>
+    notExists: () => qom.not(qom.propertyExistence(selectorName, propertyName)),
+    isNull: () => qom.not(qom.propertyExistence(selectorName, propertyName)),
+    fullText: (expression) =>
       qom.fullTextSearch(selectorName, propertyName, staticOperand(expression)),
     equals: (other) =>
       qom.equiJoinCondition(selectorName, propertyName, other.selectorName, other.propertyName),
@@ -437,7 +593,7 @@ function selectorRef<K extends string>(selectorName: K): SelectorRef<K> {
   return {
     selectorName,
     prop: (propertyName) => propertyRef(selectorName, propertyName),
-    contains: (expression) => qom.fullTextSearch(selectorName, null, staticOperand(expression)),
+    fullText: (expression) => qom.fullTextSearch(selectorName, null, staticOperand(expression)),
     all: () => qom.column(selectorName),
     isDescendantOf,
     isChildOf,
@@ -525,9 +681,10 @@ export interface JoinClause<A extends string, C extends string, B extends Bound>
 export interface QueryBuilder<A extends string, B extends Bound> {
   /**
    * Phantom marker for the limit state. It exists at compile time only and the object never carries
-   * it.
+   * it. It is named `__limit` because the compiler prints this property name next to the value of
+   * `B` when a builder without a limit reaches an execution seam.
    */
-  readonly bound?: B;
+  readonly __limit?: B;
   /** Adds a constraint that runs on the index. Repeated calls are joined with `AND`. */
   where(constraint: Arg<A, Constraint<A, "fast">>): QueryBuilder<A, B>;
   /** Adds a constraint of any speed. Repeated calls are joined with `AND`. */
@@ -545,15 +702,20 @@ export interface QueryBuilder<A extends string, B extends Bound> {
   orderBy(...orderings: Arg<A, Ordering<A, "fast">>[]): QueryBuilder<A, B>;
   /** Appends orderings of any speed. */
   orderBySlow(...orderings: Arg<A, Ordering<A>>[]): QueryBuilder<A, B>;
-  /** Appends columns. An empty column list writes `SELECT *`. */
+  /**
+   * Appends columns to the statement. An empty column list writes `SELECT *`.
+   *
+   * This shapes the statement and nothing else. `getNodesByJCRQuery` and `useJCRQuery` return the
+   * nodes of the left selector whatever the columns say, so a named column is not a field of the
+   * result. Read the value from the node that comes back.
+   */
   select(...columns: Arg<A, Column<A>>[]): QueryBuilder<A, B>;
-  /** Same as {@link QueryBuilder.select}, under the name the model uses. */
-  columns(...columns: Arg<A, Column<A>>[]): QueryBuilder<A, B>;
   /** Sets the execution limit, which is what makes the builder executable. */
   limit(count: number): QueryBuilder<A, "limitSet">;
   /**
    * Runs without a limit. Named `Slow` because the search then walks every hit. It stores `-1`,
-   * which is the value the JCR `setLimit` contract reads as unbounded.
+   * which is the value the JCR `setLimit` contract reads as unbounded. `diagnose()` reports it as a
+   * `full-scan` finding.
    */
   unboundedSlow(): QueryBuilder<A, "limitSet">;
   /** Sets the execution offset. It never enters the model. */
@@ -568,9 +730,21 @@ export interface QueryBuilder<A extends string, B extends Bound> {
   build(options?: { strict?: boolean }): QueryModel<A>;
   /** Reports how Jahia's Jackrabbit runs this query, model and execution options together. */
   diagnose(): Diagnostic[];
-  /** The model as it stands. It never carries the limit, the offset or the bindings. */
+  /**
+   * The model as it stands. It never carries the limit, the offset or the bindings.
+   *
+   * @internal This is the shape the sink walks, not a supported surface, and it can change in a
+   *   patch release. Call `build()` for the model a caller may keep. The member stays in the
+   *   published declarations, because `stripInternal` would take the phantom limit marker with it
+   *   and `Executable` is built on that marker.
+   */
   readonly model: QueryModel<A>;
-  /** The values that travel next to the model. */
+  /**
+   * The values that travel next to the model.
+   *
+   * @internal Same reservation as {@link QueryBuilder.model}: it is the shape the execution seams
+   *   read, and it can change in a patch release.
+   */
   readonly execution: ExecutionOptions;
 }
 
@@ -606,7 +780,7 @@ function assertCount(count: number, what: string, at: string): void {
 }
 
 class Chain<A extends string, B extends Bound> implements QueryBuilder<A, B> {
-  declare readonly bound?: B;
+  declare readonly __limit?: B;
 
   readonly model: QueryModel<A>;
   readonly execution: ExecutionOptions;
@@ -702,10 +876,6 @@ class Chain<A extends string, B extends Bound> implements QueryBuilder<A, B> {
     );
   }
 
-  columns(...columns: Arg<A, Column<A>>[]): QueryBuilder<A, B> {
-    return this.select(...columns);
-  }
-
   limit(count: number): QueryBuilder<A, "limitSet"> {
     assertCount(count, "limit()", "execution.limit");
     return this.withExecution<"limitSet">({ limit: count });
@@ -775,8 +945,9 @@ class Chain<A extends string, B extends Bound> implements QueryBuilder<A, B> {
  * through `qom.selector("jnt:page")` and the second signature below.
  *
  * @remarks
- *   Jahia support: a query without a limit cannot be executed, because `Queryable` accepts a builder
- *   whose limit was set only. The escape hatch is `unboundedSlow()`.
+ *   Jahia support: a query without a limit cannot be executed. `Queryable` accepts a builder whose
+ *   limit was set only, and the execution seams throw `UNSUPPORTED` on a builder that reaches them
+ *   without one. The escape hatch is `unboundedSlow()`.
  * @example
  *   ```ts
  *   from("jnt:page", "p")
@@ -789,15 +960,15 @@ class Chain<A extends string, B extends Bound> implements QueryBuilder<A, B> {
 export function from<T extends string, A extends string>(
   nodeType: T,
   alias: A,
-): QueryBuilder<A, "noLimit">;
-export function from<S extends string>(model: QueryModel<S>): QueryBuilder<S, "noLimit">;
+): QueryBuilder<A, NoLimit>;
+export function from<S extends string>(model: QueryModel<S>): QueryBuilder<S, NoLimit>;
 export function from(
   nodeTypeOrModel: string | QueryModel,
   alias?: string,
-): QueryBuilder<string, "noLimit"> {
+): QueryBuilder<string, NoLimit> {
   if (typeof nodeTypeOrModel !== "string") {
     const model = nodeTypeOrModel;
-    return new Chain<string, "noLimit">(
+    return new Chain<string, NoLimit>(
       model.source,
       model.constraint,
       model.orderings,
@@ -814,5 +985,5 @@ export function from(
     );
   }
 
-  return new Chain<string, "noLimit">(qom.selector(nodeTypeOrModel, alias), null, [], [], {});
+  return new Chain<string, NoLimit>(qom.selector(nodeTypeOrModel, alias), null, [], [], {});
 }

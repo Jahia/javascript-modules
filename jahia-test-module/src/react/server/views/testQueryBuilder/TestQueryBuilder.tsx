@@ -55,6 +55,9 @@ interface QOMFactoryLike extends Omit<QueryObjectModelFactory, "createQuery" | "
  */
 const EPOCH = "2000-01-01T00:00:00.000Z";
 
+/** The far end of the range the `between` case uses, chosen so that every fixture event fits it. */
+const HORIZON = "2099-01-01T00:00:00.000Z";
+
 /**
  * Renders the JCR-SQL2 statement Jahia formats for a built query.
  *
@@ -183,7 +186,14 @@ jahiaComponent(
     const session = currentNode.getSession();
     const siteKey = currentNode.getResolveSite().getSiteKey();
     const scope = `/sites/${siteKey}/contents/queryBuilder`;
+    // The escaping fixture lives in its own folder, so that its events never enter the counts the
+    // cases scoped to `scope` assert.
+    const escapeScope = `/sites/${siteKey}/contents/queryBuilderEscape`;
     server.render.addCacheDependency({ flushOnPathMatchingRegexp: `${scope}/.*` }, renderContext);
+    server.render.addCacheDependency(
+      { flushOnPathMatchingRegexp: `${escapeScope}/.*` },
+      renderContext,
+    );
 
     // 1. A property filter, with the path scope every case shares.
     const property = from("jnt:event", "e")
@@ -200,7 +210,7 @@ jahiaComponent(
 
     // 4. Full text search, ordered on the relevance score. Both are native Lucene constructs.
     const fullText = from("jnt:event", "e")
-      .where(({ e }) => and(e.isDescendantOf(scope), e.contains("Event")))
+      .where(({ e }) => and(e.isDescendantOf(scope), e.fullText("Event")))
       .orderBy(({ e }) => e.score().desc())
       .limit(10);
 
@@ -377,6 +387,48 @@ jahiaComponent(
       )
       .limit(10);
 
+    // 10. The folded predicates, all four in one query. Each folds into index operators, so
+    // `where()` takes them. `eventsType` is `meeting` on every event of the fixture and it is not
+    // internationalised, and no event carries `jcr:language` on the node itself.
+    const predicates = from("jnt:event", "e")
+      .where(({ e }) =>
+        and(
+          e.isDescendantOf(scope),
+          e.prop("eventsType").in(["meeting", "webinar"]),
+          e.prop("startDate").between(date(EPOCH), date(HORIZON)),
+          e.prop("jcr:language").notExists(),
+        ),
+      )
+      .limit(10);
+
+    // The prefix match, and the same prefix with a JCR-SQL2 wildcard inside it. `startsWith`
+    // escapes that wildcard, so `mee_ing` does not match `meeting` while `meet` matches it. An
+    // unescaped underscore would make the second case return every event.
+    const startsWithPlain = from("jnt:event", "e")
+      .where(({ e }) => and(e.isDescendantOf(scope), e.prop("eventsType").startsWith("meet")))
+      .limit(10);
+    const startsWithWildcard = from("jnt:event", "e")
+      .where(({ e }) => and(e.isDescendantOf(scope), e.prop("eventsType").startsWith("mee_ing")))
+      .limit(10);
+
+    // The half of the escaping that an underscore cannot decide. The escaping fixture holds two
+    // events, `eventsType` `50% off` and `eventsType` `500 seats`, and the three possible outcomes
+    // of `startsWith("50%")` name three different behaviours of the engine:
+    //
+    // - one node, the `50% off` event: the backslash is read as the escape character the JCR
+    //   specification defines, which is what `startsWith()` writes and what it documents.
+    // - two nodes: the `%` stayed a wildcard, so the escape was written and then ignored.
+    // - no node: the backslash reached the index as a literal character.
+    //
+    // `startsWithDigits` is the control. It carries no escape and must return both events, so a run
+    // that returns nothing for both cases is a fixture failure and not an escaping answer.
+    const startsWithPercent = from("jnt:event", "e")
+      .where(({ e }) => and(e.isDescendantOf(escapeScope), e.prop("eventsType").startsWith("50%")))
+      .limit(10);
+    const startsWithDigits = from("jnt:event", "e")
+      .where(({ e }) => and(e.isDescendantOf(escapeScope), e.prop("eventsType").startsWith("50")))
+      .limit(10);
+
     // A page of a query ordered on the identifier, which is the stable tiebreaker.
     const stable = from("jnt:event", "e")
       .where(({ e }) => e.isDescendantOf(scope))
@@ -418,6 +470,12 @@ jahiaComponent(
         <PrintQuery testid="notOnI18n" session={session} query={notOnI18n} />
         <PrintQuery testid="lowerOrderOnI18n" session={session} query={lowerOrderOnI18n} />
         <PrintQuery testid="lowerOrderOnPlain" session={session} query={lowerOrderOnPlain} />
+
+        <PrintQuery testid="predicates" session={session} query={predicates} />
+        <PrintQuery testid="startsWithPlain" session={session} query={startsWithPlain} />
+        <PrintQuery testid="startsWithWildcard" session={session} query={startsWithWildcard} />
+        <PrintQuery testid="startsWithPercent" session={session} query={startsWithPercent} />
+        <PrintQuery testid="startsWithDigits" session={session} query={startsWithDigits} />
 
         <PrintQuery testid="strongRef" session={session} query={strongRef} />
         <PrintQuery testid="weakRef" session={session} query={weakRef} />

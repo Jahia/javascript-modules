@@ -10,7 +10,13 @@ import { QueryError } from "./validate.js";
  * this file.
  *
  * It is the only caller of `setLimit` and `setOffset` in the whole library, so no layer slices the
- * result in JavaScript.
+ * result in JavaScript. It is also where the limit rule holds at run time: a builder that carries
+ * no limit never reaches the host.
+ *
+ * Two routes stay outside this rule, and both leave the library. `toQOM` hands back the host query
+ * object, and `execute()` on that object runs whatever it was built from. A query built through the
+ * session's own query manager never enters the library at all. The querying guide says so where it
+ * uses each of them.
  */
 
 /**
@@ -99,6 +105,18 @@ function runBuilder(
   const limit = singleValue(builder.execution.limit, options.limit, "limit");
   const offset = singleValue(builder.execution.offset, options.offset, "offset");
 
+  // The type state of the builder refuses a query without a limit at compile time, and a
+  // JavaScript caller, an `as` cast or a loosely typed wrapper walks past that check. The same rule
+  // is therefore enforced here, so that the limit holds for every caller and not only for the typed
+  // one.
+  if (limit === undefined) {
+    throw new QueryError(
+      "UNSUPPORTED",
+      "This query carries no limit, so it would return every node it matches. Call limit(n) on the query, or call unboundedSlow() when you really want every matching node",
+      "execution.limit",
+    );
+  }
+
   // `strict` throws `UNSUPPORTED` on a diagnostic whose level is `none` and that is not marked
   // `conditional`, which is a query that fails at execution whatever the environment. It runs
   // before the first host call.
@@ -123,10 +141,16 @@ function runBuilder(
  * level, which is the only text form it has; a statement is not logged, because the caller already
  * holds it.
  *
+ * A builder that carries no limit throws `UNSUPPORTED`, whatever the caller's language, because the
+ * compile-time rule alone leaves the door open to a JavaScript caller and to an `as` cast.
+ *
  * @param session The JCR session the query runs in.
  * @param query A JCR-SQL2 statement, or a builder whose limit was set.
  * @param options The limit and the offset, for a statement or for a builder that carries neither.
  * @returns The query result, with the nodes and the rows of Jahia's wrapper.
+ * @throws A `QueryError` whose code is `UNSUPPORTED` when a builder reaches this function with no
+ *   limit, and one whose code is `LIMIT_CONFLICT` when a value is set on both the query and the
+ *   call.
  */
 export function executeQuery(
   session: JCRSessionWrapper,

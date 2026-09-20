@@ -30,7 +30,7 @@ Prefer the builder. A statement is a string, so you escape by hand every value t
 
 The builder mirrors `javax.jcr.query.qom.QueryObjectModel`, which is the form Jahia hands to its Lucene translation. A statement is parsed into that same form before it runs, so the two paths cost the same and return the same nodes.
 
-The examples below also use `and`, `not`, `date`, `$`, `qom`, `Operator` and `literal`, which the same package exports.
+The examples below also use `and`, `not`, `date`, `double`, `$`, `qom`, `Operator`, `literal` and `toQOM`, which the same package exports.
 
 ## A first query
 
@@ -47,7 +47,7 @@ const nodes = getNodesByJCRQuery(session, news);
 // SELECT n.* FROM [jnt:news] AS n WHERE ISDESCENDANTNODE(n, ['/sites/acme/contents']) ORDER BY n.date DESC
 ```
 
-A query with no explicit column selects one wildcard column per selector, which is why the statement above starts with `SELECT n.*`. Use `select()` to name the columns, as the join example below does.
+A query with no explicit column selects one wildcard column per selector, which is why the statement above starts with `SELECT n.*`. `select()` names the columns of the statement, as the join example below does. It shapes the statement and nothing else: `getNodesByJCRQuery` and `useJCRQuery` return nodes whatever the columns say, so a named column is not a field of the result. Read the value from the node that comes back.
 
 A builder is immutable, so every call returns a new builder and the base is never changed. One base therefore serves several pages:
 
@@ -56,7 +56,11 @@ const page1 = getNodesByJCRQuery(session, news);
 const page2 = getNodesByJCRQuery(session, news.offset(10));
 ```
 
-A query cannot be executed before `limit(n)` was called, and the compiler enforces that rule. `getNodesByJCRQuery` and `useJCRQuery` do not accept a builder without a limit. The limit is required because a query without one reads every node it matches, and the cost of that read grows with the repository. The escape hatch is `unboundedSlow()`, which returns every matching node and carries its cost in its name.
+A query cannot be executed before `limit(n)` was called. `getNodesByJCRQuery` and `useJCRQuery` refuse a builder without a limit at compile time, and they throw a `QueryError` whose code is `UNSUPPORTED` when one reaches them anyway, which is what happens in a module written in JavaScript or behind an `as` cast. The limit is required because a query without one reads every node it matches, and the cost of that read grows with the repository. The escape hatch is `unboundedSlow()`, which returns every matching node and carries its cost in its name.
+
+The rule holds for every query the library executes. It does not reach a query that leaves the library: `toQOM()` hands back the host query object, and `execute()` on that object runs whatever it was built from, with no limit and no `diagnose()`. Use `toQOM()` to read the statement, and the two seams to run a query.
+
+A statement takes the same decision explicitly. `useJCRQuery({ query })` without a `limit` throws, and `useJCRQuery({ query, limit: -1 })` is how you ask for every matching node.
 
 ## Values and bind variables
 
@@ -85,17 +89,43 @@ The builder replaces each variable with a typed literal before the query reaches
 
 ## Full text search
 
-`contains()` builds a full text constraint, and `score()` gives the relevance that Lucene computed for a node. Both constructs are served by the index, and an ordering on the score is sorted in Lucene as well.
+`fullText()` builds a full text constraint, and `score()` gives the relevance that Lucene computed for a node. Both constructs are served by the index, and an ordering on the score is sorted in Lucene as well.
 
 ```tsx
 from("jnt:article", "a")
-  .where(({ a }) => a.contains("graal*"))
+  .where(({ a }) => a.fullText("graal*"))
   .orderBy(({ a }) => a.score().desc())
   .limit(10);
 // SELECT a.* FROM [jnt:article] AS a WHERE CONTAINS(a.*, 'graal*') ORDER BY SCORE(a) DESC
 ```
 
-`contains()` on a selector searches every property of the node. Call it on a property reference to search one property, as in `a.prop("body").contains("graal*")`. A comparison on the score is the slow case, so its methods are named `gtSlow()`, `eqSlow()` and so on.
+`fullText()` on a selector searches every property of the node. Call it on a property reference to search one property, as in `a.prop("body").fullText("graal*")`. A comparison on the score is the slow case, so its methods are named `gtSlow()`, `eqSlow()` and so on.
+
+`fullText()` is a JCR full text search over the analysed index, and it is not a substring match. It matches whole terms, so `fullText("graal")` matches a node whose text holds the word `graal` and not one that only holds `graaljs`. The expression is the JCR full text grammar: terms, quoted phrases, `OR`, a leading `-` to exclude a term, and a trailing `*` for a prefix. Use `like()` or `startsWith()` when you mean a match on the characters of one property. The method is named `fullText()` and not `contains()` because `contains` is a substring match in Prisma and in Drizzle, and the two are not the same thing.
+
+## Everyday predicates
+
+Four methods build a constraint that would otherwise be written by hand. Each folds into index operators, so `where()` accepts them all.
+
+```tsx
+from("jnt:news", "n")
+  .where(({ n }) =>
+    and(
+      n.prop("category").in(["sport", "culture", "science"]),
+      n.prop("readingTime").between(2, 10),
+      n.prop("jcr:title").startsWith("The "),
+      n.prop("expiryDate").notExists(),
+    ),
+  )
+  .limit(20);
+```
+
+- `in()` folds to `=` comparisons joined with `OR`. An empty list throws, because it would be a constraint that matches nothing. The fold writes one comparison per value, so keep the list short: Lucene bounds how many clauses one boolean query may hold, and a selection of hundreds of nodes reads better as a path scope or as a node type than as a value list.
+- `between()` folds to `>=` and `<=`, and both ends are included.
+- `startsWith()` builds `LIKE 'prefix%'` and escapes the prefix for you, so `startsWith("50% off")` matches a title that really starts with `50% off` instead of reading the `%` as a wildcard.
+- `notExists()` says that the node does not carry the property, which is `NOT (n.[expiryDate] IS NOT NULL)`. The JCR has no null value: a property is present on the node or absent from it. The JCR specification defines `IS NOT NULL` over a property as a test of existence, so by that definition a property that holds an empty string exists and `notExists()` does not match it. `isNull()` is the same constraint under the name the other query builders use for it.
+
+`in()` and `startsWith()` are also available on `lower()` and `upper()`, and on `localName()`. `in()` is available on `name()` as well, because `=` is the one operator the index serves for a node name.
 
 ## Fast and slow
 
@@ -117,7 +147,7 @@ from("jnt:page", "p")
 
 The constructs that run in memory are joins, `LENGTH`, comparisons on `SCORE()`, and comparisons on `NAME()` or `LOCALNAME()` outside their index operators. An ordering on anything other than a property or `SCORE()` is in the same group. `LOWER()` and `UPPER()` on a property are an exception. In a comparison the index serves both functions, and in an ordering it serves neither.
 
-A join is the other construct of that group, and `select()` names the columns it returns:
+A join is the other construct of that group. `select()` names the columns of the statement, and the example below also shows what the node seam hands back:
 
 ```tsx
 from("jnt:page", "p")
@@ -133,7 +163,7 @@ from("jnt:page", "p")
 // INNER JOIN [jnt:content] AS c ON ISCHILDNODE(c, p) WHERE c.[j:published] = true
 ```
 
-`getNodesByJCRQuery` returns the nodes of the left selector, which are the pages that have a published child in this example. The left node comes back once per matching row, so deduplicate in JavaScript when you need distinct nodes.
+`getNodesByJCRQuery` returns the nodes of the left selector, which are the pages that have a published child in this example. The `childTitle` column shapes the statement and never reaches that array: read the title from the child node instead, or from the rows of the host query object that `toQOM()` gives you. The left node comes back once per matching row, so deduplicate in JavaScript when you need distinct nodes.
 
 The `qom` factory is the escape hatch for a construct that the facade does not express, and a factory node mixes into a builder callback:
 
@@ -165,8 +195,12 @@ A level of `none` means the query fails at execution, and the builder refuses su
 The four other levels are `partial`, `deep-offset`, `full-scan` and `environment`:
 
 - `partial` means the query runs with different semantics.
-- `deep-offset` and `full-scan` mean the query costs more than the query suggests.
-- `environment` is always present. The entry lists the four conditions outside the model. The conditions are the native sort setting, the extra JCR providers, the render mode and the session locale.
+- `deep-offset` and `full-scan` mean the query costs more than the query suggests. A join is a `full-scan`, because both sides run unbounded, and so is `unboundedSlow()`.
+- `environment` means that a setting or an installation detail decides the cost, and that the model cannot show it. An ordering raises it for the native sort setting, and an offset raises it for the extra JCR providers.
+
+A query that carries nothing worth reporting returns an empty list, so `if (findings.length)` is a signal. Two conditions outside the model are not reported per query, because they apply to nearly every query: the render mode, which can shorten a page, and the session locale, which the localized sites section below covers.
+
+One finding is expected rather than exceptional. Every ordered query carries the `environment` finding at `orderings`, because the ordering is bounded by the limit only while `jahia.jackrabbit.useNativeSort` is true. That setting is true on a default installation, so read this one entry as a note about the installation and not as a problem with the query.
 
 ## How paging works
 
@@ -208,7 +242,9 @@ One case returns fewer nodes than the page holds. Jahia drops a node after the p
 
 There is no exact total count with an acceptable cost. `SELECT [rep:count()]` walks every hit and reads a stored document per hit. The cost is linear in the size of the result set, and the count never stops early. Do not put such a count on a page that a visitor can open.
 
-`rep:count(approximate=1)` is bounded whatever the size of the result set. The count stops after about 100 passes and extrapolates, so it gives an order of magnitude and never an exact number. There is no count API in the library, so the query goes through the session:
+`rep:count(approximate=1)` is bounded whatever the size of the result set. The count stops after about 100 passes and extrapolates, so it gives an order of magnitude and never an exact number. There is no count API in the library, so this one query goes through the session's own query manager.
+
+That path leaves the builder, so the limit rule of this library does not reach it, and neither does `diagnose()`. It is bounded by the `approximate=1` flag and by nothing else. Do not copy the shape of this snippet for a query that returns content: a `setLimit` here would not bound the count, because the count loop never breaks early, and it would make Jackrabbit start with a small heap and run the search again as it doubles. Every query that returns nodes goes through `from()` and one of the two seams.
 
 ```tsx
 const statement = `SELECT [rep:count(approximate=1)] FROM [jnt:news] AS n
@@ -303,7 +339,7 @@ An internationalized property is stored on a `jnt:translation` child node. In a 
 ## Two traps
 
 - A `REFERENCE` literal executes as a weak reference, because Jahia's value factory converts it. A query that compares a strong reference property therefore behaves as if the property were weak. `diagnose()` reports this as `partial`.
-- A `DOUBLE` literal against a `LONG` property matches nothing, and nothing reports it. `n.prop("count").eq(3.0)` returns an empty result where `n.prop("count").eq(3)` returns rows, because the two types are indexed differently. Use `long()`, `double()` or `decimal()` when you know the type of the property.
+- A `DOUBLE` literal against a `LONG` property matches nothing, and nothing reports it. Jackrabbit indexes the two types differently, so `n.prop("count").eq(double(3))` returns an empty result where `n.prop("count").eq(3)` returns rows. Writing `3.0` does not reproduce this, because JavaScript has one number type and `3.0` is the integer `3`: the builder infers `LONG` for both. An inferred `DOUBLE` needs a value that is not an integer, as in `n.prop("count").eq(3.5)`. Use `long()`, `double()` or `decimal()` when you know the type of the property.
 
 ## Where to look next
 

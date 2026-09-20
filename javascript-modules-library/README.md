@@ -187,7 +187,7 @@ const news = useJCRQuery({
 });
 ```
 
-The form without a `limit` is deprecated. It returns every node the query matches, which is slow and memory consuming on a large repository. Pass a `limit`, or pass a built query, which carries its own. See [Query builder](#query-builder).
+The form without a `limit` is deprecated, and it now throws a `QueryError` whose code is `UNSUPPORTED`. It used to return every node the query matches, which is slow and memory consuming on a large repository. Pass a `limit`, pass `-1` when you really want every matching node, or pass a built query, which carries its own. See [Query builder](#query-builder).
 
 ### `useServerContext`
 
@@ -270,7 +270,7 @@ Three rules shape this API:
 
 - A builder is immutable. Every call returns a new builder, so one base serves several pages: `news.offset(10)` and `news.offset(20)` are two queries and the base is unchanged.
 - A name that ends in `Slow` produces a construct that Jahia's query engine evaluates in memory instead of in the Lucene index. `where()` and `orderBy()` refuse such a construct, `whereSlow()` and `orderBySlow()` accept it, so the cost of a query is visible where it is written.
-- A query cannot be executed before `limit(n)` or `unboundedSlow()` was called. This is a compile-time check, not a runtime one.
+- A query cannot be executed before `limit(n)` or `unboundedSlow()` was called. The compiler refuses such a query, and the execution seams throw `UNSUPPORTED` when one reaches them anyway, so the rule holds for a JavaScript caller as well. It does not reach a query executed through the host object that `toQOM` returns, which is outside the library.
 
 The guide `docs/2-guides/4-querying/README.md` covers pagination, total counts and the traps of a localized site. This API is experimental for one minor version, so its shape can still change.
 
@@ -322,7 +322,9 @@ for (const { level, at, reason } of query.diagnose()) {
 }
 ```
 
-`none` means the query fails at execution, and `build({ strict: true })` throws on such a finding. A `none` finding that also carries `conditional: true` fails only under a condition the model cannot see. One such condition is an internationalized property, so the finding is reported and the query still runs. The `environment` entry is always present. The entry lists the four conditions that live outside the model. The conditions are the native sort setting, the extra JCR providers, the render mode and the session locale.
+`none` means the query fails at execution, and `build({ strict: true })` throws on such a finding. A `none` finding that also carries `conditional: true` fails only under a condition the model cannot see. One such condition is an internationalized property, so the finding is reported and the query still runs. `full-scan` covers a join, an unbounded execution and a `rep:facet` or exact `rep:count` column. `environment` means that a setting decides the cost: an ordering raises it for the native sort setting, and an offset raises it for the extra JCR providers. Every ordered query therefore carries one `environment` entry at `orderings`, which is a note about the installation and not a problem with the query.
+
+A query with nothing to report returns an empty list, so `if (findings.length)` is a signal.
 
 ### `double`
 
@@ -341,7 +343,11 @@ from("jnt:page", "p")
 
 It also lifts a model that `qom.createQuery` built, so that the factory and the builder mix in one query.
 
-The builder has `where`, `whereSlow`, `orderBy`, `orderBySlow`, `select`, `columns`, `joinSlow`, `limit`, `unboundedSlow`, `offset`, `bind`, `build` and `diagnose`. The callback receives one reference per alias, and a reference gives `prop(name)`, `contains(expression)`, `all()`, `isDescendantOf(path)`, `isChildOf(path)`, `isSameAs(path)`, `name()`, `localName()` and `score()`.
+The builder has `where`, `whereSlow`, `orderBy`, `orderBySlow`, `select`, `joinSlow`, `limit`, `unboundedSlow`, `offset`, `bind`, `build` and `diagnose`. `select` names the columns of the statement and changes nothing the two seams hand back: both return the nodes of the left selector whatever the columns say. The callback receives one reference per alias, and a reference gives `prop(name)`, `fullText(expression)`, `all()`, `isDescendantOf(path)`, `isChildOf(path)`, `isSameAs(path)`, `name()`, `localName()` and `score()`.
+
+`fullText` runs a JCR full text search over the analysed index. It matches whole terms and it is not a substring match, which is what `contains` means in Prisma and in Drizzle. Use `like` or `startsWith` for a match on the characters of one property.
+
+A property reference also gives four folded predicates. `in(values)` folds to `=` comparisons joined with `OR`, and an empty list throws. The fold writes one comparison per value, so keep the list short: Lucene bounds how many clauses one boolean query may hold, and a selection of hundreds of nodes reads better as a path scope or as a node type. `between(low, high)` folds to `>=` and `<=`, both ends included. `startsWith(prefix)` builds `LIKE 'prefix%'` and escapes the `%` and `_` of the prefix for you. `notExists()` says that the node does not carry the property, and `isNull()` is the same constraint under the name the other query builders use: the JCR has no null value, so a property is present on the node or absent from it, and the specification defines `IS NOT NULL` as a test of existence, so by that definition a property that holds an empty string exists. `in` and `startsWith` are also on `lower()`, `upper()` and `localName()`, and `in` is on `name()` as well.
 
 A property reference gives `lower()` and `upper()`, and the Lucene index serves both for every operator. `upper()` carries the same caveat as `not` below. It fails for a property that the rewriter moves to a `jnt:translation` selector, and that redirect needs an internationalized property in a localized session. `diagnose` reports the risk, and the query is not refused. A lab run on Jahia 8.2.3.2 did not reproduce that failure. In that run, `upper()`, `not` and an ordering on `lower()` returned the expected nodes for an internationalized `jcr:title` in a localized session.
 
@@ -447,6 +453,8 @@ const statement = toQOM(news.build(), session).getStatement();
 
 Jahia rewrites the query before the object model exists, so the statement is the one of the rewritten query. In a localized session that rewrite adds a `jcr:language` constraint to every selector that carries none.
 
+The object it returns is the host query, not a builder. Calling `execute()` on it runs the query outside the library, so it carries no limit and no `diagnose()`, whatever the builder it came from said. Use it to read the statement, and `getNodesByJCRQuery` or `useJCRQuery` to run a query.
+
 ### `unchecked`
 
 This function accepts a constraint whose selector name is held in a `string` variable, and defers the selector check to `build()`. Use it when an alias cannot be a literal type, for instance when it comes from a configuration value.
@@ -462,7 +470,7 @@ This function creates a `WEAKREFERENCE` literal out of a node identifier.
 ### Two traps
 
 - A `REFERENCE` literal executes as a weak reference, as the `reference` entry says above. A query that compares a strong reference property therefore behaves as if the property were weak.
-- A `DOUBLE` literal against a `LONG` property matches nothing, and nothing reports it. Jackrabbit indexes the two types differently, so `n.prop("count").eq(3.0)` returns an empty result where `n.prop("count").eq(3)` returns rows. Use `long()`, `double()` or `decimal()` when the property type is known.
+- A `DOUBLE` literal against a `LONG` property matches nothing, and nothing reports it. Jackrabbit indexes the two types differently, so `n.prop("count").eq(double(3))` returns an empty result where `n.prop("count").eq(3)` returns rows. Writing `3.0` does not reproduce this, because JavaScript has one number type and `3.0` is the integer `3`. An inferred `DOUBLE` needs a value that is not an integer, as in `eq(3.5)`. Use `long()`, `double()` or `decimal()` when the property type is known.
 
 ## URL builder
 
