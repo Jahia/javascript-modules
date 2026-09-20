@@ -123,8 +123,7 @@ The sample is the first 100 passes in sort order, so ACL skew and translation do
 
 ### 2.6 Unverified items
 
-- Live: whether Jackrabbit reads a backslash in a `LIKE` operand as the escape character the JCR specification defines, which is what `startsWith()` writes for a `%`, a `_` or a backslash in the prefix. Two cases of the test module read it, and neither has run on a live instance yet. `startsWithWildcard` checks that an underscore in the prefix no longer matches any character, and it passes under both readings, so it does not decide the question. `startsWithPercent` decides it. It runs over the `queryBuilderEscape` fixture folder, which holds an event whose `eventsType` is `50% off` and one whose `eventsType` is `500 seats`, and the pattern `50\%%` returns one node when the escape works, two when the `%` stayed a wildcard, and none when the backslash reached the index as a character. The unit test of the escaping table asserts the same pattern, so the two stay in step.
-- Live: whether Jackrabbit answers property existence for a property whose value is an empty string. The JCR specification defines `IS NOT NULL` over a property as a test of existence, which is what `notExists()` and `isNull()` document, but no probe reads what the index does for an empty string. The fixture carries no such value, and a unit test cannot reach the question.
+- Settled on 2026-09-20, see the pattern lab in section 14. The backslash is read as the escape character the specification defines, and a property whose value is an empty string exists. The two items that stood here are answered.
 - Live: how many `OR` clauses one folded `in()` list may hold before Lucene refuses the boolean query. The bound exists, the documentation says to keep the list short, and no number is named because none was measured.
 - Live: a factory QOM with one wildcard column per selector and a parsed `SELECT *` return the same nodes on a multilingual site. `getNodes()` on a join through the multi-provider fan-out returns the left selector's nodes. The two visitor null-rebuild defects and the `jcr:language = $var` cast reproduce on a lab instance.
 - Build: the effect of the blacklist removal on the other emitted `.d.ts` files. `flattenType` may need the parent `javax.jcr.query.Query` to be included to copy its members. Whether `addMissingOverloads` duplicates overloads in `ValueFactory` or `Node`, and the wall-clock time of a regen on a developer machine.
@@ -320,11 +319,11 @@ type Arg<A extends string, N> = N | ((s: { readonly [K in A]: SelectorRef<K> }) 
 type LiteralArg = string | number | boolean | bigint | Date | Literal | BindVariableValue;   type Bindings = Record<string, Exclude<LiteralArg, BindVariableValue>>;
 ```
 
-`SelectorRef<K>` gives `prop(name)`, `fullText(expr)`, `all()`, `isDescendantOf(pathOrRef)`, `isChildOf(pathOrRef)`, `isSameAs(ref, path = ".")`, `name()`, `localName()` and `score()`. The reference forms of the three path methods return join conditions. `PropertyRef` has the fast methods `eq`, `ne`, `lt`, `le`, `gt`, `ge`, `like`, `in`, `between`, `startsWith`, `asc()`, `desc()`, `exists()`, `notExists()`, `isNull()`, `fullText()`, `equals(otherProp)` and `as(columnName?)`. Its `lengthSlow()` returns a `LengthRef`, with the same name rule as `qom.lengthSlow`. Its `lower()` and `upper()` return a `CaseRef` with the same fast comparisons and `ascSlow()` and `descSlow()`.
+`SelectorRef<K>` gives `prop(name)`, `fullText(expr)`, `all()`, `isDescendantOf(pathOrRef)`, `isChildOf(pathOrRef)`, `isSameAs(ref, path = ".")`, `name()`, `localName()` and `score()`. The reference forms of the three path methods return join conditions. `PropertyRef` has the fast methods `eq`, `ne`, `lt`, `le`, `gt`, `ge`, `like`, `in`, `between`, `startsWith`, `endsWith`, `contains`, `asc()`, `desc()`, `exists()`, `notExists()`, `fullText()`, `equals(otherProp)` and `as(columnName?)`. Its `lengthSlow()` returns a `LengthRef`, with the same name rule as `qom.lengthSlow`. Its `lower()` and `upper()` return a `CaseRef` with the same fast comparisons and `ascSlow()` and `descSlow()`.
 
-`NameRef` has a fast `eq` and `in`, `LocalNameRef` has fast `eq`, `like`, `in` and `startsWith`, `ScoreRef` has fast `asc()` and `desc()`, and `LengthRef` has no fast method. Every other method on those four references carries the `Slow` suffix, such as `gtSlow` or `descSlow()`.
+`NameRef` has a fast `eq` and `in`, `LocalNameRef` has fast `eq`, `like`, `in`, `startsWith`, `endsWith` and `contains`, `ScoreRef` has fast `asc()` and `desc()`, and `LengthRef` has no fast method. Every other method on those four references carries the `Slow` suffix, such as `gtSlow` or `descSlow()`.
 
-The full text method is named `fullText` and not `contains`, because `contains` is a substring match in Prisma and in Drizzle while this one is a JCR full text search over the analysed index. Four methods fold into other constructs inside the library, so each is as fast as the operators it folds to: `in` folds to `=` comparisons joined with `OR` and throws on an empty list, `between` folds to `>=` and `<=` with both ends included, `startsWith` builds `LIKE 'prefix%'` and escapes the `%`, the `_` and the backslash of the prefix, and `notExists()` is `NOT PropertyExistence`. `isNull()` is the same constraint as `notExists()` under the name the field uses, because the JCR has no null value and a property is present or absent. `startsWith` is absent from `NameRef`, because `NAME()` with `LIKE` fails at execution.
+The full text method is named `fullText` and not `contains`, because `contains` is a substring match in Prisma and in Drizzle while this one is a JCR full text search over the analysed index. The pattern lab of section 14 measured the two to be different operations, so `contains` is the right name for the substring match and `fullText` for the term search. Five methods fold into other constructs inside the library, so each is as fast as the operators it folds to: `in` folds to `=` comparisons joined with `OR` and throws on an empty list, `between` folds to `>=` and `<=` with both ends included, `startsWith`, `endsWith` and `contains` build `LIKE 'text%'`, `LIKE '%text'` and `LIKE '%text%'` and escape the `%`, the `_` and the backslash of the text, and `notExists()` is `NOT PropertyExistence`. The three text methods are absent from `NameRef`, because `NAME()` with `LIKE` fails at execution. There is no `isNull()`: the JCR has no null value, so the absence test carries one name, `notExists()`.
 
 The `alias` parameter is required, so the callback never needs `({ "jnt:page": p })` destructuring. The alias-less form `SELECT * FROM [jnt:page]` stays reachable through `qom.selector("jnt:page")`. `NameRef` and `LocalNameRef` have no `lower()` or `upper()`, because those transforms move the comparison into memory. The factory path `qom.comparisonSlow(qom.lowerCase(qom.nodeName("p")), ...)` expresses them. Top-level helpers are `and(...c)`, `or(...c)`, `not(c)` and `$(name)`, and `and`, `or` and `not` propagate `"slow"` when any child is `"slow"`. `.limit()`, `.offset()` and `.bind()` write to `execution` and never to `model`, so `toQOM` never sees them.
 
@@ -600,6 +599,138 @@ and the English title filter returned nothing, which is the documented locale de
 Two shapes of the language constraint appear. A selector whose constraint already names an
 internationalised property gets `AND sel.[jcr:language] = '<locale>'`, and a selector without one
 gets `AND (NOT sel.[jcr:language] IS NOT NULL OR sel.[jcr:language] = '<locale>')`.
+
+### Pattern lab, 2026-09-20
+
+Run on the same instance as the lab above: Jahia 8.2.3.2, Jackrabbit fork `2.22.0-jahia1`, Lucene
+3.6.2. The probes went through the tools Groovy console against `QueryManager` and
+`QueryObjectModelFactory`, over a fixture of 16 `jnt:navMenu` nodes with a plain `j:styleName`, an
+internationalised `jcr:title` and a multi-valued `j:keywords`, holding the values `50% off`,
+`500 seats`, `%`, `%50%`, `meeting`, `mee_ing`, `_`, `a\b`, `ab`, `\`, `MeetUp`, `a b c`,
+`it's 50%` and the empty string.
+
+The question was what JCR pattern matching in Jahia can really do, so that the method names follow
+the capability instead of an assumption about it.
+
+#### Why the earlier escape fixture never ran
+
+`jnt:event.eventsType` carries a value constraint, `[meeting, consumerShow, roadShow, conference,
+show, pressConference]`. Setting it to `50% off` raises a `ConstraintViolationException` in
+`ItemSaveOperation.validateTransientItems`, which is Jackrabbit core and therefore common to every
+session type, the Cypress GraphQL `addNode` helper included. The `queryBuilderEscape` fixture of
+the Cypress suite could not be created at all, which is why nothing had ever been measured. The
+fixture now uses `javascriptExample:testGetNodeProps`, whose `smallText` and `multipleSmallText`
+carry no constraint and are not internationalised.
+
+#### What the engine does
+
+| Probe | Result | What it settles |
+|---|---|---|
+| `LIKE '50%'` / `LIKE '50\%%'` | 2 / 1 | the backslash escape is real |
+| `LIKE 'mee_ing'` / `LIKE 'mee\_ing'` | 2 / 1 | the same for `_` |
+| `LIKE 'a\\b'` / `LIKE '\\'` | `a\b` / `\` | an escaped backslash is one literal backslash |
+| `LIKE 'a\b'`, `'\5%'`, `'\a%'`, `'mee\ting'` | `a\b`, 0, 0, 0 | Jackrabbit keeps `\` before a letter or a digit, against JCR 2.0 6.7.16 |
+| `LIKE 'meeting\'` | 1 | a dangling trailing backslash is dropped |
+| `LIKE '%off'` / `'%eeti%'` / `'%0% o%'` | 1 / 1 / 1 | a leading and a surrounding wildcard are legal |
+| `LIKE 'off'` | 0 | `LIKE` compares the whole stored value, not a term |
+| `LIKE 'meetin_'` / `'meeti_'` | 1 / 0 | `_` is exactly one character |
+| `LIKE 'Meet%'` / `'meet%'` | `MeetUp` / `meeting` | `LIKE` is case sensitive |
+| `LOWER(...) LIKE '50\%%'`, `UPPER(...)` | 1 each | the escape survives a case transform |
+| `LIKE 'a.b.c'`, `'a.*'`, `'[ab]%'`, `'.*'` | 0 each | no regex metacharacter leaks through |
+| `n.[jcr:title] LIKE ...`, every shape | same counts as the plain property | the Jahia i18n rewrite leaves operand2 and the operator alone |
+| `n.[j:keywords] LIKE '50\%%'` | 1 | a multi-valued property matches when any value matches |
+| `LOCALNAME(n) LIKE 'pct%'` / `'%Off'` / `'%ct%'` | 5 / 1 / 5 | a local name takes the same language, leading wildcard included |
+| `NAME(n) LIKE 'pct%'` | `UnsupportedRepositoryOperationException` | `NAME()` with `LIKE` really fails |
+| `LENGTH(P) LIKE '1_'` | `ValueFormatException: conversion to long failed` | the operand is cast to `LONG`, so `LENGTH` never takes a pattern |
+| `RLIKE`, `SIMILAR TO`, `REGEXP(...)`, `MATCHES` | `InvalidQueryException` at parse | there is no regular expression entry point |
+
+Two open questions of section 2.6 fall out of the same run. A property set to the empty string
+**exists**: `IS NOT NULL` returned all 16 nodes including that one, `LIKE '%'` matched it and
+`LIKE ''` matched it alone, so `notExists()` correctly does not match an empty string. And
+`getStatement()` round-trips a pattern faithfully: 22 patterns were built as a QOM and re-executed
+from the model's own statement text, and all 22 agreed, the two escapes composing in
+`LIKE 'it''s 50\%%'`.
+
+Full text is a different language, and the mechanism is stemming. `CONTAINS(P, 'seat')` finds
+`500 seats` because the index holds the stem, while `CONTAINS(P, 'seats*')` finds nothing because a
+wildcard term is not stemmed. `CONTAINS(P, 'meet*')` returns 2 and `CONTAINS(P, 'meetin*')`
+returns 0, the same asymmetry. `CONTAINS(P, 'MEETING')` returns 1, so full text ignores case where
+`LIKE` does not, and `CONTAINS(P, '50%')` matches on the token `50` because the analyser drops the
+percent sign.
+
+#### Cost, which is what decides the `Slow` suffix
+
+Whole repository, 3316 nodes, three timed runs after a warm-up.
+
+| Query | Hits | ms |
+|---|---|---|
+| `n.[jcr:title] LIKE 'a%'` | 3 | 5.0, 5.2, 5.8 |
+| `n.[jcr:title] LIKE '%a'` | 1 | 4.6, 5.2, 8.2 |
+| `n.[jcr:title] LIKE '%a%'` | 43 | 8.0, 10.0, 12.5 |
+| `LOCALNAME(n) LIKE 'pct%'` | 5 | 4.7, 6.1, 10.2 |
+| `LOCALNAME(n) LIKE '%a%'` | 1227 | 52.9, 53.5, 60.9 |
+| `LENGTH(n.[jcr:title]) > 0`, the in-memory control | 1 | 105, 110, 113 |
+
+The in-memory control costs about 110 ms for a single hit, because it loads every node. A
+surrounding-wildcard property `LIKE` costs about 10 ms for 43 hits. Cost tracks the hit count and
+not the corpus, so a leading or a surrounding wildcard is served from the index and does not earn
+a `Slow` suffix. No `TooManyClauses` was reached at this corpus size.
+
+The two local-name rows above differ by 1222 hits, so they do not isolate the width of the term
+walk from the number of matches. A zero-hit control does, and it shows the two at parity on the
+same corpus, now 3324 nodes:
+
+| Query | Hits | ms |
+|---|---|---|
+| `n.[jcr:title] LIKE '%zzkq'` | 0 | 6.0, 5.4, 9.2 |
+| `LOCALNAME(n) LIKE '%zzkq'` | 0 | 5.8, 5.5, 5.4 |
+
+The walk really is wider on a local name, and the index says by how much. Reading the Lucene terms
+of the `default` workspace through `JahiaSearchIndex.getIndexReader()`: `_:LOCAL_NAME` holds 1164
+terms, while `_:PROPERTIES` holds 8131 terms spread over 156 property names, of which `jcr:title`
+owns 62. A property pattern walks only its own property's terms because
+`FieldNames.createNamedValue(propName, value)` prefixes every one of them with the property name
+and `[`, and `WildcardQuery` passes that factory only when a property name is given
+(`WildcardQuery.java:103-111`); for `LOCALNAME` the factory is the bare one
+(`LuceneQueryFactory.getNodeLocalNameQuery`), so the prefix is empty and the walk covers the whole
+field. So the local-name walk is about 19 times wider here, and at this size that buys no
+measurable time. Width is a mechanism, not a cost, and the documentation now says so.
+
+#### The surface the measurement supports
+
+Four facts decide the names.
+
+1. The escape is real, so a method that promises literal text is truthful. `startsWith` keeps its
+   name. The builder escapes exactly `\`, `%` and `_`, which are exactly the three characters
+   Jackrabbit unescapes faithfully, and it never emits `\` before a letter or a digit, so the
+   deviation at `Util.createRegexp` is unreachable from it.
+2. The capability is a full glob on the raw stored value, not a prefix. Leading, trailing and
+   surrounding wildcards all work, on plain, internationalised, multi-valued and local-name
+   operands, under `LOWER` and `UPPER`, all at index speed. A surface that exposed only
+   `startsWith` would under-report the engine by two thirds, so `endsWith` and `contains` join it,
+   on `PropertyRef`, `CaseRef` and `LocalNameRef`, none of them with a `Slow` suffix.
+3. `contains` is measurably the right name for the substring match and not for the term search.
+   The two were probed side by side and behave differently in stemming and in case. The name was
+   left free for exactly this, as the paragraph in section 6.4 records. The cost of that choice is
+   a collision with the JCR's own vocabulary, since `contains()` emits `LIKE` while the JCR-SQL2
+   `CONTAINS()` is what `fullText()` emits. Both guides now state that inversion in one sentence
+   rather than leaving a reader to find it in a generated statement.
+4. No name may suggest a regular expression, because there is none at any layer. The raw method
+   keeps the JCR's own word for what it is: `like`.
+
+`NameRef` keeps no pattern method beyond the `likeSlow` it documents as failing. `LengthRef` keeps
+`likeSlow` as the completeness member it already was, with its documentation corrected: the operand
+is cast to `LONG`, so a pattern is impossible there and a digits-only one means `eqSlow`.
+
+#### Two findings that are not acted on here
+
+- `LENGTH()` returns nothing on an internationalised property. `LENGTH(n.[jcr:title]) > 0` returned
+  0 while `n.[jcr:title] IS NOT NULL` returned 16 and `LENGTH(n.[j:styleName]) > 0` returned 15.
+  This is the same finding the lab above recorded, confirmed on a second fixture shape.
+- The `upper()` caveat did not reproduce, again. `UPPER(n.[jcr:title]) LIKE '50\%%'` returned the
+  right node through both paths, and the rewrite kept the selector and added
+  `n.[jcr:language] = 'en'`. Either the claim is wrong or it needs a narrower trigger than the one
+  `diagnose()` reports. It stays as a `conditional` diagnostic, unchanged, on one more version.
 
 ## 15. Prior art
 

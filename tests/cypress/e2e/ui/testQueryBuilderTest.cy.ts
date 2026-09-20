@@ -21,21 +21,25 @@ describe("JCR query builder test", () => {
   const page = `/sites/${GENERIC_SITE_KEY}/home/queryBuilder`;
 
   /**
-   * The escaping fixture, in its own folder so that its two events never enter the counts the cases
+   * The pattern fixture, in its own folder so that its nodes never enter the counts the cases
    * scoped to `scope` assert.
+   *
+   * Its nodes are `testGetNodeProps` and not events. `jnt:event.eventsType` carries a value
+   * constraint, `[meeting, consumerShow, roadShow, conference, show, pressConference]`, so writing
+   * `50% off` on an event raises a `ConstraintViolationException` and the fixture cannot be created
+   * at all. `smallText` and `multipleSmallText` carry no constraint and are not internationalised.
    */
-  const escapeScope = `/sites/${GENERIC_SITE_KEY}/contents/queryBuilderEscape`;
-  const percentEvent = `${escapeScope}/escape-percent`;
-  const plainEvent = `${escapeScope}/escape-plain`;
+  const patternScope = `/sites/${GENERIC_SITE_KEY}/contents/queryBuilderPattern`;
+  const patternNode = (name: string) => `${patternScope}/pattern-${name}`;
 
   /** What every statement of a single selector case holds, whatever the rewrite added. */
   const single = [`SELECT e.*`, `FROM [jnt:event] AS e`, `ISDESCENDANTNODE(e, ['${scope}'])`];
 
-  /** The same fragments for a case scoped to the escaping fixture folder. */
-  const singleEscape = [
-    `SELECT e.*`,
-    `FROM [jnt:event] AS e`,
-    `ISDESCENDANTNODE(e, ['${escapeScope}'])`,
+  /** The same fragments for a case scoped to the pattern fixture folder. */
+  const singlePattern = [
+    `SELECT n.*`,
+    `FROM [javascriptExample:testGetNodeProps] AS n`,
+    `ISDESCENDANTNODE(n, ['${patternScope}'])`,
   ];
 
   const fragments: Record<string, string[]> = {
@@ -99,14 +103,25 @@ describe("JCR query builder test", () => {
       `startDate <= CAST('2099-01-01T00:00:00.000Z' AS DATE)`,
       `[jcr:language] IS NOT NULL`,
     ],
-    startsWithPlain: [...single, `eventsType LIKE 'meet%'`],
-    // The prefix holds a `%`, which `startsWith` escapes with a backslash, so the pattern reads
-    // `50\%%`: a literal `50%`, then the trailing wildcard the method adds. Unlike the fragments
-    // above, this one was not read from a live statement. It predicts that the formatter writes the
-    // backslash through, because the only escape the SQL2 string literal grammar defines is a
-    // doubled quote. The node assertion below is what reads the engine's own behaviour.
-    startsWithPercent: [...singleEscape, String.raw`eventsType LIKE '50\%%'`],
-    startsWithDigits: [...singleEscape, `eventsType LIKE '50%'`],
+    // The pattern cases. Each escaped fragment holds the backslash the builder wrote, which the
+    // formatter carries through: the only escape the SQL2 string literal grammar defines is the
+    // doubled quote, so a backslash travels to the engine verbatim.
+    startsWithLiteral: [...singlePattern, String.raw`smallText LIKE '50\%%'`],
+    likeWildcard: [...singlePattern, `smallText LIKE '50%'`],
+    startsWithUnderscore: [...singlePattern, String.raw`smallText LIKE 'mee\_ing%'`],
+    likeUnderscore: [...singlePattern, `smallText LIKE 'mee_ing'`],
+    startsWithBackslash: [...singlePattern, String.raw`smallText LIKE 'a\\b%'`],
+    endsWithLiteral: [...singlePattern, `smallText LIKE '% off'`],
+    containsLiteral: [...singlePattern, String.raw`smallText LIKE '%0\% o%'`],
+    likeWholeValue: [...singlePattern, `smallText LIKE 'off'`],
+    containsCased: [...singlePattern, `smallText LIKE '%eetu%'`],
+    lowerContains: [...singlePattern, `LOWER(`, `LIKE '%eetu%'`],
+    lowerContainsLiteral: [...singlePattern, `LOWER(`, String.raw`LIKE '%0\% o%'`],
+    localNameEndsWith: [...singlePattern, `LOCALNAME(n) LIKE '%-percent'`],
+    localNameContains: [...singlePattern, `LOCALNAME(n) LIKE '%-under%'`],
+    multiContains: [...singlePattern, String.raw`multipleSmallText LIKE '%0\% o%'`],
+    fullTextStem: [...singlePattern, `CONTAINS(`, `'seat')`],
+    fullTextWildcard: [...singlePattern, `CONTAINS(`, `'seats*')`],
     stable: [...single, `ORDER BY`, `[jcr:uuid]`],
   };
 
@@ -172,27 +187,35 @@ describe("JCR query builder test", () => {
         addEvent(GENERIC_SITE_KEY, initEvent(4));
         addEvent(GENERIC_SITE_KEY, initEvent(5));
 
-        // The escaping fixture. `escape-percent` holds a literal `%` in `eventsType`, and
-        // `escape-plain` starts with the same two digits without one, so a prefix of `50%` tells a
-        // working escape from an ignored one: one node against two.
+        // The pattern fixture. One node per value the pattern language treats differently, so that
+        // each case below separates a working escape from an ignored one by the node it returns
+        // rather than by a count alone. The node names carry the same distinctions, which is what
+        // the two `LOCALNAME` cases read.
         addNode({
           parentPathOrId: `/sites/${GENERIC_SITE_KEY}/contents`,
-          name: "queryBuilderEscape",
+          name: "queryBuilderPattern",
           primaryNodeType: "jnt:contentFolder",
         }).then(() => {
-          addEvent(GENERIC_SITE_KEY, {
-            parentPath: escapeScope,
-            name: "escape-percent",
-            title: "Escape percent",
-            startDate: new Date(),
-            eventsType: "50% off",
-          });
-          addEvent(GENERIC_SITE_KEY, {
-            parentPath: escapeScope,
-            name: "escape-plain",
-            title: "Escape plain",
-            startDate: new Date(),
-            eventsType: "500 seats",
+          const withSmallText = (name: string, value: string) =>
+            addNode({
+              parentPathOrId: patternScope,
+              name: `pattern-${name}`,
+              primaryNodeType: "javascriptExample:testGetNodeProps",
+              properties: [{ name: "smallText", value }],
+            });
+
+          withSmallText("percent", "50% off");
+          withSmallText("plain", "500 seats");
+          withSmallText("meeting", "meeting");
+          withSmallText("underscore", "mee_ing");
+          withSmallText("camel", "MeetUp");
+          withSmallText("backslash", "a\\b");
+
+          addNode({
+            parentPathOrId: patternScope,
+            name: "pattern-multi",
+            primaryNodeType: "javascriptExample:testGetNodeProps",
+            properties: [{ name: "multipleSmallText", values: ["50% off", "zzz"] }],
           });
         });
 
@@ -328,25 +351,61 @@ describe("JCR query builder test", () => {
     });
   });
 
-  it("escapes the LIKE wildcards of a startsWith prefix", () => {
+  it("reads a backslash in a LIKE pattern as the escape character", () => {
     visitView();
-    paths("startsWithPlain").then((found) => {
-      expect([...found].sort()).to.deep.equal([event(1), event(2), event(3), event(4), event(5)]);
+    // The control first: an unescaped `%` is a wildcard, so both values that start with `50` come
+    // back. A run where this one returns nothing is a broken fixture, not an escaping answer.
+    paths("likeWildcard").then((found) => {
+      expect([...found].sort()).to.deep.equal([patternNode("percent"), patternNode("plain")]);
     });
-    // `mee_ing` matches `meeting` when the underscore stays a wildcard, and nothing once it is
-    // escaped, which is what this case reads.
-    paths("startsWithWildcard").should("have.length", 0);
+    // `startsWith("50%")` writes `50\%%`. One node means the backslash is the escape character the
+    // JCR specification defines, two mean the `%` stayed a wildcard, and none mean the backslash
+    // reached the index as a character.
+    paths("startsWithLiteral").should("deep.equal", [patternNode("percent")]);
+
+    // The same pair for the other wildcard, and for the backslash itself.
+    paths("likeUnderscore").then((found) => {
+      expect([...found].sort()).to.deep.equal([patternNode("meeting"), patternNode("underscore")]);
+    });
+    paths("startsWithUnderscore").should("deep.equal", [patternNode("underscore")]);
+    paths("startsWithBackslash").should("deep.equal", [patternNode("backslash")]);
   });
 
-  it("matches a literal percent sign in a startsWith prefix", () => {
+  it("accepts a wildcard at the start of a pattern and in the middle of one", () => {
     visitView();
-    // The control first: the fixture folder holds two events whose `eventsType` starts with `50`.
-    paths("startsWithDigits").then((found) => {
-      expect([...found].sort()).to.deep.equal([percentEvent, plainEvent]);
-    });
-    // The prefix `50%` is written as `50\%%`. One node means the backslash escape works, two mean
-    // the `%` stayed a wildcard, and none mean the backslash reached the index as a character.
-    paths("startsWithPercent").should("deep.equal", [percentEvent]);
+    // A leading wildcard is legal and is served by the index, which is why `endsWith` and
+    // `contains` carry no `Slow` suffix.
+    paths("endsWithLiteral").should("deep.equal", [patternNode("percent")]);
+    // A surrounding wildcard, with an escaped `%` between the two, so both halves are read here.
+    paths("containsLiteral").should("deep.equal", [patternNode("percent")]);
+    // LIKE compares the whole stored value and not its terms: `off` alone matches no value.
+    paths("likeWholeValue").should("have.length", 0);
+    // A multi-valued property matches when any one of its values matches.
+    paths("multiContains").should("deep.equal", [patternNode("multi")]);
+  });
+
+  it("matches case sensitively, unless a case transform is applied first", () => {
+    visitView();
+    // `MeetUp` holds `eetU` and not `eetu`, so the untransformed substring match returns nothing.
+    paths("containsCased").should("have.length", 0);
+    paths("lowerContains").should("deep.equal", [patternNode("camel")]);
+    // The escape survives the transform, which uses a different term enumeration.
+    paths("lowerContainsLiteral").should("deep.equal", [patternNode("percent")]);
+  });
+
+  it("takes the same pattern language on a local name", () => {
+    visitView();
+    paths("localNameEndsWith").should("deep.equal", [patternNode("percent")]);
+    paths("localNameContains").should("deep.equal", [patternNode("underscore")]);
+  });
+
+  it("searches stemmed terms with fullText, which is not what contains does", () => {
+    visitView();
+    // Full text matches the stem the index holds, so the term `seat` finds the `500 seats` node.
+    paths("fullTextStem").should("deep.equal", [patternNode("plain")]);
+    // A wildcard term is not stemmed, so `seats*` misses that same stem and returns nothing. This
+    // is why a substring match belongs to `contains()` and not to a full text wildcard.
+    paths("fullTextWildcard").should("have.length", 0);
   });
 
   it("executes a reference literal exactly as a weak reference one", () => {

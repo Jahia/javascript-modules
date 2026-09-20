@@ -101,11 +101,45 @@ from("jnt:article", "a")
 
 `fullText()` on a selector searches every property of the node. Call it on a property reference to search one property, as in `a.prop("body").fullText("graal*")`. A comparison on the score is the slow case, so its methods are named `gtSlow()`, `eqSlow()` and so on.
 
-`fullText()` is a JCR full text search over the analysed index, and it is not a substring match. It matches whole terms, so `fullText("graal")` matches a node whose text holds the word `graal` and not one that only holds `graaljs`. The expression is the JCR full text grammar: terms, quoted phrases, `OR`, a leading `-` to exclude a term, and a trailing `*` for a prefix. Use `like()` or `startsWith()` when you mean a match on the characters of one property. The method is named `fullText()` and not `contains()` because `contains` is a substring match in Prisma and in Drizzle, and the two are not the same thing.
+`fullText()` is a JCR full text search over the analysed index, and it is not a substring match. It matches whole terms, so `fullText("graal")` matches a node whose text holds the word `graal` and not one that only holds `graaljs`. The expression is the JCR full text grammar: terms, quoted phrases, `OR`, a leading `-` to exclude a term, and a trailing `*` for a prefix. Use `contains()` when you mean a substring of one property. The method is named `fullText()` and not `contains()` because `contains` is a substring match in Prisma and in Drizzle, and the two are not the same thing.
+
+The difference is measurable. Full text reads the terms the analyser produced, which are stemmed and lower case, so `fullText("seat")` finds a value of `500 seats` and `fullText("MEETING")` finds `meeting`. A wildcard term is not stemmed, so `fullText("seats*")` finds nothing at all: the index holds the stem `seat`, and `seats*` never reaches it. `contains()` reads the stored characters instead, case included. Reach for `fullText()` to search words a person wrote, and for `contains()` to search the characters of a value.
+
+## Pattern matching
+
+`like()` is the one pattern match the JCR defines, and there is no regular expression anywhere in the query language. The pattern is a glob over the whole stored value:
+
+- `%` matches zero or more characters.
+- `_` matches exactly one character.
+- A backslash makes the next character literal, so `\%` matches a percent sign.
+
+A wildcard may sit anywhere, the first position included, and Jahia serves every position from the index. The comparison reads the value whole rather than term by term, so `like("off")` does not match `50% off` while `like("%off")` does, and it is case sensitive. On a multi-valued property the node matches when any one of its values matches.
+
+Three methods take literal text instead of a pattern and escape it for you, so a `%` or a `_` in the text matches itself:
+
+```tsx
+from("jnt:news", "n")
+  .where(({ n }) =>
+    or(
+      n.prop("jcr:title").startsWith("50% off"), // LIKE '50\% off%'
+      n.prop("jcr:title").endsWith(" off"), // LIKE '% off'
+      n.prop("jcr:title").contains("0% o"), // LIKE '%0\% o%'
+    ),
+  )
+  .limit(20);
+```
+
+`contains()` builds a `LIKE` pattern. It is not the JCR-SQL2 `CONTAINS()` function: a `CONTAINS` you read in a generated statement comes from `fullText()`.
+
+None of the three carries a `Slow` suffix, because a leading wildcard is served by the index too: the term scan stays inside that one property, so the cost follows the number of matches and not the size of the repository. The three are also on `lower()` and `upper()`, which is how a case insensitive match is written, and on `localName()`. A pattern on a local name walks every local name the index holds, where a pattern on a property walks only that property's own terms, because the index prefixes a property's terms with the property name and a local name carries no such prefix. The walk is wider, but the cost still follows the number of matches: on a repository of 3324 nodes, a pattern that matched nothing cost the same on both.
+
+Escape `%`, `_` and the backslash, and nothing else, when you write a pattern by hand. Jackrabbit keeps a backslash that sits in front of a letter or a digit instead of dropping it, which section 6.7.16 of the JCR specification says it should drop, so `like("mee\\ting")` matches nothing rather than `meeting`, and a pattern that ends in a lone backslash loses it. The three methods above never emit that form.
+
+`name()` carries no text method that escapes for you. It does carry `likeSlow()`, for completeness, and that one fails at execution with an `UnsupportedRepositoryOperationException`, which `diagnose()` reports before you run it. Use `localName()` for a pattern match on a node name.
 
 ## Everyday predicates
 
-Four methods build a constraint that would otherwise be written by hand. Each folds into index operators, so `where()` accepts them all.
+Three more methods build a constraint that would otherwise be written by hand. Each folds into index operators, so `where()` accepts them all.
 
 ```tsx
 from("jnt:news", "n")
@@ -113,7 +147,6 @@ from("jnt:news", "n")
     and(
       n.prop("category").in(["sport", "culture", "science"]),
       n.prop("readingTime").between(2, 10),
-      n.prop("jcr:title").startsWith("The "),
       n.prop("expiryDate").notExists(),
     ),
   )
@@ -122,10 +155,9 @@ from("jnt:news", "n")
 
 - `in()` folds to `=` comparisons joined with `OR`. An empty list throws, because it would be a constraint that matches nothing. The fold writes one comparison per value, so keep the list short: Lucene bounds how many clauses one boolean query may hold, and a selection of hundreds of nodes reads better as a path scope or as a node type than as a value list.
 - `between()` folds to `>=` and `<=`, and both ends are included.
-- `startsWith()` builds `LIKE 'prefix%'` and escapes the prefix for you, so `startsWith("50% off")` matches a title that really starts with `50% off` instead of reading the `%` as a wildcard.
-- `notExists()` says that the node does not carry the property, which is `NOT (n.[expiryDate] IS NOT NULL)`. The JCR has no null value: a property is present on the node or absent from it. The JCR specification defines `IS NOT NULL` over a property as a test of existence, so by that definition a property that holds an empty string exists and `notExists()` does not match it. `isNull()` is the same constraint under the name the other query builders use for it.
+- `notExists()` says that the node does not carry the property, which is `NOT (n.[expiryDate] IS NOT NULL)`. The JCR has no null value: a property is present on the node or absent from it. The JCR specification defines `IS NOT NULL` over a property as a test of existence, so a property that holds an empty string exists and `notExists()` does not match it. Jahia was measured to behave that way.
 
-`in()` and `startsWith()` are also available on `lower()` and `upper()`, and on `localName()`. `in()` is available on `name()` as well, because `=` is the one operator the index serves for a node name.
+`in()` is also available on `lower()`, `upper()` and `localName()`, and on `name()` as well, because `=` is the one operator the index serves for a node name.
 
 ## Fast and slow
 

@@ -186,12 +186,15 @@ jahiaComponent(
     const session = currentNode.getSession();
     const siteKey = currentNode.getResolveSite().getSiteKey();
     const scope = `/sites/${siteKey}/contents/queryBuilder`;
-    // The escaping fixture lives in its own folder, so that its events never enter the counts the
-    // cases scoped to `scope` assert.
-    const escapeScope = `/sites/${siteKey}/contents/queryBuilderEscape`;
+    // The pattern fixture lives in its own folder, so that its nodes never enter the counts the
+    // cases scoped to `scope` assert. Its nodes are `testGetNodeProps`, not events, because
+    // `jnt:event.eventsType` carries a value constraint that refuses any value outside its list,
+    // so a fixture value such as `50% off` cannot be written on an event at all. `smallText` and
+    // `multipleSmallText` carry no constraint and are not internationalised.
+    const patternScope = `/sites/${siteKey}/contents/queryBuilderPattern`;
     server.render.addCacheDependency({ flushOnPathMatchingRegexp: `${scope}/.*` }, renderContext);
     server.render.addCacheDependency(
-      { flushOnPathMatchingRegexp: `${escapeScope}/.*` },
+      { flushOnPathMatchingRegexp: `${patternScope}/.*` },
       renderContext,
     );
 
@@ -401,32 +404,91 @@ jahiaComponent(
       )
       .limit(10);
 
-    // The prefix match, and the same prefix with a JCR-SQL2 wildcard inside it. `startsWith`
-    // escapes that wildcard, so `mee_ing` does not match `meeting` while `meet` matches it. An
-    // unescaped underscore would make the second case return every event.
-    const startsWithPlain = from("jnt:event", "e")
-      .where(({ e }) => and(e.isDescendantOf(scope), e.prop("eventsType").startsWith("meet")))
-      .limit(10);
-    const startsWithWildcard = from("jnt:event", "e")
-      .where(({ e }) => and(e.isDescendantOf(scope), e.prop("eventsType").startsWith("mee_ing")))
-      .limit(10);
+    // 11. The pattern surface, over the pattern fixture folder. Every case below was first read on
+    // a live Jahia 8.2.3.2 carrying the Jackrabbit fork `2.22.0-jahia1`, and each one pins one
+    // measured property of the engine rather than an assumption about it.
+    //
+    // The fixture holds one `testGetNodeProps` node per interesting value: `50% off`, `500 seats`,
+    // `meeting`, `mee_ing`, `MeetUp` and `a\b`, plus one node whose multi-valued `multipleSmallText`
+    // holds `50% off` next to an unrelated value.
+    const patternBase = from("javascriptExample:testGetNodeProps", "n");
 
-    // The half of the escaping that an underscore cannot decide. The escaping fixture holds two
-    // events, `eventsType` `50% off` and `eventsType` `500 seats`, and the three possible outcomes
-    // of `startsWith("50%")` name three different behaviours of the engine:
-    //
-    // - one node, the `50% off` event: the backslash is read as the escape character the JCR
-    //   specification defines, which is what `startsWith()` writes and what it documents.
-    // - two nodes: the `%` stayed a wildcard, so the escape was written and then ignored.
-    // - no node: the backslash reached the index as a literal character.
-    //
-    // `startsWithDigits` is the control. It carries no escape and must return both events, so a run
-    // that returns nothing for both cases is a fixture failure and not an escaping answer.
-    const startsWithPercent = from("jnt:event", "e")
-      .where(({ e }) => and(e.isDescendantOf(escapeScope), e.prop("eventsType").startsWith("50%")))
+    // `startsWith("50%")` writes `50\%%`. One node means the backslash is the escape character the
+    // JCR specification defines, two mean the `%` stayed a wildcard, and none mean the backslash
+    // reached the index as a character. It returned one node, the `50% off` one.
+    const startsWithLiteral = patternBase
+      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").startsWith("50%")))
       .limit(10);
-    const startsWithDigits = from("jnt:event", "e")
-      .where(({ e }) => and(e.isDescendantOf(escapeScope), e.prop("eventsType").startsWith("50")))
+    // The control, with the wildcard written on purpose through the raw pattern method. It must
+    // return both `50% off` and `500 seats`, so a run that returns nothing for both cases is a
+    // broken fixture and not an answer about the escaping.
+    const likeWildcard = patternBase
+      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").like("50%")))
+      .limit(10);
+    // The same pair for the other wildcard. The escaped form selects `mee_ing` alone, the raw one
+    // selects `meeting` as well, which is what makes `_` a wildcard and the escape real.
+    const startsWithUnderscore = patternBase
+      .where(({ n }) =>
+        and(n.isDescendantOf(patternScope), n.prop("smallText").startsWith("mee_ing")),
+      )
+      .limit(10);
+    const likeUnderscore = patternBase
+      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").like("mee_ing")))
+      .limit(10);
+    // An escaped backslash matches one literal backslash, which is the third escape.
+    const startsWithBackslash = patternBase
+      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").startsWith("a\\b")))
+      .limit(10);
+    // The leading wildcard, which the engine accepts and serves from the index.
+    const endsWithLiteral = patternBase
+      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").endsWith(" off")))
+      .limit(10);
+    // The surrounding wildcard, with an escaped `%` in the middle of the text.
+    const containsLiteral = patternBase
+      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").contains("0% o")))
+      .limit(10);
+    // `LIKE` compares the whole stored value and not its terms, so a substring needs `contains()`.
+    const likeWholeValue = patternBase
+      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").like("off")))
+      .limit(10);
+    // `LIKE` is case sensitive, and the case transform is how a caller opts out of that. The first
+    // case returns nothing and the second returns the `MeetUp` node.
+    const containsCased = patternBase
+      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").contains("eetu")))
+      .limit(10);
+    const lowerContains = patternBase
+      .where(({ n }) =>
+        and(n.isDescendantOf(patternScope), n.prop("smallText").lower().contains("eetu")),
+      )
+      .limit(10);
+    // The escape survives the case transform, which uses a different term enumeration.
+    const lowerContainsLiteral = patternBase
+      .where(({ n }) =>
+        and(n.isDescendantOf(patternScope), n.prop("smallText").lower().contains("0% o")),
+      )
+      .limit(10);
+    // A local name takes the same pattern language, leading wildcard included.
+    const localNameEndsWith = patternBase
+      .where(({ n }) => and(n.isDescendantOf(patternScope), n.localName().endsWith("-percent")))
+      .limit(10);
+    const localNameContains = patternBase
+      .where(({ n }) => and(n.isDescendantOf(patternScope), n.localName().contains("-under")))
+      .limit(10);
+    // A multi-valued property matches when any one of its values matches.
+    const multiContains = patternBase
+      .where(({ n }) =>
+        and(n.isDescendantOf(patternScope), n.prop("multipleSmallText").contains("0% o")),
+      )
+      .limit(10);
+    // Full text is the other pattern language, and it is not the same one. It matches stemmed
+    // terms, so the term `seat` finds the `500 seats` node, while `contains("seat")` finds it only
+    // because those four characters are there. The wildcard form is not stemmed, so `seats*` misses
+    // the stem the index holds and returns nothing.
+    const fullTextStem = patternBase
+      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").fullText("seat")))
+      .limit(10);
+    const fullTextWildcard = patternBase
+      .where(({ n }) => and(n.isDescendantOf(patternScope), n.prop("smallText").fullText("seats*")))
       .limit(10);
 
     // A page of a query ordered on the identifier, which is the stable tiebreaker.
@@ -472,10 +534,22 @@ jahiaComponent(
         <PrintQuery testid="lowerOrderOnPlain" session={session} query={lowerOrderOnPlain} />
 
         <PrintQuery testid="predicates" session={session} query={predicates} />
-        <PrintQuery testid="startsWithPlain" session={session} query={startsWithPlain} />
-        <PrintQuery testid="startsWithWildcard" session={session} query={startsWithWildcard} />
-        <PrintQuery testid="startsWithPercent" session={session} query={startsWithPercent} />
-        <PrintQuery testid="startsWithDigits" session={session} query={startsWithDigits} />
+        <PrintQuery testid="startsWithLiteral" session={session} query={startsWithLiteral} />
+        <PrintQuery testid="likeWildcard" session={session} query={likeWildcard} />
+        <PrintQuery testid="startsWithUnderscore" session={session} query={startsWithUnderscore} />
+        <PrintQuery testid="likeUnderscore" session={session} query={likeUnderscore} />
+        <PrintQuery testid="startsWithBackslash" session={session} query={startsWithBackslash} />
+        <PrintQuery testid="endsWithLiteral" session={session} query={endsWithLiteral} />
+        <PrintQuery testid="containsLiteral" session={session} query={containsLiteral} />
+        <PrintQuery testid="likeWholeValue" session={session} query={likeWholeValue} />
+        <PrintQuery testid="containsCased" session={session} query={containsCased} />
+        <PrintQuery testid="lowerContains" session={session} query={lowerContains} />
+        <PrintQuery testid="lowerContainsLiteral" session={session} query={lowerContainsLiteral} />
+        <PrintQuery testid="localNameEndsWith" session={session} query={localNameEndsWith} />
+        <PrintQuery testid="localNameContains" session={session} query={localNameContains} />
+        <PrintQuery testid="multiContains" session={session} query={multiContains} />
+        <PrintQuery testid="fullTextStem" session={session} query={fullTextStem} />
+        <PrintQuery testid="fullTextWildcard" session={session} query={fullTextWildcard} />
 
         <PrintQuery testid="strongRef" session={session} query={strongRef} />
         <PrintQuery testid="weakRef" session={session} query={weakRef} />

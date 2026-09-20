@@ -85,8 +85,8 @@ export interface SelectorRef<K extends string = string> {
    * This is a search over the analysed index and not a substring match. The expression is the JCR
    * full text grammar, so it carries terms, quoted phrases, `OR`, a leading `-` for exclusion and a
    * trailing `*` for a prefix. It matches whole terms, so `fullText("graal")` matches a node whose
-   * text holds the word `graal` and not one that only holds `graaljs`. Use `prop(name).like()` or
-   * `prop(name).startsWith()` for a match on the characters of one property.
+   * text holds the word `graal` and not one that only holds `graaljs`. Use `prop(name).contains()`
+   * for a substring match on the characters of one property.
    */
   fullText(expression: LiteralArg): FullTextSearch<K>;
   /** Every property of this selector as one wildcard column, which is `alias.*`. */
@@ -135,7 +135,22 @@ export interface PropertyRef<K extends string = string> {
   gt(value: LiteralArg): Comparison<K, "fast">;
   /** `property >= value` */
   ge(value: LiteralArg): Comparison<K, "fast">;
-  /** `property LIKE value`, with `%` and `_` as wildcards. */
+  /**
+   * `property LIKE pattern`, the one pattern match the JCR defines, served by the index.
+   *
+   * The pattern is a glob over the whole stored value and never a regular expression. `%` matches
+   * zero or more characters, `_` matches exactly one, and a backslash makes the next character
+   * literal. A wildcard may sit anywhere, the leading position included. The comparison is case
+   * sensitive, and it reads the value whole rather than term by term, so `like("off")` does not
+   * match `50% off` while `like("%off")` does. On a multi-valued property the node matches when any
+   * one of its values matches.
+   *
+   * Escape `%`, `_` and the backslash itself, and nothing else. Jackrabbit keeps the backslash in
+   * front of a letter or a digit instead of dropping it, against section 6.7.16 of the JCR
+   * specification, so a pattern that escapes a letter matches nothing, and a pattern that ends in a
+   * lone backslash loses it. {@link PropertyRef.startsWith}, {@link PropertyRef.endsWith} and
+   * {@link PropertyRef.contains} do that escaping for you and never emit the broken form.
+   */
   like(value: LiteralArg): Comparison<K, "fast">;
   /**
    * The property must equal one of these values, which folds to `=` comparisons joined with `OR`.
@@ -152,10 +167,35 @@ export interface PropertyRef<K extends string = string> {
    */
   between(low: LiteralArg, high: LiteralArg): Constraint<K, "fast">;
   /**
-   * The property must start with this text, which is `LIKE 'prefix%'`. The `%` and `_` characters
-   * of the prefix are escaped for you, so they match themselves.
+   * The property must start with this text, which is `LIKE 'text%'`, served by the index.
+   *
+   * The `%`, the `_` and the backslash of the text are escaped for you, so each matches itself:
+   * `startsWith("50% off")` matches a value that really starts with `50% off`. The comparison is
+   * case sensitive, so use `lower().startsWith()` to ignore case.
    */
-  startsWith(prefix: string): Comparison<K, "fast">;
+  startsWith(text: string): Comparison<K, "fast">;
+  /**
+   * The property must end with this text, which is `LIKE '%text'`, served by the index.
+   *
+   * It escapes the text the way {@link PropertyRef.startsWith} does. The leading wildcard is served
+   * by the index too: the term scan stays inside this one property, so the cost follows the number
+   * of matches and not the size of the repository, and the name carries no `Slow` suffix.
+   */
+  endsWith(text: string): Comparison<K, "fast">;
+  /**
+   * The property must hold this text somewhere, which is `LIKE '%text%'`, served by the index.
+   *
+   * It escapes the text the way {@link PropertyRef.startsWith} does, and it costs what
+   * {@link PropertyRef.endsWith} costs.
+   *
+   * This is a substring match over the characters of the stored value, which is what `contains`
+   * means in Prisma and in Drizzle. It builds a `LIKE` pattern and not the JCR-SQL2 `CONTAINS()`
+   * function, which is what {@link PropertyRef.fullText} builds. Full text searches the analysed
+   * index: it matches stemmed terms and ignores case, so it finds `500 seats` for the term `seat`,
+   * while `contains("seat")` finds that value only because the characters are there and
+   * `contains("Seat")` finds nothing.
+   */
+  contains(text: string): Comparison<K, "fast">;
   /** Orders ascending on this property, which Lucene sorts natively. */
   asc(): Ordering<K, "fast">;
   /** Orders descending on this property, which Lucene sorts natively. */
@@ -169,21 +209,16 @@ export interface PropertyRef<K extends string = string> {
    * is a test of absence and never a comparison against a null. The JCR specification defines `IS
    * NOT NULL` over a property as a test of existence, so by that definition a property that holds
    * an empty string exists and this constraint does not match it, and a property whose value comes
-   * from a node type default exists as well.
+   * from a node type default exists as well. Jahia was measured to behave that way: a property set
+   * to the empty string answers `exists()` and is not returned by this constraint.
    */
   notExists(): Not<K, "fast">;
-  /**
-   * The same constraint as {@link PropertyRef.notExists}, under the name the field uses for it. The
-   * JCR has no null value, so "is null" here means that the property is absent from the node.
-   */
-  isNull(): Not<K, "fast">;
   /**
    * JCR full text search over this property only, which is `CONTAINS(alias.[property],
    * expression)`.
    *
    * This is a search over the analysed index and not a substring match, so it matches whole terms.
-   * Use {@link PropertyRef.like} or {@link PropertyRef.startsWith} for a match on the characters of
-   * the value.
+   * Use {@link PropertyRef.contains} for a match on the characters of the value.
    */
   fullText(expression: LiteralArg): FullTextSearch<K>;
   /** Joins this property to the property of another selector on equal values. */
@@ -223,7 +258,11 @@ export interface CaseRef<K extends string = string> {
   gt(value: LiteralArg): Comparison<K, "fast">;
   /** `LOWER(property) >= value` */
   ge(value: LiteralArg): Comparison<K, "fast">;
-  /** `LOWER(property) LIKE value` */
+  /**
+   * `LOWER(property) LIKE pattern`, the same pattern language as {@link PropertyRef.like}. The
+   * backslash escape survives the transform, so a pattern built for the untransformed property
+   * keeps its meaning here.
+   */
   like(value: LiteralArg): Comparison<K, "fast">;
   /**
    * The transformed value must equal one of these values, which folds to `=` comparisons joined
@@ -233,11 +272,22 @@ export interface CaseRef<K extends string = string> {
   /** The transformed value must be between the two values, both ends included. */
   between(low: LiteralArg, high: LiteralArg): Constraint<K, "fast">;
   /**
-   * The transformed value must start with this text, which is `LIKE 'prefix%'`. The `%` and `_`
-   * characters of the prefix are escaped for you. Write the prefix in the case the transform
+   * The transformed value must start with this text, which is `LIKE 'text%'`. The `%`, the `_` and
+   * the backslash of the text are escaped for you. Write the text in the case the transform
    * produces, so `lower().startsWith("ho")` and not `lower().startsWith("Ho")`.
    */
-  startsWith(prefix: string): Comparison<K, "fast">;
+  startsWith(text: string): Comparison<K, "fast">;
+  /**
+   * The transformed value must end with this text, which is `LIKE '%text'`, with the same escaping
+   * and the same case rule as {@link CaseRef.startsWith}.
+   */
+  endsWith(text: string): Comparison<K, "fast">;
+  /**
+   * The transformed value must hold this text somewhere, which is `LIKE '%text%'`, with the same
+   * escaping and the same case rule as {@link CaseRef.startsWith}. This is the case insensitive
+   * substring match: `lower().contains("meetup")` finds a value of `MeetUp`.
+   */
+  contains(text: string): Comparison<K, "fast">;
   /** Orders ascending on the transformed value, which costs one node load per collected document. */
   ascSlow(): Ordering<K, "slow">;
   /** Orders descending on the transformed value, which costs one node load per collected document. */
@@ -267,7 +317,13 @@ export interface NameRef<K extends string = string> {
   gtSlow(value: LiteralArg): Comparison<K, "slow">;
   /** `NAME(alias) >= value`, evaluated in memory. */
   geSlow(value: LiteralArg): Comparison<K, "slow">;
-  /** `NAME(alias) LIKE value`, which fails at execution. See `diagnose()`. */
+  /**
+   * `NAME(alias) LIKE value`, which fails at execution with an
+   * `UnsupportedRepositoryOperationException`, as `diagnose()` reports. This reference therefore
+   * carries no `startsWith`, `endsWith` or `contains`. Use `localName()` for a pattern match on a
+   * node name, or wrap the name in `LOWER` through the factory, which moves the comparison into
+   * memory where `LIKE` is supported.
+   */
   likeSlow(value: LiteralArg): Comparison<K, "slow">;
   /** Orders ascending on the node name, which costs one node load per collected document. */
   ascSlow(): Ordering<K, "slow">;
@@ -275,11 +331,20 @@ export interface NameRef<K extends string = string> {
   descSlow(): Ordering<K, "slow">;
 }
 
-/** The name of the node without its prefix. The index serves `=` and `LIKE`. */
+/**
+ * The name of the node without its prefix. The index serves `=` and `LIKE`, so the pattern methods
+ * keep their plain names. A pattern that opens with a wildcard is served by the index as well. Its
+ * term walk is wider here than on a property, because the index prefixes a property's terms with
+ * the property name and a local name carries no such prefix, but the cost still follows the number
+ * of matches rather than the width of the walk.
+ */
 export interface LocalNameRef<K extends string = string> {
   /** `LOCALNAME(alias) = value`, served by the index. */
   eq(value: LiteralArg): Comparison<K, "fast">;
-  /** `LOCALNAME(alias) LIKE value`, served by the index. */
+  /**
+   * `LOCALNAME(alias) LIKE pattern`, served by the index, with the same pattern language as
+   * {@link PropertyRef.like}.
+   */
   like(value: LiteralArg): Comparison<K, "fast">;
   /**
    * The local name must be one of these values, which folds to `=` comparisons joined with `OR`. An
@@ -287,10 +352,20 @@ export interface LocalNameRef<K extends string = string> {
    */
   in(values: readonly LiteralArg[]): Constraint<K, "fast">;
   /**
-   * The local name must start with this text, which is `LOCALNAME(alias) LIKE 'prefix%'`. The `%`
-   * and `_` characters of the prefix are escaped for you.
+   * The local name must start with this text, which is `LOCALNAME(alias) LIKE 'text%'`. The `%`,
+   * the `_` and the backslash of the text are escaped for you.
    */
-  startsWith(prefix: string): Comparison<K, "fast">;
+  startsWith(text: string): Comparison<K, "fast">;
+  /**
+   * The local name must end with this text, which is `LOCALNAME(alias) LIKE '%text'`, with the same
+   * escaping as {@link LocalNameRef.startsWith}.
+   */
+  endsWith(text: string): Comparison<K, "fast">;
+  /**
+   * The local name must hold this text somewhere, which is `LOCALNAME(alias) LIKE '%text%'`, with
+   * the same escaping as {@link LocalNameRef.startsWith}.
+   */
+  contains(text: string): Comparison<K, "fast">;
   /** `LOCALNAME(alias) <> value`, evaluated in memory. */
   neSlow(value: LiteralArg): Comparison<K, "slow">;
   /** `LOCALNAME(alias) < value`, evaluated in memory. */
@@ -346,7 +421,11 @@ export interface LengthRef<K extends string = string> {
   gtSlow(value: LiteralArg): Comparison<K, "slow">;
   /** `LENGTH(property) >= value`, evaluated in memory. */
   geSlow(value: LiteralArg): Comparison<K, "slow">;
-  /** `LENGTH(property) LIKE value`, evaluated in memory. */
+  /**
+   * `LENGTH(property) LIKE value`, evaluated in memory. It carries no pattern: the engine casts the
+   * operand of a `LENGTH` comparison to `LONG` before it compares, so a pattern that holds a
+   * wildcard fails with a `ValueFormatException` and a pattern of digits alone means `eqSlow`.
+   */
   likeSlow(value: LiteralArg): Comparison<K, "slow">;
   /** Orders ascending on the length, which costs one node load per collected document. */
   ascSlow(): Ordering<K, "slow">;
@@ -375,21 +454,37 @@ function staticOperand(value: LiteralArg): StaticOperand {
 /** The characters `LIKE` reads as wildcards, and the backslash that escapes them. */
 const LIKE_SPECIAL = /[\\%_]/g;
 
+/** Where the literal text sits inside the pattern each of the three methods builds. */
+const LIKE_AFFIXES = {
+  startsWith: ["", "%"],
+  endsWith: ["%", ""],
+  contains: ["%", "%"],
+} as const;
+
+/** The three methods that take literal text and build the `LIKE` pattern that matches it. */
+type LikeMethod = keyof typeof LIKE_AFFIXES;
+
 /**
- * Turns a plain prefix into the `LIKE` pattern that matches it. The JCR-SQL2 `LIKE` operand reads
- * `%` and `_` as wildcards and a backslash as the escape character, so a prefix that holds one of
- * the three is escaped here and matches itself.
+ * Turns literal text into the `LIKE` pattern that matches it, with a wildcard on the side the
+ * method names.
+ *
+ * `LIKE` reads `%` and `_` as wildcards and a backslash as the escape character, so each of the
+ * three is escaped here and matches itself. Those three are the only characters escaped, because
+ * they are the only ones Jackrabbit unescapes faithfully: a backslash in front of a letter or a
+ * digit reaches the matcher as a backslash instead of disappearing, so escaping more would build a
+ * pattern that matches nothing.
  */
-function likePrefixPattern(prefix: string, at: string): string {
-  if (typeof prefix !== "string") {
+function likePattern(text: string, method: LikeMethod): string {
+  if (typeof text !== "string") {
     throw new QueryError(
       "UNSUPPORTED",
-      `startsWith() needs a string prefix, got ${String(prefix)}`,
-      at,
+      `${method}() needs a string, got ${String(text)}`,
+      "constraint.operand2",
     );
   }
 
-  return `${prefix.replace(LIKE_SPECIAL, "\\$&")}%`;
+  const [before, after] = LIKE_AFFIXES[method];
+  return `${before}${text.replace(LIKE_SPECIAL, "\\$&")}${after}`;
 }
 
 /**
@@ -434,7 +529,9 @@ function caseRef<K extends string>(operand: FastOperand<K>): CaseRef<K> {
         fast(Operator.GREATER_THAN_OR_EQUAL_TO, low),
         fast(Operator.LESS_THAN_OR_EQUAL_TO, high),
       ),
-    startsWith: (prefix) => fast(Operator.LIKE, likePrefixPattern(prefix, "constraint.operand2")),
+    startsWith: (text) => fast(Operator.LIKE, likePattern(text, "startsWith")),
+    endsWith: (text) => fast(Operator.LIKE, likePattern(text, "endsWith")),
+    contains: (text) => fast(Operator.LIKE, likePattern(text, "contains")),
     ascSlow: () => qom.ascendingSlow(operand),
     descSlow: () => qom.descendingSlow(operand),
   };
@@ -475,17 +572,16 @@ function nameRef<K extends string>(operand: NodeName<K>): NameRef<K> {
 function localNameRef<K extends string>(operand: NodeLocalName<K>): LocalNameRef<K> {
   const equalTo = (value: LiteralArg): Comparison<K, "fast"> =>
     qom.comparison(operand, Operator.EQUAL_TO, staticOperand(value));
+  const like = (value: LiteralArg): Comparison<K, "fast"> =>
+    qom.comparison(operand, Operator.LIKE, staticOperand(value));
 
   return {
     eq: equalTo,
-    like: (value) => qom.comparison(operand, Operator.LIKE, staticOperand(value)),
+    like,
     in: (values) => anyOf<K, "fast">(values, equalTo),
-    startsWith: (prefix) =>
-      qom.comparison(
-        operand,
-        Operator.LIKE,
-        staticOperand(likePrefixPattern(prefix, "constraint.operand2")),
-      ),
+    startsWith: (text) => like(likePattern(text, "startsWith")),
+    endsWith: (text) => like(likePattern(text, "endsWith")),
+    contains: (text) => like(likePattern(text, "contains")),
     neSlow: (value) => slowComparison(operand, Operator.NOT_EQUAL_TO, value),
     ltSlow: (value) => slowComparison(operand, Operator.LESS_THAN, value),
     leSlow: (value) => slowComparison(operand, Operator.LESS_THAN_OR_EQUAL_TO, value),
@@ -531,12 +627,13 @@ function propertyRef<K extends string>(selectorName: K, propertyName: string): P
         fast(Operator.GREATER_THAN_OR_EQUAL_TO, low),
         fast(Operator.LESS_THAN_OR_EQUAL_TO, high),
       ),
-    startsWith: (prefix) => fast(Operator.LIKE, likePrefixPattern(prefix, "constraint.operand2")),
+    startsWith: (text) => fast(Operator.LIKE, likePattern(text, "startsWith")),
+    endsWith: (text) => fast(Operator.LIKE, likePattern(text, "endsWith")),
+    contains: (text) => fast(Operator.LIKE, likePattern(text, "contains")),
     asc: () => qom.ascending(operand),
     desc: () => qom.descending(operand),
     exists: () => qom.propertyExistence(selectorName, propertyName),
     notExists: () => qom.not(qom.propertyExistence(selectorName, propertyName)),
-    isNull: () => qom.not(qom.propertyExistence(selectorName, propertyName)),
     fullText: (expression) =>
       qom.fullTextSearch(selectorName, propertyName, staticOperand(expression)),
     equals: (other) =>

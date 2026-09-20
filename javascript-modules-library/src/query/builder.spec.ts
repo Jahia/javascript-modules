@@ -17,6 +17,15 @@ function errorCode(run: () => unknown): string | undefined {
   }
 }
 
+function errorMessage(run: () => unknown): string {
+  try {
+    run();
+    return "no error was thrown";
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error);
+  }
+}
+
 const page = qom.selector("jnt:page", "p");
 const title = qom.propertyValue("p", "jcr:title");
 
@@ -278,6 +287,11 @@ describe("the folded predicates", () => {
     build: (selectors: { p: import("./builder.js").SelectorRef<"p"> }) => unknown,
   ) => from("jnt:page", "p").where(build as never).model.constraint;
 
+  /** The `LIKE` pattern a built comparison carries, which is the text the engine receives. */
+  const patternOf = (
+    build: (selectors: { p: import("./builder.js").SelectorRef<"p"> }) => unknown,
+  ) => (constraintOf(build) as unknown as { operand2: { value: string } }).operand2.value;
+
   test("in() folds to = comparisons joined with OR, in the order of the list", () => {
     assert.deepEqual(
       constraintOf(({ p }) => p.prop("cat").in(["a", "b", "c"])),
@@ -385,61 +399,147 @@ describe("the folded predicates", () => {
     );
   });
 
-  test("startsWith() builds a LIKE whose pattern ends in a wildcard", () => {
+  test("the three text methods put the wildcard on the side their name says", () => {
+    const property = qom.propertyValue("p", "jcr:title");
     assert.deepEqual(
       constraintOf(({ p }) => p.prop("jcr:title").startsWith("Home")),
-      qom.comparison(qom.propertyValue("p", "jcr:title"), Operator.LIKE, literal("Home%")),
+      qom.comparison(property, Operator.LIKE, literal("Home%")),
+    );
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("jcr:title").endsWith("Home")),
+      qom.comparison(property, Operator.LIKE, literal("%Home")),
+    );
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("jcr:title").contains("Home")),
+      qom.comparison(property, Operator.LIKE, literal("%Home%")),
     );
   });
 
-  test("startsWith() escapes the two LIKE wildcards and the escape character itself", () => {
-    const pattern = (prefix: string) => {
-      const constraint = constraintOf(({ p }) => p.prop("jcr:title").startsWith(prefix));
-      return (constraint as { operand2: { value: string } }).operand2.value;
-    };
-
-    assert.equal(pattern("50% off"), "50\\% off%");
-    // The pattern the `startsWithPercent` case of the test module sends to a live Jackrabbit.
-    assert.equal(pattern("50%"), "50\\%%");
-    assert.equal(pattern("a_b"), "a\\_b%");
-    assert.equal(pattern("c:\\temp"), "c:\\\\temp%");
-    assert.equal(pattern("%_\\"), "\\%\\_\\\\%");
-    assert.equal(pattern(""), "%");
-  });
-
-  test("startsWith() refuses a value that is not a string", () => {
+  /**
+   * The escaping table, read against a live Jackrabbit `2.22.0-jahia1` on Jahia 8.2.3.2. Every
+   * pattern below was executed there and returned the node that holds the characters verbatim, so
+   * these assertions are the unit-level record of a measured behaviour and not of an assumption.
+   *
+   * Only `%`, `_` and the backslash are escaped. Jackrabbit unescapes those three faithfully and
+   * keeps the backslash in front of a letter or a digit, so escaping any other character would
+   * build a pattern that matches nothing.
+   */
+  test("the three text methods escape the two wildcards and the escape character", () => {
     assert.equal(
-      errorCode(() =>
-        from("jnt:page", "p").where(({ p }) => p.prop("jcr:title").startsWith(3 as never)),
-      ),
-      "UNSUPPORTED",
+      patternOf(({ p }) => p.prop("jcr:title").startsWith("50%")),
+      "50\\%%",
+    );
+    assert.equal(
+      patternOf(({ p }) => p.prop("jcr:title").startsWith("50% off")),
+      "50\\% off%",
+    );
+    assert.equal(
+      patternOf(({ p }) => p.prop("jcr:title").startsWith("mee_ing")),
+      "mee\\_ing%",
+    );
+    assert.equal(
+      patternOf(({ p }) => p.prop("jcr:title").startsWith("c:\\temp")),
+      "c:\\\\temp%",
+    );
+    assert.equal(
+      patternOf(({ p }) => p.prop("jcr:title").startsWith("%_\\")),
+      "\\%\\_\\\\%",
+    );
+    assert.equal(
+      patternOf(({ p }) => p.prop("jcr:title").endsWith("50%")),
+      "%50\\%",
+    );
+    assert.equal(
+      patternOf(({ p }) => p.prop("jcr:title").contains("50%")),
+      "%50\\%%",
+    );
+    assert.equal(
+      patternOf(({ p }) => p.prop("jcr:title").contains("_")),
+      "%\\_%",
+    );
+    // An apostrophe is not a `LIKE` special, so it travels unescaped. The statement path doubles
+    // it inside the string literal, and the two escapes compose without interfering.
+    assert.equal(
+      patternOf(({ p }) => p.prop("jcr:title").contains("it's 50%")),
+      "%it's 50\\%%",
     );
   });
 
-  test("startsWith() is available on a case transform and on a local name", () => {
+  test("empty text leaves the wildcards alone, so the pattern matches every value", () => {
+    assert.equal(
+      patternOf(({ p }) => p.prop("jcr:title").startsWith("")),
+      "%",
+    );
+    assert.equal(
+      patternOf(({ p }) => p.prop("jcr:title").endsWith("")),
+      "%",
+    );
+    assert.equal(
+      patternOf(({ p }) => p.prop("jcr:title").contains("")),
+      "%%",
+    );
+  });
+
+  test("the three text methods refuse a value that is not a string, and name themselves", () => {
+    for (const method of ["startsWith", "endsWith", "contains"] as const) {
+      const run = () =>
+        from("jnt:page", "p").where(({ p }) => p.prop("jcr:title")[method](3 as never));
+      assert.equal(errorCode(run), "UNSUPPORTED");
+      assert.match(errorMessage(run), new RegExp(`^${method}\\(\\) needs a string`));
+    }
+  });
+
+  test("the three text methods are on a case transform and on a local name too", () => {
+    const lowerTitle = qom.lowerCase(qom.propertyValue("p", "jcr:title"));
     assert.deepEqual(
       constraintOf(({ p }) => p.prop("jcr:title").lower().startsWith("ho")),
+      qom.comparison(lowerTitle, Operator.LIKE, literal("ho%")),
+    );
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("jcr:title").lower().endsWith("me")),
+      qom.comparison(lowerTitle, Operator.LIKE, literal("%me")),
+    );
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("jcr:title").upper().contains("OM")),
       qom.comparison(
-        qom.lowerCase(qom.propertyValue("p", "jcr:title")),
+        qom.upperCase(qom.propertyValue("p", "jcr:title")),
         Operator.LIKE,
-        literal("ho%"),
+        literal("%OM%"),
       ),
     );
     assert.deepEqual(
       constraintOf(({ p }) => p.localName().startsWith("home")),
       qom.comparison(qom.nodeLocalName("p"), Operator.LIKE, literal("home%")),
     );
-  });
-
-  test("notExists() and isNull() are the same constraint, which is the negated existence", () => {
-    const expected = qom.not(qom.propertyExistence("p", "subtitle"));
     assert.deepEqual(
-      constraintOf(({ p }) => p.prop("subtitle").notExists()),
-      expected,
+      constraintOf(({ p }) => p.localName().endsWith("page")),
+      qom.comparison(qom.nodeLocalName("p"), Operator.LIKE, literal("%page")),
     );
     assert.deepEqual(
-      constraintOf(({ p }) => p.prop("subtitle").isNull()),
-      expected,
+      constraintOf(({ p }) => p.localName().contains("me-pa")),
+      qom.comparison(qom.nodeLocalName("p"), Operator.LIKE, literal("%me-pa%")),
+    );
+  });
+
+  test("a case transform escapes the text the same way the raw property does", () => {
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("jcr:title").lower().contains("50%")),
+      qom.comparison(
+        qom.lowerCase(qom.propertyValue("p", "jcr:title")),
+        Operator.LIKE,
+        literal("%50\\%%"),
+      ),
+    );
+    assert.deepEqual(
+      constraintOf(({ p }) => p.localName().contains("a_b")),
+      qom.comparison(qom.nodeLocalName("p"), Operator.LIKE, literal("%a\\_b%")),
+    );
+  });
+
+  test("notExists() is the negated existence", () => {
+    assert.deepEqual(
+      constraintOf(({ p }) => p.prop("subtitle").notExists()),
+      qom.not(qom.propertyExistence("p", "subtitle")),
     );
   });
 
@@ -897,17 +997,31 @@ export function speedFixtures(): void {
   base.where(({ p }) => p.prop("cat").in(["a", "b"]));
   base.where(({ p }) => p.prop("count").between(1, 10));
   base.where(({ p }) => p.prop("jcr:title").startsWith("Home"));
+  base.where(({ p }) => p.prop("jcr:title").endsWith("Home"));
+  base.where(({ p }) => p.prop("jcr:title").contains("Home"));
   base.where(({ p }) => p.prop("subtitle").notExists());
-  base.where(({ p }) => p.prop("subtitle").isNull());
   base.where(({ p }) => p.prop("jcr:title").lower().in(["home"]));
   base.where(({ p }) => p.prop("jcr:title").lower().between("a", "b"));
   base.where(({ p }) => p.prop("jcr:title").lower().startsWith("ho"));
+  base.where(({ p }) => p.prop("jcr:title").lower().endsWith("me"));
+  base.where(({ p }) => p.prop("jcr:title").lower().contains("om"));
   base.where(({ p }) => p.name().in(["home"]));
   base.where(({ p }) => p.localName().in(["home"]));
   base.where(({ p }) => p.localName().startsWith("home"));
+  base.where(({ p }) => p.localName().endsWith("page"));
+  base.where(({ p }) => p.localName().contains("me-pa"));
+
+  // @ts-expect-error isNull() was removed: notExists() is the one name for the absence test
+  base.where(({ p }) => p.prop("subtitle").isNull());
 
   // @ts-expect-error NAME() with LIKE is not an index operator, so the reference has no startsWith()
   base.whereSlow(({ p }) => p.name().startsWith("home"));
+
+  // @ts-expect-error NAME() with LIKE fails at execution, so the reference has no endsWith() either
+  base.whereSlow(({ p }) => p.name().endsWith("home"));
+
+  // @ts-expect-error the same holds for contains(), which is a LIKE with two wildcards
+  base.whereSlow(({ p }) => p.name().contains("home"));
 
   // @ts-expect-error a score has no value list, because = on a score runs in memory
   base.whereSlow(({ p }) => p.score().in([0.5]));
