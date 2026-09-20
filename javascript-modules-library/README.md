@@ -178,8 +178,16 @@ On the client, you can use your favorite GraphQL client, such as [Apollo Client]
 This hook is used to execute a JCR query on the current Jahia instance.
 
 ```tsx
-const pages = useJCRQuery({ query: "SELECT * FROM [jnt:page]" });
+// A JCR SQL2 statement, with the limit it must not exceed
+const pages = useJCRQuery({ query: "SELECT * FROM [jnt:page]", limit: 20 });
+
+// A query built with `from()`, which carries its own limit and offset
+const news = useJCRQuery({
+  query: from("jnt:news", "n").limit(10).offset(20),
+});
 ```
+
+The form without a `limit` is deprecated. It returns every node the query matches, which is slow and memory consuming on a large repository. Pass a `limit`, or pass a built query, which carries its own. See [Query builder](#query-builder).
 
 ### `useServerContext`
 
@@ -231,8 +239,230 @@ const { title, description } = getNodeProps(node, ["title", "description"]);
 This function is used to get nodes by a JCR query.
 
 ```tsx
+// A JCR SQL2 statement, with its limit and its offset
 const pages = getNodesByJCRQuery(session, "SELECT * FROM [jnt:page]", limit, offset);
+
+// A built query carries its own limit and offset, so both parameters are left out
+const news = getNodesByJCRQuery(session, from("jnt:news", "n").limit(10).offset(20));
 ```
+
+A built query must have a limit before it is accepted here, and the compiler enforces it. A positional `limit` or `offset` next to a built query that carries one throws a `QueryError` whose code is `LIMIT_CONFLICT`. Only one of the two values could win.
+
+## Query builder
+
+This group builds a JCR query as a typed object instead of a JCR SQL2 string. The model mirrors `javax.jcr.query.qom.QueryObjectModel`, which is the level Jahia hands to its Lucene translation. No value is concatenated into a statement, and no string is parsed back.
+
+```tsx
+import { from, getNodesByJCRQuery } from "@jahia/javascript-modules-library";
+
+const news = from("jnt:news", "n")
+  .where(({ n }) => n.isDescendantOf("/sites/acme/contents"))
+  .orderBy(({ n }) => n.prop("date").desc())
+  .limit(10);
+
+const nodes = getNodesByJCRQuery(session, news);
+// SELECT n.* FROM [jnt:news] AS n WHERE ISDESCENDANTNODE(n, ['/sites/acme/contents']) ORDER BY n.date DESC
+```
+
+A query with no explicit column names one wildcard column per selector, which is why every statement below starts with `SELECT n.*` and not with `SELECT *`. That column is what makes Jahia's internationalization rewrite see the selector, so a built query and the statement it mirrors return the same nodes. The statements in this file are the ones the formatter writes for the model as it is built. A localized session adds a `jcr:language` constraint to every selector.
+
+Three rules shape this API:
+
+- A builder is immutable. Every call returns a new builder, so one base serves several pages: `news.offset(10)` and `news.offset(20)` are two queries and the base is unchanged.
+- A name that ends in `Slow` produces a construct that Jahia's query engine evaluates in memory instead of in the Lucene index. `where()` and `orderBy()` refuse such a construct, `whereSlow()` and `orderBySlow()` accept it, so the cost of a query is visible where it is written.
+- A query cannot be executed before `limit(n)` or `unboundedSlow()` was called. This is a compile-time check, not a runtime one.
+
+The guide `docs/2-guides/4-querying/README.md` covers pagination, total counts and the traps of a localized site. This API is experimental for one minor version, so its shape can still change.
+
+### `$`
+
+This function creates a bind variable, which the query carries until `bind()` gives it a value. It is the short name of `bindVariable`.
+
+```tsx
+const upcoming = from("jnt:event", "e")
+  .where(({ e }) => e.prop("startDate").ge($("since")))
+  .limit(5);
+
+getNodesByJCRQuery(session, upcoming.bind({ since: new Date() }));
+```
+
+The sink replaces each variable with a typed literal before it calls the host. A variable without a value throws a `QueryError` whose code is `UNBOUND_VARIABLE`, before the query reaches Jahia.
+
+### `and`
+
+This function combines constraints with `AND`. It takes one constraint or more, and one constraint folds to itself.
+
+```tsx
+from("jnt:page", "p")
+  .where(({ p }) => and(p.prop("j:published").eq(true), p.prop("jcr:title").like("A%")))
+  .limit(20);
+```
+
+### `date`
+
+This function creates a `DATE` literal out of a `Date` or an ISO 8601 string that carries milliseconds and a zone. A string without a time or without milliseconds is refused, because Jackrabbit reads the string at fixed offsets, so `date("2026-09-01")` throws.
+
+```tsx
+from("jnt:event", "e")
+  .where(({ e }) => e.prop("startDate").ge(date("2026-09-01T00:00:00.000+02:00")))
+  .limit(100);
+```
+
+### `decimal`
+
+This function creates a `DECIMAL` literal out of a number, a bigint or a string. Use it when the property is a decimal, so that the value is not compared as a double.
+
+### `diagnose`
+
+This function reports what the model cannot show at a glance. It returns one entry per finding, with a `level` of `none`, `partial`, `deep-offset`, `full-scan` or `environment`, the place in the model, and the reason.
+
+```tsx
+for (const { level, at, reason } of query.diagnose()) {
+  console.warn(`${level} at ${at}: ${reason}`);
+}
+```
+
+`none` means the query fails at execution, and `build({ strict: true })` throws on such a finding. A `none` finding that also carries `conditional: true` fails only under a condition the model cannot see. One such condition is an internationalized property, so the finding is reported and the query still runs. The `environment` entry is always present. The entry lists the four conditions that live outside the model. The conditions are the native sort setting, the extra JCR providers, the render mode and the session locale.
+
+### `double`
+
+This function creates a `DOUBLE` literal out of a number, a bigint or a string. A number that is not an integer already infers `DOUBLE`, so this constructor is for the cases where the inference is not what you want.
+
+### `from`
+
+This function starts a query. It takes a node type and an alias, and the alias is the name the callbacks receive.
+
+```tsx
+from("jnt:page", "p")
+  .where(({ p }) => p.prop("jcr:title").eq("Home"))
+  .limit(20);
+// SELECT p.* FROM [jnt:page] AS p WHERE p.[jcr:title] = 'Home'
+```
+
+It also lifts a model that `qom.createQuery` built, so that the factory and the builder mix in one query.
+
+The builder has `where`, `whereSlow`, `orderBy`, `orderBySlow`, `select`, `columns`, `joinSlow`, `limit`, `unboundedSlow`, `offset`, `bind`, `build` and `diagnose`. The callback receives one reference per alias, and a reference gives `prop(name)`, `contains(expression)`, `all()`, `isDescendantOf(path)`, `isChildOf(path)`, `isSameAs(path)`, `name()`, `localName()` and `score()`.
+
+A property reference gives `lower()` and `upper()`, and the Lucene index serves both for every operator. `upper()` carries the same caveat as `not` below. It fails for a property that the rewriter moves to a `jnt:translation` selector, and that redirect needs an internationalized property in a localized session. `diagnose` reports the risk, and the query is not refused. A lab run on Jahia 8.2.3.2 did not reproduce that failure. In that run, `upper()`, `not` and an ordering on `lower()` returned the expected nodes for an internationalized `jcr:title` in a localized session.
+
+One construct did fail there. `lengthSlow()` over an internationalized property matches nothing. `LENGTH` is evaluated in memory against the node itself, and the translated value lives on a `jnt:translation` child. Use `lengthSlow()` on a property that is not internationalized.
+
+```tsx
+// A join runs in memory on both sides, which is why it is named `joinSlow`. The result holds the
+// nodes of the left selector, one per matching row, so the same node comes back once per match.
+// A statement with the same join returns the same list, so this is Jahia's behaviour and not
+// something the builder adds. Deduplicate in JavaScript when you need distinct nodes.
+from("jnt:page", "p")
+  .joinSlow("jnt:content", "c")
+  .on(({ c, p }) => c.isChildOf(p))
+  .where(({ c }) => c.prop("j:published").eq(true))
+  .select(
+    ({ p }) => p.all(),
+    ({ c }) => c.prop("jcr:title").as("childTitle"),
+  )
+  .limit(20);
+```
+
+### `JoinType`
+
+This object holds the three join types of the specification, which are `INNER`, `LEFT_OUTER` and `RIGHT_OUTER`. `joinSlow` uses `INNER` when no type is given. Jahia's engine runs a right outer join as a left outer join with the sides swapped, which `diagnose` reports as `partial`.
+
+### `literal`
+
+This function creates a literal and infers its type. A string gives `STRING`, a boolean gives `BOOLEAN`, a bigint gives `LONG`, and a `Date` gives `DATE`. A number gives `LONG` when it is an integer, and `DOUBLE` otherwise. A number beyond `Number.MAX_SAFE_INTEGER` throws `LITERAL_PRECISION`, because it can no longer be written back exactly.
+
+The comparison methods of the builder accept a plain value and call this function for you, so `literal` is mostly useful with the factory.
+
+### `long`
+
+This function creates a `LONG` literal out of a number, a bigint or a string.
+
+### `name`
+
+This function creates a `NAME` literal, which is the type a comparison on `NAME()` or `LOCALNAME()` expects.
+
+### `not`
+
+This function negates a constraint.
+
+```tsx
+from("jnt:page", "p")
+  .where(({ p }) => not(p.prop("j:published").eq(true)))
+  .limit(50);
+// SELECT p.* FROM [jnt:page] AS p WHERE NOT p.[j:published] = true
+```
+
+One case fails at execution. Jahia's query rewriter rebuilds a `NOT` with a null child once it has changed the node under it. The rewriter changes that node for a property it moves to a `jnt:translation` selector. That redirect needs an internationalized property in a localized session, so a negation over any other property runs. `diagnose` reports the risk as a `none` finding marked `conditional`, and the builder does not refuse the query.
+
+### `Operator`
+
+This object holds the seven comparison operators of the specification, from `EQUAL_TO` to `LIKE`. The builder methods `eq`, `ne`, `lt`, `le`, `gt`, `ge` and `like` use them, so this object is mostly useful with the factory.
+
+`NOT_EQUAL_TO` excludes multi-valued properties from the result in Jackrabbit, which `diagnose` reports as `partial`.
+
+### `or`
+
+This function combines constraints with `OR`. It takes one constraint or more, and one constraint folds to itself.
+
+### `Order`
+
+This object holds the two ordering directions, which are `ASCENDING` and `DESCENDING`. The builder methods `asc()`, `desc()`, `ascSlow()` and `descSlow()` use them.
+
+### `path`
+
+This function creates a `PATH` literal. A path must be absolute.
+
+### `qom`
+
+This object is the factory layer. It has one pure function per method of `javax.jcr.query.qom.QueryObjectModelFactory`, with the parameter order of Java. The factory is the escape hatch for anything the fluent builder does not express. Five names carry the `Slow` suffix, which are `joinSlow`, `lengthSlow`, `comparisonSlow`, `ascendingSlow` and `descendingSlow`.
+
+```tsx
+// `LOWER` on a property is served by the index in a comparison, so this node is fast
+qom.comparison(
+  qom.lowerCase(qom.propertyValue("p", "jcr:title")),
+  Operator.EQUAL_TO,
+  literal("home"),
+);
+```
+
+Each function checks its own arguments and throws a `QueryError`. The checks are the JCR name grammar for node types, selectors and properties, and a looser grammar for column names. A path must be absolute where the specification asks for one.
+
+### `QueryError`
+
+This error carries a `code`, an `at` path into the model, and a `statement` when one exists. The codes are `INVALID_NAME`, `INVALID_PATH`, `INVALID_COLUMN`, `NULL_CONSTRAINT`, `UNDECLARED_SELECTOR`, `DUPLICATE_SELECTOR`, `MISSING_JOIN_CONDITION`, `LITERAL_PRECISION`, `UNBOUND_VARIABLE`, `LIMIT_CONFLICT` and `UNSUPPORTED`.
+
+### `reference`
+
+This function creates a `REFERENCE` literal out of a node identifier.
+
+Jahia's value factory turns a reference value into a weak reference, so a `REFERENCE` literal executes as a `WEAKREFERENCE` one. `diagnose` reports this as `partial`. Write `weakReference()` when that is what you mean.
+
+### `toQOM`
+
+This function turns a model into the host query object, through the object model factory of the session. It is what the execution seams call, and it is exported so that a module can read the statement Jahia formats for a built query.
+
+```tsx
+const statement = toQOM(news.build(), session).getStatement();
+```
+
+Jahia rewrites the query before the object model exists, so the statement is the one of the rewritten query. In a localized session that rewrite adds a `jcr:language` constraint to every selector that carries none.
+
+### `unchecked`
+
+This function accepts a constraint whose selector name is held in a `string` variable, and defers the selector check to `build()`. Use it when an alias cannot be a literal type, for instance when it comes from a configuration value.
+
+### `uri`
+
+This function creates a `URI` literal.
+
+### `weakReference`
+
+This function creates a `WEAKREFERENCE` literal out of a node identifier.
+
+### Two traps
+
+- A `REFERENCE` literal executes as a weak reference, as the `reference` entry says above. A query that compares a strong reference property therefore behaves as if the property were weak.
+- A `DOUBLE` literal against a `LONG` property matches nothing, and nothing reports it. Jackrabbit indexes the two types differently, so `n.prop("count").eq(3.0)` returns an empty result where `n.prop("count").eq(3)` returns rows. Use `long()`, `double()` or `decimal()` when the property type is known.
 
 ## URL builder
 

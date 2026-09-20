@@ -83,10 +83,11 @@ describe("none", () => {
     assert.deepEqual(levels(model), ["environment"]);
   });
 
-  test("a NOT around a property reports the translation rewrite", () => {
+  test("a NOT around a property reports the translation rewrite, as a conditional finding", () => {
     const model = pageQuery(qom.not(qom.comparison(title, Operator.EQUAL_TO, literal("Home"))));
     assert.deepEqual(findingsAt(model, "none"), ["constraint"]);
     assert.match(diagnose(model)[0].reason, /jnt:translation/);
+    assert.equal(diagnose(model)[0].conditional, true);
   });
 
   test("a NOT around a path constraint does not", () => {
@@ -94,11 +95,24 @@ describe("none", () => {
     assert.deepEqual(levels(model), ["environment"]);
   });
 
-  test("an UPPER around a property reports it too", () => {
+  test("an UPPER around a property reports it too, and it is conditional as well", () => {
     const model = pageQuery(
       qom.comparison(qom.upperCase(title), Operator.EQUAL_TO, literal("HOME")),
     );
     assert.deepEqual(findingsAt(model, "none"), ["constraint.operand1"]);
+    assert.equal(diagnose(model)[0].conditional, true);
+  });
+
+  test("the two failures that need no condition are not marked conditional", () => {
+    const badName = pageQuery(
+      qom.comparisonSlow(qom.nodeName("p"), Operator.LIKE, literal("home%")),
+    );
+    const badLanguage = pageQuery(
+      qom.comparison(qom.propertyValue("p", "jcr:language"), Operator.EQUAL_TO, $("lang")),
+    );
+
+    assert.equal(diagnose(badName)[0].conditional, undefined);
+    assert.equal(diagnose(badLanguage)[0].conditional, undefined);
   });
 
   test("a LOWER around a property does not", () => {

@@ -23,7 +23,8 @@ import type {
  * A construct that Jackrabbit runs in memory has no level of its own, because the `Slow` suffix in
  * its name already says so at the call site.
  *
- * - `none`: the query fails.
+ * - `none`: the query fails. A finding that also carries `conditional` fails under a condition the
+ *   model cannot see, so the strict gate reports it and lets it through.
  * - `partial`: the query runs with different semantics.
  * - `deep-offset`: the offset makes the search run again with a doubled heap.
  * - `full-scan`: the hit loop never breaks early.
@@ -36,6 +37,12 @@ export interface Diagnostic {
   readonly level: DiagnosticLevel;
   readonly at: string;
   readonly reason: string;
+  /**
+   * `true` on a `none` finding whose failure needs a condition the model cannot see. The query runs
+   * in every other condition, so `build({ strict: true })` and the execution seams report such a
+   * finding and do not refuse the query.
+   */
+  readonly conditional?: boolean;
 }
 
 /** The values that travel next to the model, and that the model never carries. */
@@ -49,7 +56,7 @@ const ENVIRONMENT_REASON =
   "Four conditions decide the real cost and the model cannot show them: jahia.jackrabbit.useNativeSort set to false, extra JCR providers, render mode, and the session locale.";
 
 const I18N_REWRITE_REASON =
-  "In a localised session, the query rewriter moves an internationalised property to a jnt:translation join selector. A NOT or an UPPER around such a property makes the rewriter rebuild the constraint with null, and the query fails. The model cannot tell which properties are internationalised.";
+  "The query rewriter rebuilds a NOT or an UPPER with a null child once it has changed the node under it, and the query then fails. It changes that node for a property it moves to a jnt:translation selector, which needs an internationalised property in a localised session. The model sees neither condition, so this finding reports the risk and does not refuse the query.";
 
 function innermostOperand(operand: DynamicOperand): DynamicOperand {
   let current = operand;
@@ -124,7 +131,7 @@ function diagnoseOperandTransforms(operand: DynamicOperand, at: string, found: D
   }
 
   if (hasUpperCase(operand) && innermostOperand(operand).kind === "PropertyValue") {
-    found.push({ level: "none", at, reason: I18N_REWRITE_REASON });
+    found.push({ level: "none", conditional: true, at, reason: I18N_REWRITE_REASON });
   }
 }
 
@@ -185,7 +192,7 @@ function diagnoseConstraint(constraint: Constraint, at: string, found: Diagnosti
       return;
     case "Not":
       if (referencesProperty(constraint.constraint)) {
-        found.push({ level: "none", at, reason: I18N_REWRITE_REASON });
+        found.push({ level: "none", conditional: true, at, reason: I18N_REWRITE_REASON });
       }
 
       diagnoseConstraint(constraint.constraint, `${at}.constraint`, found);

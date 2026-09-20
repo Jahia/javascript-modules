@@ -269,8 +269,9 @@ function or<
  * writes parentheses around a `NOT` child of an `AND`.
  *
  * @remarks
- *   Jahia support: runs on the index. In a localised session, a `NOT` around a property that the
- *   rewriter moves to a `jnt:translation` selector makes the query fail, see `diagnose()`.
+ *   Jahia support: runs on the index. A `NOT` around a property that the rewriter moves to a
+ *   `jnt:translation` selector fails, which needs an internationalised property in a localised
+ *   session. `diagnose()` reports the risk and the query is not refused.
  */
 function not<A extends string, P extends Speed = "fast">(constraint: Constraint<A, P>): Not<A, P> {
   assertConstraint(constraint, "The operand of not()", "not.constraint");
@@ -519,8 +520,9 @@ function lowerCase<S extends string = string, O extends DynamicOperand<S> = Dyna
  * The upper case form of an operand.
  *
  * @remarks
- *   Jahia support: the same as `lowerCase`. In a localised session, an `UPPER` around a property that
- *   the rewriter moves to a `jnt:translation` selector makes the query fail, see `diagnose()`.
+ *   Jahia support: the same as `lowerCase`. An `UPPER` around a property that the rewriter moves to a
+ *   `jnt:translation` selector fails, which needs an internationalised property in a localised
+ *   session. `diagnose()` reports the risk and the query is not refused.
  */
 function upperCase<S extends string = string, O extends DynamicOperand<S> = DynamicOperand<S>>(
   operand: O,

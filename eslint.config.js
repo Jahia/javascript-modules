@@ -97,7 +97,11 @@ export default defineConfig(
   // tsconfig.json that claims them. The test build does, and the type aware rules read it here.
   // The pattern matches the `include` of that test build, so every file it claims has a project.
   {
-    files: ["./javascript-modules-library/src/query/**/*.spec.ts"],
+    files: [
+      "./javascript-modules-library/src/query/**/*.spec.ts",
+      "./javascript-modules-library/src/utils/jcr/getNodesByJCRQuery.spec.ts",
+      "./javascript-modules-library/src/hooks/useJCRQuery.spec.ts",
+    ],
     languageOptions: {
       parserOptions: {
         projectService: false,

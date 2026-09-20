@@ -175,28 +175,30 @@ Rejected alternatives:
 
 ## 5. Developer experience
 
-The eight examples below show the facade and the factory mixed. Each comment gives `getStatement()` as the fork formats it. Every example calls `.limit()`, because a builder without a limit does not compile as a `Queryable`.
+The eight examples below show the facade and the factory mixed. Each comment gives `getStatement()` as the fork formats it for the model as it is built. Every example calls `.limit()`, because a builder without a limit does not compile as a `Queryable`.
+
+Two facts changed these comments after the phase 2 implementation. The sink emits one wildcard column per selector, per section 7.1, so the formatter writes `SELECT p.*` where an empty column list would write `SELECT *`. And `createQuery` rewrites the query before the object model exists, per section 2.1, so the statement a live query reports also carries whatever the rewrite added, which in a localised session is a `jcr:language` constraint per selector without one.
 
 ```ts
 // 1. Property filter
 from("jnt:page", "p").where(({ p }) => p.prop("jcr:title").eq("Home")).limit(20);
-// SELECT * FROM [jnt:page] AS p WHERE p.[jcr:title] = 'Home'
+// SELECT p.* FROM [jnt:page] AS p WHERE p.[jcr:title] = 'Home'
 // 2. Path scope
 from("jnt:news", "n").where(({ n }) => n.isDescendantOf("/sites/acme/contents")).limit(50);
-// SELECT * FROM [jnt:news] AS n WHERE ISDESCENDANTNODE(n, ['/sites/acme/contents'])
+// SELECT n.* FROM [jnt:news] AS n WHERE ISDESCENDANTNODE(n, ['/sites/acme/contents'])
 // 3. Ordering with pages. Every call returns a new builder, so one base serves several pages.
 const news = from("jnt:news", "n").orderBy(({ n }) => n.prop("date").desc()).limit(10);
-getNodesByJCRQuery(session, news.offset(20)); // SELECT * FROM [jnt:news] AS n ORDER BY n.date DESC
+getNodesByJCRQuery(session, news.offset(20)); // SELECT n.* FROM [jnt:news] AS n ORDER BY n.date DESC
 // 4. Full text and score ordering, both sorted in Lucene
 from("jnt:article", "a").where(({ a }) => a.contains("graal*")).orderBy(({ a }) => a.score().desc()).limit(10);
-// SELECT * FROM [jnt:article] AS a WHERE CONTAINS(a.*, 'graal*') ORDER BY SCORE(a) DESC
+// SELECT a.* FROM [jnt:article] AS a WHERE CONTAINS(a.*, 'graal*') ORDER BY SCORE(a) DESC
 // 5. Typed date literal
 from("jnt:event", "e").where(({ e }) => e.prop("startDate").ge(date("2026-09-01T00:00:00.000+02:00"))).limit(100);
-// SELECT * FROM [jnt:event] AS e WHERE e.startDate >= CAST('2026-09-01T00:00:00.000+02:00' AS DATE)
+// SELECT e.* FROM [jnt:event] AS e WHERE e.startDate >= CAST('2026-09-01T00:00:00.000+02:00' AS DATE)
 // 6. Bind variable, replaced by a typed literal in the sink
 const upcoming = from("jnt:event", "e").where(({ e }) => e.prop("startDate").ge($("since"))).limit(5);
 getNodesByJCRQuery(session, upcoming.bind({ since: date(startOfMonth) }));
-// SELECT * FROM [jnt:event] AS e WHERE e.startDate >= CAST('2026-09-01T00:00:00.000+02:00' AS DATE)
+// SELECT e.* FROM [jnt:event] AS e WHERE e.startDate >= CAST('2026-09-01T00:00:00.000+02:00' AS DATE)
 // 7. Join, runs in memory. getNodes() returns the nodes of the left selector: pages that have a published child.
 from("jnt:page", "p").joinSlow("jnt:content", "c").on(({ c, p }) => c.isChildOf(p))
   .where(({ c }) => c.prop("j:published").eq(true))
@@ -210,7 +212,9 @@ from("jnt:page", "p").where(({ p }) => and(
      qom.comparison(qom.lowerCase(qom.propertyValue("p", "jcr:title")), Operator.EQUAL_TO, literal("home"))),
 )).whereSlow(({ p }) => p.prop("jcr:title").lengthSlow().gtSlow(3))
   .orderBySlow(({ p }) => p.prop("jcr:title").lower().descSlow()).limit(50);
-// SELECT * FROM [jnt:page] AS p WHERE (NOT p.[j:published] = true) AND (p.[jcr:title] LIKE 'A%' OR LOWER(p.[jcr:title]) = 'home') AND LENGTH(p.[jcr:title]) > CAST('3' AS LONG) ORDER BY LOWER(p.[jcr:title]) DESC
+// SELECT p.* FROM [jnt:page] AS p WHERE (NOT p.[j:published] = true) AND (p.[jcr:title] LIKE 'A%' OR LOWER(p.[jcr:title]) = 'home') AND LENGTH(p.[jcr:title]) > CAST('3' AS LONG) ORDER BY LOWER(p.[jcr:title]) DESC
+// This example returns nothing in a localised session: `LENGTH` over the internationalised
+// `jcr:title` reads the node itself, where the translated value does not live. See section 14.
 ```
 
 Notes on the examples:
@@ -221,7 +225,7 @@ Notes on the examples:
 4. `SCORE` ordering is native, and `JahiaQueryEngine.java:186-192` corrects the Lucene flag to JCR semantics.
 5. `date()` accepts a `Date` or an ISO 8601 string with a zone. `Date.prototype.toISOString()` output is accepted, and a date-only string is rejected by Jackrabbit, per `Probe2.java`.
 6. `$("since")` is a `BindVariableValue` in the model, and `.bind()` stores the values in the execution options. The sink replaces each variable with a typed literal before the factory call, because `bindValue` on the QOM proxy fails at execution, see section 2.1. A variable without a binding throws `UNBOUND_VARIABLE` before any host call.
-7. `joinSlow` names the in-memory join. Both sides run unbounded, see section 2.4, so the limit only slices the merged rows. A join builder has no `build()` until `.on()` is called, and `getNodesByJCRQuery` returns the left selector's nodes, deduplicated.
+7. `joinSlow` names the in-memory join. Both sides run unbounded, see section 2.4, so the limit only slices the merged rows. A join builder has no `build()` until `.on()` is called, and `getNodesByJCRQuery` returns the left selector's nodes. The lab of section 14 shows that they are **not** deduplicated: the left node comes back once per matching row, on the object model path and on the statement path alike.
 8. `j:published` comes from `jmix:lastPublished`, see `02-jahia-nodetypes.cnd:55-57`. `LOWER` in a comparison on a property runs on the index through `CaseTermQuery`, so `qom.comparison` and `.eq()` keep their names. `LENGTH` in a comparison and `LOWER` in an ordering load a node per hit, so `lengthSlow()`, `gtSlow()` and `descSlow()` carry `Slow`. Only `whereSlow()` and `orderBySlow()` accept their output. The parentheses around `NOT` are required, because the Parser reads `NOT a AND b` as `NOT (a AND b)`.
 
 ## 6. Type model and factory surface
@@ -334,12 +338,12 @@ Construction time: each `qom.*` function validates its arguments and throws `Que
 
 Every construct exists in the model and in the factory, and support has three signals. The first signal is the `Slow` suffix in the name, for every construct that Jackrabbit runs in memory. Those constructs are joins, `LENGTH`, and comparisons on `SCORE`, `NAME()` and `LOCALNAME()` outside their index operators. Orderings on an operand other than a property or `SCORE()`, and an unbounded execution, complete the list. The second signal is `diagnose(model, execution?)`, which returns `Diagnostic[]` with `{ level: "none" | "partial" | "deep-offset" | "full-scan" | "environment"; at: string; reason: string }`. The third signal is JSDoc `@remarks Jahia support: ...` on each function, and no construct is `@deprecated`.
 
-- `none`: the query fails. The cases are `NAME()` with `LIKE` and no transform, and `jcr:language = $var`. The third case is `NOT` or `UPPER` around a property that the rewriter redirects to a `jnt:translation` join selector.
+- `none`: the query fails. The cases are `NAME()` with `LIKE` and no transform, and `jcr:language = $var`. The third case is `NOT` or `UPPER` around a property that the rewriter redirects to a `jnt:translation` join selector. That third case carries `conditional: true`, because the rewriter rebuilds the node with a null child only once it has changed the node under it, see `QueryModifierAndOptimizerVisitor.java:380-386` and `:488-493`. It needs an internationalised property in a localised session, and the model sees neither condition.
 - `partial`: the query runs with different semantics. The cases are `<>` on multi-valued properties, nested `LOWER(UPPER(x))`, `RIGHT OUTER` joins, and `reference()`, which executes as a weak reference.
 - `deep-offset`: `offset > 32768`, where the search runs again with a doubled heap. `full-scan`: a `rep:facet` column, or a `rep:count` column without `approximate=1`.
 - `environment`: one fixed entry that lists the four conditions the model cannot show: `useNativeSort=false`, extra providers, render mode, and session locale. A reader sees them next to the model findings.
 
-`build({ strict: true })` throws on `none`, and `executeQuery` throws `UNSUPPORTED` on `none`. No runtime warning exists for a `Slow` construct, because the name is the warning.
+`build({ strict: true })` throws on `none`, and `executeQuery` throws `UNSUPPORTED` on `none`. A `none` finding marked `conditional` is reported and not thrown on, because refusing it would take `not()` and `upper()` away from every caller for a condition that holds in few queries. No runtime warning exists for a `Slow` construct, because the name is the warning.
 
 ## 7. Sinks
 
@@ -359,7 +363,7 @@ The value factory is type-only, so the TypeScript grammar check is the only name
 
 `src/query/execute.ts` is internal in v1, and the public seams are `getNodesByJCRQuery` and `useJCRQuery`. `executeQuery(session, input)` takes either `{ statement: string; limit: number; offset: number }` from a string seam or an `Executable`. It is the sole caller of `setLimit` and `setOffset`: it calls `setLimit(limit)` when `limit >= 0`, `setOffset(offset)` when `offset > 0`, and then `execute()`. A string input goes through `createQuery(statement, "JCR-SQL2")`, as `getNodesByJCRQuery.ts:29` does today, and an `Executable` goes through `toQOM`. No layer slices in JavaScript.
 
-The spec types `execute()` as `javax.jcr.query.QueryResult`, and the runtime object is Jahia's `QueryResultWrapper`, so `executeQuery` casts once to a local `QueryResultLike` with `getNodes()` and `getRows()`. `getApproxCount()` is not exposed, because it returns `0` at `JahiaQueryEngine.java:148`. A join executes through `getNodes()` and yields the left selector's nodes, deduplicated, because `QueryResultAdapter` returns the node of `getSelectorNames()[0]` and `QueryEngine.getSelectorNames` lists left then right. `getRows()` gives column access and the `CountRow` of a `rep:count` query, and phase 0 adds it to the generated types.
+The spec types `execute()` as `javax.jcr.query.QueryResult`, and the runtime object is Jahia's `QueryResultWrapper`, so `executeQuery` casts once to a local `QueryResultLike` with `getNodes()` and `getRows()`. `getApproxCount()` is not exposed, because it returns `0` at `JahiaQueryEngine.java:148`. A join executes through `getNodes()` and yields the left selector's nodes, because `QueryResultAdapter` returns the node of `getSelectorNames()[0]` and `QueryEngine.getSelectorNames` lists left then right. The lab of section 14 shows that they are not deduplicated: there is one entry per matching row. `getRows()` gives column access and the `CountRow` of a `rep:count` query, and phase 0 adds it to the generated types.
 
 ### 7.3 Later: SQL2 serialiser
 
@@ -420,7 +424,7 @@ The guide documents two total-count patterns without a count API. The first is o
   - `.limit()`, `.offset()` and `.bind()` never enter the model, and a positional limit together with a carried limit throws `LIMIT_CONFLICT`,
   - `@ts-expect-error` fixtures: a phantom selector, no `Queryable` before `.limit()`, `where()` and `orderBy()` reject a `"slow"` node, and `qom.comparison` rejects the operands of section 6.5.
 - Integration tests run on the Docker lab with Cypress and a test-module view in the `getNodesByJCRQueryTest` pattern. They cover:
-  - each example of section 5 through the QOM sink, with a `getStatement()` snapshot assertion per example. The node UUID set is asserted against the parsed statement,
+  - each example of section 5 through the QOM sink, with a `getStatement()` assertion per example. The assertion reads the fragments the rewrite of section 2.1 leaves intact, because the statement a live query reports is the rewritten one. The node UUID set is asserted against the parsed statement,
   - `createValue(String, int)` per type, bind inlining, and a join through `getNodes()` that returns left-selector nodes,
   - i18n parity of one wildcard column per selector against a parsed `SELECT *` on a 3-language site, with `limit` below the number of distinct nodes,
   - `offset=2, limit=2` with `ORDER BY n.[jcr:uuid]` returns the same page over three runs. For a preview `?alias=` user who lacks read, `setLimit(size + 1)` gives `getSize() == size + 1` while the returned array is shorter,
@@ -523,6 +527,69 @@ Verify before build, on the Docker lab, in priority order:
 9. `getRows()` from JavaScript. Run `result.getRows().nextRow().getValue("rep:count(approximate=1)").getLong()` in the test module, and check the behaviour on more than 100 nodes.
 10. Shortened page. In preview with `?alias=` for a user who lacks read, run `setLimit(size + 1)` and confirm `getSize() == size + 1` while the returned array is shorter. Repeat with a `j:isExternalProviderRoot` node in a full page of 1000.
 11. Providers and ISO 8601 strictness. Dump `JCRSessionFactory.getInstance().getProviderList()`, and if more than `default` exists, test a page past provider 1. Then confirm the `QValueFactory` ISO 8601 strictness on the string path, one line.
+
+### Lab results, 2026-09-20
+
+Run on a Cortex Docker instance of `jahia/jahia-ee:8.2.3`, which reports product version `8.2.3.2`
+and carries the Jackrabbit fork `2.22.0-jahia1`, the one this plan cites as `FORK`, in
+development operating mode, with the engine and the test module built from this worktree and the
+`javascriptTestSite` of the Cypress suite, a one-language site in a session whose locale is `en`.
+
+| Check | Result |
+|---|---|
+| 1, `bindValue` on the QOM proxy path | **Fails, as predicted.** `javax.jcr.RepositoryException: Unknown bind variable: kind`, thrown by `execute()` after `bindValue()` returned without error. The sink's inlining is therefore required. |
+| 2, `REFERENCE` literal | **Behaves as `WEAKREFERENCE`, as predicted.** `reference(uuid)` and `weakReference(uuid)` produce the same statement, `CAST('<uuid>' AS WEAKREFERENCE)`, and return the same node. |
+| 3, `useNativeSort` | Not run. It needs a DEBUG logger on the Jackrabbit join engine. |
+| 4, native `ORDER BY` push-down | Not run. It needs a data set of more than 50000 nodes. |
+| 5, approximate count bias | Not run. It needs more than 100 readable nodes. |
+| 6, regen diff assertions | Not re-run here. Phase 0 ran it; this lab only consumed its output. |
+| 7, translation in-page reorder | Not run as written, which needs a modified translation date. The site was switched to three languages by hand and the i18n parity of section 10 was checked there, see below. |
+| 8, `LOWER` and `UPPER` push-down | Partly run, without the node-load counts. Both return the expected nodes over an internationalised property. |
+| 9, `getRows()` from JavaScript | **Runs.** The count snippet of the querying guide, executed verbatim in the test view, returned `estimate=5 approxLimitReached=false` over five events. The more-than-100-node half of the check was not run. |
+| 10, shortened page | Not run. It needs a preview `?alias=` user without read access. |
+| 11, providers and ISO 8601 strictness | Not run. |
+
+Three findings the checks above did not predict.
+
+- **A join is not deduplicated.** The left selector comes back once per matching row, on the object
+  model path and on the equivalent JCR-SQL2 statement alike. Sections 5 and 7.2 are corrected.
+- **`LENGTH` over an internationalised property matches nothing.** The value lives on a
+  `jnt:translation` child and `LENGTH` is evaluated in memory against the node itself. `LOWER`,
+  `UPPER` and `NOT` over the same property all return the expected nodes, because they are served
+  by the index or by the ordering path. Example 8 of section 5 is therefore an empty query in a
+  localised session.
+- **`NOT` and `UPPER` over an internationalised property did not fail.** Section 2.3 lists them as
+  failing once the rewrite redirects the property to a `jnt:translation` selector. On this version
+  the rewrite adds a language constraint to the selector and redirects nothing, so both ran and
+  returned the expected nodes. This supports the static reading recorded in the phase 2 report, and
+  the `conditional` flag on the two diagnostics is the right call. It is one version and one
+  property shape, so the row is not deleted.
+
+The statements the fork wrote for the cases of the test view, for the record:
+
+```
+property    SELECT e.* FROM [jnt:event] AS e WHERE ISDESCENDANTNODE(e, ['<scope>']) AND e.[jcr:title] = 'Event 1' AND e.[jcr:language] = 'en'
+path        SELECT e.* FROM [jnt:event] AS e WHERE ISDESCENDANTNODE(e, ['<scope>']) AND e.[jcr:language] = 'en' ORDER BY e.[jcr:title]
+fullText    SELECT e.* FROM [jnt:event] AS e WHERE ISDESCENDANTNODE(e, ['<scope>']) AND CONTAINS(e.*, 'Event') AND (NOT e.[jcr:language] IS NOT NULL OR e.[jcr:language] = 'en') ORDER BY SCORE(e) DESC
+date        SELECT e.* FROM [jnt:event] AS e WHERE ISDESCENDANTNODE(e, ['<scope>']) AND e.startDate >= CAST('2000-01-01T00:00:00.000Z' AS DATE) AND (NOT e.[jcr:language] IS NOT NULL OR e.[jcr:language] = 'en')
+bind        identical to date, so the sink inlined the bound value
+join        SELECT p.*, c.[jcr:title] AS childTitle FROM [jnt:contentFolder] AS p INNER JOIN [jnt:event] AS c ON ISCHILDNODE(c, p) WHERE ISSAMENODE(p, ['<scope>']) AND (NOT p.[jcr:language] IS NOT NULL OR p.[jcr:language] = 'en') AND c.[jcr:language] = 'en'
+mixed       SELECT e.* FROM [jnt:event] AS e WHERE ISDESCENDANTNODE(e, ['<scope>']) AND (NOT ISSAMENODE(e, ['<scope>/event-1'])) AND (e.[jcr:title] LIKE 'Event%' OR LOWER(e.[jcr:title]) = 'event 2') AND LENGTH(e.[jcr:title]) > CAST('3' AS LONG) AND e.[jcr:language] = 'en' ORDER BY LOWER(e.[jcr:title]) DESC
+literals    ... e.nameProp = CAST('jnt:event' AS NAME) ... e.referenceProp = CAST('<uuid>' AS WEAKREFERENCE) ... e.uriProp = CAST('https://www.jahia.com' AS URI) ...
+```
+
+The i18n parity of section 10 was checked by hand, outside the Cypress suite, because the suite's
+site helper creates a one-language site. The site was switched to `en`, `fr` and `de` and each of
+the five events was given a French and a German `jcr:title`. The built query, which emits one
+wildcard column per selector, and the parsed `SELECT *` statement then returned the same three
+nodes with a limit of three below the five distinct nodes, in an English session and in a French
+session alike. No duplicate and no short page appeared, so the doubled hit stream of the risk list
+does not reach the caller. In the French session the statement carried `e.[jcr:language] = 'fr'`
+and the English title filter returned nothing, which is the documented locale dependence.
+
+Two shapes of the language constraint appear. A selector whose constraint already names an
+internationalised property gets `AND sel.[jcr:language] = '<locale>'`, and a selector without one
+gets `AND (NOT sel.[jcr:language] IS NOT NULL OR sel.[jcr:language] = '<locale>')`.
 
 ## 15. Prior art
 

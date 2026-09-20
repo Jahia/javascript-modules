@@ -2,9 +2,28 @@
  * The JCR query builder, modeled on `javax.jcr.query.qom`.
  *
  * This index is the surface of the pure layer: the query model, the wire constants, the literal
- * constructors, the factory that mirrors `QueryObjectModelFactory`, the cross-node checks and
- * `diagnose()`. The fluent facade and the host sinks come on top of it.
+ * constructors, the factory that mirrors `QueryObjectModelFactory`, the fluent facade, the
+ * cross-node checks and `diagnose()`. The host sinks come on top of it.
  */
+
+// Fluent facade
+export { and, from, not, or } from "./builder.js";
+export type {
+  Arg,
+  Bound,
+  CaseRef,
+  Executable,
+  JoinClause,
+  LengthRef,
+  LocalNameRef,
+  NameRef,
+  PropertyRef,
+  QueryBuilder,
+  Queryable,
+  ScoreRef,
+  SelectorRef,
+  Selectors,
+} from "./builder.js";
 
 // Constants
 export { DEEP_OFFSET_THRESHOLD, JoinType, LiteralTypes, Operator, Order } from "./constants.js";
