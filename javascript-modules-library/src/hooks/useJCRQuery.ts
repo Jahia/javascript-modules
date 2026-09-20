@@ -70,8 +70,12 @@ export function useJCRQuery({
     );
   }
 
-  const { renderContext } = useServerContext();
-  const session = renderContext.getMainResource().getNode().getSession();
+  // The session comes from the node being rendered, which is the spelling the guide and the test
+  // module use. The engine builds the server context's `jcrSession` from the same call, so this is
+  // the session of the current user in the current language. The main resource was the earlier
+  // source here, and that is the page root rather than the node being rendered.
+  const { currentNode } = useServerContext();
+  const session = currentNode.getSession();
 
   if (typeof query === "string") {
     return getNodesByJCRQuery(session, query, limit, offset ?? 0);
