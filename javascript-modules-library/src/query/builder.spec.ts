@@ -630,6 +630,506 @@ describe("fullText", () => {
   });
 });
 
+/**
+ * Full text search and pattern matching read two different stores, and the two are easy to confuse
+ * here for one reason: Jahia's GraphQL `nodesByCriteria` API names the full text search `contains`
+ * and the raw pattern match `like`, while this builder names the raw pattern match `contains()` and
+ * the full text search `fullText()`. The word `contains` therefore names a different operator in
+ * each API. This suite pins what each method builds, so that the difference is a test and not a
+ * paragraph.
+ *
+ * Three instruments measured the behaviours named in the comments below. The accent, stem and node
+ * name facts come from the `nodesByCriteria` lab that the Cortex lesson records, run through
+ * `/modules/graphql` on Jahia 8.2. The wildcard and pattern facts come from a Groovy lab run on
+ * Jahia 8.2.3.2 over a fixture folder it created itself. The expression facts come from a third
+ * run, 195 expressions sent to `nodesByCriteria` on 8.2.3.2, which reaches the same parser. Where a
+ * comment names a shape no lab ran, it says so. The store split explains all of it: full text reads
+ * the Lucene index, which is lowercased, accent folded, stemmed and tokenised, and `LIKE` reads the
+ * raw stored property value.
+ */
+describe("the two searches, and what tells them apart", () => {
+  const constraintOf = (build: (page: SelectorRef<"jnt:page">) => unknown) =>
+    from("jnt:page").where(build as never).model.constraint;
+
+  /** The `LIKE` pattern a built comparison carries, which is the text the engine receives. */
+  const patternOf = (build: (page: SelectorRef<"jnt:page">) => unknown) =>
+    (constraintOf(build) as unknown as { operand2: { value: string } }).operand2.value;
+
+  test("fullText() searches the index, and contains() matches the raw value", () => {
+    // The index folds accents and stems words, so the full text clause finds a title written
+    // "Châteaux" for the term "chateaux". The pattern below folds nothing: it matches the eight
+    // characters of the term against the stored value, and that title is not among its matches.
+    assert.deepEqual(
+      constraintOf((p) => p.prop("jcr:title").fullText("chateaux")),
+      qom.fullTextSearch("jnt:page", "jcr:title", literal("chateaux")),
+    );
+    assert.deepEqual(
+      constraintOf((p) => p.prop("jcr:title").contains("chateaux")),
+      qom.comparison(title, Operator.LIKE, literal("%chateaux%")),
+    );
+  });
+
+  test("the two calls build two different nodes, so neither name can stand for both", () => {
+    // A developer who arrives from nodesByCriteria reads `contains()` as the full text search and
+    // receives a raw pattern match, with no accent folding and no stemming. The query then returns
+    // less than expected and reports no error, which is why the two shapes are asserted apart.
+    const fullText = constraintOf((p) => p.prop("jcr:title").fullText("chateaux"));
+    const pattern = constraintOf((p) => p.prop("jcr:title").contains("chateaux"));
+
+    assert.equal((fullText as { kind: string }).kind, "FullTextSearch");
+    assert.equal((pattern as { kind: string }).kind, "Comparison");
+    assert.notDeepEqual(fullText, pattern);
+  });
+
+  test("the two wildcard alphabets do not cross", () => {
+    // A full text expression uses `*`, and a pattern uses `%` and `_`. A `%` is an ordinary
+    // character in an expression, and the analyser splits the term at it: `%priv%` searches for
+    // `priv`, while `ho%me` searches for `ho` and `me` together and matched nothing where `home`
+    // matched. Next to a star the `%` is not harmless either, because a term carrying a `*` skips
+    // the analyser: `%priv*%` matched nothing where `priv*` matched. The builder passes the
+    // expression through unchanged, which is what a query builder owes a developer who wrote a JCR
+    // expression by hand.
+    assert.deepEqual(
+      constraintOf((p) => p.fullText("%priv%")),
+      qom.fullTextSearch("jnt:page", null, literal("%priv%")),
+    );
+    assert.deepEqual(
+      constraintOf((p) => p.fullText("%priv*%")),
+      qom.fullTextSearch("jnt:page", null, literal("%priv*%")),
+    );
+
+    // The other direction is the mirror image. A `*` carries no meaning inside a pattern, and
+    // `contains()` takes literal text, so the star is one more character to match.
+    assert.equal(
+      patternOf((p) => p.prop("jcr:title").contains("priv*")),
+      "%priv*%",
+    );
+    assert.equal(
+      patternOf((p) => p.prop("jcr:title").startsWith("priv*")),
+      "priv*%",
+    );
+  });
+
+  test("the same characters mean two things, one per method", () => {
+    // `%priv*%` is a full text expression that matches nothing, and it is also the pattern that
+    // `contains("priv*")` builds, which matches a value holding the four characters `priv` and a
+    // star. One string, two readings, and the method name is the only thing that separates them.
+    assert.equal(
+      patternOf((p) => p.prop("jcr:title").contains("priv*")),
+      (
+        constraintOf((p) => p.fullText("%priv*%")) as unknown as {
+          fullTextSearchExpression: { value: string };
+        }
+      ).fullTextSearchExpression.value,
+    );
+  });
+
+  test("an expression the Jahia parser rejects is reported, and the strict build refuses it", () => {
+    // Each of these returned `javax.jcr.RepositoryException: Invalid full text search expression`,
+    // raised inside `execute()` once the whole query object already existed. The builder is a query
+    // builder and not a search box, so it rewrites nothing: the expression still reaches the model
+    // exactly as it was written, and the refusal happens at the gate instead.
+    for (const expression of ["privacy!", "foo(", '"unclosed', "OR", "--", "home -", "home OR"]) {
+      const query = from("jnt:page")
+        .where((p) => p.fullText(expression))
+        .limit(10);
+
+      assert.deepEqual(
+        query.model.constraint,
+        qom.fullTextSearch("jnt:page", null, literal(expression)),
+      );
+      assert.deepEqual(
+        query.diagnose().map((finding) => `${finding.level} ${finding.at}`),
+        ["none constraint.fullTextSearchExpression"],
+        `${expression} must be reported`,
+      );
+      assert.equal(
+        errorCode(() => query.build({ strict: true })),
+        "UNSUPPORTED",
+      );
+    }
+
+    // The failure covers the whole constraint, so one rejected expression takes the clauses beside
+    // it down as well. Refusing at the gate is what saves the sibling clause from a term the caller
+    // never sanitised.
+    const mixed = from("jnt:page")
+      .where((p) => or(p.fullText("privacy!"), p.prop("jcr:title").contains("privacy")))
+      .limit(10);
+    assert.deepEqual(
+      mixed.diagnose().map((finding) => finding.level),
+      ["none"],
+    );
+    assert.equal(
+      errorCode(() => mixed.build({ strict: true })),
+      "UNSUPPORTED",
+    );
+  });
+
+  test("an expression the Jahia parser accepts is left alone, whatever it looks like", () => {
+    // The other half of the guard above, and the half that matters most: a rule that refuses a
+    // query must never refuse a legal one. Each one is a shape that could look wrong to a careless
+    // rule. `graal*` ends in a wildcard, the phrase holds two quotation marks, `OR` sits between
+    // two terms rather than alone, and `-policy` opens with the exclusion operator.
+    //
+    // Every one of these was run against Jahia and came back without an error. `chateaux OR policy`
+    // and `-policy` returned no row, which is a result and not a rejection, and the assertion here
+    // is only that no rule fires. The quoted phrase stands for `"policies published"`, which the
+    // lab ran; `graal*` has the shape of `priv*`, which it also ran.
+    //
+    // The last four are the ones that decide how narrow the rules have to be. `C++` and `home-` end
+    // on an operator character, and they run because `+` and `-` are term characters once a term
+    // has begun. `"a (b" home` holds a parenthesis inside a quoted phrase, where it is text. `term\`
+    // ends on a backslash with nothing left to escape, and it runs too.
+    for (const expression of [
+      "graal*",
+      '"exact phrase"',
+      "chateaux OR policy",
+      "-policy",
+      "chateaux zzzznomatch",
+      "seat*",
+      "*hateau*",
+      "(a OR b) c",
+      "term\\!",
+      "C++",
+      "home-",
+      '"a (b" home',
+      "term\\",
+    ]) {
+      const query = from("jnt:page")
+        .where((p) => p.fullText(expression))
+        .limit(10);
+
+      assert.deepEqual(query.diagnose(), [], `${expression} must be accepted`);
+      assert.deepEqual(query.build({ strict: true }), query.model);
+    }
+  });
+
+  test("a percent sign is reported as the wrong alphabet, and the query still runs", () => {
+    // A `%` is not a syntax error and it is a deliberate escape in one measured case, so it is
+    // reported at `partial` and never refused. `%privacy!%` returned rows where `privacy!` failed,
+    // so the finding it carries is this one alone.
+    for (const expression of ["%priv%", "%priv*%", "%privacy!%"]) {
+      const query = from("jnt:page")
+        .where((p) => p.fullText(expression))
+        .limit(10);
+
+      assert.deepEqual(
+        query.diagnose().map((finding) => finding.level),
+        ["partial"],
+        `${expression} must be reported once`,
+      );
+      assert.deepEqual(query.build({ strict: true }), query.model);
+    }
+  });
+
+  test("a bind variable carries no expression to read, so nothing is reported", () => {
+    // The guard reads a string literal. A variable holds its value outside the model, so an
+    // expression supplied at execution time is never inspected and never refused.
+    const query = from("jnt:page")
+      .where((p) => p.fullText($("words")))
+      .limit(10)
+      .bind({ words: "privacy!" });
+
+    assert.deepEqual(query.diagnose(), []);
+    assert.deepEqual(query.build({ strict: true }), query.model);
+  });
+
+  test("a leading minus stays the exclusion operator of the full text grammar", () => {
+    // `contains: "-policy"` matched nothing, because a leading `-` is the NOT operator, while
+    // `contains: "%-policy%"` matched 2 nodes. Both are valid expressions, so both are passed
+    // through and the caller decides which one it meant.
+    assert.deepEqual(
+      constraintOf((p) => p.fullText("-policy")),
+      qom.fullTextSearch("jnt:page", null, literal("-policy")),
+    );
+    assert.deepEqual(
+      constraintOf((p) => p.fullText("%-policy%")),
+      qom.fullTextSearch("jnt:page", null, literal("%-policy%")),
+    );
+  });
+
+  test("a case transform lowercases the property and not the pattern, so the wrong case throws", () => {
+    // `LOWER(node.[prop]) LIKE '<pattern>'` compares a lowercased value against the pattern as it
+    // was written, so a pattern that carries an uppercase letter can never match. Jahia answers
+    // that with an empty result and not with an error, and the builder holds both the transform and
+    // the text at the call, so the call is refused there, the way `in([])` is refused.
+    assert.equal(
+      errorCode(() =>
+        from("jnt:page").where((p) => p.prop("jcr:title").lower().contains("Privacy")),
+      ),
+      "NULL_CONSTRAINT",
+    );
+    assert.match(
+      errorMessage(() =>
+        from("jnt:page").where((p) => p.prop("jcr:title").lower().contains("Privacy")),
+      ),
+      /lower\(\)\.contains\("Privacy"\) can never match.*"privacy"/,
+    );
+    assert.equal(
+      errorCode(() => from("jnt:page").where((p) => p.prop("jcr:title").upper().eq("Home"))),
+      "NULL_CONSTRAINT",
+    );
+
+    // The form that matches is the one whose text is already in the case the transform produces.
+    assert.equal(
+      patternOf((p) => p.prop("jcr:title").lower().contains("privacy")),
+      "%privacy%",
+    );
+    assert.equal(
+      patternOf((p) => p.prop("jcr:title").upper().contains("PRIVACY")),
+      "%PRIVACY%",
+    );
+  });
+
+  test("the guard covers the seven matching methods and leaves the five bounds alone", () => {
+    const wrong = (build: (page: SelectorRef<"jnt:page">) => unknown) =>
+      errorCode(() => from("jnt:page").where(build as never));
+
+    // Every method whose result turns on the exact value. Each one would build a comparison that
+    // Jahia runs without complaint and that returns the wrong rows.
+    assert.equal(
+      wrong((p) => p.prop("jcr:title").lower().eq("Home")),
+      "NULL_CONSTRAINT",
+    );
+    assert.equal(
+      wrong((p) => p.prop("jcr:title").lower().in(["home", "Away"])),
+      "NULL_CONSTRAINT",
+    );
+    assert.equal(
+      wrong((p) => p.prop("jcr:title").lower().like("%Home%")),
+      "NULL_CONSTRAINT",
+    );
+    assert.equal(
+      wrong((p) => p.prop("jcr:title").lower().startsWith("Ho")),
+      "NULL_CONSTRAINT",
+    );
+    assert.equal(
+      wrong((p) => p.prop("jcr:title").lower().endsWith("Me")),
+      "NULL_CONSTRAINT",
+    );
+    assert.equal(
+      wrong((p) => p.prop("jcr:title").lower().contains("Om")),
+      "NULL_CONSTRAINT",
+    );
+    assert.equal(
+      wrong((p) => p.prop("jcr:title").upper().contains("om")),
+      "NULL_CONSTRAINT",
+    );
+
+    // `ne` is refused for the mirror reason, and it is the one the reader is most likely to think
+    // safe. `LOWER(prop) <> 'Home'` excludes nothing, because no lowercased value equals that text,
+    // so the clause returns every node that carries the property instead of every node but one.
+    assert.equal(
+      wrong((p) => p.prop("jcr:title").lower().ne("Home")),
+      "NULL_CONSTRAINT",
+    );
+    assert.match(
+      errorMessage(() => from("jnt:page").where((p) => p.prop("jcr:title").lower().ne("Home"))),
+      /lower\(\)\.ne\("Home"\) can never exclude anything.*"home"/,
+    );
+
+    // A bound over a transformed value is a range test and not a match, so a mixed case value there
+    // is a legitimate comparison and passes through.
+    for (const build of [
+      (p: SelectorRef<"jnt:page">) => p.prop("jcr:title").lower().lt("Home"),
+      (p: SelectorRef<"jnt:page">) => p.prop("jcr:title").lower().le("Home"),
+      (p: SelectorRef<"jnt:page">) => p.prop("jcr:title").lower().gt("Home"),
+      (p: SelectorRef<"jnt:page">) => p.prop("jcr:title").lower().ge("Home"),
+      (p: SelectorRef<"jnt:page">) => p.prop("jcr:title").lower().between("A", "Z"),
+    ]) {
+      assert.equal(wrong(build), undefined);
+    }
+
+    // The list method names the element at fault by its position, because the call site wrote a
+    // list and no call anywhere in the source reads `in("Away")`.
+    assert.match(
+      errorMessage(() =>
+        from("jnt:page").where((p) => p.prop("jcr:title").lower().in(["home", "Away"])),
+      ),
+      /lower\(\)\.in\(\[\.\.\.\]\) can never match on its value at index 1, "Away".*"away"/,
+    );
+
+    // Text that carries no letter has one case only, and a bind variable holds its value outside
+    // the model, so neither is refused.
+    assert.equal(
+      wrong((p) => p.prop("jcr:title").lower().contains("50% off")),
+      undefined,
+    );
+    assert.equal(
+      wrong((p) => p.prop("jcr:title").lower().eq($("title"))),
+      undefined,
+    );
+  });
+
+  test("a pattern match always names a property, and only full text reads a whole node", () => {
+    // In GraphQL, `{like: "%privacy%"}` with no property answers `'property' field is required`,
+    // and `{contains: "privacy"}` searches every property. The restriction comes from JCR QOM: a
+    // comparison takes one operand, and `FullTextSearch` is the only one whose property name may be
+    // null. The builder makes that structural rather than documented.
+    let members: string[] = [];
+    from("jnt:page").where((p) => {
+      members = Object.keys(p);
+      return p.fullText("privacy");
+    });
+
+    assert.ok(members.includes("fullText"));
+    for (const absent of ["like", "contains", "startsWith", "endsWith"]) {
+      assert.ok(!members.includes(absent), `a selector reference must not carry ${absent}()`);
+    }
+
+    // The factory closes the other route: a property value with no property name is not a node it
+    // builds, while a full text search with no property name is.
+    assert.equal(
+      errorCode(() => qom.propertyValue("jnt:page", null as unknown as string)),
+      "INVALID_NAME",
+    );
+    assert.deepEqual(qom.fullTextSearch("jnt:page", null, literal("privacy")), {
+      kind: "FullTextSearch",
+      selectorName: "jnt:page",
+      propertyName: null,
+      fullTextSearchExpression: literal("privacy"),
+    });
+  });
+
+  test("the one node name pattern match is reported and refused", () => {
+    // `function: NODE_NAME` with `like` answers `UnsupportedRepositoryOperationException` every
+    // time, so `likeSlow()` on a name reference can only ever fail. It is the one method of the
+    // facade in that state, which is why `diagnose()` reports it and the strict build refuses it.
+    const byName = from("jnt:page")
+      .whereSlow((p) => p.name().likeSlow("%priv%"))
+      .limit(10);
+
+    assert.deepEqual(
+      byName.diagnose().map((finding) => finding.level),
+      ["none"],
+    );
+    assert.equal(
+      errorCode(() => byName.build({ strict: true })),
+      "UNSUPPORTED",
+    );
+
+    // `LOCALNAME()` is the node name operand that does serve a pattern, and it is the form to use.
+    const byLocalName = from("jnt:page")
+      .where((p) => p.localName().contains("priv"))
+      .limit(10);
+
+    assert.deepEqual(byLocalName.diagnose(), []);
+    assert.equal(
+      patternOf((p) => p.localName().contains("priv")),
+      "%priv%",
+    );
+  });
+
+  test("text a visitor typed cannot widen a pattern the builder escaped", () => {
+    // A pattern carries the caller's own text, and `%` and `_` are wildcards there: a visitor who
+    // typed `%` matched every node of the measured corpus. The three text methods escape the
+    // backslash, the percent sign and the underscore, and nothing else, because Jackrabbit keeps a
+    // backslash that sits in front of a letter or a digit.
+    assert.equal(
+      patternOf((p) => p.prop("jcr:title").contains("%")),
+      "%\\%%",
+    );
+    assert.equal(
+      patternOf((p) => p.prop("jcr:title").contains("%_%")),
+      "%\\%\\_\\%%",
+    );
+
+    // A full text expression has no escape of that kind, so a caller that forwards visitor input
+    // sanitises it before it builds the clause.
+    assert.deepEqual(
+      constraintOf((p) => p.fullText("%")),
+      qom.fullTextSearch("jnt:page", null, literal("%")),
+    );
+  });
+
+  test("the search a visitor expects is a composition of the two clauses", () => {
+    // A case insensitive and accent insensitive search needs both stores. The full text clause
+    // matches the analysed terms, and the pattern clause matches the raw characters the analyser
+    // never produced. The caller still owns the folding and the sanitisation, because neither
+    // belongs to a query builder.
+    const query = from("jnt:page")
+      .where((p) => or(p.fullText("chateaux"), p.prop("jcr:title").lower().contains("chateaux")))
+      .limit(20);
+
+    assert.deepEqual(
+      query.model.constraint,
+      qom.or(
+        qom.fullTextSearch("jnt:page", null, literal("chateaux")),
+        qom.comparison(qom.lowerCase(title), Operator.LIKE, literal("%chateaux%")),
+      ),
+    );
+    assert.deepEqual(query.diagnose(), []);
+  });
+
+  test("a wildcard term is matched against the stem the index holds", () => {
+    // The analyser stems, and a term that carries a wildcard is not analysed, so the two rules meet
+    // in the middle. Over a value of `500 seats available`, `fullText("seats*")` matched nothing and
+    // `fullText("seat*")` matched, because the index holds the stem `seat` and the wildcard term
+    // never reaches it. The expression travels unchanged, so the caller writes its own term against
+    // the stem before it adds a star.
+    for (const expression of ["seats*", "seat*"]) {
+      assert.deepEqual(
+        constraintOf((p) => p.fullText(expression)),
+        qom.fullTextSearch("jnt:page", null, literal(expression)),
+      );
+    }
+  });
+
+  test("the node name answers a search of the whole node and not one scoped to the property", () => {
+    // A node named `oauth-result` answered `fullText("oauth")` over the whole node, and answered
+    // nothing when the same search named `j:nodename`: the name reaches the aggregated node text,
+    // and the property keeps a field that the term never enters. The raw pattern reads the stored
+    // name instead, so `contains()` on that property does match. Three shapes, three answers.
+    assert.deepEqual(
+      constraintOf((p) => p.fullText("oauth")),
+      qom.fullTextSearch("jnt:page", null, literal("oauth")),
+    );
+    assert.deepEqual(
+      constraintOf((p) => p.prop("j:nodename").fullText("oauth")),
+      qom.fullTextSearch("jnt:page", "j:nodename", literal("oauth")),
+    );
+    assert.equal(
+      patternOf((p) => p.prop("j:nodename").contains("oauth")),
+      "%oauth%",
+    );
+  });
+
+  test("an empty term builds a pattern that matches every node, and an expression that fails", () => {
+    // The two methods break in opposite directions on the same empty string. `contains("")` builds
+    // `LIKE '%%'`, which matched every node of the measured corpus rather than none, and
+    // `fullText("")` fails the whole query with `javax.jcr.RepositoryException: Invalid full text
+    // search expression`. Only the second one can be told apart from a deliberate query, so only
+    // that one is reported. A search box skips the clause when its sanitised term is empty.
+    assert.equal(
+      patternOf((p) => p.prop("jcr:title").contains("")),
+      "%%",
+    );
+    assert.deepEqual(
+      from("jnt:page")
+        .where((p) => p.prop("jcr:title").contains(""))
+        .limit(10)
+        .diagnose(),
+      [],
+    );
+
+    assert.deepEqual(
+      constraintOf((p) => p.fullText("")),
+      qom.fullTextSearch("jnt:page", null, literal("")),
+    );
+    const empty = from("jnt:page")
+      .where((p) => p.fullText(""))
+      .limit(10);
+    assert.deepEqual(
+      empty.diagnose().map((finding) => finding.level),
+      ["none"],
+    );
+    assert.equal(
+      errorCode(() => empty.build({ strict: true })),
+      "UNSUPPORTED",
+    );
+  });
+});
+
 describe("and, or and not", () => {
   const published = qom.comparison(
     qom.propertyValue("jnt:page", "j:published"),
@@ -1206,9 +1706,42 @@ export function shapeFixtures(): void {
     .where(({ c }) => c.prop("j:published").eq(true));
 }
 
+/**
+ * The compile-time half of the disambiguation suite. The rule it pins is the one JCR QOM imposes: a
+ * pattern match needs a property, and a full text search is the only construct that reads a whole
+ * node. A selector reference therefore carries `fullText()` and no pattern method at all.
+ */
+export function searchFixtures(): void {
+  const base = from("jnt:page", "p");
+
+  // Full text is on both, because it is the one search that a property name may be left out of.
+  base.where(({ p }) => p.fullText("graal*"));
+  base.where(({ p }) => p.prop("body").fullText("graal*"));
+
+  // Every pattern method is on a property, on a case transform and on a local name.
+  base.where(({ p }) => p.prop("jcr:title").contains("graal"));
+  base.where(({ p }) => p.prop("jcr:title").lower().contains("graal"));
+  base.where(({ p }) => p.localName().contains("graal"));
+
+  // @ts-expect-error a pattern match needs a property, so a selector reference carries no like()
+  base.where(({ p }) => p.like("%graal%"));
+
+  // @ts-expect-error the same rule takes startsWith() off the selector reference
+  base.where(({ p }) => p.startsWith("graal"));
+
+  // @ts-expect-error and endsWith() with it
+  base.where(({ p }) => p.endsWith("graal"));
+}
+
 describe("type fixtures", () => {
   test("they compile, which is the assertion", () => {
-    for (const fixture of [limitStateFixtures, speedFixtures, selectorFixtures, shapeFixtures]) {
+    for (const fixture of [
+      limitStateFixtures,
+      speedFixtures,
+      selectorFixtures,
+      shapeFixtures,
+      searchFixtures,
+    ]) {
       assert.equal(typeof fixture, "function");
     }
   });

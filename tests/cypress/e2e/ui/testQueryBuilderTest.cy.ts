@@ -131,6 +131,21 @@ describe("JCR query builder test", () => {
     multiContains: [...singlePattern, String.raw`multipleSmallText LIKE '%0\% o%'`],
     fullTextStem: [...singlePattern, `CONTAINS(`, `'seat')`],
     fullTextWildcard: [...singlePattern, `CONTAINS(`, `'seats*')`],
+    // The two searches over the same terms. A `CONTAINS(` in a statement always comes from
+    // `fullText()`, and a `LIKE` always comes from `contains()`, whatever the two words mean in
+    // the GraphQL API.
+    accentFullText: [...singlePattern, `CONTAINS(`, `'chateaux')`],
+    accentFullTextAccented: [...singlePattern, `CONTAINS(`, `'châteaux')`],
+    accentContains: [...singlePattern, `smallText LIKE '%chateaux%'`],
+    accentContainsRaw: [...singlePattern, `smallText LIKE '%Châteaux%'`],
+    accentWildcard: [...singlePattern, `CONTAINS(`, `'*hateau*')`],
+    accentWildcardAccented: [...singlePattern, `CONTAINS(`, `'*hâteau*')`],
+    caseFullText: [...singlePattern, `CONTAINS(`, `'MEETING')`],
+    caseContains: [...singlePattern, `smallText LIKE '%MEETING%'`],
+    starFullText: [...singlePattern, `CONTAINS(`, `'seat*')`],
+    percentFullText: [...singlePattern, `CONTAINS(`, `'%seat%')`],
+    starPercentFullText: [...singlePattern, `CONTAINS(`, `'%seat*%')`],
+    starContains: [...singlePattern, `smallText LIKE '%seat*%'`],
     stable: [...single, `ORDER BY`, `[jcr:uuid]`],
   };
 
@@ -219,6 +234,9 @@ describe("JCR query builder test", () => {
           withSmallText("underscore", "mee_ing");
           withSmallText("camel", "MeetUp");
           withSmallText("backslash", "a\\b");
+          // The accented value the two searches disagree about. No other fixture value holds the
+          // letters `hateau`, so every case that names them reads this node alone.
+          withSmallText("accent", "Châteaux et Haras");
 
           addNode({
             parentPathOrId: patternScope,
@@ -415,6 +433,57 @@ describe("JCR query builder test", () => {
     // A wildcard term is not stemmed, so `seats*` misses that same stem and returns nothing. This
     // is why a substring match belongs to `contains()` and not to a full text wildcard.
     paths("fullTextWildcard").should("have.length", 0);
+  });
+
+  it("folds accents in a full text search, and folds nothing in a pattern", () => {
+    visitView();
+    // The positive control of the pair. The stored value is `Châteaux et Haras`, and the analysed
+    // index holds it folded, so the unaccented term finds it. If this one returns nothing the
+    // index is not answering and the empty results below say nothing at all.
+    paths("accentFullText").should("deep.equal", [patternNode("accent")]);
+    // The analyser folds the query term as well, so the accented term finds the same node.
+    paths("accentFullTextAccented").should("deep.equal", [patternNode("accent")]);
+    // The same term through the substring match finds nothing, because a pattern reads the stored
+    // characters and folds nothing. This is the divergence a developer who arrives from the
+    // GraphQL `nodesByCriteria` API walks into: there, `contains` is the search above.
+    paths("accentContains").should("have.length", 0);
+    // The second control: the pattern side does work, once the text carries the stored characters.
+    paths("accentContainsRaw").should("deep.equal", [patternNode("accent")]);
+  });
+
+  it("skips the analyser for a wildcard term, so that term is not folded either", () => {
+    visitView();
+    // The index holds the folded token, so a wildcard term written without the accent reaches it.
+    paths("accentWildcard").should("deep.equal", [patternNode("accent")]);
+    // The same term written with the accent reaches nothing, because a term that carries a
+    // wildcard is not analysed and no index token holds the accent. Fold the term yourself before
+    // you wrap it in a star.
+    paths("accentWildcardAccented").should("have.length", 0);
+  });
+
+  it("ignores case in a full text search, and respects it in a pattern", () => {
+    visitView();
+    // The index is lower case on both sides, so the upper case term finds the `meeting` value.
+    paths("caseFullText").should("deep.equal", [patternNode("meeting")]);
+    // A pattern compares the characters as they were written, so the same term finds nothing.
+    paths("caseContains").should("have.length", 0);
+  });
+
+  it("reads * as the full text wildcard and % as the pattern wildcard, never the other way", () => {
+    visitView();
+    // The control: the index holds the stem `seat` for `500 seats`, which `fullTextStem` reads, so
+    // the prefix term reaches it.
+    paths("starFullText").should("deep.equal", [patternNode("plain")]);
+    // A `%` is not a full text wildcard. It is an ordinary character, and the analyser splits the
+    // term at it, so a `%` that wraps the term leaves the term itself and this returns what the
+    // bare term returns rather than nothing.
+    paths("percentFullText").should("deep.equal", [patternNode("plain")]);
+    // Next to a star it is not harmless: a term carrying a `*` skips the analyser, so the `%` stays
+    // inside the term and the expression that matched above now matches nothing.
+    paths("starPercentFullText").should("have.length", 0);
+    // The mirror image. A `*` inside a pattern is one more character to match, and no stored value
+    // holds a star, so the substring match returns nothing.
+    paths("starContains").should("have.length", 0);
   });
 
   it("executes a reference literal exactly as a weak reference one", () => {

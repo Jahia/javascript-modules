@@ -398,3 +398,193 @@ describe("a query that trips several levels at once", () => {
     ]);
   });
 });
+
+/**
+ * The full text expression is the one free text the model carries, and the JCR parser reads it
+ * inside `execute()`, after the statement is formatted and the limit is set. Nothing later in the
+ * path can report the failure, so these rules report it here.
+ *
+ * Every expression in the two lists below was run against Jahia 8.2.3.2 through the GraphQL
+ * `nodesByCriteria` endpoint, whose `contains` reaches this same parser. The batch carried a
+ * positive control that returned rows, so its empty results mean an empty result and not a broken
+ * index. The first list holds the expressions that answered `javax.jcr.RepositoryException: Invalid
+ * full text search expression`, the second holds the expressions that ran. Nothing here is derived
+ * from the grammar: the grammar over-reports, and the pairs that look alike and behave differently
+ * are exactly what these two lists pin.
+ */
+describe("a full text expression", () => {
+  const search = (expression: string): QueryModel<"p"> =>
+    pageQuery(qom.fullTextSearch("p", null, literal(expression)));
+
+  test("a shape the parser rejects is reported as a query that does not run", () => {
+    // `""` and `"   "` are the empty expression, with and without whitespace. Every other one threw
+    // on 8.2.3.2. Read each against its neighbour in the accepted list: `home -` against `home-`,
+    // `home!` against `home!page`, `&&` against `&&&`, `OR` against `AND`. `OR home`, `&& home` and
+    // `|| home` are the binary operators missing their left term, where `-policy` shows that a
+    // prefix operator opens a legal expression. The three that end on a space are here because a
+    // trailing space rescues a dangling `+`, `-` or `!` and does not rescue a binary operator, so
+    // `&& `, `home && ` and `home OR ` still threw. `+ -` and `! -` end on a raw `-`, which the
+    // space before it does not reach.
+    for (const expression of [
+      "privacy!",
+      "foo(",
+      '"unclosed',
+      "OR",
+      "--",
+      "",
+      "   ",
+      "a)b",
+      "(home",
+      "home)",
+      '"a" "b" (c',
+      "home -",
+      "home +",
+      "home !",
+      "home!",
+      "home --",
+      "home OR",
+      "home &&",
+      "home ||",
+      "(home)!",
+      "home*!",
+      "&&",
+      "||",
+      "+",
+      "-",
+      "!",
+      "OR home",
+      "&& home",
+      "|| home",
+      "&& ",
+      "home && ",
+      "home OR ",
+      "+ -",
+      "! -",
+    ]) {
+      assert.deepEqual(levels(search(expression)), ["none"], `${expression} must be reported`);
+      assert.deepEqual(findingsAt(search(expression), "none"), [
+        "constraint.fullTextSearchExpression",
+      ]);
+    }
+  });
+
+  test("a shape the parser accepts is not reported, wildcards and operators included", () => {
+    // The assertion is that no rule fires, and not that rows come back: `-policy` was measured and
+    // returned none, which is a result and not a rejection. Every one of these ran on 8.2.3.2, so
+    // every one of them is a query a rule must not refuse. `term\!` and `home \!` are the escaped
+    // forms of `privacy!`, and they ran; `"a (b" home` holds a parenthesis inside a phrase, and it
+    // ran; `C++` and `home-` end on an operator character glued to a term, and both ran.
+    // `\-home OR page` opens on an escaped operator, which is a term, so the `OR` that follows it
+    // is not the leading operator of the expression: it ran and returned rows. `\OR home` and
+    // `home \OR` are the same point on the operator word itself, and both ran, as did `\OR` and
+    // `\&&` on their own, which are the escaped forms of two expressions that fail unescaped.
+    //
+    // The expressions that carry a space around an operator are the other half of that rule, and
+    // the half a search box meets. The parser escapes a `+`, a `-` or a `!` into ordinary text as soon as whitespace
+    // follows it, so `home!` fails while `home! ` runs, `home -` fails while `home - ` runs, `--`
+    // fails while `-- ` runs, and a `-` or a `!` between two terms was text all along.
+    for (const expression of [
+      "graal*",
+      '"exact phrase"',
+      "chateaux OR policy",
+      "a AND b",
+      "a NOT b",
+      "AND",
+      "NOT",
+      "-policy",
+      "*hateau*",
+      "seat*",
+      "(a OR b) c",
+      "(home)",
+      '"a (b" home',
+      '"a )b"',
+      '"home (page"',
+      '"home!"',
+      '"home -"',
+      "term\\",
+      "term\\!",
+      "\\-home OR page",
+      "\\OR home",
+      "home \\OR",
+      "\\OR",
+      "\\&&",
+      "term\\(",
+      "term\\\\",
+      "home \\!",
+      "\\-",
+      "C++",
+      "home-",
+      "home+",
+      "home!page",
+      "home &",
+      "home |",
+      "&",
+      "|",
+      "&&&",
+      "-&",
+      "home ~",
+      "50",
+      "home! ",
+      "home ! ",
+      "home - ",
+      "home + ",
+      "-- ",
+      "-!  ",
+      "+ ",
+      "- ",
+      "! ",
+      "- home",
+      "+ home",
+      "! home",
+      "home ! page",
+      "home -- page",
+      "home*! ",
+      "(home)! ",
+    ]) {
+      assert.deepEqual(levels(search(expression)), [], `${expression} must be accepted`);
+    }
+  });
+
+  test("the rule that fires names the operator, so the message points at the fix", () => {
+    // `--` and `home -` fail for the same reason, and a developer needs to read two different
+    // sentences: the first has nothing left to search for, and the second lost only its right
+    // operand. Asserting the level alone would let one rule stand in for the other.
+    assert.match(diagnose(search("--"))[0].reason, /holds no term to search for/);
+    assert.match(diagnose(search("home -"))[0].reason, /ends on the operator -/);
+    assert.match(diagnose(search("home!"))[0].reason, /ends on the operator !/);
+    assert.match(diagnose(search("home OR"))[0].reason, /ends on the operator OR/);
+    assert.match(diagnose(search("OR home"))[0].reason, /opens on the operator OR/);
+    assert.match(diagnose(search("foo("))[0].reason, /unbalanced parenthesis/);
+    assert.match(diagnose(search('"unclosed'))[0].reason, /unclosed quotation mark/);
+  });
+
+  test("a percent sign is the wildcard of the other alphabet, and is reported as partial", () => {
+    // A `%` is an ordinary character in the expression: the analyser splits the term at it, so
+    // `%priv%` searches for `priv`, and a term carrying a `*` skips the analyser, so the `%` stays
+    // in `%priv*%` and it matches nothing. Neither one fails the query, so neither is refused.
+    // `%privacy!%` returned rows where `privacy!` failed, so the wrapper is a working escape and
+    // carries this finding alone.
+    assert.deepEqual(levels(search("%priv%")), ["partial"]);
+    assert.deepEqual(levels(search("%priv*%")), ["partial"]);
+    assert.deepEqual(levels(search("%privacy!%")), ["partial"]);
+    assert.deepEqual(findingsAt(search("%priv%"), "partial"), [
+      "constraint.fullTextSearchExpression",
+    ]);
+  });
+
+  test("an expression supplied at execution time is not read", () => {
+    assert.deepEqual(levels(pageQuery(qom.fullTextSearch("p", null, $("words")))), []);
+  });
+
+  test("the rules reach a search nested under the other constraints", () => {
+    const model = pageQuery(
+      qom.or(
+        qom.comparison(title, Operator.EQUAL_TO, literal("Home")),
+        qom.fullTextSearch("p", "jcr:title", literal("privacy!")),
+      ),
+    );
+    assert.deepEqual(findingsAt(model, "none"), [
+      "constraint.constraint2.fullTextSearchExpression",
+    ]);
+  });
+});

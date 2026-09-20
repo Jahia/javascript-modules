@@ -487,6 +487,59 @@ jahiaComponent(
       .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").fullText("seats*")))
       .limit(10);
 
+    // 12. The split between the two searches, read on live data.
+    //
+    // `fullText()` searches the analysed index, which is lower case, accent folded and stemmed.
+    // `contains()` matches the raw stored characters. Jahia's GraphQL `nodesByCriteria` API uses
+    // the same two words for the opposite operators, so a developer who arrives from it reads
+    // `contains()` as the analysed search and gets the raw one, with no error anywhere. Every pair
+    // below runs the same term through both methods over the same fixture, so the divergence is a
+    // result and not a claim. Each pair carries a case that returns a node, which is the positive
+    // control the whole pair depends on.
+    // Accents. The fixture value is `Châteaux et Haras`.
+    const accentFullText = patternBase
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").fullText("chateaux")))
+      .limit(10);
+    const accentFullTextAccented = patternBase
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").fullText("châteaux")))
+      .limit(10);
+    const accentContains = patternBase
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").contains("chateaux")))
+      .limit(10);
+    const accentContainsRaw = patternBase
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").contains("Châteaux")))
+      .limit(10);
+    // A term that carries a wildcard skips the analyser, so it is neither folded nor stemmed.
+    const accentWildcard = patternBase
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").fullText("*hateau*")))
+      .limit(10);
+    const accentWildcardAccented = patternBase
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").fullText("*hâteau*")))
+      .limit(10);
+
+    // Case. The fixture value is `meeting`, and no value holds `MEETING`.
+    const caseFullText = patternBase
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").fullText("MEETING")))
+      .limit(10);
+    const caseContains = patternBase
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").contains("MEETING")))
+      .limit(10);
+
+    // The two wildcard alphabets. The index holds the stem `seat` for the value `500 seats`, which
+    // the `fullTextStem` case above already reads.
+    const starFullText = patternBase
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").fullText("seat*")))
+      .limit(10);
+    const percentFullText = patternBase
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").fullText("%seat%")))
+      .limit(10);
+    const starPercentFullText = patternBase
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").fullText("%seat*%")))
+      .limit(10);
+    const starContains = patternBase
+      .where((n) => and(n.isDescendantOf(patternScope), n.prop("smallText").contains("seat*")))
+      .limit(10);
+
     // A page of a query ordered on the identifier, which is the stable tiebreaker.
     const stable = from("jnt:event")
       .where((e) => e.isDescendantOf(scope))
@@ -546,6 +599,27 @@ jahiaComponent(
         <PrintQuery testid="multiContains" session={session} query={multiContains} />
         <PrintQuery testid="fullTextStem" session={session} query={fullTextStem} />
         <PrintQuery testid="fullTextWildcard" session={session} query={fullTextWildcard} />
+
+        <PrintQuery testid="accentFullText" session={session} query={accentFullText} />
+        <PrintQuery
+          testid="accentFullTextAccented"
+          session={session}
+          query={accentFullTextAccented}
+        />
+        <PrintQuery testid="accentContains" session={session} query={accentContains} />
+        <PrintQuery testid="accentContainsRaw" session={session} query={accentContainsRaw} />
+        <PrintQuery testid="accentWildcard" session={session} query={accentWildcard} />
+        <PrintQuery
+          testid="accentWildcardAccented"
+          session={session}
+          query={accentWildcardAccented}
+        />
+        <PrintQuery testid="caseFullText" session={session} query={caseFullText} />
+        <PrintQuery testid="caseContains" session={session} query={caseContains} />
+        <PrintQuery testid="starFullText" session={session} query={starFullText} />
+        <PrintQuery testid="percentFullText" session={session} query={percentFullText} />
+        <PrintQuery testid="starPercentFullText" session={session} query={starPercentFullText} />
+        <PrintQuery testid="starContains" session={session} query={starContains} />
 
         <PrintQuery testid="strongRef" session={session} query={strongRef} />
         <PrintQuery testid="weakRef" session={session} query={weakRef} />

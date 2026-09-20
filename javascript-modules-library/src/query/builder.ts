@@ -98,6 +98,26 @@ export interface SelectorRef<K extends string = string> {
    * trailing `*` for a prefix. It matches whole terms, so `fullText("graal")` matches a node whose
    * text holds the word `graal` and not one that only holds `graaljs`. Use `prop(name).contains()`
    * for a substring match on the characters of one property.
+   *
+   * This is the operator that Jahia's GraphQL `nodesByCriteria` API calls `contains`. The index
+   * lowercases, folds accents and stems, so `fullText("chateaux")` finds a title of `Châteaux`,
+   * while a term that carries a wildcard skips the analyser and is neither folded nor stemmed. The
+   * default operator between two terms is `AND`, so `fullText("chateaux zzzznomatch")` matches
+   * nothing. The wildcard is `*` and never `%`: a `%` is an ordinary character and the analyser
+   * splits the term at it, so `fullText("%term%")` searches for `term` itself while
+   * `fullText("ho%me")` searches for `ho` and `me` together, and a `%` next to a `*` survives into
+   * the term and the expression then matches nothing.
+   *
+   * The expression reaches Jahia as it was written. An expression the parser rejects, such as
+   * `privacy!`, `foo(`, an unclosed quotation mark, a bare `OR` or `--`, fails the whole query at
+   * execution with a `RepositoryException` and takes down every clause beside it. `diagnose()`
+   * reads a literal expression and reports four shapes at level `none`, so `build({ strict: true
+   * })` and `executeQuery` refuse the query before the first call into Jahia: no term left once the
+   * operators are removed, an odd number of quotation marks, a parenthesis that does not pair up
+   * outside a quoted phrase, and an operator missing the term it needs, which is a trailing `-`,
+   * `+`, `!` or `OR`, or a leading `OR`, `&&` or `||`. A `%` is reported at level `partial`.
+   * Nothing here rewrites what the caller wrote, so sanitise text that a visitor typed before you
+   * build the clause.
    */
   fullText(expression: LiteralArg): FullTextSearch<K>;
   /** Every property of this selector as one wildcard column, which is `alias.*`. */
@@ -199,12 +219,21 @@ export interface PropertyRef<K extends string = string> {
    * It escapes the text the way {@link PropertyRef.startsWith} does, and it costs what
    * {@link PropertyRef.endsWith} costs.
    *
+   * An empty text builds the pattern `%%`, which matches every node that carries the property, so
+   * skip the clause when the search box is empty rather than passing an empty string.
+   *
    * This is a substring match over the characters of the stored value, which is what `contains`
    * means in Prisma and in Drizzle. It builds a `LIKE` pattern and not the JCR-SQL2 `CONTAINS()`
    * function, which is what {@link PropertyRef.fullText} builds. Full text searches the analysed
    * index: it matches stemmed terms and ignores case, so it finds `500 seats` for the term `seat`,
    * while `contains("seat")` finds that value only because the characters are there and
    * `contains("Seat")` finds nothing.
+   *
+   * Jahia's GraphQL `nodesByCriteria` API uses the two words the other way round: its `contains` is
+   * the full text search and its `like` is this raw pattern match. A reader who arrives from that
+   * API and expects the analysed search gets raw characters instead, with no accent folding and no
+   * stemming, so `contains("chateaux")` does not find a title of `Châteaux`. Call
+   * {@link PropertyRef.fullText} for the operator that API names `contains`.
    */
   contains(text: string): Comparison<K, "fast">;
   /** Orders ascending on this property, which Lucene sorts natively. */
@@ -229,7 +258,14 @@ export interface PropertyRef<K extends string = string> {
    * expression)`.
    *
    * This is a search over the analysed index and not a substring match, so it matches whole terms.
-   * Use {@link PropertyRef.contains} for a match on the characters of the value.
+   * Use {@link PropertyRef.contains} for a match on the characters of the value. It carries the same
+   * expression rules as {@link SelectorRef.fullText}, and it is the operator that Jahia's GraphQL
+   * `nodesByCriteria` API calls `contains`.
+   *
+   * Scope changes what a full text search reads. A property declared `nofulltext`, such as
+   * `j:tagList`, is left out of the aggregated node text and keeps its own full text field, so this
+   * form finds nodes that {@link SelectorRef.fullText} does not. The node name is the opposite case:
+   * it reaches the aggregated text and does not answer `prop("j:nodename").fullText()`.
    */
   fullText(expression: LiteralArg): FullTextSearch<K>;
   /** Joins this property to the property of another selector on equal values. */
@@ -255,11 +291,25 @@ export interface PropertyRef<K extends string = string> {
  * A case transform over a property value. Jackrabbit serves every comparison on it from the index,
  * so the comparisons keep their plain names, while an ordering on it loads a node per collected
  * document.
+ *
+ * The transform applies to the property and never to the value the caller passes. `LOWER(property)`
+ * can hold no uppercase letter, so `lower().eq("Home")`, `lower().like("%Home%")` and
+ * `lower().contains("Home")` could only ever match nothing, and Jahia would report that as an empty
+ * result and not as an error. Write every value in the case the transform produces.
+ *
+ * The seven methods whose result turns on the exact value refuse a string value in another case and
+ * throw a `QueryError` whose code is `NULL_CONSTRAINT`, naming the value to write instead, the way
+ * `in([])` refuses a list that would match nothing: `eq`, `ne`, `in`, `like`, `startsWith`,
+ * `endsWith` and `contains`. The bounds `lt`, `le`, `gt`, `ge` and `between` take any case, because
+ * a bound is not a match. A bind variable carries no value at the call and is never checked.
  */
 export interface CaseRef<K extends string = string> {
   /** `LOWER(property) = value` */
   eq(value: LiteralArg): Comparison<K, "fast">;
-  /** `LOWER(property) <> value` */
+  /**
+   * `LOWER(property) <> value`. A value in another case excludes nothing, so the comparison would
+   * return every node that carries the property, and the call throws instead.
+   */
   ne(value: LiteralArg): Comparison<K, "fast">;
   /** `LOWER(property) < value` */
   lt(value: LiteralArg): Comparison<K, "fast">;
@@ -285,7 +335,8 @@ export interface CaseRef<K extends string = string> {
   /**
    * The transformed value must start with this text, which is `LIKE 'text%'`. The `%`, the `_` and
    * the backslash of the text are escaped for you. Write the text in the case the transform
-   * produces, so `lower().startsWith("ho")` and not `lower().startsWith("Ho")`.
+   * produces: `lower().startsWith("ho")` builds the pattern, and `lower().startsWith("Ho")`
+   * throws.
    */
   startsWith(text: string): Comparison<K, "fast">;
   /**
@@ -505,7 +556,7 @@ function likePattern(text: string, method: LikeMethod): string {
  */
 function anyOf<K extends string, P extends Speed>(
   values: readonly LiteralArg[],
-  comparisonFor: (value: LiteralArg) => Comparison<K, P>,
+  comparisonFor: (value: LiteralArg, index: number) => Comparison<K, P>,
 ): Constraint<K, P> {
   if (!Array.isArray(values) || values.length === 0) {
     throw new QueryError("NULL_CONSTRAINT", "in() needs at least one value", "constraint");
@@ -522,27 +573,113 @@ function slowComparison<K extends string>(
   return qom.comparisonSlow(operand, operator, staticOperand(value));
 }
 
-function caseRef<K extends string>(operand: FastOperand<K>): CaseRef<K> {
+/** The text a case transform compares against, when the argument carries one to read. */
+function caseSensitiveText(value: LiteralArg): string | null {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  // A bind variable holds no value here. A literal of another type is a name, a path or a URI,
+  // where the case belongs to the identifier and not to a spelling the caller chose.
+  if (typeof value === "object" && value !== null && "kind" in value) {
+    return value.kind === "Literal" && value.type === "String" ? value.value : null;
+  }
+
+  return null;
+}
+
+/**
+ * A case transform over a property, with the guard that refuses a value the transform can never
+ * produce.
+ *
+ * `LOWER(property)` holds no uppercase letter, so `lower().eq("Home")` compares a lowercased value
+ * against one that still carries a capital and matches nothing, under every operator whose match is
+ * an equality or a pattern. Nothing downstream can report that: the comparison is well formed, the
+ * statement is valid, and Jahia returns an empty result. Both sides are in hand at the call, so the
+ * call throws, the way `in([])` already throws for a constraint that would match nothing.
+ *
+ * `ne` is guarded for the same reason read from the other side. `lower().ne("Home")` builds
+ * `LOWER(property) <> 'Home'`, which no lowercased value can equal, so it excludes nothing and
+ * returns every node that carries the property. A dead exclusion is as silent as a dead match.
+ *
+ * The bounds are left alone. `lower().lt("M")` is an ordinary bound over the transformed value and
+ * not a match, so the same reasoning does not apply to it, nor to `between`.
+ */
+function caseRef<K extends string>(
+  operand: FastOperand<K>,
+  transform: "lower" | "upper",
+): CaseRef<K> {
+  const produce = (text: string): string =>
+    transform === "lower" ? text.toLowerCase() : text.toUpperCase();
+
+  /** The text of a value the transform can never produce, or `null` when there is nothing to refuse. */
+  const otherCase = (value: LiteralArg): string | null => {
+    const text = caseSensitiveText(value);
+    return text === null || produce(text) === text ? null : text;
+  };
+
+  /**
+   * @param subject The call and what it could only ever do, which `in` words differently because
+   *   the call site passed a list and not the one value named here.
+   */
+  const refuse = (subject: string, text: string): never => {
+    throw new QueryError(
+      "NULL_CONSTRAINT",
+      `${subject}, because ${transform.toUpperCase()}() transforms the property and not the value you pass. Write ${JSON.stringify(produce(text))} instead.`,
+      "constraint.operand2",
+    );
+  };
+
+  const matchable = (value: LiteralArg, method: string, effect = "can never match"): LiteralArg => {
+    const text = otherCase(value);
+    if (text !== null) {
+      refuse(`${transform}().${method}(${JSON.stringify(text)}) ${effect}`, text);
+    }
+
+    return value;
+  };
+
   const fast = (operator: Operator, value: LiteralArg): Comparison<K, "fast"> =>
     qom.comparison(operand, operator, staticOperand(value));
 
+  const matched = (operator: Operator, value: LiteralArg, method: string): Comparison<K, "fast"> =>
+    fast(operator, matchable(value, method));
+
+  /** The same guard for the three methods that take literal text and build the pattern themselves. */
+  const pattern = (text: string, method: LikeMethod): string => {
+    matchable(text, method);
+    return likePattern(text, method);
+  };
+
   return {
-    eq: (value) => fast(Operator.EQUAL_TO, value),
-    ne: (value) => fast(Operator.NOT_EQUAL_TO, value),
+    eq: (value) => matched(Operator.EQUAL_TO, value, "eq"),
+    ne: (value) =>
+      fast(Operator.NOT_EQUAL_TO, matchable(value, "ne", "can never exclude anything")),
     lt: (value) => fast(Operator.LESS_THAN, value),
     le: (value) => fast(Operator.LESS_THAN_OR_EQUAL_TO, value),
     gt: (value) => fast(Operator.GREATER_THAN, value),
     ge: (value) => fast(Operator.GREATER_THAN_OR_EQUAL_TO, value),
-    like: (value) => fast(Operator.LIKE, value),
-    in: (values) => anyOf<K, "fast">(values, (value) => fast(Operator.EQUAL_TO, value)),
+    like: (value) => matched(Operator.LIKE, value, "like"),
+    in: (values) =>
+      anyOf<K, "fast">(values, (value, index) => {
+        const text = otherCase(value);
+        if (text !== null) {
+          refuse(
+            `${transform}().in([...]) can never match on its value at index ${index}, ${JSON.stringify(text)}`,
+            text,
+          );
+        }
+
+        return fast(Operator.EQUAL_TO, value);
+      }),
     between: (low, high) =>
       qom.and(
         fast(Operator.GREATER_THAN_OR_EQUAL_TO, low),
         fast(Operator.LESS_THAN_OR_EQUAL_TO, high),
       ),
-    startsWith: (text) => fast(Operator.LIKE, likePattern(text, "startsWith")),
-    endsWith: (text) => fast(Operator.LIKE, likePattern(text, "endsWith")),
-    contains: (text) => fast(Operator.LIKE, likePattern(text, "contains")),
+    startsWith: (text) => fast(Operator.LIKE, pattern(text, "startsWith")),
+    endsWith: (text) => fast(Operator.LIKE, pattern(text, "endsWith")),
+    contains: (text) => fast(Operator.LIKE, pattern(text, "contains")),
     ascSlow: () => qom.ascendingSlow(operand),
     descSlow: () => qom.descendingSlow(operand),
   };
@@ -651,8 +788,8 @@ function propertyRef<K extends string>(selectorName: K, propertyName: string): P
       qom.equiJoinCondition(selectorName, propertyName, other.selectorName, other.propertyName),
     as: (columnName) => qom.column(selectorName, propertyName, columnName ?? null),
     lengthSlow: () => lengthRef(qom.lengthSlow(operand)),
-    lower: () => caseRef<K>(qom.lowerCase<K, PropertyValue<K>>(operand)),
-    upper: () => caseRef<K>(qom.upperCase<K, PropertyValue<K>>(operand)),
+    lower: () => caseRef<K>(qom.lowerCase<K, PropertyValue<K>>(operand), "lower"),
+    upper: () => caseRef<K>(qom.upperCase<K, PropertyValue<K>>(operand), "upper"),
   };
 }
 

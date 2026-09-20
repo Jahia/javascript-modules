@@ -103,9 +103,48 @@ from("jnt:article")
 
 `fullText()` on a selector searches every property of the node. Call it on a property reference to search one property, as in `a.prop("body").fullText("graal*")`. A comparison on the score is the slow case, so its methods are named `gtSlow()`, `eqSlow()` and so on.
 
-`fullText()` is a JCR full text search over the analysed index, and it is not a substring match. It matches whole terms, so `fullText("graal")` matches a node whose text holds the word `graal` and not one that only holds `graaljs`. The expression is the JCR full text grammar: terms, quoted phrases, `OR`, a leading `-` to exclude a term, and a trailing `*` for a prefix. Use `contains()` when you mean a substring of one property. The method is named `fullText()` and not `contains()` because `contains` is a substring match in Prisma and in Drizzle, and the two are not the same thing.
+`fullText()` is a JCR full text search over the analysed index, and it is not a substring match. It matches whole terms, so `fullText("graal")` matches a node whose text holds the word `graal` and not one that only holds `graaljs`. Use `contains()` when you mean a substring of one property. The method is named `fullText()` and not `contains()` because `contains` is a substring match in Prisma and in Drizzle, and the two are not the same thing.
 
-The difference is measurable. Full text reads the terms the analyser produced, which are stemmed and lower case, so `fullText("seat")` finds a value of `500 seats` and `fullText("MEETING")` finds `meeting`. A wildcard term is not stemmed, so `fullText("seats*")` finds nothing at all: the index holds the stem `seat`, and `seats*` never reaches it. `contains()` reads the stored characters instead, case included. Reach for `fullText()` to search words a person wrote, and for `contains()` to search the characters of a value.
+### The one rule behind every surprise
+
+The two methods read two different stores. `fullText()` reads the Lucene index, which is lower case, accent folded, stemmed and split into terms. `contains()` reads the raw stored value. Every row below follows from that split, and each one was run on a live Jahia 8.2, against a fixture whose stored value holds the text shown.
+
+| Stored value        | Call                   | Result                                           |
+| ------------------- | ---------------------- | ------------------------------------------------ |
+| `500 seats`         | `fullText("seat")`     | match, because the index holds the stem `seat`   |
+| `500 seats`         | `contains("seat")`     | match, because those characters are in the value |
+| `500 seats`         | `contains("Seat")`     | no match, a pattern is case sensitive            |
+| `500 seats`         | `fullText("seats*")`   | no match, a wildcard term is not stemmed         |
+| `Châteaux et Haras` | `fullText("chateaux")` | match, the index folds accents, and the term too |
+| `Châteaux et Haras` | `fullText("CHATEAUX")` | match, the index is lower case on both sides     |
+| `Châteaux et Haras` | `contains("chateaux")` | no match, a pattern folds nothing                |
+| `Châteaux et Haras` | `fullText("*hâteau*")` | no match, a wildcard term is not folded either   |
+
+Reach for `fullText()` to search words a person wrote, and for `contains()` to search the characters of a value. Lowercase a term and strip its accents yourself before you wrap it in a star.
+
+The expression is the JCR full text grammar: terms, quoted phrases, `OR`, a leading `-` to exclude a term, and a trailing `*` for a prefix. The default operator between two terms is `AND`, so `fullText("chateaux zzzznomatch")` matches nothing, and a search box that forwards several words asks for a node that holds every one of them.
+
+Its wildcard is `*`, and `%` and `_` belong to the pattern language instead. A `%` inside a full text expression is not a wildcard, and it is not inert either: it is an ordinary character, and the analyser splits the term at it. `fullText("%chateaux%")` therefore returns what `fullText("chateaux")` returns, while `fullText("ho%me")` asks for `ho` and `me` together and matches nothing where `fullText("home")` matches. A term that carries a `*` skips the analyser, so there the `%` stays inside the term and `fullText("%priv*%")` matches nothing where `fullText("priv*")` matches. A `*` inside a pattern is one more character to match, so `contains("priv*")` looks for a value that really holds `priv` followed by a star.
+
+The expression reaches Jahia as you wrote it, and the JCR parser rejects ordinary keyboard input. `fullText("privacy!")` answers `javax.jcr.RepositoryException: Invalid full text search expression`, and so do `foo(`, an unclosed quotation mark, a bare `OR`, `--` and an empty term. The parser runs inside `execute()`, once the whole query object already exists, and the failure covers the whole constraint, so one rejected expression takes down the clauses beside it. `diagnose()` reads a literal expression and reports four shapes at level `none`, which makes `build({ strict: true })` and `executeQuery` refuse the query before the first call into Jahia: no term left once the operators are removed, an odd number of quotation marks, a parenthesis that does not pair up outside a quoted phrase, and an operator missing the term it needs, which is a trailing `-`, `+`, `!` or `OR`, or a leading `OR`, `&&` or `||`. A `%` is reported at level `partial` and the query still runs.
+
+Each of the four rules is the narrow form, because refusing a legal query costs more than missing an illegal one. They were fitted to 195 expressions run against Jahia 8.2.3.2, and against that run they refuse nothing Jahia accepted. The pairs that decide the shape of each rule are these: `home -` fails while `home-` and `home - ` both run, since `+` and `-` are term characters once a term has begun, and the parser turns a dangling one into ordinary text as soon as whitespace follows it; `home!` fails while `home!page` runs, since `!` is a token wherever it stands; `&&` fails while `&&&` and a single `&` run; a bare `OR` fails while a bare `AND` and a bare `NOT` run; `OR home` fails while `-policy` runs, since only a binary operator needs a term on its left; `"a (b" home` runs, since a parenthesis inside a quoted phrase is text; and `term\`, a backslash with nothing left to escape, runs. A failing shape that none of the four rules covers still answers the `RepositoryException` at execution, which is what you had before this gate existed. The builder never rewrites what you wrote, so sanitise text that a visitor typed before you build the clause: remove every character outside `[\w\s]`, drop a token that starts with `-`, and skip the clause when nothing is left. Skip it on the other side too, because `contains("")` builds `LIKE '%%'`, which matches every node that carries the property instead of none, and nothing reports that.
+
+Scope changes what full text reads. An unscoped `fullText()` reads the node name as well, while `prop("j:nodename").fullText()` does not. A property declared `nofulltext`, such as `j:tagList`, is the opposite case: the flag keeps it out of the aggregated node text and the property keeps its own full text field, so `prop("j:tagList").fullText(term)` finds nodes that the unscoped search does not.
+
+### Coming from the GraphQL `nodesByCriteria` API
+
+The two APIs use the same two words for the opposite operators. Read this table before you translate a query from one to the other.
+
+| What you want                      | GraphQL `nodesByCriteria` | This builder               |
+| ---------------------------------- | ------------------------- | -------------------------- |
+| Search the analysed index          | `contains: "term"`        | `fullText("term")`         |
+| Match the raw stored characters    | `like: "%term%"`          | `contains("term")`         |
+| Match the raw characters, any case | `like`, `LOWER_CASE`      | `lower().contains("term")` |
+
+`contains()` here is the substring match, which is what `contains` means in Prisma and in Drizzle. A call that reads `contains("chateaux")` therefore matches characters and not words: it folds no accent, it stems nothing, and it is case sensitive. It returns less than the GraphQL `contains` would return, and it reports no error while it does so. Write `fullText()` when you mean the search that the GraphQL API calls `contains`.
+
+The table has no row for a substring over a whole node, because the JCR has no such operator: `contains()` needs a property, since a comparison takes one operand and a null operand means nothing in JCR QOM. The closest equivalent is a selector `fullText("*term*")` with no property, which reads every property of the node. It matches index tokens and not raw characters, so fold the term and lowercase it yourself before you wrap it in stars, and write it against the stem rather than against the word an editor typed. The `fullText("seats*")` row above is that rule seen from one side: a term carrying a wildcard skips the analyser, so it meets the stem `seat` and never the plural.
 
 ## Pattern matching
 
@@ -133,11 +172,15 @@ from("jnt:news")
 
 `contains()` builds a `LIKE` pattern. It is not the JCR-SQL2 `CONTAINS()` function: a `CONTAINS` you read in a generated statement comes from `fullText()`.
 
+It is not the `contains` of Jahia's GraphQL `nodesByCriteria` API either. That API uses the two words the other way round: its `contains` is the full text search and its `like` is this raw pattern match. A developer who arrives from it and writes `contains("chateaux")` gets a pattern over the raw characters, which folds no accent, stems nothing and is case sensitive, so the query returns less than expected and reports no error. Write `fullText()` for the operator that API calls `contains`, and read the section "Coming from the GraphQL `nodesByCriteria` API" above before you carry a query across.
+
 None of the three carries a `Slow` suffix, because a leading wildcard is served by the index too: the term scan stays inside that one property, so the cost follows the number of matches and not the size of the repository. The three are also on `lower()` and `upper()`, which is how a case insensitive match is written, and on `localName()`. A pattern on a local name walks every local name the index holds, where a pattern on a property walks only that property's own terms, because the index prefixes a property's terms with the property name and a local name carries no such prefix. The walk is wider, but the cost still follows the number of matches: on a repository of 3324 nodes, a pattern that matched nothing cost the same on both.
+
+A case transform applies to the property and not to your text. `lower().contains("Privacy")` would build `LOWER([jcr:title]) LIKE '%Privacy%'`, which compares a lowercased value against a pattern that still holds a capital, so it could only ever match nothing, and Jahia would report that as an empty result rather than as an error. Both sides are in hand at the call, so the call throws a `QueryError` whose code is `NULL_CONSTRAINT` and which names the text to write instead. Write the text in the case the transform produces: `lower().contains("privacy")`, and `upper().contains("PRIVACY")`. The check covers `eq`, `ne`, `in`, `like`, `startsWith`, `endsWith` and `contains`. `ne` is in that list because its wrong case form fails the other way round: `lower().ne("Home")` builds `LOWER([jcr:title]) <> 'Home'`, which no lowercased value can equal, so it excludes nothing and returns every node that carries the property. The bounds `lt`, `le`, `gt`, `ge` and `between` take any case, because a bound is not a match, and a bind variable is never checked, because it carries no value at the call.
 
 Escape `%`, `_` and the backslash, and nothing else, when you write a pattern by hand. Jackrabbit keeps a backslash that sits in front of a letter or a digit instead of dropping it, which section 6.7.16 of the JCR specification says it should drop, so `like("mee\\ting")` matches nothing rather than `meeting`, and a pattern that ends in a lone backslash loses it. The three methods above never emit that form.
 
-`name()` carries no text method that escapes for you. It does carry `likeSlow()`, for completeness, and that one fails at execution with an `UnsupportedRepositoryOperationException`, which `diagnose()` reports before you run it. Use `localName()` for a pattern match on a node name.
+`name()` carries no text method that escapes for you. It does carry `likeSlow()`, for completeness, and that one fails at execution with an `UnsupportedRepositoryOperationException`, which `diagnose()` reports before you run it and `build({ strict: true })` refuses. Use `localName()` for a pattern match on a node name. A pattern on `localName()` is case sensitive and carries no transform, because a JCR function holds one value and not a list. For a node name match that ignores case, use `prop("j:nodename").lower()` on a node type that carries `jmix:nodenameInfo`.
 
 ## Everyday predicates
 
