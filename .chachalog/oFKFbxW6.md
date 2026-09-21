@@ -7,7 +7,7 @@ Bumped embedded dependencies. (#658, #664, #793)
 
 | Dependency    | From (JSM 1.2.0) | To (JSM 1.3.0) |
 | ------------- | ---------------- | -------------- |
-| devalue       | 5.6.4            | 5.9.2          |
+| devalue       | 5.6.4            | 6.0.0          |
 | i18next       | 25.7.3           | 26.4.2         |
 | react         | 19.2.3           | 19.3.0         |
 | react-dom     | 19.2.3           | 19.3.0         |
