@@ -12,6 +12,8 @@ type CommonProps = { src: JCRNodeWrapper } & Omit<
   "src" | keyof MergedOptions
 >;
 
+export type JImageProps = CommonProps & (FixedSizeOptions | ResponsiveOptions);
+
 export function JImage(options: CommonProps & FixedSizeOptions): JSX.Element;
 export function JImage(options: CommonProps & ResponsiveOptions): JSX.Element;
 export function JImage({
