@@ -76,6 +76,25 @@
                             </arguments>
                         </configuration>
                     </execution>
+                    <execution>
+                        <!-- Runs after generate-resources has written target/types, which the test
+                             build needs to type-check the files that import the generated Java
+                             declarations. -->
+                        <id>yarn test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <!-- exec:exec is not governed by surefire, so the standard flag is
+                                 read here, and -DskipTests skips this execution too. -->
+                            <skip>${skipTests}</skip>
+                            <executable>yarn</executable>
+                            <arguments>
+                                <argument>test</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
