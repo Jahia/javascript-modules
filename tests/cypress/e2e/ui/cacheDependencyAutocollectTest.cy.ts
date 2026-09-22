@@ -1,6 +1,6 @@
 import { addNode, deleteNode, publishAndWaitJobEnding } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY, JAHIA_CONTEXT } from "../../support/constants";
+import { GENERIC_SITE_KEY } from "../../support/constants";
 
 describe("Cache dependencies collected by the URL builder", () => {
   const PAGE = "testAutocollectedCacheDependency";
@@ -97,9 +97,9 @@ describe("Cache dependencies collected by the URL builder", () => {
 
         // Liveness: the rename has to have reached live, or "the opted-out view did not change"
         // would pass simply because nothing happened at all.
-        cy.request(`${JAHIA_CONTEXT}/files/live${FILES}/${RENAMED}`)
-          .its("status")
-          .should("eq", 200);
+        // The URL is relative: Cypress appends it to `baseUrl`, which already carries the
+        // servlet context path. Prefixing JAHIA_CONTEXT here would double it.
+        cy.request(`/files/live${FILES}/${RENAMED}`).its("status").should("eq", 200);
 
         renderLive().then((third) => {
           expect(
