@@ -12,12 +12,12 @@
   },
   "dependencies": {
     "@jahia/javascript-modules-library": "workspace:*",
-    "devalue": "6.0.0",
+    "devalue": "6.0.2",
     "fast-text-encoding": "patch:fast-text-encoding@npm%3A1.0.6#~/.yarn/patches/fast-text-encoding-npm-1.0.6-b474f65fe2.patch",
     "i18next": "26.4.2",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "react-i18next": "17.0.14"
+    "react-i18next": "17.0.15"
   },
   "devDependencies": {
     "@types/node": "^22.20.3",
