@@ -19,7 +19,6 @@ import javax.servlet.jsp.JspWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.Writer;
 
 /**
  * Mock implementation of the {@link javax.servlet.jsp.JspWriter} class.
@@ -48,7 +47,7 @@ public class MockJspWriter extends JspWriter {
         this.targetWriter = new PrintWriter(this.originalWriter);
     }
 
-    protected PrintWriter getTargetWriter() throws IOException {
+    protected PrintWriter getTargetWriter() {
         return this.targetWriter;
     }
 

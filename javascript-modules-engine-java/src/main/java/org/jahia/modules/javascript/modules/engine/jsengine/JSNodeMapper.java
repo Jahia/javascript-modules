@@ -111,7 +111,7 @@ public class JSNodeMapper {
                 jsProperties.put(property.getName(),
                         Arrays.stream(property.getValues())
                                 .map(ThrowingFunction.unchecked(value -> toJSNodePropertyValue(property, value)))
-                                .collect(Collectors.toList()));
+                                .toList());
             } else {
                 jsProperties.put(property.getName(), toJSNodePropertyValue(property, property.getValue()));
             }
@@ -225,7 +225,7 @@ public class JSNodeMapper {
         if (epd != null && epd.isMultiple()) {
             if (value instanceof List && ((List) value).size() > 0) {
                 List<?> values = (List<?>) value;
-                List<String> stringList = values.stream().map(Object::toString).collect(Collectors.toUnmodifiableList());
+                List<String> stringList = values.stream().map(Object::toString).toList();
                 node.setProperty(propertyName, stringList.toArray(new String[stringList.size()]));
             } else {
                 node.setProperty(propertyName, ((String) value).split(" "));
