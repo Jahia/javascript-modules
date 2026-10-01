@@ -2,8 +2,6 @@
 # Runs the tests on the host against the Jahia container that ci.build.bare-metal.sh started.
 set -uo pipefail
 
-export JAHIA_URL="http://localhost:8080${CONTEXT_PATH:-}"
-
 # Not `yarn env.run`: yarn runs dependency binaries with node, and this one is a bash script
 node_modules/.bin/env.run
 status=$?

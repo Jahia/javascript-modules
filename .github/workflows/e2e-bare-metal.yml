@@ -48,6 +48,10 @@ jobs:
       - name: Expose docker compose as docker-compose
         run: printf '#!/bin/sh\nexec docker compose "$@"\n' | sudo install /dev/stdin /usr/local/bin/docker-compose
 
+      # The tests expect to reach Jahia as http://jahia:8080, like the cypress container did
+      - name: Resolve jahia to the host
+        run: echo "127.0.0.1 jahia" | sudo tee -a /etc/hosts
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - uses: jdx/mise-action@7e36c90d9ab29c415a2384db3006f3ec8a8cc654 # v4.2.4
