@@ -4,12 +4,13 @@ set -uo pipefail
 
 export JAHIA_URL="http://localhost:8080${CONTEXT_PATH:-}"
 
-yarn env.run
+# Not `yarn env.run`: yarn runs dependency binaries with node, and this one is a bash script
+node_modules/.bin/env.run
 status=$?
 
-# The action reads the reports and test_success from artifacts/results/
+# The action reads the reports and test_success from artifacts/results/, and writes its own logs there
 rm -rf artifacts/results
-mkdir -p artifacts
-cp -r results artifacts/results
+mkdir -p artifacts/results
+cp -r results/. artifacts/results/ 2>/dev/null || true
 
 exit $status
