@@ -20,29 +20,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build Module
-    runs-on: ubuntu-latest
-    env:
-      NEXUS_INTERNAL_URL: ${{ secrets.NEXUS_INTERNAL_URL }}
-    container:
-      image: ghcr.io/jahia/jahia-docker-mvn-cache:17-jdk-noble-mvn-loaded
-      credentials:
-        username: ${{ secrets.GH_PACKAGES_USERNAME }}
-        password: ${{ secrets.GH_PACKAGES_TOKEN }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: jahia/jahia-modules-action/build@v2
-        with:
-          mvn_settings_filepath: ".github/maven.settings.xml"
-          nexus_username: ${{ secrets.NEXUS_USERNAME }}
-          nexus_password: ${{ secrets.NEXUS_PASSWORD }}
-
+  # The modules build in this job, while Jahia boots: see tests/ci.build.bare-metal.sh
   integration-tests:
     name: Integration Tests (bare metal)
-    needs: build
     runs-on: ubuntu-26.04
     timeout-minutes: 65
+    env:
+      NEXUS_INTERNAL_URL: ${{ secrets.NEXUS_INTERNAL_URL }}
     steps:
       # The runner ships the Compose plugin only, the action still calls the docker-compose binary to export the logs
       - name: Expose docker compose as docker-compose
@@ -62,7 +46,14 @@ jobs:
           path: |
             ~/.cache/Cypress
             ~/.yarn/berry/cache
-          key: e2e-bare-metal-${{ runner.os }}-${{ hashFiles('tests/yarn.lock') }}
+          key: e2e-bare-metal-${{ runner.os }}-${{ hashFiles('yarn.lock', 'tests/yarn.lock') }}
+
+      - name: Cache the Maven repository
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: ~/.m2/repository
+          key: e2e-bare-metal-maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: e2e-bare-metal-maven-${{ runner.os }}-
 
       - uses: jahia/jahia-modules-action/integration-tests@v2
         with:
