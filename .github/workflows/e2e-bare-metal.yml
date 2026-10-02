@@ -82,7 +82,8 @@ jobs:
           ci_build_script: ci.build.bare-metal.sh
           ci_startup_script: ci.startup.bare-metal.sh
           github_artifact_name: bare-metal-js-eng-${{ github.run_number }}
-          jahia_artifact_name: bare-metal-js-eng-${{ github.run_number }}
+          # The GitHub artifact keeps the results
+          jahia_artifact_enable: false
           tests_report_type: json
           tests_report_path: "artifacts/results/reports/report.json"
           bastion_ssh_private_key: ${{ secrets.BASTION_SSH_PRIVATE_KEY_JAHIACI }}
