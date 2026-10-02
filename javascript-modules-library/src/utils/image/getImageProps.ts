@@ -84,22 +84,25 @@ const isVector = (node: JCRNodeWrapper) => {
 const encodeComma = (url: string) => url.replaceAll(",", "%2C");
 
 /**
- * There is no real way to know what will resize the image, so we make this assumption:
+ * The node is asked for a sized URL first, through `node.getUrl(["w:640", ...])`:
  *
- * - If a DAM is set (node.getProvider().isDefault() === false), the DAM will resize the image
- * - Otherwise, a page filter will rewrite the image URL to for resizing
+ * - A DAM (node.getProvider().isDefault() === false) always resizes through these arguments
+ * - On the default provider, a `jnt:file` decorator may answer `getUrl(List)` with a sized URL
+ * - When no decorator answers, `getUrl(List)` returns `getUrl()`, and the size goes in `?w=` / `?h=`
+ *   for an image resizer in front of Jahia
  */
 const resizedUrl = (
   node: JCRNodeWrapper,
   args: { w?: string; h?: string },
   options: Parameters<typeof buildNodeUrl>[1],
-) =>
-  encodeComma(
-    buildNodeUrl(
-      node,
-      node.getProvider().isDefault() ? { ...options, parameters: args } : { ...options, args },
-    ),
+) => {
+  const sized =
+    !node.getProvider().isDefault() ||
+    node.getUrl(Object.entries(args).map(([key, value]) => `${key}:${value}`)) !== node.getUrl();
+  return encodeComma(
+    buildNodeUrl(node, sized ? { ...options, args } : { ...options, parameters: args }),
   );
+};
 
 /**
  * Default set of image widths for the `srcset` attribute.
