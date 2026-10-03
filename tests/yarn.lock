@@ -113,8 +113,8 @@ __metadata:
   linkType: hard
 
 "@jahia/cypress@npm:^8.4.0":
-  version: 8.5.0
-  resolution: "@jahia/cypress@npm:8.5.0"
+  version: 8.6.0
+  resolution: "@jahia/cypress@npm:8.6.0"
   dependencies:
     "@apollo/client": "npm:^3.4.9"
     "@faker-js/faker": "npm:^10.3.0"
@@ -128,7 +128,7 @@ __metadata:
     ci.startup: ./ci.startup.sh
     env.debug: ./env.debug.sh
     env.run: ./env.run.sh
-  checksum: 10c0/f703c7908e3da23d84af52035030f8ec9eccdc8073f38ef7b9fc5dc84e1ff06d5adb7e6f423477e709a917809248454537dd052289aae0c24ac029c05ae9d92f
+  checksum: 10c0/8422f48157489cdb5d95a49fc60a45d7b5e328c204581ec10414973c4b7f08ddd1c12a313552c360fd16c7adeeb43f94c0161d65f8c4f9a489924335fc643a81
   languageName: node
   linkType: hard
 
@@ -451,11 +451,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*, @types/node@npm:>=12.0.0":
-  version: 26.6.1
-  resolution: "@types/node@npm:26.6.1"
+  version: 26.6.4
+  resolution: "@types/node@npm:26.6.4"
   dependencies:
     undici-types: "npm:~8.9.0"
-  checksum: 10c0/c90d3db40e7c9c92f0854ecdcaabd9c1923b7e2a43cf2c97cf147a5aba7e18a1c80034088edfb1bb2153ceffdd87be7ce0a256b80ec7cd92e619c564133ae5fe
+  checksum: 10c0/094e7362df9200ba4c2da09131ca3b5d1aa51535a268a24e4ee2546d9c5a323d1d30cbdaaaa3db7ef8b2387572d1f9edabb11538ab7a09d3bca33ae5cddc2b1b
   languageName: node
   linkType: hard
 
@@ -467,11 +467,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:^22.15.12":
-  version: 22.20.3
-  resolution: "@types/node@npm:22.20.3"
+  version: 22.20.5
+  resolution: "@types/node@npm:22.20.5"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10c0/27034f3f66d7044494f0be7b20b17eecbb1f6deab9e2ea8b004d79e896f4a90cde954da9a433a145e800f3db3e5c5c4761a65366434997c77102ba364dcbedd0
+  checksum: 10c0/0cf61a89c6a69917ab49f976a6bb11a29e3b348a6ae19f5827ceb91d3ade781faab58dcf3b8fa625f975f5d7536b9166ff94e8250c29272c667164f77c28fa88
   languageName: node
   linkType: hard
 
@@ -1302,15 +1302,15 @@ __metadata:
   linkType: hard
 
 "cypress-terminal-report@npm:^7.2.1":
-  version: 7.3.3
-  resolution: "cypress-terminal-report@npm:7.3.3"
+  version: 7.4.0
+  resolution: "cypress-terminal-report@npm:7.4.0"
   dependencies:
     chalk: "npm:^4.0.0"
     compare-versions: "npm:^6.1.1"
     superstruct: "npm:0.14.2"
   peerDependencies:
     cypress: ">=10.0.0"
-  checksum: 10c0/afd2976c26e5a92499c3b00b0f223764a9029c4ec57da99a4efa737cf1b9468541281c59252c18fc93e4ad2672d86aa607e046e8ccaddd12c94166444f49aded
+  checksum: 10c0/d96853c771d1bc11ecbcedaed68019d7c7604e6b2a928688766b7925b84042a9596b1b029653d02d7c84d935efe535a12ef13922eee24afbfd0f5f9cdf8440a7
   languageName: node
   linkType: hard
 
