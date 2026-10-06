@@ -65,6 +65,33 @@ describe("Verify client side component are rehydrated as expected", () => {
       cy.get('span[data-testid="counter"]').should("contain", "0");
 
       cy.get('[data-testid="ssr-child"]').should("contain", "Server-side rendered");
+
+      // Check that client-only islands receive their server-rendered children
+      cy.get('[data-testid="client-only-children"] [data-testid="client-only-child"]').should(
+        "contain",
+        "Server-side child of a client-only island",
+      );
+      // Children are kept when unmounted and mounted again
+      cy.get('button[data-testid="client-only-toggle"]').click();
+      cy.get('[data-testid="client-only-child"]').should("not.exist");
+      cy.get('button[data-testid="client-only-toggle"]').click();
+      cy.get('[data-testid="client-only-children"] [data-testid="client-only-child"]').should(
+        "contain",
+        "Server-side child of a client-only island",
+      );
+
+      // Check that children are only displayed inside the component when requested
+      cy.get('[data-testid="modal"] [data-testid="modal-child"]').should("be.visible");
+    });
+
+    it(`${workspace}: Check that client-only children can be hidden while loading`, () => {
+      cy.request(
+        `/cms/render/${workspace}/en/sites/${GENERIC_SITE_KEY}/home/testHydrateInBrowser.html`,
+      ).then(({ body }) => {
+        const slot = Cypress.$(body).find('[data-testid="modal-child"]').parent();
+        expect(slot.prop("tagName")).to.equal("JSM-CHILDREN");
+        expect(slot.attr("style")).to.match(/display:\s*none/);
+      });
     });
   }
 });
