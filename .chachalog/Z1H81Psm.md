@@ -3,7 +3,7 @@
 javascript-modules: minor
 ---
 
-`<Island clientOnly>` now passes its children to the island component, like server-rendered islands do.
+`<Island clientOnly>` now passes its children to the island component, like server-rendered islands do. (#807)
 
 Children are displayed until the component is loaded, then moved into it. Components that do not render their children are unaffected: the children still act as a loading placeholder.
 
