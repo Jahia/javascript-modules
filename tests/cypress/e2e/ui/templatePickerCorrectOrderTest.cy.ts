@@ -1,6 +1,6 @@
 import { JContent } from "@jahia/jcontent-cypress/dist/page-object/jcontent";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 
 describe("Template Picker Correct Order Test", () => {
   before("Create page", () => {
@@ -16,8 +16,12 @@ describe("Template Picker Correct Order Test", () => {
     );
   });
 
-  beforeEach('Login', () => { cy.login(); });
-  afterEach('Logout', () => { cy.logout(); });
+  beforeEach("Login", () => {
+    cy.login();
+  });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
   it("should display the correct order of templates", () => {
     const templatesValues = [

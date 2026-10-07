@@ -1,6 +1,6 @@
 import { addNode, deleteNode } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 import "cypress-wait-until";
 
 describe("Test priority parameter on views", () => {
@@ -13,18 +13,25 @@ describe("Test priority parameter on views", () => {
   ];
 
   beforeEach("Create test page before each test", () => {
-    addSimplePage(`/sites/${GENERIC_SITE_KEY}`, pageName, "Test components priorities", "en", "simple", [
-      {
-        name: "pagecontent",
-        primaryNodeType: "jnt:contentList",
-      },
-    ]);
+    addSimplePage(
+      `/sites/${GENERIC_SITE_KEY}`,
+      pageName,
+      "Test components priorities",
+      "en",
+      "simple",
+      [
+        {
+          name: "pagecontent",
+          primaryNodeType: "jnt:contentList",
+        },
+      ],
+    );
     cy.login();
   });
 
   afterEach("Delete the test page after each test", () => {
     deleteNode(`/sites/${GENERIC_SITE_KEY}/${pageName}`);
-      cy.logout();
+    cy.logout();
   });
 
   examples.forEach(({ nodeType, expectedPriority }) => {

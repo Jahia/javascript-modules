@@ -1,6 +1,6 @@
 import { addNode, addVanityUrl, deleteNode, publishAndWaitJobEnding } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY, JAHIA_CONTEXT } from "../../support/constants";
+import { GENERIC_SITE_KEY, JAHIA_CONTEXT, JAHIA_ORIGIN } from "../../support/constants";
 
 describe("Test on url helper", () => {
   before("Create test page and contents", () => {
@@ -146,6 +146,18 @@ describe("Test on url helper", () => {
         expectedURL: `${JAHIA_CONTEXT}/cms/render/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
+        dataTestId: "content_link_language_fr_raw",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_CONTEXT}/cms/render/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
+        dataTestId: "content_link_mode_edit_raw",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_CONTEXT}/cms/edit/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
         dataTestId: "content_link_parameters",
         tag: "a",
         attribute: "href",
@@ -162,6 +174,50 @@ describe("Test on url helper", () => {
         tag: "a",
         attribute: "href",
         expectedURL: "param1=value1",
+      },
+      {
+        dataTestId: "content_link_absolute",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
+        dataTestId: "content_link_absolute_origin",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `https://origin.test${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
+        dataTestId: "content_link_absolute_language_fr",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
+        dataTestId: "image_static_resource_absolute",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
+      },
+      {
+        dataTestId: "endpoint_absolute",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/graphql`,
+      },
+      {
+        dataTestId: "endpoint_absolute_origin",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `https://origin.test${JAHIA_CONTEXT}/graphql`,
+      },
+      // An origin must not be prefixed onto a URL that already carries one, as an external
+      // provider's does. Regression guard: buildNodeUrl once returned `<server><dam url>`.
+      {
+        dataTestId: "external_provider_absolute",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: "https://media.keepeek.test/asset/1234.jpg",
       },
       {
         dataTestId: "action_url",
@@ -253,6 +309,50 @@ describe("Test on url helper", () => {
         expectedURL: "param1=value1",
       },
       {
+        dataTestId: "content_link_absolute",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
+        dataTestId: "content_link_absolute_origin",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `https://origin.test${JAHIA_CONTEXT}/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
+        dataTestId: "content_link_absolute_language_fr",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
+        dataTestId: "image_static_resource_absolute",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
+      },
+      {
+        dataTestId: "endpoint_absolute",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/graphql`,
+      },
+      {
+        dataTestId: "endpoint_absolute_origin",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `https://origin.test${JAHIA_CONTEXT}/graphql`,
+      },
+      // An origin must not be prefixed onto a URL that already carries one, as an external
+      // provider's does. Regression guard: buildNodeUrl once returned `<server><dam url>`.
+      {
+        dataTestId: "external_provider_absolute",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: "https://media.keepeek.test/asset/1234.jpg",
+      },
+      {
         dataTestId: "action_url",
         tag: "a",
         attribute: "href",
@@ -263,6 +363,38 @@ describe("Test on url helper", () => {
         tag: "a",
         attribute: "href",
         expectedURL: `${JAHIA_CONTEXT}/sites/${GENERIC_SITE_KEY}/home/testUrl/pagecontent/test.html.ajax`,
+      },
+    ]);
+
+    cy.logout();
+  });
+
+  it("Generated URLs should stay inside the edit frame", function () {
+    cy.login();
+    cy.visit(`/cms/editframe/default/en/sites/${GENERIC_SITE_KEY}/home/testUrl.html`);
+
+    testUrl([
+      // An inferred mode follows the servlet that served the request, so links stay in the frame
+      // rather than reloading the whole edit UI inside it. Asserted outside an <a href>, the only
+      // place EditModeFilter rewrites /cms/edit/ into /cms/editframe/ on its own.
+      {
+        dataTestId: "content_link_language_fr_raw",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_CONTEXT}/cms/editframe/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      // An explicit mode is an entry point into that mode, not the current servlet: unchanged.
+      {
+        dataTestId: "content_link_mode_edit_raw",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_CONTEXT}/cms/edit/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
+        dataTestId: "content_link_mode_preview",
+        tag: "a",
+        attribute: "href",
+        expectedURL: `${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
     ]);
 
@@ -352,6 +484,50 @@ describe("Test on url helper", () => {
         expectedURL: "param1=value1",
       },
       {
+        dataTestId: "content_link_absolute",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/vanityUrlTest`,
+      },
+      {
+        dataTestId: "content_link_absolute_origin",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `https://origin.test${JAHIA_CONTEXT}/cms/render/default/vanityUrlTest`,
+      },
+      {
+        dataTestId: "content_link_absolute_language_fr",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
+        dataTestId: "image_static_resource_absolute",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
+      },
+      {
+        dataTestId: "endpoint_absolute",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/graphql`,
+      },
+      {
+        dataTestId: "endpoint_absolute_origin",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `https://origin.test${JAHIA_CONTEXT}/graphql`,
+      },
+      // An origin must not be prefixed onto a URL that already carries one, as an external
+      // provider's does. Regression guard: buildNodeUrl once returned `<server><dam url>`.
+      {
+        dataTestId: "external_provider_absolute",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: "https://media.keepeek.test/asset/1234.jpg",
+      },
+      {
         dataTestId: "action_url",
         tag: "a",
         attribute: "href",
@@ -439,6 +615,50 @@ describe("Test on url helper", () => {
         tag: "a",
         attribute: "href",
         expectedURL: "param1=value1",
+      },
+      {
+        dataTestId: "content_link_absolute",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/vanityUrlTest`,
+      },
+      {
+        dataTestId: "content_link_absolute_origin",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `https://origin.test${JAHIA_CONTEXT}/vanityUrlTest`,
+      },
+      {
+        dataTestId: "content_link_absolute_language_fr",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
+        dataTestId: "image_static_resource_absolute",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
+      },
+      {
+        dataTestId: "endpoint_absolute",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/graphql`,
+      },
+      {
+        dataTestId: "endpoint_absolute_origin",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: `https://origin.test${JAHIA_CONTEXT}/graphql`,
+      },
+      // An origin must not be prefixed onto a URL that already carries one, as an external
+      // provider's does. Regression guard: buildNodeUrl once returned `<server><dam url>`.
+      {
+        dataTestId: "external_provider_absolute",
+        tag: "span",
+        attribute: "data-url",
+        expectedURL: "https://media.keepeek.test/asset/1234.jpg",
       },
       {
         dataTestId: "action_url",

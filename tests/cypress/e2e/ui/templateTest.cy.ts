@@ -1,6 +1,6 @@
 import { publishAndWaitJobEnding } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 import "cypress-iframe";
 
 const checkSectionsPresence = () => {
@@ -26,7 +26,9 @@ describe("Template testsuite", () => {
     cy.visit(`/jahia/jcontent/${GENERIC_SITE_KEY}/en/pages/home/${pageName}`);
   });
 
-  afterEach("Logout", () => { cy.logout(); });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
   it(`${pageName}: Verify 3 sections presence`, () => {
     cy.iframe("#page-builder-frame-1").within(() => {

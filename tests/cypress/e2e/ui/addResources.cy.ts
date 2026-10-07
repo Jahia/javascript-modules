@@ -1,6 +1,6 @@
 import { addNode } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY, JAHIA_CONTEXT } from '../../support/constants';
+import { GENERIC_SITE_KEY, JAHIA_CONTEXT } from "../../support/constants";
 
 describe("Test on add resources component/helper", () => {
   const pageName = "testAddResources";
@@ -29,21 +29,26 @@ describe("Test on add resources component/helper", () => {
     });
   });
 
-  beforeEach("Login", () => { cy.login(); });
-  afterEach('Logout', () => { cy.logout(); });
+  beforeEach("Login", () => {
+    cy.login();
+  });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
   it(`${pageName}: should not contain a div in the head tag in the page source code`, () => {
-    cy.request(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`)
-      .then((response) => {
+    cy.request(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`).then(
+      (response) => {
         const regex = /<head>[\s\S]*?<div>[\s\S]*?<\/head>/;
         expect(regex.test(response.body)).to.be.false;
-      });
+      },
+    );
   });
 
   it(`${pageName} : should contain a link tag in the head tag to load the CSS styles`, () => {
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);
     cy.get(
-      `head link[href="${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/css/styles.css"]`
+      `head link[href="${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/css/styles.css"]`,
     ).then(($link: JQuery<HTMLLinkElement>) => {
       expect($link.attr("id")).to.match(/^staticAssetCSS/);
     });

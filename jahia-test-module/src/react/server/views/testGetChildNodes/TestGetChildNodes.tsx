@@ -60,35 +60,33 @@ jahiaComponent(
     return (
       <>
         <h3>getChildNodes usages</h3>
-        <PrintChildren title="All Children" testid="all" children={allChildren} />
-        <PrintChildren title="Filtered Children" testid="filtered" children={filteredChildren} />
-        <PrintChildren
-          title="Filtered + offset Children"
-          testid="filteredOffset"
-          children={filteredOffsetChildren}
-        />
-        <PrintChildren
-          title="Filtered + limit Children"
-          testid="filteredLimit"
-          children={filteredLimitChildren}
-        />
-        <PrintChildren
-          title="Filtered + limit + offset Children"
-          testid="filteredLimitOffset"
-          children={filteredLimitOffsetChildren}
-        />
-        <PrintChildren title="Limit Children" testid="limit" children={limitChildren} />
-        <PrintChildren
-          title="Limit + offset Children"
-          testid="limitOffset"
-          children={limitOffsetChildren}
-        />
-        <PrintChildren
-          title="Limit is mandatory"
-          testid="limitMandatory"
-          children={limitMandatory}
-        />
-        <PrintChildren title="Offset children" testid="offset" children={offsetChildren} />
+        <PrintChildren title="All Children" testid="all">
+          {allChildren}
+        </PrintChildren>
+        <PrintChildren title="Filtered Children" testid="filtered">
+          {filteredChildren}
+        </PrintChildren>
+        <PrintChildren title="Filtered + offset Children" testid="filteredOffset">
+          {filteredOffsetChildren}
+        </PrintChildren>
+        <PrintChildren title="Filtered + limit Children" testid="filteredLimit">
+          {filteredLimitChildren}
+        </PrintChildren>
+        <PrintChildren title="Filtered + limit + offset Children" testid="filteredLimitOffset">
+          {filteredLimitOffsetChildren}
+        </PrintChildren>
+        <PrintChildren title="Limit Children" testid="limit">
+          {limitChildren}
+        </PrintChildren>
+        <PrintChildren title="Limit + offset Children" testid="limitOffset">
+          {limitOffsetChildren}
+        </PrintChildren>
+        <PrintChildren title="Limit is mandatory" testid="limitMandatory">
+          {limitMandatory}
+        </PrintChildren>
+        <PrintChildren title="Offset children" testid="offset">
+          {offsetChildren}
+        </PrintChildren>
         <AddContentButtons />
 
         <h3>RenderChildren</h3>

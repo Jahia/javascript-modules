@@ -25,33 +25,33 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
                 <executions>
                     <!-- Executions bound on the "initialize" phase (executed in order of declaration): -->
-                    <execution>
-                        <id>install node and yarn - Hydrogen</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>install-node-and-yarn</goal>
-                        </goals>
-                    </execution>
                     <execution>
                         <id>yarn install - Hydrogen</id>
                         <phase>initialize</phase>
                         <goals>
-                            <goal>yarn</goal>
+                            <goal>exec</goal>
                         </goals>
+                        <configuration>
+                            <!-- bare `yarn` is `yarn install` -->
+                            <executable>yarn</executable>
+                        </configuration>
                     </execution>
                     <!-- Executions bound on the "process-sources" phase (executed in order of declaration): -->
                     <execution>
                         <id>yarn lint - Hydrogen</id>
                         <phase>process-sources</phase>
                         <goals>
-                            <goal>yarn</goal>
+                            <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <arguments>lint</arguments>
+                            <executable>yarn</executable>
+                            <arguments>
+                                <argument>lint</argument>
+                            </arguments>
                         </configuration>
                     </execution>
                     <!-- Executions bound on the "package" phase (executed in order of declaration): -->
@@ -59,10 +59,13 @@
                         <id>yarn pack - Hydrogen</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>yarn</goal>
+                            <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <arguments>build</arguments>
+                            <executable>yarn</executable>
+                            <arguments>
+                                <argument>build</argument>
+                            </arguments>
                         </configuration>
                     </execution>
                 </executions>
@@ -116,18 +119,22 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
                         <executions>
                             <!-- Keep the package.json in sync with the maven version -->
                             <execution>
                                 <id>sync-version</id>
                                 <phase>process-resources</phase>
                                 <goals>
-                                    <goal>yarn</goal>
+                                    <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>node ../../.m2/sync-version.js ${project.version}</arguments>
+                                    <executable>node</executable>
+                                    <arguments>
+                                        <argument>../../.m2/sync-version.js</argument>
+                                        <argument>${project.version}</argument>
+                                    </arguments>
                                 </configuration>
                             </execution>
                         </executions>

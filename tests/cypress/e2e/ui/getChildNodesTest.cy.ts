@@ -1,6 +1,6 @@
 import { addNode } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 
 describe("getChildNodes function test", () => {
   before("Create test page and contents", () => {
@@ -47,8 +47,12 @@ describe("getChildNodes function test", () => {
     });
   });
 
-  beforeEach('Login', () => { cy.login(); });
-  afterEach('Logout', () => { cy.logout(); });
+  beforeEach("Login", () => {
+    cy.login();
+  });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
   it("Verify all children returned", function () {
     cy.visit(

@@ -156,6 +156,36 @@ Because these props will be sent to the browser, two constraints apply:
 - **Do not pass any sensitive information,** such as API keys.
 - **The props must be serializable,** which means only a subset of all JS objects can be used. The serialization is performed by [devalue](https://www.npmjs.com/package/devalue), which offers a wider range of supported types than `JSON.stringify`, but still has limitations. For instance, you cannot send a JCR node through the props of a client component.
 
+This is how an island renders images: the server view computes the `<img />` attributes from the image node with `getImageProps`, and passes the resulting plain object as a prop. The island spreads it on an `<img />`:
+
+```tsx
+// Gallery.client.tsx
+import type { ImageProps } from "@jahia/javascript-modules-library";
+
+export default function Gallery({ images }: { images: ImageProps[] }) {
+  return images.map((image) => <img key={image.src} {...image} />);
+}
+```
+
+```tsx
+// default.server.tsx
+import { getImageProps, Island, jahiaComponent } from "@jahia/javascript-modules-library";
+import type { JCRNodeWrapper } from "org.jahia.services.content";
+import Gallery from "./Gallery.client.tsx";
+
+jahiaComponent(
+  {
+    componentType: "view",
+    nodeType: "hydrogen:gallery",
+  },
+  ({ images }: { images: JCRNodeWrapper[] }) => (
+    <Island component={Gallery} props={{ images: images.map((node) => getImageProps(node)) }} />
+  ),
+);
+```
+
+`ImageProps` is a type-only import, so it is allowed in a client file.
+
 Here is an example of what you can do:
 
 ```tsx
@@ -216,9 +246,7 @@ Our `<Pizza />` component receives its props during both server-side and client-
 
 Last but not least, the `children` prop, which is the technical name for all children passed to a React component. (`<Parent children={<Child />} />` is the same as `<Parent><Child /></Parent>`.)
 
-The `<Island />` component can take children, but its behavior depends on its `clientOnly` prop.
-
-In default mode (without `clientOnly`), the children are rendered on the server and sent to the client, as children of your island component. The children will not be made interactive.
+The `<Island />` component can take children: they are rendered on the server and sent to the client, as children of your island component. The children will not be made interactive.
 
 This behavior enables components like accordions, where the `<Island />` is not a leaf of the component tree.
 
@@ -270,10 +298,12 @@ jahiaComponent(
 
 A few things to note:
 
-- The `{children}` insertion point must always be there. If you want to hide the children of your component, use CSS instead of a JS condition. Otherwise, they will not be sent to the client and your component will appear to have no children.
+- The `{children}` insertion point must always be there. If you want to hide the children of your component, use CSS instead of a JS condition. Otherwise, they will not be sent to the client and your component will appear to have no children. (This does not apply to `clientOnly` mode, see below.)
 - Children will be wrapped in a `jsm-children` element. This should not affect your code most of the time, but don't use the `>` CSS selector to target children of your component.
 
-In `clientOnly` mode, the children of an island will not be used as children of your island component. Instead, they will be rendered on the server and used as a placeholder until the client component is loaded.
+Children are also passed to the component in `clientOnly` mode: they are displayed as is until the client component is loaded, then moved into it. The same DOM elements are reused, so their state (e.g. form inputs or nested islands) is preserved. Because the children are always sent to the client, your component may render them conditionally: they are kept while hidden, and restored when rendered again.
+
+If your island component does not render its children, they are only displayed until the client component is loaded, acting as a placeholder.
 
 ```tsx
 // default.server.tsx
@@ -287,8 +317,8 @@ jahiaComponent(
   },
   () => (
     <article>
-      <Island component={Map}>
-        {/* Placeholder until <Map /> has loaded */}
+      <Island clientOnly component={Map}>
+        {/* <Map /> does not render children: this is a placeholder until it has loaded */}
         <p>The map is loading...</p>
       </Island>
     </article>
@@ -297,6 +327,29 @@ jahiaComponent(
 ```
 
 This is a good UX practice to tell users that your site is currently loading instead of leaving an empty space. It can also prevent [layout shifts](https://web.dev/articles/cls) when the component finally loads.
+
+Displaying the children before the component is loaded is not always desirable. For instance, the content of a modal should not be displayed outside of the modal. In this case, use `clientOnly="hide-children-while-loading"`: the children will only be displayed once moved into the component.
+
+```tsx
+// default.server.tsx
+import { Island, jahiaComponent } from "@jahia/javascript-modules-library";
+import Modal from "./Modal.client.tsx";
+
+jahiaComponent(
+  {
+    componentType: "view",
+    nodeType: "hydrogen:example",
+  },
+  () => (
+    <article>
+      <Island clientOnly="hide-children-while-loading" component={Modal}>
+        {/* Only displayed inside <Modal />, once it has loaded */}
+        <p>I'm rendered on the server, but displayed in a modal!</p>
+      </Island>
+    </article>
+  ),
+);
+```
 
 ## Implementation details
 

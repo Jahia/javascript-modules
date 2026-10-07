@@ -15,7 +15,7 @@ jobs:
         include:
           - jahia_image: ghcr.io/jahia/jahia-ee-dev:8-SNAPSHOT
             suffix: SN
-            catalina_context : '' # Root context
+            catalina_context: "" # Root context
           - jahia_image: ghcr.io/jahia/jahia-ee-dev:8-SNAPSHOT
             suffix: SN-custom-context
             catalina_context: custom-context

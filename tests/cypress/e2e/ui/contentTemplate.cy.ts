@@ -1,6 +1,6 @@
 import { addNode, enableModule } from "@jahia/cypress";
 import { addEventPageAndEvents, addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 
 describe("Content templates resolution testsuite", () => {
   before("Create test page and contents", () => {
@@ -79,14 +79,20 @@ describe("Content templates resolution testsuite", () => {
     });
   });
 
-  beforeEach('Login', () => { cy.login(); });
-  afterEach('Logout', () => { cy.logout(); });
+  beforeEach("Login", () => {
+    cy.login();
+  });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
   it("Verify content template for jnt:event is correctly displayed", function () {
     cy.visit(
       `/jahia/page-composer/default/en/sites/${GENERIC_SITE_KEY}/home/testEvents/events/event-a.full.html`,
     );
-    cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testEvents/events/event-a.full.html`);
+    cy.visit(
+      `/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testEvents/events/event-a.full.html`,
+    );
 
     // Check template is good:
     cy.get('div[class="header"]').should("be.visible");
@@ -99,7 +105,9 @@ describe("Content templates resolution testsuite", () => {
   });
 
   it("Verify findDisplayableNode is correctly resolving jnt:event that is using a JS content template", function () {
-    cy.visit(`/jahia/page-composer/default/en/sites/${GENERIC_SITE_KEY}/home/testFindDisplayableNode.html`);
+    cy.visit(
+      `/jahia/page-composer/default/en/sites/${GENERIC_SITE_KEY}/home/testFindDisplayableNode.html`,
+    );
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testFindDisplayableNode.html`);
 
     cy.get('p[data-testid="displayableContent"]').contains(

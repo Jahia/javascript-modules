@@ -9,7 +9,7 @@ export default function SampleRenderInBrowserReact({ path }: { path: string }) {
   };
 
   useEffect(() => {
-    let timeoutID: NodeJS.Timeout;
+    let timeoutID: number;
     if (counter > 0) {
       timeoutID = setTimeout(() => setCounter(counter - 1), 1000);
     }

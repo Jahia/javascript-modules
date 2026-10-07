@@ -15,7 +15,6 @@ permissions:
   actions: read
   checks: write
   contents: read
-  id-token: write
 
 concurrency:
   # ensure there is at most one execution of this workflow at any time
@@ -27,7 +26,7 @@ jobs:
     name: Update module signature
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jahia/jahia-modules-action/update-signature@v2
         with:
           nexus_username: ${{ secrets.NEXUS_USERNAME }}
@@ -45,7 +44,7 @@ jobs:
         username: ${{ secrets.GH_PACKAGES_USERNAME }}
         password: ${{ secrets.GH_PACKAGES_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jahia/jahia-modules-action/build@v2
         with:
           # the test module is built as part of the Maven build
@@ -90,11 +89,7 @@ jobs:
         username: ${{ secrets.GH_PACKAGES_USERNAME }}
         password: ${{ secrets.GH_PACKAGES_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup .yarnrc.yml file to allow publication to https://registry.npmjs.org with a 'yarn npm publish'
-        shell: bash
-        run: |
-          echo "npmAuthToken: ${{ secrets.NPMJS_PUBLISH_TOKEN }}" >> ~/.yarnrc.yml
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jahia/jahia-modules-action/publish@v2
         with:
           # the test module is built as part of the Maven build

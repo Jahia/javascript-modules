@@ -22,10 +22,16 @@ import { AddResources } from "../AddResources.js";
  * It takes an optional `clientOnly` prop:
  *
  * - By default or when set to `false`, the component will be rendered on the server and hydrated in
- *   the browser. In this case, children are passed to the component.
+ *   the browser.
  * - When set to `true`, the component will be rendered only in the browser, skipping the server-side
- *   rendering step. This is useful for components that cannot be rendered on the server. In this
- *   case, children are used as a placeholder until the component is hydrated.
+ *   rendering step. This is useful for components that cannot be rendered on the server.
+ * - When set to `"hide-children-while-loading"`, the component is client-only, and its children are
+ *   hidden until the component is rendered.
+ *
+ * In all cases, children are rendered on the server and passed to the component. In client-only
+ * mode, they are displayed until the component is rendered: if the component does not render its
+ * children, they act as a placeholder. Use `"hide-children-while-loading"` when children must only
+ * be displayed inside the component (e.g. in a modal).
  */
 // @ts-expect-error TS complains that the signature does not match the implementation, but it does
 export function Island<Props>(
@@ -50,59 +56,53 @@ export function Island<Props>(
           props: Omit<Props, "children">;
         }) &
     (Props extends { children: infer Children }
-      ? // If the component has mandatory children, it cannot be client-only
+      ? // If the component has mandatory children, they must be passed
         {
           /**
            * If false or undefined, the component will be rendered on the server. If true,
-           * server-side rendering will be skipped.
+           * server-side rendering will be skipped, and children will be displayed until the
+           * component is rendered. If `"hide-children-while-loading"`, server-side rendering will
+           * be skipped, and children will only be displayed inside the component.
            */
-          clientOnly?: false;
+          clientOnly?: boolean | "hide-children-while-loading";
           /** The children to render inside the component. */
           children: Children;
         }
       : "children" extends keyof Props
-        ? // If the component has optional children, it may be client-only or not
-            | {
-                // In SSR mode, the children are passed to the component and must be of the correct type
-                /**
-                 * If false or undefined, the component will be rendered on the server. If true,
-                 * server-side rendering will be skipped.
-                 */
-                clientOnly?: false;
-                /** The children to render inside the component. */
-                children?: Props["children"];
-              }
-            | {
-                // In CSR mode, the children are used as a placeholder and may be of any type
-                /**
-                 * If false or undefined, the component will be rendered on the server. If true,
-                 * server-side rendering will be skipped.
-                 */
-                clientOnly: true;
-                /** Placeholder content until the component is rendered on the client. */
-                children?: ReactNode;
-              }
+        ? // If the component has optional children, they may be passed or not
+          {
+            /**
+             * If false or undefined, the component will be rendered on the server. If true,
+             * server-side rendering will be skipped, and children will be displayed until the
+             * component is rendered. If `"hide-children-while-loading"`, server-side rendering will
+             * be skipped, and children will only be displayed inside the component.
+             */
+            clientOnly?: boolean | "hide-children-while-loading";
+            /** The children to render inside the component. */
+            children?: Props["children"];
+          }
         : // If the component has no children, it may be client-only or not
-            | {
-                // In SSR mode, the component cannot have children
-                /**
-                 * If false or undefined, the component will be rendered on the server. If true,
-                 * server-side rendering will be skipped.
-                 */
-                clientOnly?: false;
-                // Prevent children from being passed to the component
-                children?: never;
-              }
-            | {
-                // In CSR mode, the children are used as a placeholder and may be of any type
-                /**
-                 * If false or undefined, the component will be rendered on the server. If true,
-                 * server-side rendering will be skipped.
-                 */
-                clientOnly: true;
-                /** Placeholder content until the component is rendered on the client. */
-                children?: ReactNode;
-              }),
+          | {
+              // In SSR mode, the component cannot have children
+              /**
+               * If false or undefined, the component will be rendered on the server. If true,
+               * server-side rendering will be skipped.
+               */
+              clientOnly?: false;
+              // Prevent children from being passed to the component
+              children?: never;
+            }
+          | {
+              // In CSR mode, the children are not rendered by the component: they are only
+              // displayed as a placeholder until the component is rendered on the client
+              /**
+               * If false or undefined, the component will be rendered on the server. If true,
+               * server-side rendering will be skipped.
+               */
+              clientOnly: true;
+              /** Placeholder content until the component is rendered on the client. */
+              children?: ReactNode;
+            }),
 ): ReactNode;
 
 // We use an overload rather than a single function because some props (e.g. children) are not always defined
@@ -114,7 +114,7 @@ export function Island({
 }: Readonly<{
   component: ComponentType<{ children?: ReactNode }>;
   props?: Record<string, unknown>;
-  clientOnly?: boolean;
+  clientOnly?: boolean | "hide-children-while-loading";
   children?: ReactNode;
 }>): ReactNode {
   const { bundleKey, currentResource } = useServerContext();
@@ -192,31 +192,37 @@ export function Island({
       {
         // We use a custom element to create the hydration marker, rather than a div or a span,
         // to prevent a broken DOM structure in the browser. (e.g. a `<div>` inside a `<p>`)
-        createElement("jsm-island", {
-          "style": { display: "contents" },
-          "data-client-only": clientOnly ? true : undefined,
-          "data-src": entry,
-          "data-lang": language,
-          "data-bundle": bundleKey,
-          "children": [
-            props !== undefined && (
-              <script type="application/json">{devalue.stringify(props)}</script>
-            ),
-            clientOnly ? (
-              children
-            ) : (
-              <I18nextProvider i18n={i18n} defaultNS={bundleKey}>
-                <Component
-                  {...props}
-                  children={createElement("jsm-children", {
-                    style: { display: "contents" },
-                    children,
-                  })}
-                />
-              </I18nextProvider>
-            ),
-          ],
-        })
+        createElement(
+          "jsm-island",
+          {
+            "style": { display: "contents" },
+            "data-client-only": clientOnly ? true : undefined,
+            "data-src": entry,
+            "data-lang": language,
+            "data-bundle": bundleKey,
+          },
+          props !== undefined && (
+            <script type="application/json">{devalue.stringify(props)}</script>
+          ),
+          clientOnly ? (
+            // Children are sent to the client, which will move them into the component
+            createElement(
+              "jsm-children",
+              {
+                style: {
+                  display: clientOnly === "hide-children-while-loading" ? "none" : "contents",
+                },
+              },
+              children,
+            )
+          ) : (
+            <I18nextProvider i18n={i18n} defaultNS={bundleKey}>
+              <Component {...props}>
+                {createElement("jsm-children", { style: { display: "contents" } }, children)}
+              </Component>
+            </I18nextProvider>
+          ),
+        )
       }
     </>
   );

@@ -1,6 +1,6 @@
 import { addNode } from "@jahia/cypress";
 import { addEvent, addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 
 describe("getNodesByJCRQuery function test", () => {
   const initEvent = (index: number) => {
@@ -50,9 +50,13 @@ describe("getNodesByJCRQuery function test", () => {
       });
     });
   });
-  
-  beforeEach("Login", () => { cy.login(); });
-  afterEach("Logout", () => { cy.logout(); });
+
+  beforeEach("Login", () => {
+    cy.login();
+  });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
   // dynmically generated test cases
   [

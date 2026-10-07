@@ -104,7 +104,7 @@ This code tells Jahia how to render the `heroSection` node type as a React compo
 
 The file is named `default.server.tsx` because it's the `default` view for the Hero Section `server` component. We'll create non-default views later.
 
-`buildNodeUrl` is a helper to transform a node into a URL to its content. We'll need this every time we want to reference a resource in the browser: for `<img />`, `<a />`, `background-image`, etc.
+`buildNodeUrl` is a helper to transform a node into a URL to its content. We'll need this every time we want to reference a resource in the browser: for `<a />`, `background-image`, etc. It is the simplest building block; in the blog section, we'll introduce `<JImage />`, a component that turns an image node into a fully responsive `<img />`.
 
 We named this file `default.server.tsx` because it's the default view for this node type; the same node type can have multiple views, each with its own rendering logic.
 

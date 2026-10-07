@@ -32,7 +32,7 @@ i18n
     fallbackLng: "en",
     ns: "javascript-modules-engine",
     defaultNS: "javascript-modules-engine",
-    initImmediate: false,
+    initAsync: false,
     react: {
       useSuspense: false,
     },

@@ -1,6 +1,6 @@
 import { enableModule, publishAndWaitJobEnding } from "@jahia/cypress";
 import { addEvent, addEventPageAndEvents, addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 
 describe("Check on bound components", () => {
   before(() => {
@@ -18,8 +18,12 @@ describe("Check on bound components", () => {
     });
   });
 
-  beforeEach('Login', () => {  cy.login(); });
-  afterEach('Logout', () => { cy.logout(); });
+  beforeEach("Login", () => {
+    cy.login();
+  });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
   const validateNumberOfEventInCalendar = (expectedNumber: number) => {
     cy.get(`span[class*="fc-event-title"]:contains("${expectedNumber}")`).should("exist");
@@ -113,7 +117,9 @@ describe("Check on bound components", () => {
 
   it("Test boundComponent behavior with area/list creation by edit mode", function () {
     // The page have been published without rendering in edit mode, list for area won't be created yet, check live:
-    cy.visit(`/sites/${GENERIC_SITE_KEY}/home/testBoundComponent.html`, { failOnStatusCode: false });
+    cy.visit(`/sites/${GENERIC_SITE_KEY}/home/testBoundComponent.html`, {
+      failOnStatusCode: false,
+    });
     cy.get('[data-testid="boundComponent_path"]').should("contain", "null");
     // Check preview:
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/testBoundComponent.html`);
@@ -137,12 +143,16 @@ describe("Check on bound components", () => {
       `/${GENERIC_SITE_KEY}/home/testBoundComponent/events`,
     );
     // Retest live that should still not be correct, since we didn't publish the changes
-    cy.visit(`/sites/${GENERIC_SITE_KEY}/home/testBoundComponent.html`, { failOnStatusCode: false });
+    cy.visit(`/sites/${GENERIC_SITE_KEY}/home/testBoundComponent.html`, {
+      failOnStatusCode: false,
+    });
     cy.get('[data-testid="boundComponent_path"]').should("contain", "null");
 
     // Publish the changes, and retest live that should be correct
     publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}/home/testBoundComponent`);
-    cy.visit(`/sites/${GENERIC_SITE_KEY}/home/testBoundComponent.html`, { failOnStatusCode: false });
+    cy.visit(`/sites/${GENERIC_SITE_KEY}/home/testBoundComponent.html`, {
+      failOnStatusCode: false,
+    });
     cy.get('[data-testid="boundComponent_path"]').should(
       "contain",
       `/${GENERIC_SITE_KEY}/home/testBoundComponent/events`,

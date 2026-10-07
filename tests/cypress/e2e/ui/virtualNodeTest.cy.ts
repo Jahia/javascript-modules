@@ -1,6 +1,6 @@
 import { addNode, createUser, deleteUser } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 
 describe("Test virtual nodes", () => {
   const pageName = "testVirtualNode";
@@ -21,8 +21,12 @@ describe("Test virtual nodes", () => {
     });
   });
 
-  beforeEach('Login', () => { cy.login(); });
-  afterEach('Logout', () => { cy.logout(); });
+  beforeEach("Login", () => {
+    cy.login();
+  });
+  afterEach("Logout", () => {
+    cy.logout();
+  });
 
   it(`${pageName}: Check virtual nodes are correctly rendered in preview mode`, function () {
     cy.visit(`/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/${pageName}.html`);

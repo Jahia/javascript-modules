@@ -1,6 +1,5 @@
 // @ts-check
-import { defineConfig } from "eslint/config";
-import { includeIgnoreFile } from "@eslint/compat";
+import { defineConfig, includeIgnoreFile } from "eslint/config";
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import path from "node:path";
@@ -17,14 +16,23 @@ export default defineConfig(
 
   // JS/TS recommended
   eslint.configs.recommended,
-  { files: ["**/*.ts", "**/*.tsx"], extends: tseslint.configs.recommended },
+  {
+    files: ["**/*.ts", "**/*.tsx"],
+    extends: tseslint.configs.recommended,
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
 
   // React
   eslintReact.configs["recommended-typescript"],
   {
     rules: {
       // We know what we're doing
-      "@eslint-react/dom/no-dangerously-set-innerhtml": "off",
+      "@eslint-react/dom-no-dangerously-set-innerhtml": "off",
     },
   },
 
@@ -40,5 +48,11 @@ export default defineConfig(
 
   // Ignore the same files as .gitignore
   includeIgnoreFile(path.resolve(import.meta.dirname, ".gitignore")),
-  { ignores: ["**/fixtures/expected/**"] },
+  { ignores: ["**/fixtures/**", "./javascript-create-module/templates/**"] },
+
+  // No rules of hook during server-side rendering
+  {
+    files: ["./javascript-modules-library/src/**"],
+    rules: { "@eslint-react/rules-of-hooks": "off" },
+  },
 );

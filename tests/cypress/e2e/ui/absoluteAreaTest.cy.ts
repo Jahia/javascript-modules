@@ -1,6 +1,6 @@
 import { addNode, enableModule } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 import "cypress-wait-until";
 
 describe("Absolute Area test", () => {

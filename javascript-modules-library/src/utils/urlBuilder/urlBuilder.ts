@@ -26,6 +26,8 @@ export function buildNodeUrl(
     | {
         /** The query string parameters to append to the URL */
         parameters?: Record<string, string>;
+        /** Prefix the URL with `http(s)://host`. Set to a string to specify the origin explicitly. */
+        absolute?: boolean | string;
         /**
          * The mode to use to build the URL. Defines the mode or override the one provided by the
          * renderContext.
@@ -41,12 +43,24 @@ export function buildNodeUrl(
          * provided by the current resource
          */
         extension?: string;
+        /**
+         * By default `node` will be added to the dependencies of the current view. Set to `false`
+         * to disable.
+         */
+        autocollectDependency?: boolean;
       }
     | {
         /** The query string parameters to append to the URL */
         parameters?: Record<string, string>;
+        /** Prefix the URL with `http(s)://host`. Set to a string to specify the origin explicitly. */
+        absolute?: boolean | string;
         /** Additional arguments used for building the URL, through `node.getUrl` overloads. */
         args?: Record<string, string | number | boolean>;
+        /**
+         * By default `node` will be added to the dependencies of the current view. Set to `false`
+         * to disable.
+         */
+        autocollectDependency?: boolean;
       },
   context?: {
     /** Provided in react context, but you need to provide one otherwise. * */
@@ -59,17 +73,25 @@ export function buildNodeUrl(
   node: JCRNodeWrapper,
   config: {
     parameters?: Record<string, string>;
+    absolute?: string | boolean;
     mode?: "edit" | "preview" | "live";
     language?: string;
     extension?: string;
     args?: Record<string, string | number | boolean>;
+    autocollectDependency?: boolean;
   } = {},
   context: {
     renderContext?: RenderContext;
     currentResource?: Resource;
+    autocollectedDependencies?: Set<string>;
   } = useServerContext(),
 ): string {
   if (!node) throw new Error("Expected a node in buildNodeUrl, received undefined");
+
+  if (config.autocollectDependency !== false && context.autocollectedDependencies) {
+    // getCanonicalPath accounts for mounted and versioned nodes
+    context.autocollectedDependencies.add(node.getCanonicalPath());
+  }
 
   // URL building is an old thing in Jahia, with a lot of branches and special cases:
   // - if any of mode, language or extension is provided, we need to build the URL manually
@@ -82,24 +104,29 @@ export function buildNodeUrl(
       throw new Error("You cannot use args with mode, language or extension in buildNodeUrl.");
     }
 
-    const mode = config.mode ?? context.renderContext?.getMode();
+    const mode = config.mode;
     const language = config.language ?? context.currentResource?.getLocale().toString();
     const extension =
       config.extension ?? `.${context.currentResource?.getTemplateType() ?? "html"}`;
 
-    if (!mode) throw new Error("buildNodeUrl: mode is not defined and cannot be inferred.");
+    if (!mode && !context.renderContext)
+      throw new Error("buildNodeUrl: mode is not defined and cannot be inferred.");
     if (!language) throw new Error("buildNodeUrl: language is not defined and cannot be inferred.");
 
+    // If mode is undefined, preserve the current mode (base): edit, editframe, preview or live
+    // This ensures URLs generated in the editframe point to other editframe URLs
+    const base =
+      mode === undefined && context.renderContext
+        ? context.renderContext.getURLGenerator().getBase(language)
+        : mode === "edit"
+          ? `/cms/edit/default/${language}`
+          : mode === "preview"
+            ? `/cms/render/default/${language}`
+            : `/cms/render/live/${language}`;
+
     return buildEndpointUrl(
-      (mode === "edit"
-        ? "/cms/edit/default/"
-        : mode === "preview"
-          ? "/cms/render/default/"
-          : "/cms/render/live/") +
-        language +
-        node.getPath() +
-        extension,
-      { parameters: config.parameters },
+      base + node.getPath() + extension,
+      { parameters: config.parameters, absolute: config.absolute },
       context,
     );
   }
@@ -110,7 +137,8 @@ export function buildNodeUrl(
     : node.getUrl();
   if (context.renderContext) url = context.renderContext.getResponse().encodeURL(url);
   if (config.parameters) url = appendParameters(url, config.parameters);
-  return url;
+  if (absoluteUrlRegExp.test(url)) return url;
+  return toAbsolute(url, config.absolute, context.renderContext);
 }
 
 /**
@@ -128,6 +156,8 @@ export function buildModuleFileUrl(
     moduleName?: string;
     /** Querystring parameters to append to the URL */
     parameters?: Record<string, string>;
+    /** Prefix the URL with `http(s)://host`. Set to a string to specify the origin explicitly. */
+    absolute?: boolean | string;
   } = {},
   context: {
     /** Provided in react context, you need to provide one (or the module name) otherwise. */
@@ -149,7 +179,7 @@ export function buildModuleFileUrl(
     : context.renderContext?.getURLGenerator().getCurrentModule();
   return buildEndpointUrl(
     `${moduleName}/${filePath}`,
-    { parameters: config.parameters },
+    { parameters: config.parameters, absolute: config.absolute },
     { renderContext: context.renderContext },
   );
 }
@@ -161,6 +191,8 @@ export function buildEndpointUrl(
   config: {
     /** Querystring parameters to append to the URL */
     parameters?: Record<string, string>;
+    /** Prefix the URL with `http(s)://host`. Set to a string to specify the origin explicitly. */
+    absolute?: boolean | string;
   } = {},
   context: {
     /** Provided in react context, you need to provide one otherwise. */
@@ -168,9 +200,24 @@ export function buildEndpointUrl(
   } = useServerContext(),
 ): string {
   let url = endpoint;
-  if (!absoluteUrlRegExp.test(url) && context.renderContext) {
-    url = url.startsWith("/") ? context.renderContext.getRequest().getContextPath() + url : url;
-    url = context.renderContext.getResponse().encodeURL(url);
+  if (!absoluteUrlRegExp.test(url)) {
+    if (context.renderContext) {
+      url = url.startsWith("/") ? context.renderContext.getRequest().getContextPath() + url : url;
+      url = context.renderContext.getResponse().encodeURL(url);
+    }
+    url = toAbsolute(url, config.absolute, context.renderContext);
   }
   return config.parameters ? appendParameters(url, config.parameters) : url;
+}
+
+/** Makes `url` absolute if `absolute` is true or a string specifying the origin */
+function toAbsolute(url: string, absolute?: boolean | string, renderContext?: RenderContext) {
+  if (!absolute) return url;
+  if (typeof absolute === "string") return absolute.replace(/\/+$/, "") + url;
+  if (!renderContext) {
+    throw new Error(
+      `Cannot make an absolute URL for ${url}. Set absolute: "http://..." or provide a RenderContext.`,
+    );
+  }
+  return renderContext.getURLGenerator().getServer() + url;
 }

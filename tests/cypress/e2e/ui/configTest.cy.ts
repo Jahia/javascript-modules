@@ -1,6 +1,6 @@
 import { addNode, publishAndWaitJobEnding } from "@jahia/cypress";
 import { addSimplePage } from "../../utils/helpers";
-import { GENERIC_SITE_KEY } from '../../support/constants';
+import { GENERIC_SITE_KEY } from "../../support/constants";
 
 describe("Test OSGi configuration in views", () => {
   const pageName = "testConfig";

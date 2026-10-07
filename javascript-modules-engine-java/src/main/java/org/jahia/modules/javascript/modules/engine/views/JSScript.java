@@ -18,6 +18,10 @@ package org.jahia.modules.javascript.modules.engine.views;
 import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyObject;
 import org.jahia.modules.javascript.modules.engine.jsengine.GraalVMEngine;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jahia.modules.javascript.modules.engine.js.server.CollectedCacheDependencies;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.RenderException;
 import org.jahia.services.render.Resource;
@@ -61,18 +65,40 @@ public class JSScript implements Script {
 
             viewValues.put("bundle", Value.asValue(jsView.getModule().getBundle()));
             Object executionResult = Value.asValue(viewRenderer.get("render")).execute(resource, renderContext, ProxyObject.fromMap(viewValues));
-            Value value = Value.asValue(executionResult);
-            return value.asString();
+            return readRenderResult(Value.asValue(executionResult), resource);
         }));
 
         if (jsView.isTemplate()) {
-            // Jahia core TemplateNodeFilter is using this attribute to store the template in request for sub fragment cache entries
-            // We need to clean it after template output, in order for cache keys to be generated correctly for the main resource
-            // (part of code necessary to make template inheritance hierarchy and relatives areas working correctly)
+            // Jahia core TemplateNodeFilter is using this attribute to store the template
+            // in request for sub fragment cache entries
+            // We need to clean it after template output, in order for cache keys to be
+            // generated correctly for the main resource
+            // (part of code necessary to make template inheritance hierarchy and relatives
+            // areas working correctly)
             renderContext.getRequest().setAttribute("previousTemplate", null);
         }
 
         return output;
+    }
+
+    /**
+     * Reads what a view renderer returned: the markup, and the cache dependencies
+     * the view autocollected while it rendered.
+     *
+     * @param result   what the renderer returned
+     * @param resource the resource that was rendered
+     * @return the markup
+     */
+    private String readRenderResult(Value result, Resource resource) {
+        Value dependencies = result.getMember("autocollectedDependencies");
+        int length = (int) dependencies.getArraySize();
+        List<String> collected = new ArrayList<>(length);
+        for (int i = 0; i < length; i++) {
+            collected.add(dependencies.getArrayElement(i).asString());
+        }
+        CollectedCacheDependencies.register(resource, collected);
+
+        return result.getMember("html").asString();
     }
 
     @Override
