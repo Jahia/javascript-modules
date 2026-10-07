@@ -29,6 +29,7 @@ jahiaComponent(
         </Island>
         <Island clientOnly component={SampleClientOnlyChildren}>
           <p data-testid="client-only-child">Server-side child of a client-only island</p>
+          <input data-testid="client-only-input" aria-label="Client-only input" />
         </Island>
         <Island clientOnly="hide-children-while-loading" component={SampleModal}>
           <p data-testid="modal-child">Server-side child of a modal</p>

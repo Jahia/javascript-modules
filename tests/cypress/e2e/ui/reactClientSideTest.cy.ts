@@ -71,13 +71,20 @@ describe("Verify client side component are rehydrated as expected", () => {
         "contain",
         "Server-side child of a client-only island",
       );
-      // Children are kept when unmounted and mounted again
+      // Children are kept when unmounted and mounted again, with their DOM state
+      cy.get('[data-testid="client-only-children"] [data-testid="client-only-input"]').type(
+        "Preserved state",
+      );
       cy.get('button[data-testid="client-only-toggle"]').click();
       cy.get('[data-testid="client-only-child"]').should("not.exist");
       cy.get('button[data-testid="client-only-toggle"]').click();
       cy.get('[data-testid="client-only-children"] [data-testid="client-only-child"]').should(
         "contain",
         "Server-side child of a client-only island",
+      );
+      cy.get('[data-testid="client-only-children"] [data-testid="client-only-input"]').should(
+        "have.value",
+        "Preserved state",
       );
 
       // Check that hidden children are displayed inside the component once loaded
