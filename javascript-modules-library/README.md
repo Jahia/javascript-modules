@@ -17,10 +17,16 @@ This component creates an island of interactivity on the page, following the [Is
 It takes an optional `clientOnly` prop:
 
 - By default or when set to `false`, the component will be rendered on the server and hydrated in
-  the browser. In this case, children are passed to the component.
+  the browser.
 - When set to `true`, the component will be rendered only in the browser, skipping the server-side
-  rendering step. This is useful for components that cannot be rendered on the server. In this
-  case, children are used as a placeholder until the component is hydrated.
+  rendering step. This is useful for components that cannot be rendered on the server.
+- When set to `"hide-children-while-loading"`, the component is client-only, and its children are
+  hidden until the component is rendered.
+
+In all cases, children are rendered on the server and passed to the component. In client-only mode,
+they are displayed until the component is rendered: if the component does not render its children,
+they act as a placeholder. Use `"hide-children-while-loading"` when children must only be displayed
+inside the component (e.g. in a modal).
 
 ### `Render`
 
