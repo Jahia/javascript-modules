@@ -80,7 +80,7 @@ describe("Verify client side component are rehydrated as expected", () => {
         "Server-side child of a client-only island",
       );
 
-      // Check that children are only displayed inside the component when requested
+      // Check that hidden children are displayed inside the component once loaded
       cy.get('[data-testid="modal"] [data-testid="modal-child"]').should("be.visible");
     });
 

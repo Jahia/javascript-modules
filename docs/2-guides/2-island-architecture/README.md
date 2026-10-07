@@ -301,7 +301,7 @@ A few things to note:
 - The `{children}` insertion point must always be there. If you want to hide the children of your component, use CSS instead of a JS condition. Otherwise, they will not be sent to the client and your component will appear to have no children. (This does not apply to `clientOnly` mode, see below.)
 - Children will be wrapped in a `jsm-children` element. This should not affect your code most of the time, but don't use the `>` CSS selector to target children of your component.
 
-This also works in `clientOnly` mode: the children are displayed as is until the client component is loaded, then moved into it. The same DOM elements are reused, so their state (e.g. form inputs or nested islands) is preserved. Because the children are always sent to the client, your component may render them conditionally: they are kept while hidden, and restored when rendered again.
+Children are also passed to the component in `clientOnly` mode: they are displayed as is until the client component is loaded, then moved into it. The same DOM elements are reused, so their state (e.g. form inputs or nested islands) is preserved. Because the children are always sent to the client, your component may render them conditionally: they are kept while hidden, and restored when rendered again.
 
 If your island component does not render its children, they are only displayed until the client component is loaded, acting as a placeholder.
 

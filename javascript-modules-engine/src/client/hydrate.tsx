@@ -35,7 +35,7 @@ const ComponentWrapper = ({
   /** Language string */
   lang: string;
   /** React component */
-  Component: ComponentType<{ children?: React.ReactNode }>;
+  Component: ComponentType<{ children?: ReactNode }>;
   /** Props object for the app component */
   props: Record<string, unknown>;
   /** Server-rendered children */
@@ -73,15 +73,18 @@ const load = async (element: HTMLElement) => {
 
   let children: ReactNode;
   if (hydrate) {
+    // This is a hydration border: hydration will stop here, and the server-rendered content is
+    // kept as is
     children = createElement("jsm-children", {
       dangerouslySetInnerHTML: { __html: "" },
       suppressHydrationWarning: true,
     });
   } else {
     // Keep a reference to the server-rendered children: React will detach them when clearing the
-    // island, and they will be moved into the component in the same commit (no flash of content)
+    // island, and they will be moved into the component in the same commit (no empty frame)
     const holder =
       element.querySelector<HTMLElement>(":scope > jsm-children") ??
+      // In case of broken HTML or cached fragment from older JSM versions
       document.createElement("jsm-children");
     children = <AdoptedChildren holder={holder} />;
   }
