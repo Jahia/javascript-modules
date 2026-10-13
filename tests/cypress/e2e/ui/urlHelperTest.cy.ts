@@ -205,6 +205,13 @@ describe("Test on url helper", () => {
         attribute: "data-url",
         exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
       },
+      // An explicit origin does not replace the origin of a URL that encodeURL made absolute.
+      {
+        dataTestId: "content_link_absolute_origin_cross_site_language_fr",
+        tag: "span",
+        attribute: "data-url",
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
+      },
       {
         dataTestId: "image_static_resource_absolute",
         tag: "span",
@@ -366,6 +373,13 @@ describe("Test on url helper", () => {
       },
       {
         dataTestId: "content_link_absolute_cross_site_language_fr",
+        tag: "span",
+        attribute: "data-url",
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
+      },
+      // An explicit origin does not replace the origin of a URL that encodeURL made absolute.
+      {
+        dataTestId: "content_link_absolute_origin_cross_site_language_fr",
         tag: "span",
         attribute: "data-url",
         exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
@@ -570,6 +584,13 @@ describe("Test on url helper", () => {
         attribute: "data-url",
         exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
       },
+      // An explicit origin does not replace the origin of a URL that encodeURL made absolute.
+      {
+        dataTestId: "content_link_absolute_origin_cross_site_language_fr",
+        tag: "span",
+        attribute: "data-url",
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
+      },
       {
         dataTestId: "image_static_resource_absolute",
         tag: "span",
@@ -731,6 +752,13 @@ describe("Test on url helper", () => {
       },
       {
         dataTestId: "content_link_absolute_cross_site_language_fr",
+        tag: "span",
+        attribute: "data-url",
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
+      },
+      // An explicit origin does not replace the origin of a URL that encodeURL made absolute.
+      {
+        dataTestId: "content_link_absolute_origin_cross_site_language_fr",
         tag: "span",
         attribute: "data-url",
         exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,

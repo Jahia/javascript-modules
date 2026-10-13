@@ -41,7 +41,7 @@ jahiaComponent(
 
     // In live, encodeURL turns a link to another site into an absolute URL on the server name of that
     // site. Jahia does it only when the request host maps to a site, and no test host maps to a site.
-    // This stand-in returns an URL of the same shape: https://other-site.test/<context>/fr/home/...
+    // This stand-in returns a URL of the same shape: https://other-site.test/<context>/fr/home/...
     const crossSiteRenderContext = {
       getRequest: () => renderContext.getRequest(),
       getResponse: () => ({
@@ -238,6 +238,17 @@ jahiaComponent(
                 )}
               >
                 absolute FR, already made absolute by encodeURL
+              </span>
+            </div>
+            <div data-testid="content_link_absolute_origin_cross_site_language_fr">
+              <span
+                data-url={buildNodeUrl(
+                  linkNodeRef,
+                  { absolute: "https://origin.test/", language: "fr" },
+                  { renderContext: crossSiteRenderContext, currentResource },
+                )}
+              >
+                absolute FR with an explicit origin, already made absolute by encodeURL
               </span>
             </div>
             <div data-testid="action_url">
