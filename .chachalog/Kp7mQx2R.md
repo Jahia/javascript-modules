@@ -7,4 +7,4 @@ javascript-modules: minor
 
 This mechanism is enabled by default but can be disabled on a per-view basis by setting `"cache.autocollectDependencies": "false"` in the view's properties, or on a per-call basis with the new `autocollectDependency: false` option in `buildNodeUrl`.
 
-When a view links to more than 100 contents, a change anywhere in the folder that holds them refreshes the view, and a change in another site never does.
+When a view links to more than 100 contents, a change in a folder that holds many of them also refreshes the view.

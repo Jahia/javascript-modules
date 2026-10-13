@@ -344,11 +344,11 @@ public class RenderHelper {
     }
 
     /**
-     * Collect a cache dependency for the resource being rendered. Unlike
+     * Collect a cache dependency for the fragment being rendered. Unlike
      * {@link #addCacheDependency}, the dependency is registered once the view has
-     * rendered, unless the view sets {@code cache.autocollectDependencies} to
-     * {@code false}, and many collected paths are merged into a few regular
-     * expressions.
+     * rendered. A view that sets {@code cache.autocollectDependencies} to
+     * {@code false} collects nothing. Above 100 paths, the paths are merged into
+     * regular expressions.
      *
      * @param path          the canonical path of the node to add as a dependency
      * @param renderContext the current rendering context

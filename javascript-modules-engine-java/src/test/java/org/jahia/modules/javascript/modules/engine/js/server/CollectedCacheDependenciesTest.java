@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,12 +25,12 @@ public class CollectedCacheDependenciesTest {
         return paths;
     }
 
-    private static String mergedInto(Set<String> dependencies) {
-        CollectedCacheDependencies.Reduced reduced = CollectedCacheDependencies.reduce(dependencies, 100);
-        assertFalse("the dependencies were expected to be merged", reduced.regexps.isEmpty());
-        assertTrue("a merged fragment keeps no exact dependency", reduced.paths.isEmpty());
-        assertEquals(1, reduced.regexps.size());
-        return reduced.regexps.iterator().next();
+    private static String regexp(String folder) {
+        return "/\\Q" + folder.substring(1) + "\\E(/.*)?";
+    }
+
+    private static CollectedCacheDependencies.Reduced reduce(Set<String> dependencies) {
+        return CollectedCacheDependencies.reduce(dependencies, 100);
     }
 
     private static Resource resource(String path) {
@@ -56,11 +54,17 @@ public class CollectedCacheDependenciesTest {
                 });
     }
 
+    /** Starts the render of a cached fragment, as the filter does in prepare. */
+    private static void startRender(HttpServletRequest request, Resource resource, boolean enabled) {
+        request.setAttribute(CollectedCacheDependencies.ATTRIBUTE,
+                new CollectedCacheDependencies.Collector(resource, enabled));
+    }
+
     @Test
     public void shouldKeepEveryDependencyExactWithinBudget() {
         Set<String> dependencies = children("/sites/mysite/contents/posts", 100);
 
-        CollectedCacheDependencies.Reduced reduced = CollectedCacheDependencies.reduce(dependencies, 100);
+        CollectedCacheDependencies.Reduced reduced = reduce(dependencies);
 
         assertEquals(dependencies, reduced.paths);
         assertTrue(reduced.regexps.isEmpty());
@@ -68,56 +72,91 @@ public class CollectedCacheDependenciesTest {
 
     @Test
     public void shouldMergeAListingIntoTheFolderItLivesIn() {
-        String regexp = mergedInto(children("/sites/mysite/contents/posts", 150));
+        CollectedCacheDependencies.Reduced reduced = reduce(children("/sites/mysite/contents/posts", 150));
 
-        assertTrue("/sites/mysite/contents/posts/item-1".matches(regexp));
+        assertTrue(reduced.paths.isEmpty());
+        assertEquals(Set.of(regexp("/sites/mysite/contents/posts")), reduced.regexps);
+        String regexp = reduced.regexps.iterator().next();
         // an edited title lands on a subnode of the item
         assertTrue("/sites/mysite/contents/posts/item-1/j:translation_en".matches(regexp));
-        // the folder may itself be one of the linked nodes: renaming it must flush the
-        // fragment
-        assertTrue("the merged folder itself is covered",
-                "/sites/mysite/contents/posts".matches(regexp));
-        assertFalse("a sibling folder is not covered",
-                "/sites/mysite/contents/events/item-1".matches(regexp));
+        // the folder may itself be one of the linked nodes: renaming it must flush the fragment
+        assertTrue("/sites/mysite/contents/posts".matches(regexp));
+        assertFalse("/sites/mysite/contents/events/item-1".matches(regexp));
     }
 
     @Test
-    public void shouldMergeToTheDeepestSharedFolder() {
-        Set<String> dependencies = children("/sites/mysite/contents/posts", 80);
-        dependencies.addAll(children("/sites/mysite/contents/events", 80));
+    public void shouldKeepALoneLinkOutsideTheListingExact() {
+        Set<String> dependencies = children("/sites/mysite/home", 120);
+        dependencies.add("/sites/mysite/files/logo.png");
 
-        String regexp = mergedInto(dependencies);
+        CollectedCacheDependencies.Reduced reduced = reduce(dependencies);
 
-        assertTrue("/sites/mysite/contents/posts/item-1".matches(regexp));
-        assertTrue("/sites/mysite/contents/events/item-1".matches(regexp));
-        assertFalse("nothing above the shared folder is covered",
-                "/sites/mysite/files/logo.png".matches(regexp));
+        assertEquals(Set.of("/sites/mysite/files/logo.png"), new HashSet<>(reduced.paths));
+        assertEquals(Set.of(regexp("/sites/mysite/home")), reduced.regexps);
+    }
+
+    @Test
+    public void shouldMergeOnlyWhatTheLimitNeeds() {
+        Set<String> dependencies = children("/sites/mysite/contents/events", 80);
+        dependencies.addAll(children("/sites/mysite/contents/posts", 80));
+
+        CollectedCacheDependencies.Reduced reduced = reduce(dependencies);
+
+        // merging one folder brings 160 entries down to 81, so the other one stays exact
+        assertEquals(Set.of(regexp("/sites/mysite/contents/events")), reduced.regexps);
+        assertEquals(children("/sites/mysite/contents/posts", 80), new HashSet<>(reduced.paths));
+    }
+
+    @Test
+    public void shouldMergeTheBiggestFolderFirstAtOneDepth() {
+        Set<String> dependencies = children("/sites/mysite/contents/events", 30);
+        dependencies.addAll(children("/sites/mysite/contents/posts", 90));
+
+        CollectedCacheDependencies.Reduced reduced = reduce(dependencies);
+
+        assertEquals(Set.of(regexp("/sites/mysite/contents/posts")), reduced.regexps);
+        assertEquals(30, reduced.paths.size());
+    }
+
+    @Test
+    public void shouldMergeUpwardsUntilTheEntriesFit() {
+        Set<String> dependencies = new HashSet<>();
+        for (int i = 0; i < 150; i++) {
+            dependencies.add("/sites/mysite/home/section-" + i + "/page");
+        }
+
+        CollectedCacheDependencies.Reduced reduced = reduce(dependencies);
+
+        // no section holds two pages, so the merge goes up to the folder that holds the sections
+        assertTrue(reduced.paths.isEmpty());
+        assertEquals(Set.of(regexp("/sites/mysite/home")), reduced.regexps);
+    }
+
+    @Test
+    public void shouldCompareWholeSegmentsInsideOneSite() {
+        Set<String> dependencies = children("/sites/mysite/contents", 60);
+        dependencies.addAll(children("/sites/mysite/contents2", 60));
+
+        CollectedCacheDependencies.Reduced reduced = reduce(dependencies);
+
+        assertEquals(Set.of(regexp("/sites/mysite/contents")), reduced.regexps);
+        // contents is a character prefix of contents2, but not an ancestor of it
+        assertFalse("/sites/mysite/contents2/item-1".matches(reduced.regexps.iterator().next()));
+        assertEquals(children("/sites/mysite/contents2", 60), new HashSet<>(reduced.paths));
     }
 
     @Test
     public void shouldNeverMergeAboveTheSite() {
-        Set<String> dependencies = children("/sites/mysite/home", 80);
-        dependencies.addAll(children("/sites/mysite/files", 80));
+        Set<String> dependencies = new HashSet<>();
+        for (int i = 0; i < 150; i++) {
+            dependencies.add("/sites/site-" + i + "/home");
+        }
 
-        String regexp = mergedInto(dependencies);
+        CollectedCacheDependencies.Reduced reduced = reduce(dependencies);
 
-        assertTrue("/sites/mysite/home/item-1".matches(regexp));
-        assertTrue("/sites/mysite/files/item-1".matches(regexp));
-        assertFalse("another site is not covered", "/sites/other/home/item-1".matches(regexp));
-    }
-
-    @Test
-    public void shouldMergeEachSiteSeparately() {
-        Set<String> dependencies = children("/sites/mysite/contents", 80);
-        dependencies.addAll(children("/sites/mysite2/contents", 80));
-
-        CollectedCacheDependencies.Reduced reduced = CollectedCacheDependencies.reduce(dependencies, 100);
-
-        // /sites/mysite is a character prefix of /sites/mysite2, but not an ancestor of
-        // it
-        assertTrue(reduced.paths.isEmpty());
-        assertEquals(Set.of("/\\Qsites/mysite/contents\\E(/.*)?", "/\\Qsites/mysite2/contents\\E(/.*)?"),
-                new HashSet<>(reduced.regexps));
+        // no folder below /sites holds two links: the paths stay exact, above the limit
+        assertEquals(dependencies, new HashSet<>(reduced.paths));
+        assertTrue(reduced.regexps.isEmpty());
     }
 
     @Test
@@ -125,23 +164,12 @@ public class CollectedCacheDependenciesTest {
         Set<String> dependencies = children("/sites/mysite/contents", 80);
         dependencies.addAll(children("/users/root/files", 80));
 
-        CollectedCacheDependencies.Reduced reduced = CollectedCacheDependencies.reduce(dependencies, 100);
+        CollectedCacheDependencies.Reduced reduced = reduce(dependencies);
 
-        assertEquals(2, reduced.regexps.size());
+        assertEquals(81, reduced.paths.size() + reduced.regexps.size());
         for (String regexp : reduced.regexps) {
             assertFalse(regexp + " covers another site", "/sites/other/contents/whatever".matches(regexp));
         }
-    }
-
-    @Test
-    public void shouldKeepALoneDependencyOfAnotherSiteExact() {
-        Set<String> dependencies = children("/sites/mysite/contents/posts", 150);
-        dependencies.add("/sites/shared/files/logo.png");
-
-        CollectedCacheDependencies.Reduced reduced = CollectedCacheDependencies.reduce(dependencies, 100);
-
-        assertEquals(Set.of("/sites/shared/files/logo.png"), new HashSet<>(reduced.paths));
-        assertEquals(Set.of("/\\Qsites/mysite/contents/posts\\E(/.*)?"), new HashSet<>(reduced.regexps));
     }
 
     @Test
@@ -149,42 +177,37 @@ public class CollectedCacheDependenciesTest {
         Set<String> dependencies = children("/sites/mysite/contents/posts", 150);
         dependencies.add("/modules/mymodule/templates/one");
 
-        String regexp = mergedInto(dependencies);
+        CollectedCacheDependencies.Reduced reduced = reduce(dependencies);
 
-        assertFalse("/sites/other/contents/whatever".matches(regexp));
-        assertTrue(CollectedCacheDependencies.reduce(Set.of("/modules/mymodule/templates/one"), 100).paths.isEmpty());
+        assertEquals(150, reduced.collected);
+        assertEquals(Set.of(regexp("/sites/mysite/contents/posts")), reduced.regexps);
+        assertTrue(reduce(Set.of("/modules/mymodule/templates/one")).paths.isEmpty());
     }
 
     @Test
     public void shouldQuoteThePathSoADotIsNotAWildcard() {
-        String regexp = mergedInto(children("/sites/mysite/files/my.docs", 150));
+        CollectedCacheDependencies.Reduced reduced = reduce(children("/sites/mysite/files/my.docs", 150));
+        String regexp = reduced.regexps.iterator().next();
 
         assertTrue("/sites/mysite/files/my.docs/item-1".matches(regexp));
         assertFalse("/sites/mysite/files/myXdocs/item-1".matches(regexp));
     }
 
-    private static final Predicate<Resource> ENABLED = resource -> true;
-
-    /** Starts the render of a resource, as the filter does in prepare. */
-    private static void startRender(HttpServletRequest request, Resource resource) {
-        request.setAttribute(CollectedCacheDependencies.ATTRIBUTE, new CollectedCacheDependencies.Collector(resource));
-    }
-
     @Test
-    public void shouldCollectForTheResourceBeingRendered() {
+    public void shouldCollectForTheFragmentBeingRendered() {
         HttpServletRequest request = request();
         Resource parent = resource("/sites/mysite/home");
         Resource child = resource("/sites/mysite/home/area/child");
 
-        startRender(request, parent);
-        CollectedCacheDependencies.collect(request, "/sites/mysite/home/about", ENABLED);
-        // a nested render: the render chain pushes the child's collector, then restores the parent's
+        startRender(request, parent, true);
+        CollectedCacheDependencies.collect(request, "/sites/mysite/home/about");
+        // a nested fragment: the render chain pushes the child's collector, then restores the parent's
         Object parentCollector = request.getAttribute(CollectedCacheDependencies.ATTRIBUTE);
-        startRender(request, child);
-        CollectedCacheDependencies.collect(request, "/sites/mysite/files/logo.png", ENABLED);
+        startRender(request, child, true);
+        CollectedCacheDependencies.collect(request, "/sites/mysite/files/logo.png");
         assertEquals(Set.of("/sites/mysite/files/logo.png"), CollectedCacheDependencies.collected(request, child));
         request.setAttribute(CollectedCacheDependencies.ATTRIBUTE, parentCollector);
-        CollectedCacheDependencies.collect(request, "/sites/mysite/home/contact", ENABLED);
+        CollectedCacheDependencies.collect(request, "/sites/mysite/home/contact");
 
         assertEquals(Set.of("/sites/mysite/home/about", "/sites/mysite/home/contact"),
                 CollectedCacheDependencies.collected(request, parent));
@@ -196,37 +219,30 @@ public class CollectedCacheDependenciesTest {
         Resource first = resource("/sites/mysite/home/teaser");
         Resource second = resource("/sites/mysite/home/teaser");
 
-        startRender(request, first);
-        CollectedCacheDependencies.collect(request, "/sites/mysite/home/about", ENABLED);
+        startRender(request, first, true);
+        CollectedCacheDependencies.collect(request, "/sites/mysite/home/about");
 
         assertTrue(CollectedCacheDependencies.collected(request, second).isEmpty());
         assertEquals(Set.of("/sites/mysite/home/about"), CollectedCacheDependencies.collected(request, first));
     }
 
     @Test
-    public void shouldCollectNothingOutsideARender() {
+    public void shouldCollectNothingOutsideAFragment() {
         HttpServletRequest request = request();
 
-        CollectedCacheDependencies.collect(request, "/sites/mysite/home/about", ENABLED);
+        CollectedCacheDependencies.collect(request, "/sites/mysite/home/about");
 
         assertTrue(CollectedCacheDependencies.collected(request, resource("/sites/mysite/home")).isEmpty());
     }
 
     @Test
-    public void shouldCollectNothingForAViewThatOptedOutAndReadItsViewOnce() {
+    public void shouldCollectNothingForAViewThatOptedOut() {
         HttpServletRequest request = request();
         Resource resource = resource("/sites/mysite/home");
-        AtomicInteger reads = new AtomicInteger();
 
-        startRender(request, resource);
-        for (int i = 0; i < 3; i++) {
-            CollectedCacheDependencies.collect(request, "/sites/mysite/home/item-" + i, r -> {
-                reads.incrementAndGet();
-                return false;
-            });
-        }
+        startRender(request, resource, false);
+        CollectedCacheDependencies.collect(request, "/sites/mysite/home/about");
 
         assertTrue(CollectedCacheDependencies.collected(request, resource).isEmpty());
-        assertEquals(1, reads.get());
     }
 }

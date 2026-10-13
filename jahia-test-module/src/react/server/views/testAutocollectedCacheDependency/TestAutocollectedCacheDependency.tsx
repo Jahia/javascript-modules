@@ -1,4 +1,4 @@
-import { buildNodeUrl, jahiaComponent } from "@jahia/javascript-modules-library";
+import { buildNodeUrl, jahiaComponent, Render } from "@jahia/javascript-modules-library";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
 
 interface Props {
@@ -61,4 +61,26 @@ jahiaComponent(
       testId="callopout"
     />
   ),
+);
+
+/**
+ * The cache stores an include inside the fragment of its parent. The included view builds the URL,
+ * so the parent fragment must depend on the image.
+ */
+jahiaComponent(
+  {
+    nodeType: "javascriptExample:testAutocollectedCacheDependency",
+    name: "includeparent",
+    componentType: "view",
+  },
+  () => <Render advanceRenderingConfig="INCLUDE" view="includedimage" />,
+);
+
+jahiaComponent(
+  {
+    nodeType: "javascriptExample:testAutocollectedCacheDependency",
+    name: "includedimage",
+    componentType: "view",
+  },
+  ({ image }: Props) => <ImageAndRenderMarker src={buildNodeUrl(image)} testId="included" />,
 );
