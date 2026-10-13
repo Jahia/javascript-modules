@@ -8,6 +8,10 @@ describe("Cache dependencies collected by the URL builder", () => {
   const IMAGE = "autocollected.jpg";
   const RENAMED = "autocollected-renamed.jpg";
   const LIVE_PAGE = `/cms/render/live/en/sites/${GENERIC_SITE_KEY}/home/${PAGE}.html`;
+  /** The test ids of the views whose dependency is collected */
+  const COLLECTED = ["autocollected", "explicitcontext"];
+  /** The test ids of the views that opted out, for the whole view or for one call */
+  const OPTED_OUT = ["optedout", "callopout"];
 
   /** Renders LIVE_PAGE as an anonymous visitor */
   const renderLive = () =>
@@ -36,7 +40,7 @@ describe("Cache dependencies collected by the URL builder", () => {
       ],
     });
 
-  before("Create the page, the image and the two contents referencing it", () => {
+  before("Create the page, the image and the contents referencing it", () => {
     cy.fixture("testData/image.jpg", "binary").then((content) => {
       const blob = Cypress.Blob.binaryStringToBlob(content, "image/jpeg");
       cy.apollo({
@@ -59,6 +63,16 @@ describe("Cache dependencies collected by the URL builder", () => {
         ["jmix:renderable"],
         [{ name: "j:view", value: "noautocollect", type: "STRING" }],
       );
+      addImageReference(
+        "explicitContext",
+        ["jmix:renderable"],
+        [{ name: "j:view", value: "explicitcontext", type: "STRING" }],
+      );
+      addImageReference(
+        "callOptOut",
+        ["jmix:renderable"],
+        [{ name: "j:view", value: "callopout", type: "STRING" }],
+      );
     });
 
     publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}`);
@@ -70,20 +84,20 @@ describe("Cache dependencies collected by the URL builder", () => {
     publishAndWaitJobEnding(`/sites/${GENERIC_SITE_KEY}`);
   });
 
-  it("flushes the view that built the URL, and leaves the one that opted out", () => {
+  it("flushes the views that built the URL, and leaves the ones that opted out", () => {
     renderLive().then((first) => {
-      expect(imageSrc(first, "autocollected")).to.include(`/files/live${FILES}/${IMAGE}`);
-      expect(imageSrc(first, "optedout")).to.include(`/files/live${FILES}/${IMAGE}`);
+      for (const view of [...COLLECTED, ...OPTED_OUT]) {
+        expect(imageSrc(first, view), view).to.include(`/files/live${FILES}/${IMAGE}`);
+      }
 
       // Liveness: without cached fragments there is nothing for the rename to flush, and every
       // assertion below would pass on a page that is simply rendered afresh every time.
       renderLive().then((second) => {
-        expect(renderedAt(second, "autocollected"), "the fragment must be cached").to.eq(
-          renderedAt(first, "autocollected"),
-        );
-        expect(renderedAt(second, "optedout"), "the fragment must be cached").to.eq(
-          renderedAt(first, "optedout"),
-        );
+        for (const view of [...COLLECTED, ...OPTED_OUT]) {
+          expect(renderedAt(second, view), `the ${view} fragment must be cached`).to.eq(
+            renderedAt(first, view),
+          );
+        }
 
         cy.apollo({
           mutationFile: "graphql/jcrRenameNode.graphql",
@@ -102,16 +116,19 @@ describe("Cache dependencies collected by the URL builder", () => {
         cy.request(`/files/live${FILES}/${RENAMED}`).its("status").should("eq", 200);
 
         renderLive().then((third) => {
-          expect(
-            renderedAt(third, "autocollected"),
-            "the collected view must be flushed",
-          ).to.not.eq(renderedAt(first, "autocollected"));
-          expect(imageSrc(third, "autocollected")).to.include(`/files/live${FILES}/${RENAMED}`);
+          for (const view of COLLECTED) {
+            expect(renderedAt(third, view), `the ${view} view must be flushed`).to.not.eq(
+              renderedAt(first, view),
+            );
+            expect(imageSrc(third, view), view).to.include(`/files/live${FILES}/${RENAMED}`);
+          }
 
-          expect(renderedAt(third, "optedout"), "the opted-out view must be untouched").to.eq(
-            renderedAt(first, "optedout"),
-          );
-          expect(imageSrc(third, "optedout")).to.include(`/files/live${FILES}/${IMAGE}`);
+          for (const view of OPTED_OUT) {
+            expect(renderedAt(third, view), `the ${view} view must be untouched`).to.eq(
+              renderedAt(first, view),
+            );
+            expect(imageSrc(third, view), view).to.include(`/files/live${FILES}/${IMAGE}`);
+          }
         });
       });
     });

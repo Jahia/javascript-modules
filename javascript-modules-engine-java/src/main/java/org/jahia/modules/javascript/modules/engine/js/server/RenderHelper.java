@@ -344,6 +344,20 @@ public class RenderHelper {
     }
 
     /**
+     * Collect a cache dependency for the resource being rendered. Unlike
+     * {@link #addCacheDependency}, the dependency is registered once the view has
+     * rendered, unless the view sets {@code cache.autocollectDependencies} to
+     * {@code false}, and many collected paths are merged into a few regular
+     * expressions.
+     *
+     * @param path          the canonical path of the node to add as a dependency
+     * @param renderContext the current rendering context
+     */
+    public void autocollectCacheDependency(String path, RenderContext renderContext) {
+        CollectedCacheDependencies.collect(renderContext.getRequest(), path);
+    }
+
+    /**
      * Calculate the relative path from one node to another node.
      *
      * @param currentPath the path of the current node from which to calculate the

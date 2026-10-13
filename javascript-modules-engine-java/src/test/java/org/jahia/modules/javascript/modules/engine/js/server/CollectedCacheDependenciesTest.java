@@ -4,9 +4,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.jahia.services.render.Resource;
 import org.junit.Test;
 
 public class CollectedCacheDependenciesTest {
@@ -25,6 +31,27 @@ public class CollectedCacheDependenciesTest {
         assertTrue("a merged fragment keeps no exact dependency", reduced.paths.isEmpty());
         assertEquals(1, reduced.regexps.size());
         return reduced.regexps.iterator().next();
+    }
+
+    private static Resource resource(String path) {
+        return new Resource(path, path, null, "html", "default", "module");
+    }
+
+    /** A request that only keeps its attributes. */
+    private static HttpServletRequest request() {
+        Map<Object, Object> attributes = new HashMap<>();
+        return (HttpServletRequest) Proxy.newProxyInstance(HttpServletRequest.class.getClassLoader(),
+                new Class<?>[] {HttpServletRequest.class}, (proxy, method, args) -> {
+                    switch (method.getName()) {
+                        case "getAttribute":
+                            return attributes.get(args[0]);
+                        case "setAttribute":
+                            attributes.put(args[0], args[1]);
+                            return null;
+                        default:
+                            throw new UnsupportedOperationException(method.getName());
+                    }
+                });
     }
 
     @Test
@@ -66,41 +93,64 @@ public class CollectedCacheDependenciesTest {
     }
 
     @Test
-    public void shouldCompareWholeSegmentsRatherThanCharacters() {
+    public void shouldNeverMergeAboveTheSite() {
+        Set<String> dependencies = children("/sites/mysite/home", 80);
+        dependencies.addAll(children("/sites/mysite/files", 80));
+
+        String regexp = mergedInto(dependencies);
+
+        assertTrue("/sites/mysite/home/item-1".matches(regexp));
+        assertTrue("/sites/mysite/files/item-1".matches(regexp));
+        assertFalse("another site is not covered", "/sites/other/home/item-1".matches(regexp));
+    }
+
+    @Test
+    public void shouldMergeEachSiteSeparately() {
         Set<String> dependencies = children("/sites/mysite/contents", 80);
         dependencies.addAll(children("/sites/mysite2/contents", 80));
 
-        String regexp = mergedInto(dependencies);
+        CollectedCacheDependencies.Reduced reduced = CollectedCacheDependencies.reduce(dependencies, 100);
 
         // /sites/mysite is a character prefix of /sites/mysite2, but not an ancestor of
         // it
-        assertTrue("/sites/mysite2/contents/item-1".matches(regexp));
-        assertTrue("/sites/mysite/contents/item-1".matches(regexp));
+        assertTrue(reduced.paths.isEmpty());
+        assertEquals(Set.of("/\\Qsites/mysite/contents\\E(/.*)?", "/\\Qsites/mysite2/contents\\E(/.*)?"),
+                new HashSet<>(reduced.regexps));
     }
 
     @Test
-    public void shouldMergeToTheRepositoryRootWhenNothingIsShared() {
+    public void shouldNeverMergeToTheRepositoryRoot() {
         Set<String> dependencies = children("/sites/mysite/contents", 80);
         dependencies.addAll(children("/users/root/files", 80));
 
-        String regexp = mergedInto(dependencies);
+        CollectedCacheDependencies.Reduced reduced = CollectedCacheDependencies.reduce(dependencies, 100);
 
-        assertTrue("/sites/mysite/contents/item-1".matches(regexp));
-        assertTrue("/users/root/files/item-1".matches(regexp));
-        assertTrue("a fragment merged to the root is flushed by anything",
-                "/sites/other/contents/whatever".matches(regexp));
+        assertEquals(2, reduced.regexps.size());
+        for (String regexp : reduced.regexps) {
+            assertFalse(regexp + " covers another site", "/sites/other/contents/whatever".matches(regexp));
+        }
     }
 
     @Test
-    public void shouldLetOneStrayDependencyWidenTheMerge() {
+    public void shouldKeepALoneDependencyOfAnotherSiteExact() {
+        Set<String> dependencies = children("/sites/mysite/contents/posts", 150);
+        dependencies.add("/sites/shared/files/logo.png");
+
+        CollectedCacheDependencies.Reduced reduced = CollectedCacheDependencies.reduce(dependencies, 100);
+
+        assertEquals(Set.of("/sites/shared/files/logo.png"), new HashSet<>(reduced.paths));
+        assertEquals(Set.of("/\\Qsites/mysite/contents/posts\\E(/.*)?"), new HashSet<>(reduced.regexps));
+    }
+
+    @Test
+    public void shouldDropModuleDependenciesAsTheCoreCacheDoes() {
         Set<String> dependencies = children("/sites/mysite/contents/posts", 150);
         dependencies.add("/modules/mymodule/templates/one");
 
         String regexp = mergedInto(dependencies);
 
-        // The stray path shares no first segment with the listing, so the merge reaches
-        // the root
-        assertTrue("/sites/other/contents/whatever".matches(regexp));
+        assertFalse("/sites/other/contents/whatever".matches(regexp));
+        assertTrue(CollectedCacheDependencies.reduce(Set.of("/modules/mymodule/templates/one"), 100).paths.isEmpty());
     }
 
     @Test
@@ -109,5 +159,47 @@ public class CollectedCacheDependenciesTest {
 
         assertTrue("/sites/mysite/files/my.docs/item-1".matches(regexp));
         assertFalse("/sites/mysite/files/myXdocs/item-1".matches(regexp));
+    }
+
+    @Test
+    public void shouldCollectForTheResourceBeingRendered() {
+        HttpServletRequest request = request();
+        Resource parent = resource("/sites/mysite/home");
+        Resource child = resource("/sites/mysite/home/area/child");
+
+        request.setAttribute(CollectedCacheDependencies.CURRENT_RESOURCE, parent);
+        CollectedCacheDependencies.collect(request, "/sites/mysite/home/about");
+        // a nested render: the core render chain sets the child, then restores the parent
+        request.setAttribute(CollectedCacheDependencies.CURRENT_RESOURCE, child);
+        CollectedCacheDependencies.collect(request, "/sites/mysite/files/logo.png");
+        request.setAttribute(CollectedCacheDependencies.CURRENT_RESOURCE, parent);
+        CollectedCacheDependencies.collect(request, "/sites/mysite/home/contact");
+
+        assertEquals(Set.of("/sites/mysite/files/logo.png"), CollectedCacheDependencies.take(request, child));
+        assertEquals(Set.of("/sites/mysite/home/about", "/sites/mysite/home/contact"),
+                CollectedCacheDependencies.take(request, parent));
+        assertTrue("take removes what it returns", CollectedCacheDependencies.take(request, parent).isEmpty());
+    }
+
+    @Test
+    public void shouldTellTwoRendersOfOneNodeApart() {
+        HttpServletRequest request = request();
+        Resource first = resource("/sites/mysite/home/teaser");
+        Resource second = resource("/sites/mysite/home/teaser");
+
+        request.setAttribute(CollectedCacheDependencies.CURRENT_RESOURCE, first);
+        CollectedCacheDependencies.collect(request, "/sites/mysite/home/about");
+
+        assertTrue(CollectedCacheDependencies.take(request, second).isEmpty());
+        assertEquals(Set.of("/sites/mysite/home/about"), CollectedCacheDependencies.take(request, first));
+    }
+
+    @Test
+    public void shouldCollectNothingOutsideARender() {
+        HttpServletRequest request = request();
+
+        CollectedCacheDependencies.collect(request, "/sites/mysite/home/about");
+
+        assertTrue(CollectedCacheDependencies.take(request, resource("/sites/mysite/home")).isEmpty());
     }
 }
