@@ -26,7 +26,10 @@ export function buildNodeUrl(
     | {
         /** The query string parameters to append to the URL */
         parameters?: Record<string, string>;
-        /** Prefix the URL with `http(s)://host`. Set to a string to specify the origin explicitly. */
+        /**
+         * Prefix the URL with `http(s)://host`. Set to a string to specify the origin explicitly. A
+         * URL that is already absolute, such as a live link to another site, keeps its own origin.
+         */
         absolute?: boolean | string;
         /**
          * The mode to use to build the URL. Defines the mode or override the one provided by the
@@ -52,7 +55,10 @@ export function buildNodeUrl(
     | {
         /** The query string parameters to append to the URL */
         parameters?: Record<string, string>;
-        /** Prefix the URL with `http(s)://host`. Set to a string to specify the origin explicitly. */
+        /**
+         * Prefix the URL with `http(s)://host`. Set to a string to specify the origin explicitly. A
+         * URL that is already absolute, such as a live link to another site, keeps its own origin.
+         */
         absolute?: boolean | string;
         /** Additional arguments used for building the URL, through `node.getUrl` overloads. */
         args?: Record<string, string | number | boolean>;
@@ -137,7 +143,6 @@ export function buildNodeUrl(
     : node.getUrl();
   if (context.renderContext) url = context.renderContext.getResponse().encodeURL(url);
   if (config.parameters) url = appendParameters(url, config.parameters);
-  if (absoluteUrlRegExp.test(url)) return url;
   return toAbsolute(url, config.absolute, context.renderContext);
 }
 
@@ -156,7 +161,10 @@ export function buildModuleFileUrl(
     moduleName?: string;
     /** Querystring parameters to append to the URL */
     parameters?: Record<string, string>;
-    /** Prefix the URL with `http(s)://host`. Set to a string to specify the origin explicitly. */
+    /**
+     * Prefix the URL with `http(s)://host`. Set to a string to specify the origin explicitly. A URL
+     * that is already absolute, such as a live link to another site, keeps its own origin.
+     */
     absolute?: boolean | string;
   } = {},
   context: {
@@ -191,7 +199,10 @@ export function buildEndpointUrl(
   config: {
     /** Querystring parameters to append to the URL */
     parameters?: Record<string, string>;
-    /** Prefix the URL with `http(s)://host`. Set to a string to specify the origin explicitly. */
+    /**
+     * Prefix the URL with `http(s)://host`. Set to a string to specify the origin explicitly. A URL
+     * that is already absolute, such as a live link to another site, keeps its own origin.
+     */
     absolute?: boolean | string;
   } = {},
   context: {
@@ -199,6 +210,9 @@ export function buildEndpointUrl(
     renderContext?: RenderContext;
   } = useServerContext(),
 ): string {
+  if (config.absolute && !endpoint.startsWith("/") && !absoluteUrlRegExp.test(endpoint)) {
+    throw new Error(`Cannot make ${endpoint} absolute, because it does not start with "/".`);
+  }
   let url = endpoint;
   if (!absoluteUrlRegExp.test(url)) {
     if (context.renderContext) {
@@ -212,7 +226,8 @@ export function buildEndpointUrl(
 
 /** Makes `url` absolute if `absolute` is true or a string specifying the origin */
 function toAbsolute(url: string, absolute?: boolean | string, renderContext?: RenderContext) {
-  if (!absolute) return url;
+  // encodeURL returns an absolute URL for a live link to another site, so that URL keeps its origin
+  if (!absolute || absoluteUrlRegExp.test(url)) return url;
   if (typeof absolute === "string") return absolute.replace(/\/+$/, "") + url;
   if (!renderContext) {
     throw new Error(

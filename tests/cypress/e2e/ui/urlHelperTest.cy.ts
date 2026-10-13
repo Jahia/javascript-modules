@@ -60,7 +60,13 @@ describe("Test on url helper", () => {
 
   const testUrl = (urls) => {
     for (const url of urls) {
-      if (url.expectedURL) {
+      if (url.exactURL) {
+        cy.get(`div[data-testid="${url.dataTestId}"] ${url.tag}`).should(
+          "have.attr",
+          url.attribute,
+          url.exactURL,
+        );
+      } else if (url.expectedURL) {
         cy.get(`div[data-testid="${url.dataTestId}"] ${url.tag}`)
           .should("have.attr", url.attribute)
           .should("include", url.expectedURL);
@@ -179,37 +185,69 @@ describe("Test on url helper", () => {
         dataTestId: "content_link_absolute",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_absolute_origin",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `https://origin.test${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+        exactURL: `https://origin.test${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_absolute_language_fr",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
+        dataTestId: "content_link_absolute_cross_site_language_fr",
+        tag: "span",
+        attribute: "data-url",
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
+      },
+      // An explicit origin does not replace the origin of a URL that encodeURL made absolute.
+      {
+        dataTestId: "content_link_absolute_origin_cross_site_language_fr",
+        tag: "span",
+        attribute: "data-url",
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
       },
       {
         dataTestId: "image_static_resource_absolute",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
+      },
+      {
+        dataTestId: "image_static_resource_absolute_src",
+        tag: "img",
+        attribute: "src",
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
       },
       {
         dataTestId: "endpoint_absolute",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/graphql`,
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/graphql`,
       },
       {
         dataTestId: "endpoint_absolute_origin",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `https://origin.test${JAHIA_CONTEXT}/graphql`,
+        exactURL: `https://origin.test${JAHIA_CONTEXT}/graphql`,
+      },
+      // encodeURL already returned an absolute URL, so no second origin is prefixed.
+      {
+        dataTestId: "endpoint_absolute_cross_site",
+        tag: "span",
+        attribute: "data-url",
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/graphql`,
+      },
+      {
+        dataTestId: "endpoint_absolute_relative_error",
+        tag: "span",
+        attribute: "data-error",
+        exactURL: 'Cannot make graphql absolute, because it does not start with "/".',
       },
       // An origin must not be prefixed onto a URL that already carries one, as an external
       // provider's does. Regression guard: buildNodeUrl once returned `<server><dam url>`.
@@ -217,7 +255,7 @@ describe("Test on url helper", () => {
         dataTestId: "external_provider_absolute",
         tag: "span",
         attribute: "data-url",
-        expectedURL: "https://media.keepeek.test/asset/1234.jpg",
+        exactURL: "https://media.keepeek.test/asset/1234.jpg",
       },
       {
         dataTestId: "action_url",
@@ -312,37 +350,76 @@ describe("Test on url helper", () => {
         dataTestId: "content_link_absolute",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      // A live URL no longer contains /cms/render, so the origin stays in an href.
+      {
+        dataTestId: "content_link_absolute_href",
+        tag: "a",
+        attribute: "href",
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_absolute_origin",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `https://origin.test${JAHIA_CONTEXT}/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+        exactURL: `https://origin.test${JAHIA_CONTEXT}/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
         dataTestId: "content_link_absolute_language_fr",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
+        dataTestId: "content_link_absolute_cross_site_language_fr",
+        tag: "span",
+        attribute: "data-url",
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
+      },
+      // An explicit origin does not replace the origin of a URL that encodeURL made absolute.
+      {
+        dataTestId: "content_link_absolute_origin_cross_site_language_fr",
+        tag: "span",
+        attribute: "data-url",
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
       },
       {
         dataTestId: "image_static_resource_absolute",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
+      },
+      {
+        dataTestId: "image_static_resource_absolute_src",
+        tag: "img",
+        attribute: "src",
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
       },
       {
         dataTestId: "endpoint_absolute",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/graphql`,
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/graphql`,
       },
       {
         dataTestId: "endpoint_absolute_origin",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `https://origin.test${JAHIA_CONTEXT}/graphql`,
+        exactURL: `https://origin.test${JAHIA_CONTEXT}/graphql`,
+      },
+      // encodeURL already returned an absolute URL, so no second origin is prefixed.
+      {
+        dataTestId: "endpoint_absolute_cross_site",
+        tag: "span",
+        attribute: "data-url",
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/graphql`,
+      },
+      {
+        dataTestId: "endpoint_absolute_relative_error",
+        tag: "span",
+        attribute: "data-error",
+        exactURL: 'Cannot make graphql absolute, because it does not start with "/".',
       },
       // An origin must not be prefixed onto a URL that already carries one, as an external
       // provider's does. Regression guard: buildNodeUrl once returned `<server><dam url>`.
@@ -350,7 +427,7 @@ describe("Test on url helper", () => {
         dataTestId: "external_provider_absolute",
         tag: "span",
         attribute: "data-url",
-        expectedURL: "https://media.keepeek.test/asset/1234.jpg",
+        exactURL: "https://media.keepeek.test/asset/1234.jpg",
       },
       {
         dataTestId: "action_url",
@@ -487,37 +564,69 @@ describe("Test on url helper", () => {
         dataTestId: "content_link_absolute",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/vanityUrlTest`,
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/vanityUrlTest`,
       },
       {
         dataTestId: "content_link_absolute_origin",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `https://origin.test${JAHIA_CONTEXT}/cms/render/default/vanityUrlTest`,
+        exactURL: `https://origin.test${JAHIA_CONTEXT}/cms/render/default/vanityUrlTest`,
       },
       {
         dataTestId: "content_link_absolute_language_fr",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
+        dataTestId: "content_link_absolute_cross_site_language_fr",
+        tag: "span",
+        attribute: "data-url",
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
+      },
+      // An explicit origin does not replace the origin of a URL that encodeURL made absolute.
+      {
+        dataTestId: "content_link_absolute_origin_cross_site_language_fr",
+        tag: "span",
+        attribute: "data-url",
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
       },
       {
         dataTestId: "image_static_resource_absolute",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
+      },
+      {
+        dataTestId: "image_static_resource_absolute_src",
+        tag: "img",
+        attribute: "src",
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
       },
       {
         dataTestId: "endpoint_absolute",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/graphql`,
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/graphql`,
       },
       {
         dataTestId: "endpoint_absolute_origin",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `https://origin.test${JAHIA_CONTEXT}/graphql`,
+        exactURL: `https://origin.test${JAHIA_CONTEXT}/graphql`,
+      },
+      // encodeURL already returned an absolute URL, so no second origin is prefixed.
+      {
+        dataTestId: "endpoint_absolute_cross_site",
+        tag: "span",
+        attribute: "data-url",
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/graphql`,
+      },
+      {
+        dataTestId: "endpoint_absolute_relative_error",
+        tag: "span",
+        attribute: "data-error",
+        exactURL: 'Cannot make graphql absolute, because it does not start with "/".',
       },
       // An origin must not be prefixed onto a URL that already carries one, as an external
       // provider's does. Regression guard: buildNodeUrl once returned `<server><dam url>`.
@@ -525,7 +634,7 @@ describe("Test on url helper", () => {
         dataTestId: "external_provider_absolute",
         tag: "span",
         attribute: "data-url",
-        expectedURL: "https://media.keepeek.test/asset/1234.jpg",
+        exactURL: "https://media.keepeek.test/asset/1234.jpg",
       },
       {
         dataTestId: "action_url",
@@ -620,37 +729,76 @@ describe("Test on url helper", () => {
         dataTestId: "content_link_absolute",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/vanityUrlTest`,
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/vanityUrlTest`,
+      },
+      // A live URL no longer contains /cms/render, so the origin stays in an href.
+      {
+        dataTestId: "content_link_absolute_href",
+        tag: "a",
+        attribute: "href",
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/vanityUrlTest`,
       },
       {
         dataTestId: "content_link_absolute_origin",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `https://origin.test${JAHIA_CONTEXT}/vanityUrlTest`,
+        exactURL: `https://origin.test${JAHIA_CONTEXT}/vanityUrlTest`,
       },
       {
         dataTestId: "content_link_absolute_language_fr",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+      },
+      {
+        dataTestId: "content_link_absolute_cross_site_language_fr",
+        tag: "span",
+        attribute: "data-url",
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
+      },
+      // An explicit origin does not replace the origin of a URL that encodeURL made absolute.
+      {
+        dataTestId: "content_link_absolute_origin_cross_site_language_fr",
+        tag: "span",
+        attribute: "data-url",
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
       },
       {
         dataTestId: "image_static_resource_absolute",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
+      },
+      {
+        dataTestId: "image_static_resource_absolute_src",
+        tag: "img",
+        attribute: "src",
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/modules/javascript-modules-engine-test-module/static/images/goat.jpg`,
       },
       {
         dataTestId: "endpoint_absolute",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/graphql`,
+        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/graphql`,
       },
       {
         dataTestId: "endpoint_absolute_origin",
         tag: "span",
         attribute: "data-url",
-        expectedURL: `https://origin.test${JAHIA_CONTEXT}/graphql`,
+        exactURL: `https://origin.test${JAHIA_CONTEXT}/graphql`,
+      },
+      // encodeURL already returned an absolute URL, so no second origin is prefixed.
+      {
+        dataTestId: "endpoint_absolute_cross_site",
+        tag: "span",
+        attribute: "data-url",
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/graphql`,
+      },
+      {
+        dataTestId: "endpoint_absolute_relative_error",
+        tag: "span",
+        attribute: "data-error",
+        exactURL: 'Cannot make graphql absolute, because it does not start with "/".',
       },
       // An origin must not be prefixed onto a URL that already carries one, as an external
       // provider's does. Regression guard: buildNodeUrl once returned `<server><dam url>`.
@@ -658,7 +806,7 @@ describe("Test on url helper", () => {
         dataTestId: "external_provider_absolute",
         tag: "span",
         attribute: "data-url",
-        expectedURL: "https://media.keepeek.test/asset/1234.jpg",
+        exactURL: "https://media.keepeek.test/asset/1234.jpg",
       },
       {
         dataTestId: "action_url",
