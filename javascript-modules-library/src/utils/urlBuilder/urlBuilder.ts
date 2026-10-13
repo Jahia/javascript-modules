@@ -89,7 +89,10 @@ export function buildNodeUrl(
 
   if (config.autocollectDependency !== false && context.renderContext) {
     // getCanonicalPath accounts for mounted and versioned nodes
-    server.render.autocollectCacheDependency(node.getCanonicalPath(), context.renderContext);
+    server.render.autocollectCacheDependency(
+      node.getCanonicalPath(),
+      context.renderContext.getRequest(),
+    );
   }
 
   // URL building is an old thing in Jahia, with a lot of branches and special cases:

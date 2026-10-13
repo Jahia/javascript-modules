@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,13 +68,9 @@ public final class CollectedCacheDependencies {
     /**
      * Collects a path for the fragment being rendered.
      *
-     * @param renderContext the current rendering context
-     * @param path          the canonical path of the node the view depends on
+     * @param request the current request
+     * @param path    the canonical path of the node the view depends on
      */
-    public static void collect(RenderContext renderContext, String path) {
-        collect(renderContext.getRequest(), path);
-    }
-
     static void collect(ServletRequest request, String path) {
         Object collector = request.getAttribute(ATTRIBUTE);
         if (collector instanceof Collector && ((Collector) collector).enabled && StringUtils.isNotEmpty(path)) {

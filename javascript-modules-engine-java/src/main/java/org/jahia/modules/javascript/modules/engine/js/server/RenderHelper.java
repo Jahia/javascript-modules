@@ -44,6 +44,7 @@ import org.jahia.api.Constants;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.jcr.RepositoryException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.TagSupport;
@@ -350,11 +351,11 @@ public class RenderHelper {
      * {@code false} collects nothing. Above 100 paths, the paths are merged into
      * regular expressions.
      *
-     * @param path          the canonical path of the node to add as a dependency
-     * @param renderContext the current rendering context
+     * @param path    the canonical path of the node to add as a dependency
+     * @param request the current request, which holds the collector of the fragment
      */
-    public void autocollectCacheDependency(String path, RenderContext renderContext) {
-        CollectedCacheDependencies.collect(renderContext, path);
+    public void autocollectCacheDependency(String path, HttpServletRequest request) {
+        CollectedCacheDependencies.collect(request, path);
     }
 
     /**
