@@ -7,6 +7,7 @@ import {
   buildNodeUrl,
 } from "@jahia/javascript-modules-library";
 import type { JCRNodeWrapper } from "org.jahia.services.content";
+import type { RenderContext } from "org.jahia.services.render";
 import goat from "./goat.png";
 
 jahiaComponent(
@@ -37,6 +38,14 @@ jahiaComponent(
     const externalProviderNode = {
       getUrl: () => "https://media.keepeek.test/asset/1234.jpg",
     } as unknown as JCRNodeWrapper;
+
+    // In live, encodeURL prefixes the server name of the target site on a link to another site.
+    // That rule needs a request host mapped to a site, and no test host is, so this stands in for it.
+    const crossSiteRenderContext = {
+      getRequest: () => renderContext.getRequest(),
+      getResponse: () => ({ encodeURL: (url: string) => `https://other-site.test${url}` }),
+      getURLGenerator: () => renderContext.getURLGenerator(),
+    } as unknown as RenderContext;
 
     return (
       <>
@@ -73,10 +82,17 @@ jahiaComponent(
         </div>
 
         <div data-testid="image_static_resource_absolute">
-          {/* We use data-url to avoid Jahia from stripping the host in href/src */}
           <span data-url={buildModuleFileUrl("static/images/goat.jpg", { absolute: true })}>
             goat - absolute
           </span>
+        </div>
+
+        <div data-testid="image_static_resource_absolute_src">
+          <img
+            height="32"
+            src={buildModuleFileUrl("static/images/goat.jpg", { absolute: true })}
+            alt="goat_absolute"
+          />
         </div>
 
         <div data-testid="endpoint_absolute">
@@ -88,6 +104,18 @@ jahiaComponent(
         <div data-testid="endpoint_absolute_origin">
           <span data-url={buildEndpointUrl("/graphql", { absolute: "https://origin.test/" })}>
             endpoint - absolute with an explicit origin
+          </span>
+        </div>
+
+        <div data-testid="endpoint_absolute_cross_site">
+          <span
+            data-url={buildEndpointUrl(
+              "/graphql",
+              { absolute: true },
+              { renderContext: crossSiteRenderContext },
+            )}
+          >
+            endpoint - absolute, already made absolute by encodeURL
           </span>
         </div>
 
@@ -170,6 +198,9 @@ jahiaComponent(
             <div data-testid="content_link_absolute">
               <span data-url={buildNodeUrl(linkNodeRef, { absolute: true })}>absolute</span>
             </div>
+            <div data-testid="content_link_absolute_href">
+              <a href={buildNodeUrl(linkNodeRef, { absolute: true })}>absolute, in an anchor</a>
+            </div>
             <div data-testid="content_link_absolute_origin">
               <span data-url={buildNodeUrl(linkNodeRef, { absolute: "https://origin.test/" })}>
                 absolute with an explicit origin
@@ -178,6 +209,17 @@ jahiaComponent(
             <div data-testid="content_link_absolute_language_fr">
               <span data-url={buildNodeUrl(linkNodeRef, { absolute: true, language: "fr" })}>
                 absolute FR
+              </span>
+            </div>
+            <div data-testid="content_link_absolute_cross_site_language_fr">
+              <span
+                data-url={buildNodeUrl(
+                  linkNodeRef,
+                  { absolute: true, language: "fr" },
+                  { renderContext: crossSiteRenderContext, currentResource },
+                )}
+              >
+                absolute FR, already made absolute by encodeURL
               </span>
             </div>
             <div data-testid="action_url">

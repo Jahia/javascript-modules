@@ -205,7 +205,8 @@ export function buildEndpointUrl(
       url = url.startsWith("/") ? context.renderContext.getRequest().getContextPath() + url : url;
       url = context.renderContext.getResponse().encodeURL(url);
     }
-    url = toAbsolute(url, config.absolute, context.renderContext);
+    // The outbound rewrite rules prefix the server name of the target site on a link to another site
+    if (!absoluteUrlRegExp.test(url)) url = toAbsolute(url, config.absolute, context.renderContext);
   }
   return config.parameters ? appendParameters(url, config.parameters) : url;
 }
@@ -213,6 +214,9 @@ export function buildEndpointUrl(
 /** Makes `url` absolute if `absolute` is true or a string specifying the origin */
 function toAbsolute(url: string, absolute?: boolean | string, renderContext?: RenderContext) {
   if (!absolute) return url;
+  if (!url.startsWith("/")) {
+    throw new Error(`Cannot make the relative URL ${url} absolute. Start it with a "/".`);
+  }
   if (typeof absolute === "string") return absolute.replace(/\/+$/, "") + url;
   if (!renderContext) {
     throw new Error(
