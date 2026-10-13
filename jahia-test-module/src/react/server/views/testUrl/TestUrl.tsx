@@ -39,13 +39,25 @@ jahiaComponent(
       getUrl: () => "https://media.keepeek.test/asset/1234.jpg",
     } as unknown as JCRNodeWrapper;
 
-    // In live, encodeURL prefixes the server name of the target site on a link to another site.
-    // That rule needs a request host mapped to a site, and no test host is, so this stands in for it.
+    // In live, encodeURL turns a link to another site into an absolute URL on the server name of that
+    // site. Jahia does it only when the request host maps to a site, and no test host maps to a site.
+    // This stand-in returns an URL of the same shape: https://other-site.test/<context>/fr/home/...
     const crossSiteRenderContext = {
       getRequest: () => renderContext.getRequest(),
-      getResponse: () => ({ encodeURL: (url: string) => `https://other-site.test${url}` }),
+      getResponse: () => ({
+        encodeURL: (url: string) =>
+          "https://other-site.test" +
+          url.replace(/\/cms\/render\/\w+\/(\w+)\/sites\/[\w-]+/, "/$1"),
+      }),
       getURLGenerator: () => renderContext.getURLGenerator(),
     } as unknown as RenderContext;
+
+    let relativeEndpointError = "no error";
+    try {
+      buildEndpointUrl("graphql", { absolute: true });
+    } catch (error) {
+      relativeEndpointError = (error as Error).message;
+    }
 
     return (
       <>
@@ -82,6 +94,8 @@ jahiaComponent(
         </div>
 
         <div data-testid="image_static_resource_absolute">
+          {/* The outbound rule "Vanity url" of Jahia removes the origin from an href or a src that
+              contains /cms/render, so most absolute cases are read from data-url */}
           <span data-url={buildModuleFileUrl("static/images/goat.jpg", { absolute: true })}>
             goat - absolute
           </span>
@@ -117,6 +131,10 @@ jahiaComponent(
           >
             endpoint - absolute, already made absolute by encodeURL
           </span>
+        </div>
+
+        <div data-testid="endpoint_absolute_relative_error">
+          <span data-error={relativeEndpointError}>endpoint - absolute on a relative path</span>
         </div>
 
         <div data-testid="external_provider_absolute">

@@ -188,12 +188,6 @@ describe("Test on url helper", () => {
         exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
       {
-        dataTestId: "content_link_absolute_href",
-        tag: "a",
-        attribute: "href",
-        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/en/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
-      },
-      {
         dataTestId: "content_link_absolute_origin",
         tag: "span",
         attribute: "data-url",
@@ -209,7 +203,7 @@ describe("Test on url helper", () => {
         dataTestId: "content_link_absolute_cross_site_language_fr",
         tag: "span",
         attribute: "data-url",
-        exactURL: `https://other-site.test${JAHIA_CONTEXT}/cms/render/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
       },
       {
         dataTestId: "image_static_resource_absolute",
@@ -241,6 +235,12 @@ describe("Test on url helper", () => {
         tag: "span",
         attribute: "data-url",
         exactURL: `https://other-site.test${JAHIA_CONTEXT}/graphql`,
+      },
+      {
+        dataTestId: "endpoint_absolute_relative_error",
+        tag: "span",
+        attribute: "data-error",
+        exactURL: 'Cannot make graphql absolute, because it does not start with "/".',
       },
       // An origin must not be prefixed onto a URL that already carries one, as an external
       // provider's does. Regression guard: buildNodeUrl once returned `<server><dam url>`.
@@ -345,6 +345,7 @@ describe("Test on url helper", () => {
         attribute: "data-url",
         exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
       },
+      // A live URL no longer contains /cms/render, so the origin stays in an href.
       {
         dataTestId: "content_link_absolute_href",
         tag: "a",
@@ -367,7 +368,7 @@ describe("Test on url helper", () => {
         dataTestId: "content_link_absolute_cross_site_language_fr",
         tag: "span",
         attribute: "data-url",
-        exactURL: `https://other-site.test${JAHIA_CONTEXT}/cms/render/live/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
       },
       {
         dataTestId: "image_static_resource_absolute",
@@ -399,6 +400,12 @@ describe("Test on url helper", () => {
         tag: "span",
         attribute: "data-url",
         exactURL: `https://other-site.test${JAHIA_CONTEXT}/graphql`,
+      },
+      {
+        dataTestId: "endpoint_absolute_relative_error",
+        tag: "span",
+        attribute: "data-error",
+        exactURL: 'Cannot make graphql absolute, because it does not start with "/".',
       },
       // An origin must not be prefixed onto a URL that already carries one, as an external
       // provider's does. Regression guard: buildNodeUrl once returned `<server><dam url>`.
@@ -546,12 +553,6 @@ describe("Test on url helper", () => {
         exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/vanityUrlTest`,
       },
       {
-        dataTestId: "content_link_absolute_href",
-        tag: "a",
-        attribute: "href",
-        exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/cms/render/default/vanityUrlTest`,
-      },
-      {
         dataTestId: "content_link_absolute_origin",
         tag: "span",
         attribute: "data-url",
@@ -567,7 +568,7 @@ describe("Test on url helper", () => {
         dataTestId: "content_link_absolute_cross_site_language_fr",
         tag: "span",
         attribute: "data-url",
-        exactURL: `https://other-site.test${JAHIA_CONTEXT}/cms/render/default/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
       },
       {
         dataTestId: "image_static_resource_absolute",
@@ -599,6 +600,12 @@ describe("Test on url helper", () => {
         tag: "span",
         attribute: "data-url",
         exactURL: `https://other-site.test${JAHIA_CONTEXT}/graphql`,
+      },
+      {
+        dataTestId: "endpoint_absolute_relative_error",
+        tag: "span",
+        attribute: "data-error",
+        exactURL: 'Cannot make graphql absolute, because it does not start with "/".',
       },
       // An origin must not be prefixed onto a URL that already carries one, as an external
       // provider's does. Regression guard: buildNodeUrl once returned `<server><dam url>`.
@@ -703,6 +710,7 @@ describe("Test on url helper", () => {
         attribute: "data-url",
         exactURL: `${JAHIA_ORIGIN}${JAHIA_CONTEXT}/vanityUrlTest`,
       },
+      // A live URL no longer contains /cms/render, so the origin stays in an href.
       {
         dataTestId: "content_link_absolute_href",
         tag: "a",
@@ -725,7 +733,7 @@ describe("Test on url helper", () => {
         dataTestId: "content_link_absolute_cross_site_language_fr",
         tag: "span",
         attribute: "data-url",
-        exactURL: `https://other-site.test${JAHIA_CONTEXT}/cms/render/live/fr/sites/${GENERIC_SITE_KEY}/home/linkedPage.html`,
+        exactURL: `https://other-site.test${JAHIA_CONTEXT}/fr/home/linkedPage.html`,
       },
       {
         dataTestId: "image_static_resource_absolute",
@@ -757,6 +765,12 @@ describe("Test on url helper", () => {
         tag: "span",
         attribute: "data-url",
         exactURL: `https://other-site.test${JAHIA_CONTEXT}/graphql`,
+      },
+      {
+        dataTestId: "endpoint_absolute_relative_error",
+        tag: "span",
+        attribute: "data-error",
+        exactURL: 'Cannot make graphql absolute, because it does not start with "/".',
       },
       // An origin must not be prefixed onto a URL that already carries one, as an external
       // provider's does. Regression guard: buildNodeUrl once returned `<server><dam url>`.
