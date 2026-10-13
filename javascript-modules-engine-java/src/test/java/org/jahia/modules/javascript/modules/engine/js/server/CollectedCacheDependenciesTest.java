@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -161,24 +163,31 @@ public class CollectedCacheDependenciesTest {
         assertFalse("/sites/mysite/files/myXdocs/item-1".matches(regexp));
     }
 
+    private static final Predicate<Resource> ENABLED = resource -> true;
+
+    /** Starts the render of a resource, as the filter does in prepare. */
+    private static void startRender(HttpServletRequest request, Resource resource) {
+        request.setAttribute(CollectedCacheDependencies.ATTRIBUTE, new CollectedCacheDependencies.Collector(resource));
+    }
+
     @Test
     public void shouldCollectForTheResourceBeingRendered() {
         HttpServletRequest request = request();
         Resource parent = resource("/sites/mysite/home");
         Resource child = resource("/sites/mysite/home/area/child");
 
-        request.setAttribute(CollectedCacheDependencies.CURRENT_RESOURCE, parent);
-        CollectedCacheDependencies.collect(request, "/sites/mysite/home/about");
-        // a nested render: the core render chain sets the child, then restores the parent
-        request.setAttribute(CollectedCacheDependencies.CURRENT_RESOURCE, child);
-        CollectedCacheDependencies.collect(request, "/sites/mysite/files/logo.png");
-        request.setAttribute(CollectedCacheDependencies.CURRENT_RESOURCE, parent);
-        CollectedCacheDependencies.collect(request, "/sites/mysite/home/contact");
+        startRender(request, parent);
+        CollectedCacheDependencies.collect(request, "/sites/mysite/home/about", ENABLED);
+        // a nested render: the render chain pushes the child's collector, then restores the parent's
+        Object parentCollector = request.getAttribute(CollectedCacheDependencies.ATTRIBUTE);
+        startRender(request, child);
+        CollectedCacheDependencies.collect(request, "/sites/mysite/files/logo.png", ENABLED);
+        assertEquals(Set.of("/sites/mysite/files/logo.png"), CollectedCacheDependencies.collected(request, child));
+        request.setAttribute(CollectedCacheDependencies.ATTRIBUTE, parentCollector);
+        CollectedCacheDependencies.collect(request, "/sites/mysite/home/contact", ENABLED);
 
-        assertEquals(Set.of("/sites/mysite/files/logo.png"), CollectedCacheDependencies.take(request, child));
         assertEquals(Set.of("/sites/mysite/home/about", "/sites/mysite/home/contact"),
-                CollectedCacheDependencies.take(request, parent));
-        assertTrue("take removes what it returns", CollectedCacheDependencies.take(request, parent).isEmpty());
+                CollectedCacheDependencies.collected(request, parent));
     }
 
     @Test
@@ -187,19 +196,37 @@ public class CollectedCacheDependenciesTest {
         Resource first = resource("/sites/mysite/home/teaser");
         Resource second = resource("/sites/mysite/home/teaser");
 
-        request.setAttribute(CollectedCacheDependencies.CURRENT_RESOURCE, first);
-        CollectedCacheDependencies.collect(request, "/sites/mysite/home/about");
+        startRender(request, first);
+        CollectedCacheDependencies.collect(request, "/sites/mysite/home/about", ENABLED);
 
-        assertTrue(CollectedCacheDependencies.take(request, second).isEmpty());
-        assertEquals(Set.of("/sites/mysite/home/about"), CollectedCacheDependencies.take(request, first));
+        assertTrue(CollectedCacheDependencies.collected(request, second).isEmpty());
+        assertEquals(Set.of("/sites/mysite/home/about"), CollectedCacheDependencies.collected(request, first));
     }
 
     @Test
     public void shouldCollectNothingOutsideARender() {
         HttpServletRequest request = request();
 
-        CollectedCacheDependencies.collect(request, "/sites/mysite/home/about");
+        CollectedCacheDependencies.collect(request, "/sites/mysite/home/about", ENABLED);
 
-        assertTrue(CollectedCacheDependencies.take(request, resource("/sites/mysite/home")).isEmpty());
+        assertTrue(CollectedCacheDependencies.collected(request, resource("/sites/mysite/home")).isEmpty());
+    }
+
+    @Test
+    public void shouldCollectNothingForAViewThatOptedOutAndReadItsViewOnce() {
+        HttpServletRequest request = request();
+        Resource resource = resource("/sites/mysite/home");
+        AtomicInteger reads = new AtomicInteger();
+
+        startRender(request, resource);
+        for (int i = 0; i < 3; i++) {
+            CollectedCacheDependencies.collect(request, "/sites/mysite/home/item-" + i, r -> {
+                reads.incrementAndGet();
+                return false;
+            });
+        }
+
+        assertTrue(CollectedCacheDependencies.collected(request, resource).isEmpty());
+        assertEquals(1, reads.get());
     }
 }

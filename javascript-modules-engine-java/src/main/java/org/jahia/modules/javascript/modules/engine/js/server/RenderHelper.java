@@ -354,7 +354,7 @@ public class RenderHelper {
      * @param renderContext the current rendering context
      */
     public void autocollectCacheDependency(String path, RenderContext renderContext) {
-        CollectedCacheDependencies.collect(renderContext.getRequest(), path);
+        CollectedCacheDependencies.collect(renderContext, path);
     }
 
     /**

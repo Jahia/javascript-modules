@@ -3,18 +3,23 @@ package org.jahia.modules.javascript.modules.engine.js.server;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+import javax.jcr.RepositoryException;
 import javax.servlet.ServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
+import org.jahia.services.render.View;
+import org.jahia.services.render.scripting.Script;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,10 +28,10 @@ import org.slf4j.LoggerFactory;
  * registers them on its resource, so that its fragment is flushed when a node
  * it linked to or displayed changes.
  * <p>
- * The paths are kept per resource in a request attribute, because a view
- * renders other resources inside its own render. The core
- * {@code BaseAttributesFilter} keeps the {@code currentResource} request
- * attribute on the resource being rendered.
+ * {@link CollectedCacheDependenciesFilter} puts a {@link Collector} for each
+ * rendered resource in a request attribute, with
+ * {@code RenderChain.pushAttribute}. A nested render puts its own, and the
+ * render chain restores the one of the parent when the nested render ends.
  */
 public final class CollectedCacheDependencies {
 
@@ -38,11 +43,11 @@ public final class CollectedCacheDependencies {
      */
     public static final int DEFAULT_LIMIT = 100;
 
-    /** The request attribute that holds the collected paths of each resource. */
+    /** The request attribute that holds the {@link Collector} of the rendered resource. */
     static final String ATTRIBUTE = CollectedCacheDependencies.class.getName();
 
-    /** The request attribute in which the core render chain keeps the rendered resource. */
-    static final String CURRENT_RESOURCE = "currentResource";
+    /** The view property that turns autocollection off for a view. */
+    static final String DISABLE_PROPERTY = "cache.autocollectDependencies";
 
     /**
      * The depth a merge never goes above: two segments, such as
@@ -54,43 +59,75 @@ public final class CollectedCacheDependencies {
         // static helper
     }
 
-    /**
-     * Collects a path for the resource being rendered.
-     *
-     * @param request the current request
-     * @param path    the canonical path of the node the view depends on
-     */
-    public static void collect(ServletRequest request, String path) {
-        Object resource = request.getAttribute(CURRENT_RESOURCE);
-        if (!(resource instanceof Resource) || StringUtils.isEmpty(path)) {
-            return;
-        }
+    /** The paths collected for one rendered resource. */
+    static final class Collector {
+        final Resource resource;
+        /** Whether the view of the resource collects, read at the first collected path. */
+        Boolean enabled;
+        final Set<String> paths = new LinkedHashSet<>();
 
-        @SuppressWarnings("unchecked")
-        Map<Resource, Set<String>> byResource = (Map<Resource, Set<String>>) request.getAttribute(ATTRIBUTE);
-        if (byResource == null) {
-            // Resource overrides equals(): two renders of one node are two fragments
-            byResource = new IdentityHashMap<>();
-            request.setAttribute(ATTRIBUTE, byResource);
+        Collector(Resource resource) {
+            this.resource = resource;
         }
-        byResource.computeIfAbsent((Resource) resource, r -> new LinkedHashSet<>()).add(path);
     }
 
     /**
-     * Removes and returns the paths collected for a resource.
+     * Collects a path for the resource being rendered, unless its view sets
+     * {@value #DISABLE_PROPERTY} to {@code false}.
+     *
+     * @param renderContext the current rendering context
+     * @param path          the canonical path of the node the view depends on
+     */
+    public static void collect(RenderContext renderContext, String path) {
+        collect(renderContext.getRequest(), path, resource -> isEnabled(renderContext, resource));
+    }
+
+    static void collect(ServletRequest request, String path, Predicate<Resource> isEnabled) {
+        Object collector = request.getAttribute(ATTRIBUTE);
+        if (!(collector instanceof Collector) || StringUtils.isEmpty(path)) {
+            return;
+        }
+
+        Collector current = (Collector) collector;
+        if (current.enabled == null) {
+            current.enabled = isEnabled.test(current.resource);
+        }
+        if (current.enabled) {
+            current.paths.add(path);
+        }
+    }
+
+    /**
+     * Returns the paths collected for a resource.
      *
      * @param request  the current request
      * @param resource the rendered resource
      * @return the collected paths, empty when none
      */
-    public static Set<String> take(ServletRequest request, Resource resource) {
-        @SuppressWarnings("unchecked")
-        Map<Resource, Set<String>> byResource = (Map<Resource, Set<String>>) request.getAttribute(ATTRIBUTE);
-        if (byResource == null) {
-            return Set.of();
+    static Set<String> collected(ServletRequest request, Resource resource) {
+        Object collector = request.getAttribute(ATTRIBUTE);
+        // Resource overrides equals(): two renders of one node are two fragments
+        if (collector instanceof Collector && ((Collector) collector).resource == resource) {
+            return ((Collector) collector).paths;
         }
-        Set<String> paths = byResource.remove(resource);
-        return paths == null ? Set.of() : paths;
+        return Set.of();
+    }
+
+    /**
+     * Reads the view property at collection time: the script then runs, so the
+     * resource has already resolved it. An earlier call would fix the script
+     * before the filters that change the template run.
+     */
+    private static boolean isEnabled(RenderContext renderContext, Resource resource) {
+        try {
+            Script script = resource.getScript(renderContext);
+            View view = script == null ? null : script.getView();
+            Properties properties = view == null ? null : view.getProperties();
+            return properties == null || !"false".equals(properties.getProperty(DISABLE_PROPERTY));
+        } catch (RepositoryException e) {
+            logger.debug("Cannot resolve the view of {}, its dependencies are collected", resource, e);
+            return true;
+        }
     }
 
     /**
