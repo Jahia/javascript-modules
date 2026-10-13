@@ -24,7 +24,9 @@ import org.slf4j.LoggerFactory;
  * The conditions are those of {@code AggregateCacheFilter}. A resource that
  * filter skips, such as an include, a wrapper, an option or a fragment cached
  * with its parent, gets no collector of its own. Its view then collects into the
- * collector of the enclosing fragment, which holds its markup.
+ * collector of the enclosing fragment, which holds its markup. The opt-out of
+ * the enclosing view then decides for both views, and the opt-out of the inner
+ * view has no effect.
  * <p>
  * The priority puts {@link #execute} after the script and the wrappers, and
  * before the cache filter (16) stores the dependencies of the fragment. A render

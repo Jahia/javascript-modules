@@ -84,3 +84,34 @@ jahiaComponent(
   },
   ({ image }: Props) => <ImageAndRenderMarker src={buildNodeUrl(image)} testId="included" />,
 );
+
+/**
+ * A virtual node renders inside the fragment of its parent, which the cache stores with it. The
+ * view of the virtual node builds the URL, so the parent fragment must depend on the image.
+ */
+jahiaComponent(
+  {
+    nodeType: "javascriptExample:testAutocollectedCacheDependency",
+    name: "virtualparent",
+    componentType: "view",
+  },
+  ({ image }: Props) => (
+    <Render
+      content={{
+        name: "autocollectedVirtualNode",
+        nodeType: "javascriptExample:testAutocollectedCacheDependency",
+        properties: { image: image.getIdentifier() },
+      }}
+      view="virtualimage"
+    />
+  ),
+);
+
+jahiaComponent(
+  {
+    nodeType: "javascriptExample:testAutocollectedCacheDependency",
+    name: "virtualimage",
+    componentType: "view",
+  },
+  ({ image }: Props) => <ImageAndRenderMarker src={buildNodeUrl(image)} testId="virtual" />,
+);

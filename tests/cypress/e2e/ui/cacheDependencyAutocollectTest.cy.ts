@@ -9,7 +9,7 @@ describe("Cache dependencies collected by the URL builder", () => {
   const RENAMED = "autocollected-renamed.jpg";
   const LIVE_PAGE = `/cms/render/live/en/sites/${GENERIC_SITE_KEY}/home/${PAGE}.html`;
   /** The test ids of the views whose dependency is collected */
-  const COLLECTED = ["autocollected", "explicitcontext", "included"];
+  const COLLECTED = ["autocollected", "explicitcontext", "included", "virtual"];
   /** The test ids of the views that opted out, for the whole view or for one call */
   const OPTED_OUT = ["optedout", "callopout"];
 
@@ -77,6 +77,11 @@ describe("Cache dependencies collected by the URL builder", () => {
         "includeParent",
         ["jmix:renderable"],
         [{ name: "j:view", value: "includeparent", type: "STRING" }],
+      );
+      addImageReference(
+        "virtualParent",
+        ["jmix:renderable"],
+        [{ name: "j:view", value: "virtualparent", type: "STRING" }],
       );
     });
 
