@@ -1,9 +1,10 @@
 package org.jahia.modules.javascript.modules.engine.js.server;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -150,37 +151,52 @@ public final class CollectedCacheDependencies {
      * <p>
      * The paths under {@code /modules} are dropped, because the core cache
      * filters store no dependency there. Above the limit, the deepest folder that
-     * covers two entries or more becomes one regexp. The merge repeats until the
-     * entries fit. A merge never covers a folder above {@value #MIN_MERGE_DEPTH}
-     * segments, such as {@code /sites}, so the result can stay above the limit.
+     * covers two entries or more becomes one regexp, the biggest first at one
+     * depth. The merge goes up one depth at a time until the entries fit. A merge
+     * never covers a folder above {@value #MIN_MERGE_DEPTH} segments, such as
+     * {@code /sites}, so the result can stay above the limit.
      *
      * @param dependencies the paths the fragment resolved
      * @param limit        the number of entries a fragment may write
      * @return the paths and regexps to register
      */
     static Reduced reduce(Collection<String> dependencies, int limit) {
-        // the exact paths, each with its segments
+        // the exact paths and the merged folders, each with its segments
         Map<String, String[]> exact = new LinkedHashMap<>();
+        Map<String, String[]> folders = new LinkedHashMap<>();
+        int deepest = 0;
         for (String path : dependencies) {
             if (!isUnderModules(path)) {
-                exact.put(path, StringUtils.split(path, '/'));
+                String[] segments = StringUtils.split(path, '/');
+                exact.put(path, segments);
+                deepest = Math.max(deepest, segments.length);
             }
         }
         int collected = exact.size();
-        if (collected <= limit) {
-            return new Reduced(collected, exact.keySet(), Set.of());
-        }
 
-        // the merged folders, each with its segments
-        Map<String, String[]> folders = new LinkedHashMap<>();
-        while (exact.size() + folders.size() > limit) {
-            String[] folder = deepestSharedFolder(exact.values(), folders.values());
-            if (folder == null) {
-                break;
+        // Two folders at one depth never overlap, so a merge at one depth leaves the
+        // other folders of that depth as they were
+        for (int depth = deepest; depth >= MIN_MERGE_DEPTH && exact.size() + folders.size() > limit; depth--) {
+            Map<String, Folder> atDepth = new HashMap<>();
+            group(exact, depth, atDepth, true);
+            group(folders, depth, atDepth, false);
+
+            List<Folder> candidates = new ArrayList<>();
+            for (Folder folder : atDepth.values()) {
+                if (folder.size() >= 2) {
+                    candidates.add(folder);
+                }
             }
-            removeUnder(exact, folder);
-            removeUnder(folders, folder);
-            folders.put(String.join("/", folder), folder);
+            candidates.sort(Comparator.comparingInt(Folder::size).reversed().thenComparing(folder -> folder.key));
+
+            for (Folder folder : candidates) {
+                if (exact.size() + folders.size() <= limit) {
+                    break;
+                }
+                folder.exact.forEach(exact::remove);
+                folder.folders.forEach(folders::remove);
+                folders.put(folder.key, folder.segments);
+            }
         }
 
         Set<String> regexps = new LinkedHashSet<>();
@@ -194,55 +210,34 @@ public final class CollectedCacheDependencies {
         return "/modules".equals(path) || path.startsWith("/modules/");
     }
 
-    /**
-     * The deepest folder of at least {@value #MIN_MERGE_DEPTH} segments that
-     * covers two entries or more, or null when no folder covers two. At one depth,
-     * the folder that covers the most entries wins. An entry covers its own path,
-     * because a regexp on a folder matches the folder too.
-     */
-    private static String[] deepestSharedFolder(Collection<String[]> exact, Collection<String[]> folders) {
-        Map<String, Integer> covered = new HashMap<>();
-        Map<String, String[]> segmentsOf = new HashMap<>();
-        for (Collection<String[]> entries : List.of(exact, folders)) {
-            for (String[] segments : entries) {
-                for (int depth = MIN_MERGE_DEPTH; depth <= segments.length; depth++) {
-                    String[] folder = Arrays.copyOf(segments, depth);
-                    String key = String.join("/", folder);
-                    covered.merge(key, 1, Integer::sum);
-                    segmentsOf.putIfAbsent(key, folder);
-                }
-            }
+    /** The entries at or below one folder. An entry covers its own path, because a regexp on a folder matches it. */
+    private static final class Folder {
+        final String key;
+        final String[] segments;
+        final List<String> exact = new ArrayList<>();
+        final List<String> folders = new ArrayList<>();
+
+        Folder(String key, String[] segments) {
+            this.key = key;
+            this.segments = segments;
         }
 
-        String best = null;
-        for (Map.Entry<String, Integer> entry : covered.entrySet()) {
-            if (entry.getValue() >= 2 && (best == null
-                    || isBetter(segmentsOf.get(entry.getKey()), entry.getValue(), segmentsOf.get(best), covered.get(best)))) {
-                best = entry.getKey();
-            }
+        int size() {
+            return exact.size() + folders.size();
         }
-        return best == null ? null : segmentsOf.get(best);
     }
 
-    /** Deeper first, then the folder that covers more entries, then the first in path order. */
-    private static boolean isBetter(String[] candidate, int count, String[] best, int bestCount) {
-        if (candidate.length != best.length) {
-            return candidate.length > best.length;
-        }
-        if (count != bestCount) {
-            return count > bestCount;
-        }
-        return String.join("/", candidate).compareTo(String.join("/", best)) < 0;
-    }
-
-    /** Removes the entries at or below a folder, comparing whole segments. */
-    private static void removeUnder(Map<String, String[]> entries, String[] folder) {
-        for (Iterator<String[]> it = entries.values().iterator(); it.hasNext();) {
-            String[] segments = it.next();
-            if (segments.length >= folder.length
-                    && Arrays.equals(segments, 0, folder.length, folder, 0, folder.length)) {
-                it.remove();
+    /** Groups the entries deep enough by their folder at one depth. */
+    private static void group(Map<String, String[]> entries, int depth, Map<String, Folder> atDepth, boolean exact) {
+        for (Map.Entry<String, String[]> entry : entries.entrySet()) {
+            String[] segments = entry.getValue();
+            if (segments.length < depth) {
+                continue;
             }
+            String[] folderSegments = Arrays.copyOf(segments, depth);
+            Folder folder = atDepth.computeIfAbsent(String.join("/", folderSegments),
+                    key -> new Folder(key, folderSegments));
+            (exact ? folder.exact : folder.folders).add(entry.getKey());
         }
     }
 }
