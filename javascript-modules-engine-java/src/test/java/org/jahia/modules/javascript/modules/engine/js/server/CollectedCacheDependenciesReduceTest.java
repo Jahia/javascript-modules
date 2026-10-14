@@ -173,6 +173,18 @@ public class CollectedCacheDependenciesReduceTest {
     }
 
     @Test
+    public void shouldCountTheLimitAfterDroppingModulePaths() {
+        List<String> paths = List.of("/sites/a/x/p1", "/modules", "/modules/m/views/one", "/sites/a/x/p2");
+
+        // four paths, but two once /modules is dropped, so a limit of two merges nothing
+        CollectedCacheDependencies.Reduced reduced = CollectedCacheDependencies.reduce(paths, 2);
+
+        assertEquals(2, reduced.collected);
+        assertEquals(List.of("/sites/a/x/p1", "/sites/a/x/p2"), new ArrayList<>(reduced.paths));
+        assertTrue(reduced.regexps.isEmpty());
+    }
+
+    @Test
     public void shouldAbsorbADeeperMergeIntoAHigherOne() {
         List<String> paths = List.of("/sites/a/x/p1", "/sites/a/x/p2", "/sites/a/x/p3", "/sites/a/y/q1",
                 "/sites/a/z/r1");

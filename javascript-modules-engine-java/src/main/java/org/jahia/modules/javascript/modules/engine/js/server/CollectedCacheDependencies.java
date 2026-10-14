@@ -156,18 +156,26 @@ public final class CollectedCacheDependencies {
      * @return the paths and regexps to register
      */
     static Reduced reduce(Collection<String> dependencies, int limit) {
+        Set<String> kept = new LinkedHashSet<>();
+        for (String path : dependencies) {
+            if (!isUnderModules(path)) {
+                kept.add(path);
+            }
+        }
+        int collected = kept.size();
+        if (collected <= limit) {
+            return new Reduced(collected, kept, Set.of());
+        }
+
         // the exact paths and the merged folders, each with its segments
         Map<String, String[]> exact = new LinkedHashMap<>();
         Map<String, String[]> folders = new LinkedHashMap<>();
         int deepest = 0;
-        for (String path : dependencies) {
-            if (!isUnderModules(path)) {
-                String[] segments = StringUtils.split(path, '/');
-                exact.put(path, segments);
-                deepest = Math.max(deepest, segments.length);
-            }
+        for (String path : kept) {
+            String[] segments = StringUtils.split(path, '/');
+            exact.put(path, segments);
+            deepest = Math.max(deepest, segments.length);
         }
-        int collected = exact.size();
 
         // Two folders at one depth never overlap, so a merge at one depth leaves the
         // other folders of that depth as they were
