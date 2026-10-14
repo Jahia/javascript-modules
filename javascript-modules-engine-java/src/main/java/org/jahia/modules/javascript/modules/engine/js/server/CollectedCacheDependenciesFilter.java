@@ -5,7 +5,6 @@ import java.util.Set;
 
 import javax.jcr.RepositoryException;
 
-import org.jahia.api.Constants;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.View;
@@ -21,15 +20,24 @@ import org.slf4j.LoggerFactory;
  * Gives each resource that the cache stores as a fragment a collector for the
  * cache dependencies its view resolves, and registers what it collected.
  * <p>
- * The conditions are those of {@code AggregateCacheFilter}. A resource that
- * filter skips, such as an include, a wrapper, an option or a fragment cached
- * with its parent, gets no collector of its own. Its view then collects into the
- * collector of the enclosing fragment, which holds its markup. The opt-out of
- * the enclosing view then decides for both views, and the opt-out of the inner
- * view has no effect.
+ * {@code AggregateCacheFilter} (16) keeps the key of the fragment it stores in
+ * the module param {@code cacheKey}, from its {@code prepare} to its
+ * {@code execute}. This filter runs only on a resource that holds that param,
+ * so it follows the decision of the cache on every core version. A resource the
+ * cache does not store, such as an include, a wrapper, an option or a fragment
+ * cached with its parent, gets no collector of its own. Its view then collects
+ * into the collector of the enclosing fragment, which holds its markup. The
+ * opt-out of the enclosing view then decides for both views, and the opt-out of
+ * the inner view has no effect.
  * <p>
- * The priority puts {@link #execute} after the script and the wrappers, and
- * before the cache filter (16) stores the dependencies of the fragment. A render
+ * The deprecated cache implementation, {@code AggregateFilter} with
+ * {@code CacheFilter}, sets no such param, so this filter collects nothing
+ * with it.
+ * <p>
+ * The priority puts {@link #prepare} after the cache filter (16) sets the
+ * param. It puts {@link #execute} after the script and the wrappers, and before
+ * the cache filter removes the param and stores the dependencies of the
+ * fragment. A render
  * filter whose priority is below this one runs its own {@code execute} after
  * this filter, so a path it collects there is not registered.
  */
@@ -43,22 +51,13 @@ public class CollectedCacheDependenciesFilter extends AbstractFilter {
 
     static final float PRIORITY = 17f;
 
-    /**
-     * The request attribute of {@code AggregateCacheFilter.SKIP_AGGREGATION}. The
-     * core this module compiles against does not declare it, and sets no such
-     * attribute.
-     */
-    static final String SKIP_AGGREGATION = "aggregateFilter.skip";
+    /** The module param of the fragment key that {@code AggregateCacheFilter} stores. */
+    static final String CACHE_KEY = "cacheKey";
 
     public CollectedCacheDependenciesFilter() {
         setPriority(PRIORITY);
         setDescription("Registers the cache dependencies a JavaScript view autocollected while it rendered.");
-        setApplyOnModes("live");
-        setSkipOnTemplateTypes("json");
-        setSkipOnConfigurations("include,wrapper,option");
-        addCondition((renderContext, resource) ->
-                !Boolean.TRUE.equals(resource.getModuleParams().get(Constants.TO_CACHE_WITH_PARENT_FRAGMENT))
-                        && !Boolean.TRUE.equals(renderContext.getRequest().getAttribute(SKIP_AGGREGATION)));
+        addCondition((renderContext, resource) -> resource.getModuleParams().get(CACHE_KEY) != null);
     }
 
     @Override
@@ -76,15 +75,20 @@ public class CollectedCacheDependenciesFilter extends AbstractFilter {
         return previousOut;
     }
 
-    private static boolean isEnabled(RenderContext renderContext, Resource resource) {
+    private boolean isEnabled(RenderContext renderContext, Resource resource) {
         try {
-            Script script = resource.getScript(renderContext);
-            View view = script == null ? null : script.getView();
-            Properties properties = view == null ? null : view.getProperties();
+            Properties properties = viewProperties(renderContext, resource);
             return properties == null || !"false".equals(properties.getProperty(DISABLE_PROPERTY));
         } catch (RepositoryException e) {
             logger.debug("Cannot resolve the view of {}, its dependencies are collected", resource, e);
             return true;
         }
+    }
+
+    /** The properties of the view that renders the resource, or null when it has none. */
+    Properties viewProperties(RenderContext renderContext, Resource resource) throws RepositoryException {
+        Script script = resource.getScript(renderContext);
+        View view = script == null ? null : script.getView();
+        return view == null ? null : view.getProperties();
     }
 }
