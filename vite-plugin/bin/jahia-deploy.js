@@ -86,3 +86,20 @@ const trimObject = (/** @type {unknown} */ obj) => {
 
 const data = await response.json();
 console.log(inspect(trimObject(data), { depth: Infinity, colors: true }));
+
+// The provisioning API answers 200 even when it installed nothing: Jahia only logs the reason
+const installed =
+  Array.isArray(data) &&
+  data.some((result) => result?.install?.some((install) => install?.bundleInfos?.length > 0));
+if (!installed) {
+  console.error(
+    styleText(
+      "red",
+      `Jahia installed nothing, the module was not deployed. Possible reasons:
+ • The install failed, for instance on a content definition change that Jahia refuses ("Major change in definition"): the reason is in the Jahia log.
+ • This version, without a -SNAPSHOT suffix, is already installed: raise the version in package.json.
+ • A more recent version of the module is already installed.`,
+    ),
+  );
+  process.exit(1);
+}
