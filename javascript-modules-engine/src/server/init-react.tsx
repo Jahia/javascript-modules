@@ -28,11 +28,6 @@ server.registry.add("viewRenderer", "react", {
     // But assumes a single language per page, so i18n.changeLanguage(lang) is safe in this context.
     i18n.changeLanguage(language);
 
-    const autocollectedDependencies =
-      view.properties?.["cache.autocollectDependencies"] === "false"
-        ? undefined
-        : new Set<string>();
-
     // SSR
     const currentNode = currentResource.getNode();
     const mainNode = renderContext.getMainResource().getNode();
@@ -45,7 +40,6 @@ server.registry.add("viewRenderer", "react", {
         mainNode={mainNode}
         jcrSession={currentNode.getSession()}
         bundleKey={bundleKey}
-        autocollectedDependencies={autocollectedDependencies}
       >
         <I18nextProvider i18n={i18n} defaultNS={bundleKey}>
           <View />
@@ -53,7 +47,7 @@ server.registry.add("viewRenderer", "react", {
       </ServerContextProvider>
     );
 
-    const html =
+    return (
       // In page mode, prepend the rendered HTML with the HTML5 doctype
       (currentResource.getContextConfiguration() === "page" ? "<!DOCTYPE html>" : "") +
       // We use a `<jsm-raw-html>` element to wrap raw HTML output because React does not allow
@@ -61,11 +55,7 @@ server.registry.add("viewRenderer", "react", {
       // having them in the final output.
       // `<jsm-raw-html>` SHOULD NOT be used in userland code, it is an internal implementation
       // detail.
-      ReactDOMServer.renderToString(element).replaceAll(/<\/?jsm-raw-html>/g, "");
-
-    return {
-      html,
-      autocollectedDependencies: [...(autocollectedDependencies ?? [])],
-    };
+      ReactDOMServer.renderToString(element).replaceAll(/<\/?jsm-raw-html>/g, "")
+    );
   },
 });

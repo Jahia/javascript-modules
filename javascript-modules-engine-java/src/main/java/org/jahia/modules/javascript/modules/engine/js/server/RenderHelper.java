@@ -44,6 +44,7 @@ import org.jahia.api.Constants;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.jcr.RepositoryException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.TagSupport;
@@ -341,6 +342,20 @@ public class RenderHelper {
     public void addCacheDependency(Map<String, Object> attr, RenderContext renderContext)
             throws IllegalAccessException, InvocationTargetException, JspException, IOException {
         renderTag(new AddCacheDependencyTag(), attr, renderContext);
+    }
+
+    /**
+     * Collect a cache dependency for the fragment being rendered. Unlike
+     * {@link #addCacheDependency}, the dependency is registered once the view has
+     * rendered. A view that sets {@code cache.autocollectDependencies} to
+     * {@code false} collects nothing. Above 100 paths, the paths are merged into
+     * regular expressions.
+     *
+     * @param path    the canonical path of the node to add as a dependency
+     * @param request the current request, which holds the collector of the fragment
+     */
+    public void autocollectCacheDependency(String path, HttpServletRequest request) {
+        CollectedCacheDependencies.collect(request, path);
     }
 
     /**

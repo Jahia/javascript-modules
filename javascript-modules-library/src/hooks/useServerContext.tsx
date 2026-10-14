@@ -25,13 +25,6 @@ export interface ServerContext {
   jcrSession: JCRSessionWrapper;
   /** The OSGi bundle key of the current module being rendered */
   bundleKey: string;
-
-  /**
-   * Paths of all dependencies collected during render, unless autocollection is disabled.
-   *
-   * @internal Can change at any time without notice.
-   */
-  autocollectedDependencies?: Set<string>;
 }
 
 const ServerContext = createContext<ServerContext>({} as never);
