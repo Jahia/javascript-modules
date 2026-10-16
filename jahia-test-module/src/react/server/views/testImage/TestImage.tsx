@@ -41,20 +41,32 @@ jahiaComponent(
       return <div data-testid="image_missing_fixture">Every reference is required</div>;
     }
 
+    // A stand-in node implements only what getImageProps reads.
+    const standIn = (isDefault: boolean, getUrl: (args?: string[]) => string) =>
+      ({
+        getIdentifier: () => "stand-in",
+        hasProperty: () => false,
+        hasNode: () => false,
+        getProvider: () => ({ isDefault: () => isDefault }),
+        // buildNodeUrl collects this as a cache dependency, so it must be a real node's.
+        getCanonicalPath: () => large.getCanonicalPath(),
+        getUrl,
+      }) as unknown as JCRNodeWrapper;
+
+    // Maps ["w:300", "h:300"] to "w_300,h_300/", the shape of a Cloudinary transformation.
+    const argPath = (args?: string[]) =>
+      args ? `${args.map((arg) => arg.replace(":", "_")).join(",")}/` : "";
+
     // A DAM node answers getUrl(args) with a URL on its own host, and the resize travels in those
     // arguments rather than in a query string. No such provider is mounted here, so this stands in
-    // for one, implementing only what getImageProps reads. The URL mimics a Cloudinary path: a
-    // two-argument resize carries the comma the srcset workaround exists for.
-    const damNode = {
-      getIdentifier: () => "dam-stand-in",
-      hasProperty: () => false,
-      hasNode: () => false,
-      getProvider: () => ({ isDefault: () => false }),
-      // buildNodeUrl collects this as a cache dependency, so it must be a real node's.
-      getCanonicalPath: () => large.getCanonicalPath(),
-      getUrl: (args?: string[]) =>
-        `https://media.dam.test/${args ? `${args.map((arg) => arg.replace(":", "_")).join(",")}/` : ""}asset.jpg`,
-    } as unknown as JCRNodeWrapper;
+    // for one. A two-argument resize carries the comma the srcset workaround exists for.
+    const damNode = standIn(false, (args) => `https://media.dam.test/${argPath(args)}asset.jpg`);
+
+    // A jnt:file decorator answers getUrl(args) on the default provider with a sized URL.
+    const decoratedNode = standIn(true, (args) => `/files/sized/${argPath(args)}asset.jpg`);
+
+    // With no decorator, getUrl(args) returns getUrl(), as JCRNodeWrapperImpl does.
+    const plainNode = standIn(true, () => "/files/default/asset.jpg");
 
     return (
       <>
@@ -118,6 +130,18 @@ jahiaComponent(
         <Case id="dam_responsive" props={getImageProps(damNode)} />
         <Case id="dam_density" props={getImageProps(damNode, { width: 400 })} />
         <Case id="dam_density_both" props={getImageProps(damNode, { width: 300, height: 300 })} />
+
+        {/* The default provider: a decorator's sized URL wins, otherwise `?w=` is appended. */}
+        <Case id="decorated_responsive" props={getImageProps(decoratedNode)} />
+        <Case
+          id="decorated_density_both"
+          props={getImageProps(decoratedNode, { width: 300, height: 300 })}
+        />
+        <Case id="plain_responsive" props={getImageProps(plainNode)} />
+        <Case
+          id="plain_density_both"
+          props={getImageProps(plainNode, { width: 300, height: 300 })}
+        />
 
         {/* <JImage>: the cases above cover every branch of the computed attributes; these prove
             they land on a real <img>, in the spellings a browser reads. */}

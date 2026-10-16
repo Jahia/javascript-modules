@@ -123,6 +123,8 @@ This snippet produces something like the following HTML:
 
 On a default Jahia instance, all `?w=` URLs will serve the original image. Your production instance requires a DAM ([Cloudinary](https://www.jahia.com/integrations/cloudinary), [Keepeek](https://www.jahia.com/integrations/keepeek)) or an image resizer ([Cloudimage](https://www.jahia.com/integrations/cloudimage)) for the responsive behavior to work correctly.
 
+A module can also decorate `jnt:file` nodes and return a sized URL from `node.getUrl(["w:376"])`. `JImage` asks the node first, and appends `?w=` only when the URL comes back unchanged.
+
 Images are lazy-loaded by default. For the image above the fold, typically the hero, tell the browser to fetch it first:
 
 ```tsx
