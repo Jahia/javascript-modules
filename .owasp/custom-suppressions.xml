@@ -2,13 +2,14 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
     <suppress>
         <notes><![CDATA[
-        False positive: jackrabbit-spi-*.jar
+        False positive: jackrabbit-spi-*.jar, jackrabbit-spi-commons-*.jar, jackrabbit-jcr-commons-*.jar
         The generic cpe:apache:jackrabbit matches every Jackrabbit artifact. CVE-2026-92414 affects
         jackrabbit-jcr-server and CVE-2026-92415 affects jackrabbit-spi2dav, and this project depends on
-        neither. jackrabbit-spi comes through jackrabbit-spi-commons, used only to generate the
-        TypeScript declarations, and no bundle embeds it.
+        neither. jackrabbit-spi-commons is used only to generate the TypeScript declarations, and it
+        brings jackrabbit-spi and jackrabbit-jcr-commons. No bundle embeds any of them. The pattern names
+        each artifact, so jackrabbit-jcr-server, jackrabbit-spi2dav or jackrabbit-webdav stays reported.
         ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.jackrabbit/jackrabbit\-spi@.*$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.jackrabbit/jackrabbit\-(spi|spi\-commons|jcr\-commons)@.*$</packageUrl>
         <cve>CVE-2026-92414</cve>
         <cve>CVE-2026-92415</cve>
     </suppress>
