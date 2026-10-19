@@ -22,7 +22,8 @@
   "scripts": {
     "build": "tsc && node post-build.js && yarn pack --out dist/package.tgz && publint",
     "clean": "rm -rf dist",
-    "lint": "yarn run --top-level lint"
+    "lint": "yarn run --top-level lint",
+    "test": "tsc -p tsconfig.test.json && node --test $(find target/test-dist -name '*.spec.js')"
   },
   "devDependencies": {
     "@0no-co/graphql.web": "^1.3.4",
