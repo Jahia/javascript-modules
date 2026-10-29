@@ -43,7 +43,7 @@ public class JSScript implements Script {
     @Override
     public String execute(Resource resource, RenderContext renderContext) throws RenderException {
         String output = graalVMEngine.doWithContext(ThrowingFunction.unchecked(contextProvider -> {
-            Map<String, Object> viewValues = jsView.getRegistryInstance(contextProvider);
+            Map<String, Object> viewValues = checkRegistered(jsView.getRegistryInstance(contextProvider), jsView.getPath());
 
             if (!viewValues.containsKey("viewRenderer")) {
                 throw new RenderException(String.format("Missing view rendered for view: %s", jsView.getRegistryKey()));
@@ -75,6 +75,20 @@ public class JSScript implements Script {
         }
 
         return output;
+    }
+
+    /**
+     * A pooled context can miss a view when the module's init script failed while the context was created
+     * (the engine logs "Cannot execute init script" and keeps the context). Fail with an explicit message
+     * instead of a NullPointerException, which the JVM soon logs without any stack frame.
+     */
+    static Map<String, Object> checkRegistered(Map<String, Object> viewValues, String viewPath) throws RenderException {
+        if (viewValues == null) {
+            throw new RenderException(String.format("View %s is not registered in the current JavaScript context. "
+                    + "The module's init script probably failed when this context was created, "
+                    + "check the logs for \"Cannot execute init script\"", viewPath));
+        }
+        return viewValues;
     }
 
     @Override
