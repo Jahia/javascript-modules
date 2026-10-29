@@ -14,6 +14,12 @@ const unzipping = require("./unzipping");
 // the project's config changing)
 /** @type {Cypress.PluginConfig} */
 module.exports = (on, config) => {
+  // Bundles each spec faster than the default webpack preprocessor. Unlike webpack, esbuild does
+  // not polyfill node built-ins: @jahia/jcontent-cypress requires "path"
+  on(
+    "file:preprocessor",
+    require("@bahmutov/cypress-esbuild-preprocessor")({ alias: { path: "path-browserify" } }),
+  );
   require("./env")(on, config);
   require("@jahia/cypress/dist/plugins/registerPlugins").registerPlugins(on, config);
   require("cypress-terminal-report/src/installLogsPrinter")(on, {
