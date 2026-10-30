@@ -113,8 +113,8 @@ __metadata:
   linkType: hard
 
 "@jahia/cypress@npm:^8.4.0":
-  version: 8.5.0
-  resolution: "@jahia/cypress@npm:8.5.0"
+  version: 8.9.0
+  resolution: "@jahia/cypress@npm:8.9.0"
   dependencies:
     "@apollo/client": "npm:^3.4.9"
     "@faker-js/faker": "npm:^10.3.0"
@@ -123,12 +123,13 @@ __metadata:
     cypress-real-events: "npm:^1.11.0"
     graphql: "npm:^15.5.0"
     graphql-tag: "npm:^2.11.0"
+    yaml: "npm:^2.9.1"
   bin:
     ci.build: ./ci.build.sh
     ci.startup: ./ci.startup.sh
     env.debug: ./env.debug.sh
     env.run: ./env.run.sh
-  checksum: 10c0/f703c7908e3da23d84af52035030f8ec9eccdc8073f38ef7b9fc5dc84e1ff06d5adb7e6f423477e709a917809248454537dd052289aae0c24ac029c05ae9d92f
+  checksum: 10c0/0a938f9e887ff7fe945129d05cbc3d72461e8c6a06545661346c11550c819ed7045cad386ed54ae466e1c95fa43b25c94c0fa715b8d0123b3ac17c7f1d537d08
   languageName: node
   linkType: hard
 
@@ -451,11 +452,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*, @types/node@npm:>=12.0.0":
-  version: 26.6.1
-  resolution: "@types/node@npm:26.6.1"
+  version: 26.6.6
+  resolution: "@types/node@npm:26.6.6"
   dependencies:
     undici-types: "npm:~8.9.0"
-  checksum: 10c0/c90d3db40e7c9c92f0854ecdcaabd9c1923b7e2a43cf2c97cf147a5aba7e18a1c80034088edfb1bb2153ceffdd87be7ce0a256b80ec7cd92e619c564133ae5fe
+  checksum: 10c0/5cb63f644f6e85a257a9cd2403cbcbe196760e2a35fd3ec9fb8b5cff663e14cc832b198cc17b53f870a2e30900ed45a1fb3f53e6589aba26b8e8c484aa672053
   languageName: node
   linkType: hard
 
@@ -467,11 +468,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:^22.15.12":
-  version: 22.20.3
-  resolution: "@types/node@npm:22.20.3"
+  version: 22.20.5
+  resolution: "@types/node@npm:22.20.5"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10c0/27034f3f66d7044494f0be7b20b17eecbb1f6deab9e2ea8b004d79e896f4a90cde954da9a433a145e800f3db3e5c5c4761a65366434997c77102ba364dcbedd0
+  checksum: 10c0/0cf61a89c6a69917ab49f976a6bb11a29e3b348a6ae19f5827ceb91d3ade781faab58dcf3b8fa625f975f5d7536b9166ff94e8250c29272c667164f77c28fa88
   languageName: node
   linkType: hard
 
@@ -1302,15 +1303,15 @@ __metadata:
   linkType: hard
 
 "cypress-terminal-report@npm:^7.2.1":
-  version: 7.3.3
-  resolution: "cypress-terminal-report@npm:7.3.3"
+  version: 7.4.0
+  resolution: "cypress-terminal-report@npm:7.4.0"
   dependencies:
     chalk: "npm:^4.0.0"
     compare-versions: "npm:^6.1.1"
     superstruct: "npm:0.14.2"
   peerDependencies:
     cypress: ">=10.0.0"
-  checksum: 10c0/afd2976c26e5a92499c3b00b0f223764a9029c4ec57da99a4efa737cf1b9468541281c59252c18fc93e4ad2672d86aa607e046e8ccaddd12c94166444f49aded
+  checksum: 10c0/d96853c771d1bc11ecbcedaed68019d7c7604e6b2a928688766b7925b84042a9596b1b029653d02d7c84d935efe535a12ef13922eee24afbfd0f5f9cdf8440a7
   languageName: node
   linkType: hard
 
@@ -4300,6 +4301,15 @@ __metadata:
   version: 4.0.0
   resolution: "yallist@npm:4.0.0"
   checksum: 10c0/2286b5e8dbfe22204ab66e2ef5cc9bbb1e55dfc873bbe0d568aa943eb255d131890dfd5bf243637273d31119b870f49c18fcde2c6ffbb7a7a092b870dc90625a
+  languageName: node
+  linkType: hard
+
+"yaml@npm:^2.9.1":
+  version: 2.9.1
+  resolution: "yaml@npm:2.9.1"
+  bin:
+    yaml: bin.mjs
+  checksum: 10c0/9d06676ef02b89559a8b10a71882bd2cdae81e8393dc8dbc871615c3259475d9609ad973d19cb3c9e71e72d6206e3d1e7aa241c7e55f3d16fd2e77db305827d6
   languageName: node
   linkType: hard
 
