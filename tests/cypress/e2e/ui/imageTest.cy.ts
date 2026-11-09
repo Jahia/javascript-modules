@@ -394,6 +394,43 @@ describe("Images", () => {
     });
   });
 
+  describe("default provider", () => {
+    // The view stands in for two default-provider nodes. The decorated one answers getUrl(args)
+    // with `/files/sized/<args>/asset.jpg`. The plain one returns the same URL for any arguments.
+    it("uses the sized URL a decorator returns, with no query string", () => {
+      props("decorated_responsive").should((p) => {
+        expect(p.src).to.include(`/files/sized/w_${DEFAULT_SRCSET.at(-1)}/asset.jpg`);
+        expect(p.src).not.to.include("?");
+        const urls = candidateUrls(p.srcSet);
+        expect(urls).to.have.length(DEFAULT_SRCSET.length);
+        urls.forEach((url, i) => {
+          expect(url).to.include(`/files/sized/w_${DEFAULT_SRCSET[i]}/asset.jpg`);
+          expect(url).not.to.include("?");
+        });
+      });
+    });
+
+    it("passes the width and the height to the decorator", () => {
+      props("decorated_density_both").should((p) => {
+        expect(candidateUrls(p.srcSet)[0]).to.include("/files/sized/w_1200%2Ch_1200/asset.jpg");
+        expect(p.src).to.include("/files/sized/w_300%2Ch_300/asset.jpg");
+        expect(p.src).not.to.include("?");
+      });
+    });
+
+    it("appends the size as query parameters when no decorator answers", () => {
+      props("plain_responsive").should((p) => {
+        expect(p.src).to.include(`/files/default/asset.jpg?w=${DEFAULT_SRCSET.at(-1)}`);
+        const urls = candidateUrls(p.srcSet);
+        expect(urls).to.have.length(DEFAULT_SRCSET.length);
+        urls.forEach((url, i) => expect(url).to.include(`?w=${DEFAULT_SRCSET[i]}`));
+      });
+      props("plain_density_both").should((p) => {
+        expect(p.src).to.include("/files/default/asset.jpg?w=300&h=300");
+      });
+    });
+  });
+
   describe("JImage", () => {
     it("renders a responsive image: src, candidate set, sizes, intrinsic size and title", () => {
       img("jimage_responsive")
