@@ -106,7 +106,7 @@ public class MockPageContext extends PageContext {
         } else if (this.renderContext.getRequest().getSession().getAttribute(name) != null) {
             return this.renderContext.getRequest().getSession().getAttribute(name);
         } else {
-            return this.appAttr.containsKey(name) ? this.appAttr.get(name) : null;
+            return this.appAttr.getOrDefault(name, null);
         }
     }
 
