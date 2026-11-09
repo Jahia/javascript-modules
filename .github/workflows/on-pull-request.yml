@@ -1,6 +1,6 @@
 # This workflow is triggered every time a change is pushed to any branches
 # Github actions command reference: https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
-name: On Code Change
+name: On Pull Request
 
 # The workflow could also be triggered on PRs
 on:
@@ -13,16 +13,10 @@ on:
       - "docs/**"
 
 jobs:
-  on-code-change:
-    uses: Jahia/jahia-modules-action/.github/workflows/reusable-on-code-change.yml@v2
+  pull-request:
+    uses: Jahia/jahia-modules-action/.github/workflows/reusable-module-on-pull-request.yml@reusable-module-workflows
     secrets: inherit
-    with:
-      module_id: javascript-modules-engine
-      build_container_image: ghcr.io/jahia/jahia-docker-mvn-cache:17-jdk-noble-mvn-loaded
-      integration_tests_provisioning_manifest: provisioning-manifest-build.yml
-      integration_tests_testrail_project: Javascript Modules Engine
 
-  # This workflow ensures that Windows builds are exactly the same as on other platforms
   test-on-windows:
     name: Test on Windows
     runs-on: windows-latest
