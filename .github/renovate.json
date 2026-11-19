@@ -18,5 +18,12 @@
   "patch": {
     "automerge": true,
     "groupName": "patch"
-  }
+  },
+  "packageRules": [
+    {
+      "description": "devalue 6.0.1+ calls String.prototype.isWellFormed (ES2024), which GraalJS 23.0 lacks",
+      "matchPackageNames": ["devalue"],
+      "allowedVersions": "<=6.0.0"
+    }
+  ]
 }
