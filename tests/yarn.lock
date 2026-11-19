@@ -112,9 +112,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jahia/cypress@npm:^8.4.0":
-  version: 8.5.0
-  resolution: "@jahia/cypress@npm:8.5.0"
+"@jahia/cypress@npm:^8.9.0":
+  version: 8.9.0
+  resolution: "@jahia/cypress@npm:8.9.0"
   dependencies:
     "@apollo/client": "npm:^3.4.9"
     "@faker-js/faker": "npm:^10.3.0"
@@ -123,12 +123,13 @@ __metadata:
     cypress-real-events: "npm:^1.11.0"
     graphql: "npm:^15.5.0"
     graphql-tag: "npm:^2.11.0"
+    yaml: "npm:^2.9.1"
   bin:
     ci.build: ./ci.build.sh
     ci.startup: ./ci.startup.sh
     env.debug: ./env.debug.sh
     env.run: ./env.run.sh
-  checksum: 10c0/f703c7908e3da23d84af52035030f8ec9eccdc8073f38ef7b9fc5dc84e1ff06d5adb7e6f423477e709a917809248454537dd052289aae0c24ac029c05ae9d92f
+  checksum: 10c0/0a938f9e887ff7fe945129d05cbc3d72461e8c6a06545661346c11550c819ed7045cad386ed54ae466e1c95fa43b25c94c0fa715b8d0123b3ac17c7f1d537d08
   languageName: node
   linkType: hard
 
@@ -174,7 +175,7 @@ __metadata:
   resolution: "@jahia/javascript-modules-engine-cypress@workspace:."
   dependencies:
     "@4tw/cypress-drag-drop": "npm:^2.3.0"
-    "@jahia/cypress": "npm:^8.4.0"
+    "@jahia/cypress": "npm:^8.9.0"
     "@jahia/jahia-reporter": "npm:^1.6.0"
     "@jahia/jcontent-cypress": "npm:^3.4.0-tests.2"
     "@types/decompress": "npm:^4.2.7"
@@ -4300,6 +4301,15 @@ __metadata:
   version: 4.0.0
   resolution: "yallist@npm:4.0.0"
   checksum: 10c0/2286b5e8dbfe22204ab66e2ef5cc9bbb1e55dfc873bbe0d568aa943eb255d131890dfd5bf243637273d31119b870f49c18fcde2c6ffbb7a7a092b870dc90625a
+  languageName: node
+  linkType: hard
+
+"yaml@npm:^2.9.1":
+  version: 2.9.1
+  resolution: "yaml@npm:2.9.1"
+  bin:
+    yaml: bin.mjs
+  checksum: 10c0/9d06676ef02b89559a8b10a71882bd2cdae81e8393dc8dbc871615c3259475d9609ad973d19cb3c9e71e72d6206e3d1e7aa241c7e55f3d16fd2e77db305827d6
   languageName: node
   linkType: hard
 
