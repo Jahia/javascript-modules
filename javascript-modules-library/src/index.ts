@@ -13,6 +13,18 @@ export { JImage, type JImageProps } from "./components/JImage.js";
 
 // Declaration and registration
 export { jahiaComponent, type RegistryJahiaComponent } from "./framework/jahiaComponent.js";
+export { registerContentPatch } from "./framework/contentPatches/registerContentPatch.js";
+export type {
+  ContentPatchContext,
+  ContentPatchDeclaration,
+  ContentPatchJcr,
+  ContentPatchLogger,
+  ContentPatchOperationReport,
+  ContentPatchOperations,
+  ContentPatchPropertyValue,
+  NodeSelection,
+  QuerySelection,
+} from "./framework/contentPatches/types.js";
 
 // Hooks
 export { useGQLQuery } from "./hooks/useGQLQuery.js";

@@ -1,0 +1,9 @@
+query contentPatchStatuses {
+  jcr {
+    nodeByPath(path: "/module-management") {
+      property(name: "j:bundlesScripts") {
+        value
+      }
+    }
+  }
+}

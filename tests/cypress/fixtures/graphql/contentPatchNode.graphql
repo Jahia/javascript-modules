@@ -1,0 +1,13 @@
+query migratedNode($path: String!) {
+  jcr {
+    nodeByPath(path: $path) {
+      primaryNodeType {
+        name
+      }
+      properties {
+        name
+        value
+      }
+    }
+  }
+}
