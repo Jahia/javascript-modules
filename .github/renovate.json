@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
-  "labels": ["dependencies"],
+  "labels": ["dependencies", "🗒️ no-changelog"],
   "enabledManagers": ["npm", "mise"],
   "ignorePaths": ["**/node_modules/**"],
   "dependencyDashboard": true,
