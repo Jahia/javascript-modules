@@ -28,6 +28,8 @@ services:
     environment:
       - MANIFEST=${MANIFEST}
       - MODULE_ID=${MODULE_ID:-javascript-modules-engine}
+      # The id of the hydrogen module is hydrogen, not the artifactId of its js:mvn URL
+      - PROVISIONING_CHECK_IGNORE=${PROVISIONING_CHECK_IGNORE:-javascript-modules-samples-hydrogen}
       - SUPER_USER_PASSWORD=${SUPER_USER_PASSWORD}
       # CONTEXT_PATH can be '' (empty string, default) or '/my-context'
       - JAHIA_URL=${JAHIA_URL:-http://jahia:8080}${CONTEXT_PATH}
