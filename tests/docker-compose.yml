@@ -28,7 +28,8 @@ services:
     environment:
       - MANIFEST=${MANIFEST}
       - MODULE_ID=${MODULE_ID:-javascript-modules-engine}
-      # The id of the hydrogen module is hydrogen, not the artifactId of its js:mvn URL
+      # The readiness check skips hydrogen: its module id is hydrogen, not the artifactId of its js:mvn URL.
+      # A value set in the environment replaces this default, so it names javascript-modules-samples-hydrogen too.
       - PROVISIONING_CHECK_IGNORE=${PROVISIONING_CHECK_IGNORE:-javascript-modules-samples-hydrogen}
       - SUPER_USER_PASSWORD=${SUPER_USER_PASSWORD}
       # CONTEXT_PATH can be '' (empty string, default) or '/my-context'
