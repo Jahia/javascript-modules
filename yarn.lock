@@ -2345,7 +2345,7 @@ __metadata:
     eslint: "npm:^10.10.0"
     eslint-plugin-cypress: "npm:^7.0.2"
     globals: "npm:^17.12.0"
-    pkg-pr-new: "npm:^0.0.93"
+    pkg-pr-new: "npm:^0.0.94"
     prettier: "npm:^3.9.7"
     prettier-plugin-jsdoc: "npm:^1.8.1"
     prettier-plugin-packagejson: "npm:^3.0.2"
@@ -3143,12 +3143,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pkg-pr-new@npm:^0.0.93":
-  version: 0.0.93
-  resolution: "pkg-pr-new@npm:0.0.93"
+"pkg-pr-new@npm:^0.0.94":
+  version: 0.0.94
+  resolution: "pkg-pr-new@npm:0.0.94"
   bin:
     pkg-pr-new: bin/cli.js
-  checksum: 10c0/4d0fe78de1385ce10672bca0b58a06dc432b43910a762a6b13cc5c5111e0090704f2cc4c088dbd1a71223b4e9e43215508692d70e99f9af6c7a6cd92d48b3f63
+  checksum: 10c0/4aed733f0fc5560613b20b98879c3e6f7b6e6a141dc2356235cf95a45a08c67ce5c6530917058d7943e45f9516908f6161bc90744d4ca8993f87ee5bd75dfe77
   languageName: node
   linkType: hard
 
