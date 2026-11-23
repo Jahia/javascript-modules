@@ -65,6 +65,8 @@
 
 [javascriptExample:testJCRQuery] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
 
+[javascriptExample:testQueryBuilder] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
+
 [javascriptExample:testCurrentUser] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title
 
 [javascriptExample:testIsNodeType] > jnt:content, javascriptExampleMix:javascriptExampleComponent, mix:title

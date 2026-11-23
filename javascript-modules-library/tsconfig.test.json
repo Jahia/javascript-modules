@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Tests run from plain JavaScript in Node, so no declaration output is needed
+    "declaration": false,
+    "declarationDir": null,
+    "outDir": "target/test-dist",
+    // `node:test` and `node:assert` need the Node types, which the publish build has no use for
+    "types": ["node"]
+  },
+  // Unlike the publish build, the test build compiles the `*.spec.ts` files. It is scoped to the
+  // query builder and to the two seams that accept a built query. Everything it claims imports the
+  // ambient Java modules for types only, so the Maven build must have written `target/types` first.
+  "include": [
+    "src/query/**/*.ts",
+    "src/utils/jcr/getNodesByJCRQuery.spec.ts",
+    "src/hooks/useJCRQuery.spec.ts"
+  ],
+  "exclude": ["node_modules"]
+}
