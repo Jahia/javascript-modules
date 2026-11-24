@@ -4,6 +4,7 @@ import { styleText } from "node:util";
 import { globSync } from "tinyglobby";
 import type { PluginOption } from "vite";
 import { buildSuccessful } from "./build-successful.js";
+import { cssCodeSplit } from "./css-code-split.js";
 import { insertFilename } from "./insert-filename.js";
 import { multiEntry } from "./multi-entry.js";
 
@@ -86,6 +87,14 @@ export default function jahia(
     };
 
     /**
+     * Emit one stylesheet per CSS source instead of `assets/style.css`, and make each view add the
+     * stylesheets it imports. Experimental.
+     *
+     * @default false
+     */
+    cssCodeSplit?: boolean;
+
+    /**
      * Function to execute when the build is complete in watch mode. Can be used to automatically
      * deploy your module to a local Jahia instance.
      *
@@ -110,7 +119,9 @@ export default function jahia(
     );
   }
 
-  return {
+  const serverGlob = options.server?.inputGlob ?? "**/*.server.{jsx,tsx}";
+
+  const plugin: PluginOption = {
     name: "@jahia/vite-plugin",
 
     /**
@@ -191,10 +202,7 @@ export default function jahia(
               cssCodeSplit: false,
               emptyOutDir: false,
               rollupOptions: {
-                input: path.posix.join(
-                  options.inputDir ?? "src",
-                  options.server?.inputGlob ?? "**/*.server.{jsx,tsx}",
-                ),
+                input: path.posix.join(options.inputDir ?? "src", serverGlob),
                 output: {
                   dir: options.outputDir ?? "dist",
                   chunkFileNames: "server/[name]-[hash].js",
@@ -269,4 +277,6 @@ export default function jahia(
       }
     },
   };
+
+  return options.cssCodeSplit ? [plugin, cssCodeSplit(clientBaseDir, serverGlob)] : plugin;
 }

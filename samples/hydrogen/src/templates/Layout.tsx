@@ -1,8 +1,4 @@
-import {
-  AddResources,
-  buildModuleFileUrl,
-  useServerContext,
-} from "@jahia/javascript-modules-library";
+import { useServerContext } from "@jahia/javascript-modules-library";
 import type { ReactNode } from "react";
 
 import "modern-normalize/modern-normalize.css";
@@ -15,7 +11,6 @@ export const Layout = ({ title, children }: { title: string; children: ReactNode
   return (
     <html lang={lang}>
       <head>
-        <AddResources type="css" resources={buildModuleFileUrl("dist/assets/style.css")} />
         <title>{title}</title>
       </head>
       <body>{children}</body>
