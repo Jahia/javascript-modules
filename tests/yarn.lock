@@ -452,11 +452,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*, @types/node@npm:>=12.0.0":
-  version: 26.6.6
-  resolution: "@types/node@npm:26.6.6"
+  version: 26.6.11
+  resolution: "@types/node@npm:26.6.11"
   dependencies:
     undici-types: "npm:~8.9.0"
-  checksum: 10c0/5cb63f644f6e85a257a9cd2403cbcbe196760e2a35fd3ec9fb8b5cff663e14cc832b198cc17b53f870a2e30900ed45a1fb3f53e6589aba26b8e8c484aa672053
+  checksum: 10c0/9771f1140557ee98f65de05fdc50a4da8d0e602bbbedf206b41f679f95fb52c9a39d854ad813dc3e4f1fb9a4c22f1b4d324607eb299670c515d3ab093701e815
   languageName: node
   linkType: hard
 
@@ -468,11 +468,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:^22.15.12":
-  version: 22.20.5
-  resolution: "@types/node@npm:22.20.5"
+  version: 22.20.7
+  resolution: "@types/node@npm:22.20.7"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10c0/0cf61a89c6a69917ab49f976a6bb11a29e3b348a6ae19f5827ceb91d3ade781faab58dcf3b8fa625f975f5d7536b9166ff94e8250c29272c667164f77c28fa88
+  checksum: 10c0/f8c37287f51bab167d2698cad9ddc0817d42f18daad60a5145b54d83bda14a6916b0cb6528df31b151546140d8982026f587be1efe73f54c7eec2bc92986c05b
   languageName: node
   linkType: hard
 
@@ -1303,15 +1303,16 @@ __metadata:
   linkType: hard
 
 "cypress-terminal-report@npm:^7.2.1":
-  version: 7.4.0
-  resolution: "cypress-terminal-report@npm:7.4.0"
+  version: 7.5.0
+  resolution: "cypress-terminal-report@npm:7.5.0"
   dependencies:
     chalk: "npm:^4.0.0"
     compare-versions: "npm:^6.1.1"
+    flatted: "npm:^3.4.4"
     superstruct: "npm:0.14.2"
   peerDependencies:
     cypress: ">=10.0.0"
-  checksum: 10c0/d96853c771d1bc11ecbcedaed68019d7c7604e6b2a928688766b7925b84042a9596b1b029653d02d7c84d935efe535a12ef13922eee24afbfd0f5f9cdf8440a7
+  checksum: 10c0/b48f45fe04603e0b8c38cd3413fbeb8646b2f0476af6299039e0dc01527845fe810c9b26970311c16901aee962152f89d48ff850692f2d39d436b6ad94795d01
   languageName: node
   linkType: hard
 
@@ -1852,6 +1853,13 @@ __metadata:
   dependencies:
     to-regex-range: "npm:^5.0.1"
   checksum: 10c0/7cdad7d426ffbaadf45aeb5d15ec675bbd77f7597ad5399e3d2766987ed20bda24d5fac64b3ee79d93276f5865608bb22344a26b9b1ae6c4d00bd94bf611623f
+  languageName: node
+  linkType: hard
+
+"flatted@npm:^3.4.4":
+  version: 3.4.4
+  resolution: "flatted@npm:3.4.4"
+  checksum: 10c0/a3a52a88ea5a4c333e5a1f097dcd87a037fa31c236a77cf46222c2aa4036ef895ab9bc76138a66d9dc22bdb3652128f9598cd26e7439561bf19f67276e2bc37e
   languageName: node
   linkType: hard
 
